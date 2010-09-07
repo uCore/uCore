@@ -1,0 +1,15 @@
+Utopia Core
+Copyright (C) 2007-2010 All Rights Reserved
+
+Designed, Developed and Programmed solely by:
+
+Thomas Kay
+186 Huddersfield Road
+Holmfirth
+West Yorkshire
+HD9 3TP
+
+
+No permission is granted to copy, distribute, display, use, or create derivative works of Utopia Core without written consent from the author (Thomas Kay).  This includes commercial and non-commercial applications.
+
+Where permission has been obtained, this license must be intact and unmodified.

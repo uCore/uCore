@@ -1,0 +1,105 @@
+body.centerWrap {width:100%; text-align:center}
+div.centerWrap {width: 950px; margin: 0 auto; position: relative; text-align:left }
+
+.ui-widget { font-size:0.8em }
+
+.ui-icon { display: inline-block !important; }
+
+.shadeRow { background-color:#e0e0e0; }
+.new-ident { background-image:url(images/newrec-ident.gif); background-position:center; background-repeat:no-repeat; width:25px}
+
+.progressCursor {cursor: url("images/aero_busy.ani");}
+
+.linklist { padding-left:0 }
+
+.linklist LI {
+	list-style:none;
+	display:inline;
+}
+
+.layoutListSection .linklist,.layoutListSection .linklist-link {
+	list-style: none;
+	display: inline;
+}
+
+.layoutDetailSection,.layoutListSection {
+	width: 100%;
+	/*margin: 10px;*/
+	padding: 5px;
+	vertical-align: top;
+	text-align: left;
+	font-family: 'Tahoma', Verdana, Arial, Helvetica, sans-serif;
+	font-weight: normal;
+	font-size: 1em;
+}
+
+.layoutDetailSection TR TH {
+	font-size: 1.1em !important;
+	color: #FFFFFF;
+	padding-left: 5px;
+	height: 15px;
+	background-color: #FF9933;
+	background-image: url(images/layout_header_bg.jpg);
+	background-repeat: repeat-x;
+}
+
+.fdb-btn,a.fdb-btn:link,a.fdb-btn:visited {
+	background-color: #ccc;
+	padding: 2px 4px 2px 4px;
+	margin: 1px;
+	color: #000;
+	text-decoration: none;
+	background-image: url(images/shade.png);
+	background-position: bottom;
+	font-size: 1em;
+	border: 1px #555 solid;
+	display: inline-block;
+}
+
+.fdb-btn:hover,a.fdb-btn:hover {
+	background-color: #aaa;
+	cursor: pointer;
+	color: #fff;
+}
+
+.red {
+	color: #f00
+}
+
+.bluebg {
+	background-color: #00f !important;
+	color: #eee !important;
+}
+
+.bluebg:hover {
+	background-color: #66f !important;
+	color: #000 !important;
+}
+
+.greenbg {
+	background-color: #339900 !important;
+	color: #eee !important;
+}
+
+.greenbg:hover {
+	background-color: #228800 !important;
+	color: #000 !important;
+}
+
+.redbg {
+	background-color: #f00 !important;
+	color: #000 !important;
+}
+
+.redbg:hover {
+	background-color: #c00 !important;
+	color: #eee !important;
+}
+
+#adminSlave {z-index:100001; position:fixed; bottom:0; right:0; font-size:14px; max-height:100%; white-space:nowrap; text-align:right;
+			display:none;background-color:#EFEFEF; border:solid 1px black; border-bottom:none; border-right:none; padding:4px; float:right;}
+#adminSlave form { margin:0 }
+#adminClose {float:right; width:10px; height:10px;font-size:10px; top:2px; right:2px; cursor:pointer; background-image:url('images/utopia-close.png'); }
+			
+#utopiaImg {z-index:100000; position:fixed; bottom:0; right:0; background-image:url("images/utopia-systems.png");width:20px;height:20px;margin:2px; float:right;}
+#utopiaImg:hover {background-image:url("images/utopia-systems-hover.png"); cursor:pointer}

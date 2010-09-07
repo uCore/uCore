@@ -1,0 +1,3 @@
+.ui-treesort-item { list-style:none; margin-left:-20px }
+.ui-treesort-item > div { white-space:nowrap; }
+.ui-treesort-folder { list-style-type:none; }
