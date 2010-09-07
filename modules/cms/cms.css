@@ -1,0 +1,6 @@
+#tree li { margin-top:1px; padding-top:1px; padding-bottom:0; min-height:18px; padding-right:3em; }
+#tree li li { margin-top:1px; padding-top:1px; margin-bottom:0; min-height:18px; margin-right:-3em; }
+#tree li>div { margin-right:-3em; padding-right:3em; min-height:23px; padding-left:0.5em }
+#tree li>div:hover { background-color: #D5E2EA; background-repeat:repeat-x; }
+.hiddenItem { display:none; }
+.cmsEdit { position:absolute;top:1px;right:1px;margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(images/edit.png) }
