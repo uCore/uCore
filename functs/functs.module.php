@@ -3,6 +3,7 @@
 function LoadModulesDir($dir, $recursive = TRUE) {
 	$files = array();
 	$dir = rtrim($dir,'/'); 
+	if (preg_match('/\.svn$/i',$dir)) return $files;
 	if (file_exists($dir.'/.u_noscan')) return $files;
 	
 	if (!is_dir($dir)) return $files;
