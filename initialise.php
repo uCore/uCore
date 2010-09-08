@@ -41,42 +41,6 @@ timer_start('Load Modules');
 LoadModulesDir(PATH_ABS_MODULES); // load custom modules
 timer_end('Load Modules');
 
-
-
-$rc = PATH_REL_CORE;
-$ucStart = '## uCore ##';
-$ucEnd	 = '##-uCore-##';
-$content = <<<FIN
-php_value short_open_tag 0
-php_value display_errors 1
-
-RewriteEngine on
-RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-#RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
-RewriteRule ^(.*\.(js|css))$ {$rc}index.php?__ajax=getCompressed&file=$1 [L]
-FIN;
-$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
-$htaccess = '';
-if (file_exists(PATH_ABS_ROOT.'.htaccess')) $htaccess = file_get_contents(PATH_ABS_ROOT.'.htaccess');
-if (strpos($htaccess,$search) === FALSE) {
-	// first remove existing (outdated)
-	$s = strpos($htaccess,$ucStart);
-	$e = strrpos($htaccess,$ucEnd); // PHP5
-	//$e = strpos(strrev($htaccess),strrev($ucEnd)); // PHP4
-	if ($s !== FALSE && $e !== FALSE) {
-		$e += strlen($ucEnd); // PHP5
-		//$e = strlen($htaccess) - $e; // PHP4
-		$htaccess = substr_replace($htaccess,'',$s,$e);
-	}
-
-	$htaccess = trim($htaccess).$search;
-	file_put_contents(PATH_ABS_ROOT.'.htaccess',$htaccess);
-}
-
-
 if(!ob_start("ob_gzhandler")) ob_start();
 
 if (!array_key_exists('_noTemplate',$_GET))	FlexDB::UseTemplate();

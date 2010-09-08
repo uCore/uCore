@@ -4,31 +4,18 @@ var isFiltering = false;
 function FilterOnEnter(sender) {
     isFiltering = true;
 	if (sender.tagName == 'SELECT') return;
-//	emptyVal = sender.getAttribute('emptyVal');
-//	if (sender.value == emptyVal) {
-        sender.style.backgroundImage = ''; 
-//		sender.value = '';
-//	}
-	
-//	sender.style.color = '#000';
+	$(sender).removeClass('utopia-filter-default');
+	if (sender.value == $(sender).attr('title'))
+        sender.value = '';
 }
 
 function FilterOnLeave(sender) {
     isFiltering = false;
     StartFilterTimer();
 	if (sender.tagName == 'SELECT') return;
-//	emptyVal = sender.getAttribute('emptyVal');
-	if (sender.value == '') {
-		//var url = window.location.toString();
-		//if (url.indexOf('?') >= 0)
-        url = '/index.php?__ajax=filterText&t='+escape($(sender).attr('title'));
-		//else url = url + '?__ajax=filterText&t='+escape($(sender).attr('title'));
-        sender.style.backgroundImage = 'url("'+url+'")';
-		sender.style.backgroundPosition = '3px center';
-		sender.style.backgroundRepeat = 'no-repeat';
-//		sender.style.color = '#BBB';
-//		sender.value = emptyVal;
-	}
+
+	if (sender.value == '') $(sender).val($(sender).attr('title'));
+	if (sender.value == $(sender).attr('title')) $(sender).addClass('utopia-filter-default');
 }
 
 $(document).ready(function(){
@@ -380,7 +367,7 @@ function ReloadFilters() {
 		//	oldVal = decodeURIComponent(gup(name)).replace(/\+/g, ' ');
 		oldVal = unescape(gup(name).replace(/\+/g, ' '));
 	
-		if (($(this).attr('type') == 'checkbox' && !$(this).attr('checked')) || ($(this).attr('type') == 'radio' && !$(this).attr('checked')))
+		if (($(this).val() == $(this).attr('title')) || ($(this).attr('type') == 'checkbox' && !$(this).attr('checked')) || ($(this).attr('type') == 'radio' && !$(this).attr('checked')))
 			newVal = '';
 		else
 			newVal = String($(this).val());
