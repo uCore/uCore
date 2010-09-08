@@ -108,7 +108,7 @@ abstract class flexDb_BasicModule {
 
 	private $isInitialised = false;
 	public function Initialise() {
-		if ($this->isInitialised === TRUE) return;
+		if ($this->isInitialised === TRUE) return false;
 		$this->isInitialised = true;
 
 		//		if (!array_key_exists('last_module',$_SESSION)) $_SESSION['last_module'] = NULL;
@@ -126,6 +126,7 @@ abstract class flexDb_BasicModule {
 		// init parents?
 		//		foreach ($this->parents as $parentModule => $parent)
 		//			CallModuleFunc($parentModule,'Initialise');
+		return true;
 	}
 
 	public $isDisabled = false;
@@ -635,6 +636,7 @@ abstract class flexDb_BasicModule {
 	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkattr=NULL) {
 		if (!is_array($attr)) $attr = array();
 		if (!array_key_exists('alt',$attr)) $attr['alt'] = '';
+		$attr['width'] = $width; $attr['height'] = $height;
 		$attr = BuildAttrString($attr);
 
 		$url = $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$width,$height);
@@ -864,7 +866,11 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		if ($this->IsActive() && $this->HasParent($parent)) $this->_SetupFields();
 		return parent::CanParentLoad($parent);
 	}
-	//	public function Initialise() {parent::Initialise()}
+	public function Initialise() {
+		if (!parent::Initialise()) return false;
+		$this->_SetupFields();
+		return true;
+	}
 	public function _ParentLoad($parent) {
 		$this->_SetupFields();
 		$par = parent::_ParentLoad($parent);
@@ -2435,15 +2441,15 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 //		return PATH_REL_ROOT.DEFAULT_FILE."?__ajax=getUpload&amp;f=$fieldAlias&amp;m=$uuid&amp;p=$pkVal";
 	}
 
-	public function DrawSqlImage($fieldAlias,$pkVal,$width=NULL,$height=NULL,$attr=NULL) {
+	public function DrawSqlImage($fieldAlias,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE) {
 		if ($pkVal == NULL) return '';
 		$field = $this->GetFieldProperty($fieldAlias ,'field');
 		$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
+
 		$table = $setup['table'];
 		$key = $setup['pk'];
 		//$pkVal = $this->GetRealValue($fieldAlias,$pkVal);
-
-		return $this->DrawImageFromTable($field,$table,$key,$pkVal,$width,$height,$attr);
+		return $this->DrawImageFromTable($field,$table,$key,$pkVal,$width,$height,$attr,$link);
 	}
 
 	// TODO: Requests for XML data (ajax)
@@ -2453,7 +2459,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		// parse and inject child links into 'dataset' xml object
 	}
 
-	public function GetFilterBox($filterInfo,$attributes=NULL) {
+	public function GetFilterBox($filterInfo,$attributes=NULL,$spanAttributes=NULL) {
 		// already filtered?
 
 		if ($filterInfo['it'] === itNONE) return '';
@@ -2463,7 +2469,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		$pre = '';
 		if (!empty($filterInfo['visiblename'])) {
-			$pre = $filterInfo['visiblename'].': ';
+			$pre = $filterInfo['visiblename'].' ';
 			$emptyVal = $filterInfo['visiblename'].' '.$filterInfo['ct'];
 		} else
 		$emptyVal = $this->fields[$fieldName]['visiblename'].' '.$filterInfo['ct'];
@@ -2483,7 +2489,9 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			}
 		}
 
-		return $pre.FlexDB::DrawInput('_f_'.$filterInfo['uid'],$filterInfo['it'],$default,$vals,$attributes,false);
+		$spanAttr = BuildAttrString($spanAttributes);
+
+		return '<span '.$spanAttr.'>'.$pre.FlexDB::DrawInput('_f_'.$filterInfo['uid'],$filterInfo['it'],$default,$vals,$attributes,false).'</span>';
 	}
 
 	//	public function __construct() { $this->SetupFields(); }
