@@ -1,6 +1,8 @@
 body.centerWrap {width:100%; text-align:center}
 div.centerWrap {width: 950px; margin: 0 auto; position: relative; text-align:left }
 
+.utopia-filter-default { color: #CCC; }
+
 .ui-widget { font-size:0.8em }
 
 .ui-icon { display: inline-block !important; }
