@@ -633,7 +633,7 @@ abstract class flexDb_BasicModule {
 		return PATH_REL_SELF."?__ajax=getImage&amp;f=$field&amp;t=$table&amp;k=$key&amp;p=$pkVal$width$height";
 	}
 
-	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkattr=NULL) {
+	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {
 		if (!is_array($attr)) $attr = array();
 		if (!array_key_exists('alt',$attr)) $attr['alt'] = '';
 		$attr['width'] = $width; $attr['height'] = $height;
@@ -645,8 +645,19 @@ abstract class flexDb_BasicModule {
 		if ($link === TRUE) $linkUrl = $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$linkW,$linkH);
 		else $linkUrl = $link;
 
-		$linkattr = BuildAttrString($linkattr);
-		return "<a$linkattr href=\"$linkUrl\" target=\"_blank\"><img$attr src=\"$url\"></a>";
+		$linkAttr = BuildAttrString($linkAttr);
+		return "<a$linkAttr href=\"$linkUrl\" target=\"_blank\"><img$attr src=\"$url\"></a>";
+	}
+
+	public function DrawSqlImage($fieldAlias,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE,$linkAttr=NULL) {
+		if ($pkVal == NULL) return '';
+		$field = $this->GetFieldProperty($fieldAlias ,'field');
+		$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
+
+		$table = $setup['table'];
+		$key = $setup['pk'];
+		//$pkVal = $this->GetRealValue($fieldAlias,$pkVal);
+		return $this->DrawImageFromTable($field,$table,$key,$pkVal,$width,$height,$attr,$link,NULL,NULL,$linkAttr);
 	}
 
 	public function HookEvent($eventName,$funcName) {
@@ -2441,17 +2452,6 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 //		return PATH_REL_ROOT.DEFAULT_FILE."?__ajax=getUpload&amp;f=$fieldAlias&amp;m=$uuid&amp;p=$pkVal";
 	}
 
-	public function DrawSqlImage($fieldAlias,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE) {
-		if ($pkVal == NULL) return '';
-		$field = $this->GetFieldProperty($fieldAlias ,'field');
-		$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
-
-		$table = $setup['table'];
-		$key = $setup['pk'];
-		//$pkVal = $this->GetRealValue($fieldAlias,$pkVal);
-		return $this->DrawImageFromTable($field,$table,$key,$pkVal,$width,$height,$attr,$link);
-	}
-
 	// TODO: Requests for XML data (ajax)
 	// to be used later with full AJAX implimentation
 	public function CreateXML() {
@@ -2470,9 +2470,9 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$pre = '';
 		if (!empty($filterInfo['visiblename'])) {
 			$pre = $filterInfo['visiblename'].' ';
-			$emptyVal = $filterInfo['visiblename'].' '.$filterInfo['ct'];
+			$emptyVal = $filterInfo['visiblename'];//.' '.$filterInfo['ct'];
 		} else
-		$emptyVal = $this->fields[$fieldName]['visiblename'].' '.$filterInfo['ct'];
+			$emptyVal = $this->fields[$fieldName]['visiblename'];//.' '.$filterInfo['ct'];
 
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA)
 		$vals = cbase64_encode(get_class($this)."|$fieldName");
@@ -2480,7 +2480,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$vals = $filterInfo['values'];
 
 		if (!$attributes) $attributes = array();
-		$attributes['title'] = $emptyVal;
+		$attributes['title'] = strip_tags($emptyVal);
 
 		if ($filterInfo['it'] == itDATE) {
 			if (!array_key_exists('style',$attributes)) $attributes['style'] = array();
