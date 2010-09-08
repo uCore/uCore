@@ -15,7 +15,7 @@ class uJavascript extends flexDb_BasicModule {
 
 	public function SetupParents() {
 		self::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
-		self::IncludeFile(dirname(__FILE__).'/js/jquery.jcarousel.min.js');
+		self::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
 		self::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
 		self::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
 		self::IncludeFile(dirname(__FILE__).'/js/functs.js');
@@ -49,7 +49,7 @@ class uJavascript extends flexDb_BasicModule {
 		$lastTime = NULL;
 		foreach (self::$includeFiles as $filename) {
 			//does it exist?
-			if (!file_exists($filename)) continue;
+			if (!file_exists($filename)) { echo " not found: $filename \n"; continue; }
 			if ($lastTime == NULL || filemtime($filename) > $lastTime) $lastTime = filemtime($filename);
 		}
 
