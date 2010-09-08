@@ -49,7 +49,7 @@ class uJavascript extends flexDb_BasicModule {
 		$lastTime = NULL;
 		foreach (self::$includeFiles as $filename) {
 			//does it exist?
-			if (!file_exists($filename)) { echo " not found: $filename \n"; continue; }
+			if (!file_exists($filename)) continue;
 			if ($lastTime == NULL || filemtime($filename) > $lastTime) $lastTime = filemtime($filename);
 		}
 
