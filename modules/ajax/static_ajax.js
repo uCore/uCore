@@ -394,8 +394,12 @@ function ReloadFilters() {
 			$('#internal_FuF').append('<input type="hidden" name="'+name+'" value="'+val+'">');
 	});
 	
-	$("#internal_FuF").attr('action',($("#internal_FuF").attr('action') ? $("#internal_FuF").attr('action') :'') +window.location.hash);
-	$("#internal_FuF").submit();
+	if ($("#internal_FuF").children().length == 0) {
+		window.location.assign(window.location.pathname+window.location.hash);
+	} else {
+		$("#internal_FuF").attr('action',($("#internal_FuF").attr('action') ? $("#internal_FuF").attr('action') :'') +window.location.hash);
+		$("#internal_FuF").submit();
+	}
 }
 
 /*
