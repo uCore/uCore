@@ -4,6 +4,8 @@ div.centerWrap {width: 950px; margin: 0 auto; position: relative; text-align:lef
 .utopia-filter-default { color: #AAA; }
 *:focus { outline: 1px; }
 
+img { border: none }
+
 .ui-widget { font-size:0.8em }
 
 .ui-icon { display: inline-block !important; }

@@ -12,24 +12,29 @@ class uBreadcrumb {
 
 		//TODO: add (Search Results) to end of title if current page is filtered.
 		//$fltr(CallModuleFunc(GetCurrentModule(),'IsFiltered'));
-		$out[] = '<a href="'.$_SERVER['REQUEST_URI'].'">'.FlexDB::GetTitle(true).'</a>';
+		$out[$_SERVER['REQUEST_URI']] ='{utopia.title}';// '<a href="'.$_SERVER['REQUEST_URI'].'">{utopia.title}</a>';
 
 		foreach (self::$extras as $a) {
-			$out[] = '<a href="'.$a[1].'">'.$a[0].'</a>';
+			$out[$a[1]]=$a[0];//'<a href="'.$a[1].'">'.$a[0].'</a>';
 		}
 
 		$row = uCMS_View::findPage();
 		do {
 			if (!$row) break;
 			$url = CallModuleFunc('uCMS_View','GetURL',$row['cms_id']);
-			$out[] = '<a href="'.$url.'">'.$row['title'].'</a>';
+			$out[$url] = $row['title'];//'<a href="'.$url.'">'.$row['title'].'</a>';
 		} while ($row['parent'] && ($row = uCMS_List::findKey($arr,$row['parent'])));
 
 		$home = uCMS_View::GetHomepage();
 		$url = CallModuleFunc('uCMS_View','GetURL',$home['cms_id']);
-		$out[] = '<a href="'.$url.'">'.$home['title'].'</a>';
+		$out[$url] = $home['title'];//'<a href="'.$url.'">'.$home['title'].'</a>';
 
-		return '<div class="breadcrumb">'.implode(' &gt; ',array_reverse(array_unique($out))).'</div>';
+		$build = array();
+		foreach ($out as $k => $v) {
+			$build[] = '<a href="'.$k.'">'.$v.'</a>';
+		}
+
+		return '<div class="breadcrumb">'.implode(' &gt; ',array_reverse(array_unique($build))).'</div>';
 	}
 }
 
