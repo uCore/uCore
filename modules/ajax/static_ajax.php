@@ -116,7 +116,7 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 //			$data = file_get_contents(PATH_ABS_ROOT.'no-img.png');
 
 		$etag = sha1($_SERVER['REQUEST_URI'].'-'.strlen($data));
-		//FlexDB::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
+		FlexDB::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 
 		try {
 			$src = imagecreatefromstring($data);
