@@ -300,7 +300,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 		$this->AddField('content','content','cms','content');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
-		$this->AddFilter('cms_id',ctLIKE);
+		$this->AddFilter('cms_id',ctEQ);
 //		$this->AddFilter('is_homepage',ctLIKE);
 	}
 

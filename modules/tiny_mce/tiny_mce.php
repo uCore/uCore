@@ -38,7 +38,6 @@ class module_TinyMCE extends flexDb_BasicModule {
 			$options['plugin_preview_pageurl'] = $previewUrl;
 			$options['theme_advanced_toolbar_location'] = "top";
 			$options['theme_advanced_toolbar_align'] = "left";
-			$options['extended_valid_elements'] = 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$options['forced_root_block'] = false;
 
 			$richOpts = $options;
@@ -46,12 +45,14 @@ class module_TinyMCE extends flexDb_BasicModule {
 
 			$richOpts['editor_selector'] = "mceEditorRich";
 			$richOpts['plugins'] = "inlinepopups,spellchecker";
+			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,del';
 			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
 			$richOpts['theme_advanced_buttons3'] = "";
 			$richOpts['theme_advanced_buttons4'] = "";
 
 			$htmlOpts['editor_selector'] = "mceEditorHTML";
+			$htmlOpts['extended_valid_elements'] = 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,noneditable";
 			$htmlOpts['theme_advanced_buttons2_add'] = "media";
 			$htmlOpts['theme_advanced_buttons3_add'] = "spellchecker";

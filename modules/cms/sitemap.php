@@ -18,7 +18,7 @@ class uSitemap {
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? 'hiddenItem' : '';
 			$url = CallModuleFunc('uCMS_View','GetURL',$child['cms_id']);
-			$sel = ($url == $_SERVER['REQUEST_URI']) ? ' selected' : '';
+			$sel = (strpos($_SERVER['REQUEST_URI'],$url) !== FALSE) ? ' selected' : '';
 			echo '<li id="'.$child['cms_id'].'" class="'.$hide.$sel.'" style="position:relative;cursor:pointer">';
 			echo '<a class="cmsEdit" href="'.$url.'">'.$child['title'].'</a>';
 			if ($level !== 0) self::DrawChildren($child['children'],$child['cms_id'],$level);
@@ -39,7 +39,7 @@ class uSitemapXML extends flexDb_BasicModule {
 	public function RunModule() {
 		FlexDB::CancelTemplate();
 		$arr = CallModuleFunc('uCMS_List','GetRows');
-		
+
 		echo '<?xml version="1.0" encoding="UTF-8"?>';
 		echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 		foreach ($arr as $entry) {
