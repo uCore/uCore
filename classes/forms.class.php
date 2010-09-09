@@ -2469,7 +2469,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		$pre = '';
 		if (!empty($filterInfo['visiblename'])) {
-			$pre = $filterInfo['visiblename'].' ';
+//			$pre = $filterInfo['visiblename'].' ';
 			$emptyVal = $filterInfo['visiblename'];//.' '.$filterInfo['ct'];
 		} else
 			$emptyVal = $this->fields[$fieldName]['visiblename'];//.' '.$filterInfo['ct'];

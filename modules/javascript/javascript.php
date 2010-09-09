@@ -54,7 +54,7 @@ class uJavascript extends flexDb_BasicModule {
 		}
 
 		$etag = sha1($lastTime.'-'.count(self::$includeFiles).'-'.strlen($body));
-		FlexDB::Cache_Check($etag,'text/javascript');
+	//	FlexDB::Cache_Check($etag,'text/javascript');
 
 		foreach (self::$includeFiles as $filename) {
 //			//does it exist?
@@ -62,6 +62,10 @@ class uJavascript extends flexDb_BasicModule {
 			$body .= file_get_contents($filename).';';
 		}
 		$body = JSMin::minify($body);
+		
+		ob_end_clean();
+		header('Content-Encoding: ',true);
+		
 		FlexDB::Cache_Output($body,$etag,'text/javascript');
 	}
 }
