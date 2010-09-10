@@ -551,14 +551,17 @@ class FlexDB {
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_end_clean(); if (!$justClean) self::$usedTemplate = NULL; }
 	public static function UseTemplate($template = DEFAULT_TEMPLATE) {
 		//if ($template == TEMPLATE_DEFAULT) $template = STYLE_PATH;
+		$ret = true;
 		if ($template != TEMPLATE_BLANK && $template != TEMPLATE_ADMIN && !file_exists(PATH_ABS_TEMPLATES.$template.'/template.php')) {
 			echo 'Template not found: '.PATH_ABS_TEMPLATES.$template.'/template.php';
 			$template = TEMPLATE_BLANK;
+			$ret = false;
 		}
 		if (!FlexDB::UsingTemplate()) {
 			ob_start('FlexDB::output_buffer');
 		}
 		self::$usedTemplate = $template;
+		return $ret;
 	}
 	public static function UsingTemplate($compare = NULL) { if ($compare === NULL) return (self::$usedTemplate !== NULL); else return (self::$usedTemplate === $compare); }
 	public static function GetTemplateDir($relative=false) {
