@@ -7,6 +7,8 @@ FlexDB::AddTemplateParser('utopia','FlexDB::parseVars');
 FlexDB::AddTemplateParser('list','FlexDB::DrawList');
 FlexDB::AddTemplateParser('tab','FlexDB::Tab_GetOutput');
 
+FlexDB::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
+
 class FlexDB {
 	private static $children = array();
 	static function AddChild($parent, $child, $info) {
