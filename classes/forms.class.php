@@ -1571,19 +1571,19 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$this->filters = array(FILTER_WHERE=>array(),FILTER_HAVING=>array());
 	}
 
-	public function AddFilterWhere($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$visibleName=NULL) {
+	public function AddFilterWhere($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
 		//	if (!array_key_exists($fieldName,$this->fields) && $inputType !== itNONE) { ErrorLog("Cannot add editable WHERE filter on field '$fieldName' as the field does not exist."); return; }
 		if (!isset($this->filters[FILTER_WHERE]) || count(@$this->filters[FILTER_WHERE]) == 0) $this->NewFiltersetWhere();
-		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_WHERE,$visibleName);
+		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_WHERE,$title);
 	}
 
-	public function AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$visibleName=NULL) {
+	public function AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
 		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE)
-		return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$visibleName);
+			return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 
 		//	if (!array_key_exists($fieldName,$this->fields)) { ErrorLog("Cannot add HAVING filter on field '$fieldName' as the field does not exist.");ErrorLog(print_r(useful_backtrace(),true)); return; }
 		if (!isset($this->filters[FILTER_HAVING]) || count(@$this->filters[FILTER_HAVING]) == 0) $this->NewFiltersetHaving();
-		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$visibleName);
+			return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$title);
 	}
 
 	private $filterUID = 0;
@@ -1595,7 +1595,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	}
 
 	// private - must use addfilter or addfilterwhere.
-	private function AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$visibleName=NULL) { // enforce forces any new records to be set to this value
+	private function AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) { // enforce forces any new records to be set to this value
 		//		if (!isset($value) || empty($value)) return;
 		$uid = $this->GetNewUID();
 		$value = $dvalue;
@@ -1684,7 +1684,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$fieldData['it'] = $inputType;
 		$fieldData['uid'] = $uid;
 
-		$fieldData['visiblename']= $visibleName;
+		$fieldData['title']= $title;
 		$fieldData['values']= $vals;
 		$fieldData['default'] = $dvalue;
 		$fieldData['value'] = $value;
@@ -2468,9 +2468,9 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$default = $this->GetFilterValue($filterInfo['uid']);
 
 		$pre = '';
-		if (!empty($filterInfo['visiblename'])) {
-//			$pre = $filterInfo['visiblename'].' ';
-			$emptyVal = $filterInfo['visiblename'];//.' '.$filterInfo['ct'];
+		if (!empty($filterInfo['title'])) {
+//			$pre = $filterInfo['title'].' ';
+			$emptyVal = $filterInfo['title'];//.' '.$filterInfo['ct'];
 		} else
 			$emptyVal = $this->fields[$fieldName]['visiblename'];//.' '.$filterInfo['ct'];
 
@@ -2481,6 +2481,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		if (!$attributes) $attributes = array();
 		$attributes['title'] = strip_tags($emptyVal);
+		if (array_key_exists('class',$attributes)) $attributes['class'] .= 'uFilter';
+		else $attributes['class'] = 'uFilter';
 
 		if ($filterInfo['it'] == itDATE) {
 			if (!array_key_exists('style',$attributes)) $attributes['style'] = array();
