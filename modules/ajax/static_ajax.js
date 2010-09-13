@@ -32,7 +32,7 @@ $(document).ready(function(){
 	$(window).bind("beforeunload", function(){ uf=null; });
 //	$(window).unload(function () { alert('unloading'); uf=null; });
 	$('<form style="display:none" id="internal_FuF" method="get" action="">'+(gup('uuid')!='' ? '<input type="hidden" name="uuid" value="'+gup('uuid')+'" />' : '')+'</form>').appendTo('body');
-	$("[name^=_f_]").each(function() {
+	$(".uFilter").each(function() {
 		FilterOnLeave(this);
 		$(this).bind('click', function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return true;});
 		$(this).bind('focus', function (event) {FilterOnEnter(this);});
@@ -357,7 +357,7 @@ function ReloadFilters() {
 //	if (!empty(gup('uuid')))
 //		$('#internal_FuF').append('<input type="hidden" name="uuid" value="'+gup('uuid')+'">');
 	
-	$("[name^=_f_]").each(function () {
+	$(".uFilter").each(function () {
 		name = $(this).attr('name');
 		if (empty(name)) return;
 		processed.push(name);
