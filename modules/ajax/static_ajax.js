@@ -11,7 +11,7 @@ function FilterOnEnter(sender) {
 
 function FilterOnLeave(sender) {
     isFiltering = false;
-    StartFilterTimer();
+    if ($(sender).attr('name').indexOf('_f_') > -1) StartFilterTimer();
 	if (sender.tagName == 'SELECT') return;
 
 	if (sender.value == '') $(sender).val($(sender).attr('title'));
