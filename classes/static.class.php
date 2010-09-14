@@ -693,7 +693,10 @@ class FlexDB {
 							ob_end_clean();
 						}
 
-						if ($replace === NULL || $replace === FALSE) continue;
+						if ($replace === NULL || $replace === FALSE) {
+							$offset = $pos + $searchLen;
+							continue;
+						}
 						$replaceLen = strlen($replace);
 
 						// $test either (doesnt contain a noprocess) OR (also contains the end tag)
