@@ -35,10 +35,13 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 	}
 
 	public function getCompressed() {
+		ob_end_clean();
+		header('Content-Encoding: none');
+		
 		if (!array_key_exists('file',$_GET)) die();
 		$filename = PATH_ABS_ROOT.ltrim($_GET['file'],'/');
 		$contents = file_get_contents($filename);
-
+		
 		$ext = pathinfo($filename,PATHINFO_EXTENSION);
 		switch ($ext) {
 			case 'js':
