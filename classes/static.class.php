@@ -711,6 +711,11 @@ class FlexDB {
 
 	static $templateParsers = array();
 	static function AddTemplateParser($ident,$function,$match='.+',$catchOutput = false) {
+		if (is_string($function) && strpos($function,'::') !== FALSE) {
+			$function = explode('::',$function);
+			//$function = array($class,$fn);
+		}
+
 		if ($match) $ident .= '\.('.$match.')';
 		if (array_key_exists($ident,self::$templateParsers)) { error_log("$ident is already defined as a template parser."); return; }
 		//self::$templateParsers[$ident] = $function;
