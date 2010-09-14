@@ -23,7 +23,7 @@ class tabledef_CMS extends flexDb_TableDefinition {
 }
 
 class uCMS_List extends flexDb_ListDataModule {
-	public function GetTitle() { return 'Content Pages'; }
+	public function GetTitle() { return 'Page Editor'; }
 	public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
 	public function SetupFields() {
