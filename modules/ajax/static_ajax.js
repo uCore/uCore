@@ -39,7 +39,7 @@ $(document).ready(function(){
 		$(this).bind('blur' , function (event) {FilterOnLeave(this);});
 		//$(this).bind('change', function (event) {ReloadFilters();});
 		
-		$(this).bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
+		$(this).bind('keydown', function (event) { if ($(this).attr('name').indexOf('_f_') == -1) return; if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
 
 		 // allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
 		$(this).bind('selectstart', function (event) {event.stopPropagation(); return true;});
