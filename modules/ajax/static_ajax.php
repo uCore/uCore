@@ -115,17 +115,17 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 		$result = sql_query($qry);
 		if ($result !== FALSE && mysql_num_rows($result) > 0)
 			$data = mysql_result($result,0,'img');
-//		else
-//			$data = file_get_contents(PATH_ABS_ROOT.'no-img.png');
+		else
+			$data = file_get_contents(PATH_ABS_ROOT.'no-img.png');
 
 		$etag = sha1($_SERVER['REQUEST_URI'].'-'.strlen($data));
 		FlexDB::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 
-		try {
+//		try {
 			$src = imagecreatefromstring($data);
-		} catch (Exception $e) {
-			$src = imagecreatefromstring(file_get_contents(PATH_ABS_ROOT.'no-img.png'));
-		}
+//		} catch (Exception $e) {
+//			$src = imagecreatefromstring(file_get_contents(PATH_ABS_ROOT.'no-img.png'));
+//		}
 		//mail('oridan82@gmail.com','err',print_r(error_get_last(),true));
 
 		if (imageistruecolor($src)) {
