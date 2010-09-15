@@ -268,8 +268,7 @@ abstract class flexDb_BasicModule {
 					header('Location: '.$abs.$url,true,301); die();
 			}
 		}
-		if (flag_is_set($this->GetOptions(),IS_ADMIN) && FlexDB::UsingTemplate(DEFAULT_TEMPLATE))
-			FlexDB::UseTemplate(TEMPLATE_ADMIN);
+		if (flag_is_set($this->GetOptions(),IS_ADMIN) && FlexDB::UsingTemplate(DEFAULT_TEMPLATE)) FlexDB::$adminTemplate = true;
 
 		if ($this->isDisabled) return;
 		//		$this->SetupFields();
