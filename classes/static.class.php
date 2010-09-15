@@ -549,6 +549,7 @@ class FlexDB {
 	}
 
 	/* TEMPLATE */
+	public static $adminTemplate = false;
 	private static $usedTemplate = NULL;
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_end_clean(); if (!$justClean) self::$usedTemplate = NULL; }
 	public static function UseTemplate($template = DEFAULT_TEMPLATE) {
@@ -584,6 +585,8 @@ class FlexDB {
 		return $path.'/';
 	}
 	public static function OutputTemplate() {
+		self::SetVar('templatedir',FlexDB::GetTemplateDir(true));
+		if (self::$adminTemplate) self::UseTemplate(TEMPLATE_ADMIN);
 		if (!self::UsingTemplate()) return;
 
 		$adminPanel = CallModuleFunc('internalmodule_AdminLogin', 'GetAdminPanel');

@@ -39,6 +39,7 @@ class module_TinyMCE extends flexDb_BasicModule {
 			$options['theme_advanced_toolbar_location'] = "top";
 			$options['theme_advanced_toolbar_align'] = "left";
 			$options['forced_root_block'] = false;
+			$options['content_css'] = '{utopia.templatedir}styles.css';
 
 			$richOpts = $options;
 			$htmlOpts = $options;
@@ -80,10 +81,9 @@ class module_TinyMCE extends flexDb_BasicModule {
 		var item = $(this).data('item');
 		if (item.type != 0) return;
 
-		var path = '$relUploads/'+item.path;
 		var mceInfo = item.target.data('options').mceInfo;
 
-		mceInfo.win.document.getElementById(mceInfo.field_name).value = path;
+		mceInfo.win.document.getElementById(mceInfo.field_name).value = item.fullPath;
 		mb.dialog('close');
 	}
 	function InitMCE() {
