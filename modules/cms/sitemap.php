@@ -1,7 +1,7 @@
 <?php
 
 FlexDB::AddTemplateParser('top_menu','uSitemap::DrawMenu','',true);
-FlexDB::AddTemplateParser('sitemap','uSitemap::DrawMenu','',true);
+FlexDB::AddTemplateParser('sitemap','uSitemap::DrawSitemap','',true);
 class uSitemap {
 	static function DrawSitemap() {
 		self::DrawMenu(-1);
@@ -16,6 +16,7 @@ class uSitemap {
 		array_sort_subkey($children,'position');
 		echo '<ul>';
 		foreach ($children as $child) {
+			if ($child['hide']) continue;
 			$hide = $child['hide'] ? 'hiddenItem' : '';
 			$url = CallModuleFunc('uCMS_View','GetURL',$child['cms_id']);
 			$sel = (strpos($_SERVER['REQUEST_URI'],$url) !== FALSE) ? ' selected' : '';
