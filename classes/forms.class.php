@@ -2337,6 +2337,28 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		if (!empty($pkValue)) return '`'.$this->GetPrimaryKey()."` = '".$pkValue."'";
 		return '';
 	}
+	
+	public function GetRawData($filters=null) {
+		$this->_SetupFields();
+		$title = $this->GetTitle();
+
+		//TODO:sections	
+		$layoutSections = $this->layoutSections;
+		
+		$pk = $this->GetPrimaryKey();
+		
+		$fieldDefinitions = array();
+		foreach ($this->fields as $fieldAlias => $fieldData) {
+			$fieldDefinitions[$fieldAlias] = array('title'=>$fieldData['visiblename'],'type'=>$fieldData['inputtype']);
+		}
+		
+		$data = $this->GetRows($filters);
+		
+		return array(
+			'definition' => array('title'=>$title,'fields'=>$fieldDefinitions,'pk'=>$pk),
+			'data' => $data,
+		);
+	}	
 
 //	private $navCreated = FALSE;
 
@@ -2766,18 +2788,14 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 			if (mysql_error()) { return FALSE; }
 
-			switch (true) {
-				case $fieldAlias == $this->GetPrimaryKey():
+
+			if (!$pkVal) {
+				if ($fieldAlias == $this->GetPrimaryKey())
 					$pkVal = $pfVal;
-					$ret = $this->GetURL($pkVal);
-					break;
-				case $this->IsNewRecord():
+				else
 					$pkVal = mysql_insert_id();
-					$ret = $this->GetURL($pkVal);
-					break;
-				default:
-				//	$pkVal = mysql_insert_id();
-					break;
+				
+				if ($this->IsNewRecord()) $ret = $this->GetURL($pkVal);
 			}
 
 			// update default values
