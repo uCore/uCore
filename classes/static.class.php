@@ -810,10 +810,10 @@ class FlexDB {
 
 	static function Cache_Check($etag, $contentType,$filename='',$modified=NULL,$age=2592000,$disposition='inline') {
 		header('Content-Type: '.$contentType,true);
+		header('Pragma: public',true);
 		header("Etag: $etag",true);
 		header("Expires: ".gmdate("D, d M Y H:i:s",time()+$age) . " GMT",true);
-		header("Cache-Control: public, max-age=$age",true);
-		$fn = empty($filename) ? '' : "; filename=$filename";
+		header("Cache-Control: public, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
 		header("Content-Disposition: ".$disposition.$fn,true);
 
 		if (array_key_exists('HTTP_IF_NONE_MATCH',$_SERVER) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {

@@ -12,6 +12,7 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 		$this->AddParent('*');
 		$this->RegisterAjax('excel',array($this,'excel'));
 		$this->RegisterAjax('print',array($this,'showPrint'));
+		$this->RegisterAjax('raw',array($this,'rawOutput'));
 	}
 
 //	public function ParentLoadPoint() { return 0; }
@@ -23,6 +24,25 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 
 		$url = CallModuleFunc($parent,'GetURL',array_merge($_GET,array('__ajax'=>'print')));
 		FlexDB::LinkList_Add('list_functions:'.$parent,'Print',$url,10,NULL,array('class'=>'fdb-btn bluebg','target'=>'_blank'));
+	}
+	
+	public function rawOutput() {
+		$type = 'json';
+		if (array_key_exists('_type',$_GET))
+			$type = $_GET['_type'];
+		
+		if (!array_key_exists('_expires',$_GET) || !$_GET['_expires']) $_GET['_expires'] = 60*60*24*1;
+		
+		$etag = sha1($_SERVER['REQUEST_URI']);
+		
+		FlexDB::Cache_Check($etag,'application/json','',NULL,$_GET['_expires']);
+		switch ($type) {
+			case 'json':
+				$data = json_encode(CallModuleFunc(GetCurrentModule(),'GetRawData'));
+				FlexDB::Cache_Output($data,$etag,'application/json','',NULL,$_GET['_expires']);
+//				die();
+			break;
+		}
 	}
 
 	public function RunModule() {
@@ -85,8 +105,6 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 	}
 
 	public function excel() {
-		CallModuleFunc(GetCurrentModule(),'_SetupFields');
-		$title = CallModuleFunc(GetCurrentModule(),'GetTitle');
 		header('Content-disposition: attachment; filename="'.$title.'.csv"');
 		header('Content-type: excel/ms-excel; name="'.$title.'.csv"');
 
