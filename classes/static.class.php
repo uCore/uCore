@@ -616,7 +616,7 @@ class FlexDB {
 			self::AddCSSFile(self::GetRelativePath($templateDir.'styles.css'));
 
 		self::PrependVar('<head>',FlexDB::GetTitle().FlexDB::GetDescription().FlexDB::GetKeywords());
-		self::AppendVar('</head>','<script type="text/javascript">'.JSMin::minify(FlexDB::GetVar('script_include')).'</script>'."\n");
+		self::AppendVar('</head>','<script type="text/javascript">'.FlexDB::GetVar('script_include').'</script>'."\n");
 //		self::AppendVar('</head>','<base href="http://'.self::GetDomainName().self::GetRelativePath($templateDir).'/" />'."\n");
 
 		self::AppendVar('</body>','{UTOPIA.powered}{UTOPIA.admin_panel}');
