@@ -3,7 +3,7 @@
 function LoadModulesDir($dir, $recursive = TRUE) {
 	$files = array();
 	$dir = rtrim($dir,'/'); 
-	if (preg_match('/\.svn$/i',$dir)) return $files;
+//	if (preg_match('/\.svn$/i',$dir)) return $files;
 	if (file_exists($dir.'/.u_noscan')) return $files;
 	
 	if (!is_dir($dir)) return $files;
@@ -11,7 +11,7 @@ function LoadModulesDir($dir, $recursive = TRUE) {
 	$dirs = array();
 	if ($dh = opendir($dir)) {
 		while (($file = readdir($dh)) !== false) {
-			if ($file == '.' || $file == '..') continue;
+			if ($file == '.' || $file == '..' || $file == '.svn') continue;
 			if (is_dir($dir.'/'.$file)) { $dirs[] = $dir.'/'.$file; continue; }
 			//if (pathinfo($dir.'/'.$file, PATHINFO_EXTENSION) != 'php') continue;
 			if (substr($file, -3) != 'php') continue;
@@ -51,6 +51,8 @@ function &CallModuleFunc($classname,$funcname) {
 
 	//ErrorLog("Calling {$classname}->{$funcname}");
 
+//	$args = array_shift(array_shift(func_get_args()));
+	// get args by reference.
 	$stack = debug_backtrace();
 	$args = array();
 	if (isset($stack[0]["args"]))

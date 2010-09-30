@@ -102,9 +102,11 @@ img { border: none }
 }
 
 #adminSlave {z-index:100001; position:absolute; top:0; left:0; font-size:14px; max-height:100%; white-space:nowrap; text-align:left;
-			display:none;background-color:#EFEFEF; border:solid 1px black; border-bottom:none; border-right:none; padding:5px;}
+			display:none;background-color:#EFEFEF; border:2px groove #CCCCCC; padding:5px;}
 #adminSlave form { margin:0 }
 #adminClose {float:right; width:10px; height:10px;font-size:10px; top:2px; right:2px; cursor:pointer; background-image:url('images/utopia-close.png'); }
 			
 #utopiaImg {z-index:100000; position:absolute; top:0; left:0; background-image:url("images/utopia-systems.png");width:20px;height:20px;margin:2px;}
 #utopiaImg:hover {background-image:url("images/utopia-systems-hover.png"); cursor:pointer}
+#adminSlave a, #adminSlave a:link, #adminSlave a:visited { color:#996; }
+#adminSlave a:hover { color:#774; }

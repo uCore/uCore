@@ -1,7 +1,7 @@
 <?php
 //  SQL FUNCTIONS
 ini_set('mysql.connect_timeout',20);
-function fdb_sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
+function sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
 	//    $port = is_empty(constant('SQL_PORT')) ? '' : ';port='.SQL_PORT;
 	//   $GLOBALS['dbh'] = new PDO(DB_TYPE.':dbname='.SQL_DBNAME.';host='.SQL_SERVER.$port,SQL_USERNAME,SQL_PASSWORD);
 	//    return $GLOBALS['dbh'];
@@ -13,11 +13,11 @@ function fdb_sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
 		if (!$pass) $pass = SQL_PASSWORD;
 		switch (strtolower(DB_TYPE)) {
 			case 'mysql':
-				$GLOBALS['sql_connection'] = mysql_connect($srv,$usr,$pass);
+				$GLOBALS['sql_connection'] = mysql_pconnect($srv,$usr,$pass);
 				mysql_select_db(SQL_DBNAME);
 				break;
 			case 'mssql':
-				$GLOBALS['sql_connection'] = mssql_connect($srv,$usr,$pass);
+				$GLOBALS['sql_connection'] = mssql_pconnect($srv,$usr,$pass);
 				break;
 		}
 		if (!$GLOBALS['sql_connection']) {
@@ -124,13 +124,14 @@ function &sql_query($query) { $false = FALSE;
 	else
 		$GLOBALS['sql_query_count']++;
 
-	if (!fdb_sql_connect()) die('Could not connect to database: ' . fdb_sql_error());
+	if (!sql_connect()) die('Could not connect to database: ' . mysql_error());
 
-	timer_start('qry_'.$GLOBALS['sql_query_count']);
+	$tID='QRY: '.$query;
+	timer_start($tID);
 	$GLOBALS['sql_queries'][$GLOBALS['sql_query_count']] = $query;
-	$result =& fdb_sql_query($query);
-	$err = fdb_sql_error();	if (!empty($err)) { DebugMail('SQL Error',$err."\n\n".$query); ErrorLog($err); }//ErrorLog("$err<br/>$query");
-	$timetaken = timer_end('qry_'.$GLOBALS['sql_query_count']);
+	$result = mysql_query($query);
+	$err = mysql_error();	if (!empty($err)) { DebugMail('SQL Error',$err."\n\n".$query); ErrorLog($err); }//ErrorLog("$err<br/>$query");
+	$timetaken = timer_end($tID);
 	/*	if (false && $timetaken > 50) {
 		//echo $query." slow: $timetaken<BR>";
 		if (strtolower(substr($query,0,6)) == "select") {
@@ -152,22 +153,22 @@ function GetRow($result, $rowNum=NULL) {
 		return NULL;
 	}
 
-	if (fdb_sql_num_rows($result) <= 0) {
+	if (mysql_num_rows($result) <= 0) {
 		return NULL;
 	}
 
 	if ($rowNum !== NULL) {
 		//		echo "SEEK:".mysql_num_rows($result).':'.$rowNum;
 		//		if (mysql_num_rows($result) < $rowNum) return NULL;
-		fdb_sql_data_seek($result,$rowNum);
+		mysql_data_seek($result,$rowNum);
 		//   return $result[$rowNum];
 	}
 
 	//  $row = next($result);
 	// return $row;
 
-	$row = fdb_sql_fetch_assoc($result);
-	if ($row !== FALSE and count($row)>0){
+	$row = mysql_fetch_assoc($result);
+	if ($row){
 		foreach ($row as $key => $val) {
 			$row[$key] = stripslashes($val);
 		}

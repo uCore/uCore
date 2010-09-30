@@ -34,15 +34,28 @@ class modOpts extends flexDb_ListDataModule {
 	public function RunModule() {
 		$this->ShowData();
 	}
+	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		parent::UpdateField($fieldAlias,$newValue,$pkVal);
+		self::RefreshCache();
+	}
 	public static function AddOption($module,$ident,$name,$init='') {
-		$rec = CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
-		if (empty($rec)) {
+		$rec = self::GetOption($module,$ident);// CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
+		if ($rec === NULL) {
 			CallModuleFunc('modOpts','UpdateFields',array('module'=>$module,'ident'=>$ident,'name'=>$name,'value'=>$init));
 		}
 	}
+	public static $optCache = array();
+	public static function RefreshCache() {
+		foreach (CallModuleFunc('modOpts','GetRows') as $row) {
+			self::$optCache[$row['module']][$row['ident']] = $row['value'];
+		}
+	}
 	public static function GetOption($module,$ident) {
-		$rec = CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
-		return $rec['value'];
+		if (!array_key_exists($module,self::$optCache) || !array_key_exists($ident,self::$optCache[$module])) self::RefreshCache();
+		if (!array_key_exists($module,self::$optCache) || !array_key_exists($ident,self::$optCache[$module])) return NULL;
+		return self::$optCache[$module][$ident];
+		//$rec = CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
+		//return $rec['value'];
 	}
 }
 ?>

@@ -42,19 +42,24 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 		$filename = PATH_ABS_ROOT.ltrim($_GET['file'],'/');
 		$contents = file_get_contents($filename);
 		
+		$etag = sha1($filename.$contents);
+		
 		$ext = pathinfo($filename,PATHINFO_EXTENSION);
 		switch ($ext) {
 			case 'js':
-				header('Content-Type: text/javascript');
+				$type = 'text/javascript';
 				$contents = JSMin::minify($contents);
 				break;
 			case 'css':
-				header('Content-Type: text/css');
+				$type = 'text/css';
 				//$contents = CssMin::minify($contents);
 				break;
 			default:
+				$type = 'text/html';
 		}
+//		FlexDB::Cache_Check($etag,$type);
 
+		FlexDB::Cache_Output($contents,$etag,$type);
 		die($contents);
 	}
 

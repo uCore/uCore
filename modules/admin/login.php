@@ -74,7 +74,7 @@ class internalmodule_AdminLogin extends flexDb_BasicModule {
 			' '.FlexDB::DrawInput('',itSUBMIT,'Log In').'</form>';
 		}
 
-		return '[ <a href="'.CallModuleFunc('internalmodule_Admin','GetURL').'">Admin Home</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=adminLogout\')">Logout</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=toggleT\')">Toggle Timers</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=toggleQ\')">Toggle Queries</a> ] [ <a href="#" onclick="javascript:$(\'#errFrame\').toggle()">Show Errors</a> ]'.
+		return '[ <a href="'.CallModuleFunc('internalmodule_Admin','GetURL').'">Admin Home</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=adminLogout\')">Logout</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=toggleT\')">Toggle Timers</a> ]'.// [ <a href="#" onclick="javascript:$(\'#errFrame\').toggle()">Show Errors</a> ]'.
 				'<div id="errFrame" style="display:none; max-height:500px; overflow:scroll;">'.$errs.'</div>';
 	}
 
