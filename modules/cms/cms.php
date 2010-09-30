@@ -257,8 +257,9 @@ class uCMS_View extends flexDb_SingleDataModule {
 //		DebugMail('gu',array($_SERVER['REQUEST_URI'],$rec));
 		if (!$rec)
 			$rec = self::findPage();
-
+//		DebugMail('gu',array($_SERVER['REQUEST_URI'],$rec));
 		if (!$rec) return $_SERVER['REQUEST_URI'];
+//		DebugMail('gu',array($_SERVER['REQUEST_URI'],$rec));
 //			print_r($filters);
 	//		die('not found');
 	//	}

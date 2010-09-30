@@ -253,12 +253,10 @@ abstract class flexDb_BasicModule {
 
 	public $hasRun = false;
 	public function _RunModule() {
-		//	echo 'zzzz';print_r($_GET);
 		if (get_class($this) == GetCurrentModule()) {
 			$url = $this->GetURL($_GET);
-		//	echo 'zzzz'.$url;print_r($_GET); die();
 			if (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage)
-				|| stripos(urldecode($_SERVER['REQUEST_URI']),urldecode($url)) === FALSE) {
+				|| $_SERVER['REQUEST_URI'] !== $url) {//stripos(urldecode($_SERVER['REQUEST_URI']),urldecode($url)) === FALSE) {
 					$abs = '';
 					if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) {
 						$layer = 'http';
