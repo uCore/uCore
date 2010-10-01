@@ -21,7 +21,7 @@ define('PATH_REL_ROOT','/');
 define('PATH_REL_CORE',fix_path(PATH_REL_ROOT.$coreDiff,'/'));
 define('PATH_REL_SELF',fix_path(PATH_REL_ROOT.basename(PATH_ABS_SELF),'/'));
 
-define('DEFAULT_FILE',PATH_REL_ROOT.'index.php');
+define('DEFAULT_FILE',PATH_REL_CORE.'index.php');
 
 //if (!defined('PATH_ABS_CONFIG')) // allows overriding of the config file location
 define('PATH_ABS_CONFIG',fix_path(PATH_ABS_CORE.'.config.php'));
