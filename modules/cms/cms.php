@@ -265,8 +265,12 @@ class uCMS_View extends flexDb_SingleDataModule {
 	//	}
 		//if (!$rec) $rec = $this->GetRecord($this->GetDataset(),0);
 
+		// build QS
+		if (array_key_exists('cms_id',$filters)) unset($filters['cms_id']);
+		if (array_key_exists('uuid',$filters)) unset($filters['uuid']);
+		$qs = http_build_query($filters); if ($qs) $qs = "?$qs";
+		
 		$cms_id = $rec['cms_id'];
-
 		$path = array();
 		while ($rec['parent']) {
 			$path[] = $rec['parent'];
@@ -276,7 +280,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 		}
 		$path = array_reverse($path);
 		$path[] .= $cms_id.'.php';
-		return '/'.implode('/',$path);
+		return '/'.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
 		$rec = NULL;
