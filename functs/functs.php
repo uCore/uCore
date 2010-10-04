@@ -163,7 +163,7 @@ function ErrorLog($text) {
 function DebugMail($subject,$message) {
 	if (!is_string($message)) $message = print_r($message,true);
 	$ref = array_key_exists('HTTP_REFERER',$_SERVER) ? 'Referrer: '.$_SERVER['HTTP_REFERER']."\n" : '';
-	$message = 'URL: '.$_SERVER['REQUEST_URI']."\n".$ref."$message";
+	$message = 'URL: http://'.FlexDB::GetDomainName().$_SERVER['REQUEST_URI']."\n".$ref."$message";
 	mail('oridan82@gmail.com',$subject,$message);
 }
 
