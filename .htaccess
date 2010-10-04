@@ -1,4 +1,7 @@
 Options -Indexes
 
 RewriteEngine on
+RewriteRule ^(.*/)?\.svn/ - [F,L]
+ErrorDocument 403 "Access Forbidden"
+
 RewriteRule ^$ index.php
