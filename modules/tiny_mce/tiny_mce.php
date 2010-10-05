@@ -46,7 +46,7 @@ class module_TinyMCE extends flexDb_BasicModule {
 
 			$richOpts['editor_selector'] = "mceEditorRich";
 			$richOpts['plugins'] = "inlinepopups,spellchecker";
-			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,del';
+			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p';
 			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
 			$richOpts['theme_advanced_buttons3'] = "";
