@@ -163,7 +163,7 @@ function ErrorLog($text) {
 function DebugMail($subject,$message) {
 	if (!is_string($message)) $message = print_r($message,true);
 	$ref = array_key_exists('HTTP_REFERER',$_SERVER) ? 'Referrer: '.$_SERVER['HTTP_REFERER']."\n" : '';
-	$message = 'URL: http://'.FlexDB::GetDomainName().$_SERVER['REQUEST_URI']."\n".$ref."$message";
+	$message = 'URL: http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']."\n".$ref."$message";
 	mail('oridan82@gmail.com',$subject,$message);
 }
 
@@ -588,6 +588,6 @@ function RunAjaxScript($path) {
 }
 
 function is_assoc($array) {
-    return (is_array($array) && 0 !== count(array_diff_key($array, array_keys(array_keys($array)))));
+    return (is_array($array) && count(array_diff_key($array, array_keys(array_keys($array)))) !== 0);
 }
 ?>
