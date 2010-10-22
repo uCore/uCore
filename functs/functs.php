@@ -268,19 +268,19 @@ function UrlReadable($string) {
 function BuildQueryString($url,$vl,$encodeAmp=false) {
 	$url = htmlspecialchars_decode($url);
 	if (empty($url)) $url = $_SERVER['REQUEST_URI'];
-	$startSlash = '';
-	if (substr($url,0,1) === '/') $startSlash = '/';
+  
+  $qsPairs = GetQSPairs($url);
+  $pairs = array();
+  if (strpos($url,'?') !== false) {
+    $arr = array();
+    list($url) = explode('?',$url);
+  }
+  
+  $endSlash = substr($url,-1) === '/' ? '/' : '';
+  $startSlash = substr($url,0,1) === '/' ? '/' : '';
 	$url = trim($url,'/');
-	if (is_null($vl) || empty($vl)) return $startSlash.$url;
+	if (is_null($vl) || empty($vl)) return $startSlash.$url.$endSlash;
 	if (is_string($vl)) $vl = explode('&',$vl);
-	//echo $url;
-//	$parsedURL = parse_url($url);
-	$qsPairs = GetQSPairs($url);
-	$pairs = array();
-	if (strpos($url,'?') !== false) {
-		$arr = array();
-		list($url) = explode('?',$url);
-	}
 
 	foreach ($vl as $name => $val)
 	if ($val !== NULL) $pairs[$name] = $val;
@@ -290,26 +290,10 @@ function BuildQueryString($url,$vl,$encodeAmp=false) {
 		$pairs[$key] = $val;
 	}
 
-/*	$arr = array();
-	foreach ($pairs as $name => $val) {
-		//		$name = empty($name) ? '':$name;
-		//		$val = empty($val) ? '': "=$val";
-		if (!is_string($name))
-			$arr[] = urlencode(str_replace(' ','-',$val));
-		elseif (!$val)
-			$arr[] = urlencode($name);
-		elseif ($name && $val)
-			$arr[] = "$name=$val";
-		//		else
-		//			$arr[] = str_replace(' ','-',"$name$val");
-	}
-	//print_r($arr);
-	$qs = '?'.implode($encodeAmp ? '&amp;' : '&',$arr);
-*/
 	$qs = $encodeAmp ? http_build_query($pairs,'','&amp;') : http_build_query($pairs);
 	if ($qs) $qs = '?'.$qs;
 
-	return $startSlash.$url.$qs;
+	return $startSlash.$url.$endSlash.$qs;
 }
 
 function DONT_USE_uuid()
