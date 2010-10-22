@@ -236,18 +236,24 @@ function InstallAllModules() {
 	$result = sql_query("SELECT * FROM internal_modules");
 	while (($row = GetRow($result))) if (!class_exists($row['module_name'])) sql_query("DELETE FROM internal_modules WHERE `module_id` = '{$row['module_id']}'");
 	timer_end('module uninstallation');
+  
+  // TABLE CHANGE CHECKER
+  sql_query('CREATE TABLE IF NOT EXISTS __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40))');
+//  $r = sql_query('SHOW TABLES LIKE \'__table_checksum\'');
+//  if (!mysql_num_rows($r)) {
+    // create internal table check
+//  }
 
 	$installed = array();
 	$classes = get_declared_classes();
 	timer_start('table installation');
 	foreach ($classes as $classname){ // install tables
-		if (is_subclass_of($classname,'flexDb_TableDefinition')
-		&& $classname != 'flexDb_TableDefinition') {
-			timer_start('table install ('.$classname.')');
-			CallModuleFunc($classname,'InstallTable');
-			$installed[] = $classname;
-			timer_end('table install ('.$classname.')');
-		}
+		if ($classname == 'flexDb_TableDefinition' || !is_subclass_of($classname,'flexDb_TableDefinition')) continue;
+    
+		timer_start('table install ('.$classname.')');
+		CallModuleFunc($classname,'InstallTable');
+		$installed[] = $classname;
+		timer_end('table install ('.$classname.')');
 	}
 	timer_end('table installation');
 

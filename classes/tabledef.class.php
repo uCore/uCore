@@ -161,6 +161,21 @@ abstract class flexDb_TableDefinition {
 		$this->_SetupFields();
 		if (empty($this->tablename)) return;
 		if (empty($this->fields)) return;
+
+    // checksum
+    $classname = get_class($this);
+    $checksum = sha1(print_r($this->fields,true));
+    $r = sql_query('SELECT * FROM `__table_checksum` WHERE `name` = \''.$classname.'\'');
+    if (mysql_num_rows($r)) {
+      $info = mysql_fetch_assoc($r);
+      if ($info['checksum'] == $checksum) return;
+      // update checksum
+      sql_query('UPDATE `__table_checksum` SET `checksum` = \''.$checksum.'\' WHERE `name` = \''.$classname.'\'');
+    } else {
+      // insert checksum
+      sql_query('INSERT INTO `__table_checksum` VALUES (\''.$classname.'\',\''.$checksum.'\')');
+    }    
+
 		$unique = array();
 		$index = array();
 		if (TableExists($this->tablename)) {
