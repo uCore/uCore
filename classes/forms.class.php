@@ -514,7 +514,7 @@ abstract class flexDb_BasicModule {
 					$newVal = '';
 					if (array_key_exists($fieldName,$filters)) $newVal = $filters[$fieldName];
 					elseif (array_key_exists('_f_'.$fieldName,$filters)) $newVal = $filters['_f_'.$fieldName];
-					else continue;
+			//		else $newVal = '';
 
 					unset($filters[$fieldName]);
 					unset($filters['_f_'.$fieldName]);
@@ -524,7 +524,8 @@ abstract class flexDb_BasicModule {
 					//$filter = $this->find
 					//}
 
-					if ($newVal !== NULL) $mapped[$key] = str_replace('{'.$fieldName.'}',$newVal,$mapped[$key]);
+					//if ($newVal !== NULL)
+					$mapped[$key] = str_replace('{'.$fieldName.'}',$newVal,$mapped[$key]);
 				}
 			}
 		}
