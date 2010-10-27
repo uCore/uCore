@@ -48,7 +48,7 @@ class uSitemapXML extends flexDb_BasicModule {
 			echo <<<FIN
 
 <url>
-	<loc>{$url}/index.php</loc>
+	<loc>{$url}</loc>
 	<priority>0.5</priority>
 	<changefreq>monthly</changefreq>
 </url>

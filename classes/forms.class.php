@@ -158,7 +158,7 @@ abstract class flexDb_BasicModule {
 		if ($parent == GetCurrentModule()) return GetModuleVar($parent,'hasRun') == $this->ParentLoadPoint();
 //ErrorLog(get_class($this).': can2');
 
-		//echo "$parent ".(GetModuleVar($parent,'hasRun')?'Run':'noRun').' '.get_class($this).'='.$this->ParentLoadPoint()."<br>";#
+		//echo "$parent ".(GetModuleVar($parent,'hasRun')?'Run':'noRun').' '.get_class($this).'='.$this->ParentLoadPoint()."<br/>";#
 		// parent is child itself, if we're not persistant, dont load
 		if (!flag_is_set($this->GetOptions(), PERSISTENT_PARENT)) return false;
 //ErrorLog(get_class($this).': can3');
@@ -184,7 +184,7 @@ abstract class flexDb_BasicModule {
 	public $parentLoaded = array();
 	// timeframe is either pre(0) or post(1) currentmodule_Load, should be checked against module "ParentLoadPreference", which defaults to Post
 	public function _ParentLoad($parent) {
-//echo 'attempt '.get_class($this).' for '.$parent.'<br>';
+//echo 'attempt '.get_class($this).' for '.$parent.'<br/>';
 		if (!$this->CanParentLoad($parent)) return NULL;
 
 		//pre or post
@@ -204,7 +204,7 @@ abstract class flexDb_BasicModule {
 
 		$lm = FlexDB::GetVar('loadedModules',array());
 		if (array_search($this,$lm,true) === FALSE) $lm[] = $this;
-//echo 'PL '.get_class($this).' for '.$parent.'<br>';
+//echo 'PL '.get_class($this).' for '.$parent.'<br/>';
 		$this->activeParent = $parent;
 		$this->parentLoaded[$parent] = 0;
 
@@ -240,10 +240,10 @@ abstract class flexDb_BasicModule {
 		$children = FlexDB::GetChildren(get_class($this));
 		//print_r($children);
 		//$keys = array_keys($children);
-		//echo 'loading children for '.get_class($this).': '.implode(', ',$keys).'<br>';
+		//echo 'loading children for '.get_class($this).': '.implode(', ',$keys).'<br/>';
 
 		foreach ($children as $child => $links) {
-			//echo 'RUNNING: '.$child.' for '.get_class($this).'<br>';
+			//echo 'RUNNING: '.$child.' for '.get_class($this).'<br/>';
 			$result = CallModuleFunc($child,'_ParentLoad',get_class($this));
 			if ($result === FALSE) return FALSE;
 			if (is_numeric($result) && $result > 0) return $result -1;
@@ -410,7 +410,7 @@ abstract class flexDb_BasicModule {
 
 	public function AddChild($childModule,$fieldLinks=NULL,$parentField=NULL,$text=NULL) {
 		//$childModule = (string)$childModule;
-		//echo "addchild $childModule<br>";
+		//echo "addchild $childModule<br/>";
 		CallModuleFunc($childModule,'AddParent',get_class($this),$fieldLinks,$parentField,$text);
 	}
 
@@ -496,7 +496,7 @@ abstract class flexDb_BasicModule {
 					$return[$replace[$key-1]] = $match;
 				}
 			}
-			//echo $this->rewriteMapping[$key].' '.$map.'<br>';
+			//echo $this->rewriteMapping[$key].' '.$map.'<br/>';
 		}
 		//print_r($return);die();
 		// TODO: named filters not being picked up
@@ -591,7 +591,7 @@ abstract class flexDb_BasicModule {
 		$uuids = $this->GetUUID();
 		if (!is_array($uuids)) $uuids = array($uuids);
 		foreach ($uuids as $uuid) {
-			//echo $uuid.'<br>';
+			//echo $uuid.'<br/>';
 			$row = FlexDB::UUIDExists($uuid);
 			if ($row === FALSE) {
 				//echo "not installed:".get_class($this);
@@ -700,7 +700,7 @@ abstract class flexDb_BasicModule {
 	//		if (array_search($this,$lm,true) === FALSE) continue;
 
 			if (($parentName != 'internalmodule_Admin' && flag_is_set(CallModuleFunc(GetCurrentModule(),'GetOptions'),IS_ADMIN)) && $parentName != GetCurrentModule()) return;
-			//echo get_class($this).' '.$parentName.'<br>';
+			//echo get_class($this).' '.$parentName.'<br/>';
 
 			if (flag_is_set(CallModuleFunc($parentName,'GetOptions'),IS_ADMIN) && !flag_is_set(CallModuleFunc(GetCurrentModule(),'GetOptions'),IS_ADMIN)) return;
 
@@ -1148,14 +1148,14 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		$vtable = $fieldData['vtable'];
 		foreach ($vtable['joins'] as $fromField => $toField) {
-			//			echo "$alias=$fromField:$toField//".CallModuleFunc($vtable['tModule'],'GetPrimaryKey')."<br>";
+			//			echo "$alias=$fromField:$toField//".CallModuleFunc($vtable['tModule'],'GetPrimaryKey')."<br/>";
 			if ($toField == CallModuleFunc($vtable['tModule'],'GetPrimaryKey')) return $fromField;
 		}
 	}
 
 	//	private $rvCache = array();
 	public function GetRealValue($alias,$pkVal, $useCache=true) {
-		//echo "GetRealValue($alias,$pkVal)<br>";
+		//echo "GetRealValue($alias,$pkVal)<br/>";
 		//return "$alias:$pkVal";
 		$this->_SetupFields();
 
@@ -1165,7 +1165,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			//$rec = $this->GetCurrentRecord();
 			$rec = $this->LookupRecord($pkVal);
 			return $rec;
-			//return "grv $alias:$pkVal<br>";
+			//return "grv $alias:$pkVal<br/>";
 			//if ($rec[$this->GetPrimaryKey()] == $pkVal)
 			return $rec[$alias];
 		}
@@ -1832,19 +1832,19 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			foreach ($filterType as $fsetID => $filterset) {
 				foreach ($filterset as $arrID => $filterInfo) {
 					if ($filterInfo['fieldName'] === $fieldName && ($compareType === NULL || $filterInfo['ct'] === $compareType) && ($inputType === NULL || $filterInfo['it'] === $inputType)) {
-						//						echo "found filter matching ($fieldName $compareType $inputType) at ($uid)<br>";
+						//						echo "found filter matching ($fieldName $compareType $inputType) at ($uid)<br/>";
 						return $this->filters[$ftypeID][$fsetID][$arrID];
 					}
 				}
 			}
 		}
-		//		echo "not found<br>";
+		//		echo "not found<br/>";
 		$null = NULL;
 		return $null;
 	}
 
 	public function &GetFilterInfo($uid) {
-		//		echo get_class($this).".GetFilterInfo($uid)<br>";
+		//		echo get_class($this).".GetFilterInfo($uid)<br/>";
 		foreach ($this->filters as &$filterTypeArray) {
 			foreach ($filterTypeArray as &$filterset) {
 				if (!is_array($filterset)) continue;
@@ -1958,7 +1958,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$tabledef = $this->fields[$alias]['vtable']['tModule'];
 		//		$fieldName = $this->GetRootField($alias);
 		$fieldName = $this->fields[$alias]['field'];
-		//echo "finding prop $property for field $fieldName in $tabledef<br>";
+		//echo "finding prop $property for field $fieldName in $tabledef<br/>";
 		return CallModuleFunc($tabledef,"GetFieldProperty",$fieldName,$property);
 	}
 
@@ -2005,7 +2005,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		}
 
 		$value = $this->GetFilterValue($uid);//$filterData['value'];
-		//echo "$uid::$value<br>";
+		//echo "$uid::$value<br/>";
 		if ($value === NULL) return '';
 		// set filter VALUE
 		if ($compareType == ctLIKE && strpos($value,'%') === FALSE ) $value = "%$value%";
@@ -2332,7 +2332,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			}
 			//        $this->internalRowNum = $rn;
 			//        mysql_data_seek($dataset,$rn);
-			//echo "LRe={$this->internalRowNum}<br>";
+			//echo "LRe={$this->internalRowNum}<br/>";
 			return $return;*/
 	}
 
@@ -2397,7 +2397,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				$link = $this->GetFileFromTable($fieldName,GetModuleVar($this->GetTabledef(),'tablename'),$this->GetPrimaryKey(),$pkVal);
 				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
-				else $value = $filename.round(strlen($value)/1024,2).'Kb<br>';
+				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
 				break;
 			case ftIMAGE:
 				if (!$value) break;
@@ -2598,7 +2598,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		return false;
 		return true;
-		echo "$table, $where<br>";
+		echo "$table, $where<br/>";
 		//		list($field,$pk) = split('=',$where);
 		//		die("$table, $field, $pk");
 		// delete process, look thru all tables and find a cell which references this record
@@ -2626,7 +2626,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				$srchTable = $fieldData['vtable']['table'];//GetModuleVar($tabledef,'tablename');
 				//echo "SELECT * FROM $srchTable WHERE $newWhere";
 				$pk = CallModuleFunc($classname,'GetPrimaryKey');
-				echo "SELECT $pk FROM $srchTable WHERE $newWhere<br>";
+				echo "SELECT $pk FROM $srchTable WHERE $newWhere<br/>";
 				$result = sql_query("SELECT $pk FROM $srchTable WHERE $newWhere");
 				while (($row = GetRow($result)))
 				$inuse[] = "$srchTable: where $pk = {$row[$pk]}";
@@ -2908,7 +2908,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		// check union module
 		$searchModule = is_array($row) && array_key_exists('__module__',$row) ? $row['__module__'] : get_class($this);
 		//		print_r($GLOBALS['children']);
-		//echo "$searchModule<br>";
+		//echo "$searchModule<br/>";
 		$children = FlexDB::GetChildren($searchModule);
 
 		$info = NULL;
@@ -2959,7 +2959,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			return NULL;
 		}
 
-		//echo "<br>$field:";
+		//echo "<br/>$field:";
 		// fieldLinks: array: parentField => childField
 		// need to replace the values
 		$targetModule = $info['moduleName'];
@@ -2971,7 +2971,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			foreach ($setType as $set) {
 				foreach ($set as $fltr) {
 					if (strpos($fltr['fieldName'],' ') === FALSE && !array_key_exists($fltr['fieldName'],$targetModuleFields)) {
-						echo 'Field defined in filter ('.$fltr['fieldName'].') is not present in target module ('.$targetModule.') dataset.<br>';
+						echo 'Field defined in filter ('.$fltr['fieldName'].') is not present in target module ('.$targetModule.') dataset.<br/>';
 					}
 				}
 			}
@@ -3027,7 +3027,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				} /**/
 				//ErrorLog(print_r($linkInfo,true));
 			}
-			//echo $value."<br>";
+			//echo $value."<br/>";
 			if (!empty($value))
 			$newFilter['_f_'.$linkInfo['toField']] = $value;
 			//elseif (flag_is_set(CallModuleFunc($targetModule,'GetOptions'),ALLOW_ADD))
@@ -3377,7 +3377,7 @@ SCR_END
 				if (flag_is_set($this->GetOptions(),SHOW_TOTALS) && array_key_exists($fieldName,$total)) {
 					$foot .= "<td$class><b>";
 					if ($totalShown[$fieldName] != $total[$fieldName])
-					$foot .= htmlentities($this->PreProcess($fieldName,$totalShown[$fieldName])).'(shown)<br>';
+					$foot .= htmlentities($this->PreProcess($fieldName,$totalShown[$fieldName])).'(shown)<br/>';
 					$foot .= htmlentities($this->PreProcess($fieldName,$total[$fieldName]));
 					$foot .= '</b></td>';
 				} else

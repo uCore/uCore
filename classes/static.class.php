@@ -59,7 +59,7 @@ class FlexDB {
 		$content = self::GetVar('meta_description');
 
 		if (empty($content) || $textOnly) return $content;
-		return '<meta name="description" content="'.$content.'">'."\n";
+		return '<meta name="description" content="'.$content.'" />'."\n";
 	}
 	static function SetKeywords($text) {
 		self::SetVar('meta_keywords',$text);
@@ -71,7 +71,7 @@ class FlexDB {
 		$content = self::GetVar('meta_keywords');
 
 		if (empty($content) || $textOnly) return $content;
-		return '<meta name="keywords" content="'.$content.'">'."\n";
+		return '<meta name="keywords" content="'.$content.'" />'."\n";
 	}
 	static function AddMetaTag($name,$content) {
 		FlexDB::AppendVar('<head>','<meta name="'.$name.'" content="'.$content.'" />');
