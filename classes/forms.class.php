@@ -221,7 +221,7 @@ abstract class flexDb_BasicModule {
 //echo 'end:'.get_class($this).' for '.$parent."\n";
 //mail('oridan82@gmail.com','aaa','end:'.get_class($this).' for '.$parent);
 		if ($result !== TRUE && $result !== NULL) return $result;
-		$this->CreateParentNavButtons($parent);
+		//$this->CreateParentNavButtons($parent);
 
 		timer_end('ParentLoad: '.get_class($this).' for '.$parent);
 		$this->parentLoaded[$parent] = 1;

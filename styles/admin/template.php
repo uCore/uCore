@@ -9,6 +9,26 @@
 <div id='titleWrap'><div id="title"><h1 style="margin:0;text-align:right;">Utopia Core</h1><h2 style="margin:0;text-align:right;">{UTOPIA.title}</h2></div></div>
 
 <div id="maincontent"><a id="top"></a>
+<?php
+if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_UTOPIA)) {
+  //echo "<a class=\"btn\" href=\"".PATH_REL_CORE."index.php\">Admin Home</a>";
+  $arr = array();
+  $children = FlexDB::GetChildren('internalmodule_Admin');
+  foreach ($children as $links) {
+    foreach ($links as $child) { 
+      if ($child['fieldLinks']) continue;
+      $opts = CallModuleFunc($child['moduleName'],'GetOptions');
+      if (!flag_is_set($opts,IS_ADMIN) || flag_is_set($opts,NO_NAV)) continue;
+      $url = CallModuleFunc($child['moduleName'],'GetURL');
+      $title = CallModuleFunc($child['moduleName'],'GetTitle');
+      if (!$url || !$title) continue;
+      $arr[] = "<a class=\"btn\" href=\"$url\">$title</a>";
+    }
+  }
+  
+  echo '<ul id="adminButtons"><li>'.implode('</li><li>',$arr).'</li></ul>';
+}
+?>
 {UTOPIA.breadcrumb}
 {UTOPIA.content}
 </div>

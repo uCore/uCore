@@ -5,7 +5,7 @@ define('ADMIN_UTOPIA',flag_gen());
 class internalmodule_AdminLogin extends flexDb_BasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Login'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | IS_ADMIN; }
+	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | IS_ADMIN | NO_NAV; }
 
 	public function SetupParents() {
 		$this->RegisterAjax('adminLogout',array($this,'AdminLogout'));
