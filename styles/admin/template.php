@@ -10,7 +10,7 @@
 
 <div id="maincontent"><a id="top"></a>
 <?php
-if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_UTOPIA)) {
+if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) {
   //echo "<a class=\"btn\" href=\"".PATH_REL_CORE."index.php\">Admin Home</a>";
   $arr = array();
   $children = FlexDB::GetChildren('internalmodule_Admin');
