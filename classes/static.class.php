@@ -668,6 +668,7 @@ class FlexDB {
 				$varsArr = array_key_exists(1,$matches) ? $matches[1] : false;
 	//	if (preg_match_all('/{UTOPIA\.([^}]+)}/i',$string,$matches,PREG_SET_ORDER)) {
 				foreach ($searchArr as $k => $search) {
+          if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
 					$searchLen = strlen($search);
 					$offset = 0;
 					while (($pos = strpos($string, $search, $offset)) !== FALSE) {

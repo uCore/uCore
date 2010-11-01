@@ -27,7 +27,7 @@ class internalmodule_AdminLogin extends flexDb_BasicModule {
 			header('Location: '.CallModuleFunc('internalmodule_Admin','GetURL')); die();
 		}
 	}
-
+  
 	public function AdminLogout() {
 		unset($_SESSION['admin_auth']);
 		die('window.location.reload();');
@@ -77,6 +77,10 @@ class internalmodule_AdminLogin extends flexDb_BasicModule {
 		return '[ <a href="'.CallModuleFunc('internalmodule_Admin','GetURL').'">Admin Home</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=adminLogout\')">Logout</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=toggleT\')">Toggle Timers</a> ]'.// [ <a href="#" onclick="javascript:$(\'#errFrame\').toggle()">Show Errors</a> ]'.
 				'<div id="errFrame" style="display:none; max-height:500px; overflow:scroll;">'.$errs.'</div>';
 	}
+  
+  static function RequireLogin($accounts=NULL) {
+//    if ()
+  }
 
 	public function RunModule() {
 		//__admin_login_u

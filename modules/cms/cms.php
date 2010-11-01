@@ -251,9 +251,11 @@ class uCMS_View extends flexDb_SingleDataModule {
 		return '<div class="mceEditable">'.$rec['content'].'</div>';
 	}
 	public function GetURL($filters = NULL, $encodeAmp = false) {
+	  if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
 		$rec = NULL;
-		if ($filters && is_string($filters) || is_array($filters) && array_key_exists('cms_id',$filters))
+		if ($filters && (is_string($filters) || is_array($filters))) {
 			$rec = $this->LookupRecord($filters);
+    }
 //		DebugMail('gu',array($_SERVER['REQUEST_URI'],$rec));
 		if (!$rec)
 			$rec = self::findPage();
@@ -273,6 +275,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 			$qs = http_build_query($filters); if ($qs) $qs = "?$qs";
 		}
 		$cms_id = $rec['cms_id'];
+    $ishome = $rec['is_home'];
 		$path = array();
 		while ($rec['parent']) {
 			$path[] = $rec['parent'];
@@ -281,7 +284,9 @@ class uCMS_View extends flexDb_SingleDataModule {
 			if (!$rec) break;
 		}
 		$path = array_reverse($path);
-		$path[] .= $cms_id.'.php';
+    //print_r($rec);
+		if (!$ishome) $path[] = $cms_id;//.'.php';
+    header('test: '.json_encode($filters).'/'.implode('/',$path).$qs);
 		return '/'.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
@@ -305,6 +310,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 //		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('description','description','cms','description');
 		$this->AddField('content','content','cms','content');
+    $this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
 		$this->AddFilter('cms_id',ctEQ);
@@ -324,8 +330,10 @@ class uCMS_View extends flexDb_SingleDataModule {
 //	}
 
 	static function GetHomepage() {
-		$rows = CallModuleFunc('uCMS_List','GetNestedArray');
-		$row = reset($rows);
+	  header('gh: yes');
+//		$rows = CallModuleFunc('uCMS_List','GetNestedArray');
+//		$row = reset($rows);
+      $row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
 		if ($row) return $row;
 		return FALSE;
 	}
@@ -342,9 +350,11 @@ class uCMS_View extends flexDb_SingleDataModule {
 		}
 
 		$uri = preg_replace('/(\?.*)?/','',$uri);
-		preg_match('/([^\/]+)\.php$/Ui',$uri,$matches);
+//    preg_match('/([^\/]+)\.php$/Ui',$uri,$matches);
+    preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
 
 		if (array_key_exists(1,$matches)) {
+		  header('fp: yes');
 			$row = CallModuleFunc('uCMS_View','LookupRecord',$matches[1]);
 			if ($row) return $row;
 		}
