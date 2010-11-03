@@ -204,7 +204,7 @@ function InterpretSqlString($sqlString, &$module, &$field, &$pkVal) {
 	//	die(print_r($matches,true));
 	$module = $matches[1];
 	$field = $matches[2];
-	$pkVal = array_key_exists(3,$matches) && $matches[3] ? $matches[3] : NULL;
+	$pkVal = array_key_exists(3,$matches) ? $matches[3] : NULL;
 
 	//	list($table,$field) = split(':',$sqlString);
 	//	$where = trim(substr($table,strpos($table,'(')),'()');

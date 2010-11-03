@@ -22,7 +22,7 @@ class uJavascript extends flexDb_BasicModule {
 
 		// register ajax
 		$this->RegisterAjax('getJavascript',array($this,'BuildJavascript'),false);
-		FlexDB::AddJSFile(PATH_REL_SELF.'?__ajax=getJavascript',true);
+		FlexDB::AddJSFile(PATH_REL_CORE.'index.php?__ajax=getJavascript',true);
 		$s = (FlexDB::IsRequestSecure()) ? 's' : '';
 		FlexDB::AddJSFile('http'.$s.'://www.google.com/jsapi?autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}]}'),true);
 
