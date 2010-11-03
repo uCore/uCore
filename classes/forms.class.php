@@ -961,7 +961,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 //	}
 
 	public function GetEncodedFieldName($field,$pkValue=NULL) {
-		return cbase64_encode(get_class($this).":$field($pkValue)");
+	  $pk = $pkValue === NULL ? '' : "($pkValue)";
+		return cbase64_encode(get_class($this).":$field$pk");
 	}
 
 	public function CreateSqlField($field,$pkValue,$prefix=NULL) {
@@ -969,6 +970,13 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		return "sql[{$prefix}][".$this->GetEncodedFieldName($field,$pkValue)."]";
 	}
 
+  
+  public function GetDeleteButton($pk,$btnText = NULL,$title = NULL) {
+    $title = $title ? "Delete '$title'" : 'Delete Record';
+    if ($btnText)
+      return '<a name="'.$this->CreateSqlField('del',$pk,'del').'" class="fdb-btn redbg" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'">'.$btnText.'</a>';
+    return '<a class="btn btn-del" name="'.$this->CreateSqlField('del',$pk,'del').'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'"></a>';
+  }
 //	public function CreateSqlDeleteField($where) {
 //		$prefix = 'del';
 //		return "sql[{$prefix}][".cbase64_encode(get_class($this).":".$this->GetPrimaryTable()."($where)")."]";
@@ -2687,7 +2695,6 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
-    echo "//".gettype($pkVal);
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
@@ -2832,7 +2839,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//	}
 		} else { // update existing record
 			$updateQry = "UPDATE $table SET `$field` = $newValue WHERE `$tablePk` = '$pkVal'";
-			echo "//$updateQry";
+			//echo "//$updateQry";
 			sql_query($updateQry);
 			if (mysql_error()) { return FALSE; }
 			if ($fieldAlias == $this->GetPrimaryKey()) {
@@ -3403,7 +3410,8 @@ SCR_END
 	function DrawRow($row) {
 		$body = "<tr>";
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) {
-			$delbtn = FlexDB::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'fdb-btn redbg','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
+			//$delbtn = FlexDB::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'fdb-btn redbg','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
+			$delbtn = $this->GetDeleteButton($row[$this->GetPrimaryKey()]);
 			$body .= '<td style="width:1px">'.$delbtn.'</td>';
 		}
 		foreach ($this->fields as $fieldName => $fieldData) {
@@ -3475,7 +3483,8 @@ abstract class flexDb_SingleDataModule extends flexDb_DataModule {
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE) && !$this->IsNewRecord()) {
 			$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
 			//$delbtn = FlexDB::DrawInput($this->CreateSqlDeleteField($this->GetPrimaryKey().'='.$this->GetFilterValue($fltr['uid'])),itBUTTON,'Delete Record',NULL,array('class'=>'fdb-btn-del','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
-			$delbtn = '<a name="'.$this->CreateSqlField('del',$this->GetFilterValue($fltr['uid']),'del').'" class="fdb-btn redbg" onclick="if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);">Delete Record</a>';
+			$delbtn = $this->GetDeleteButton($this->GetFilterValue($fltr['uid']),'Delete Record');
+			//$delbtn = '<a name="'.$this->CreateSqlField('del',$this->GetFilterValue($fltr['uid']),'del').'" class="fdb-btn redbg" onclick="if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);">Delete Record</a>';
 			FlexDB::AppendVar('footer_left',$delbtn);
 		}
 

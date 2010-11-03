@@ -22,7 +22,7 @@ class tabledef_CMS extends flexDb_TableDefinition {
 	}
 }
 
-class uCMS_List extends flexDb_ListDataModule {
+class uCMS_List extends flexDb_DataModule {
 	public function GetTitle() { return 'Page Editor'; }
 	public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
@@ -39,6 +39,10 @@ class uCMS_List extends flexDb_ListDataModule {
 		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 	}
+  public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
+    parent::ProcessUpdates_del($sendingField,$fieldAlias,$value,$pkVal);
+    AjaxEcho('window.location.reload();');
+  }
 /*
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		if ($fieldAlias == 'is_homepage') {
@@ -125,12 +129,17 @@ FIN;
 		echo '<ul>';
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? 'hiddenItem' : '';
-			$editLink = CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
+      $editLink = CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
+      $delLink = CallModuleFunc('uCMS_List','CreateSqlField','del',$child['cms_id'],'del');// CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
 			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="/CubeCore/styles/images/data16.png">' : '';
 			echo '<li id="'.$child['cms_id'].'" class="'.$hide.'" style="position:relative;cursor:pointer">';
 			echo '<div onclick="$(\'#previewFrame\').attr(\'src\',\''.CallModuleFunc('uCMS_View','GetURL',array('cms_id'=>$child['cms_id'])).'\')">'.$child['title'].$data;
 			//			echo '<a href="?_action=edit" style="position:absolute;top:1px;right:3em;margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(\'/CubeCore/styles/images/add.png\')" class="btn"></a>';
-			echo '<a class="cmsEdit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'" class="btn"></a>';
+      echo '<div style="float:right;padding-left:10px">';
+      echo $this->GetDeleteButton($child['cms_id']);
+//      echo '<a class="btn btn-del" name="'.$delLink.'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="Delete \''.$child['cms_id'].'\'"></a>';
+      echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
+      echo '</div>';
 			echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
 			echo '</li>';

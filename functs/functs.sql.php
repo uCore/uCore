@@ -200,12 +200,13 @@ function TableExists($tblName) {
 
 function InterpretSqlString($sqlString, &$module, &$field, &$pkVal) {
 	$matches = null;
-	if (!preg_match('/(.+):(.+)\((.*)\)/',$sqlString,$matches)) return false;
+	if (!preg_match('/(.+):([^\(]+)(\(.*\))?/',$sqlString,$matches)) return false;
 	//	die(print_r($matches,true));
 	$module = $matches[1];
 	$field = $matches[2];
-	$pkVal = array_key_exists(3,$matches) ? $matches[3] : NULL;
-
+  //mail('oridan82@gmail.com','test',print_r($matches,true));
+	$pkVal = array_key_exists(3,$matches) ? trim($matches[3],'()') : NULL;
+  
 	//	list($table,$field) = split(':',$sqlString);
 	//	$where = trim(substr($table,strpos($table,'(')),'()');
 	//	$table = substr($table,0,strpos($table,'('));
