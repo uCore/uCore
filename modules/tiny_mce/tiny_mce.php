@@ -25,7 +25,6 @@ class module_TinyMCE extends flexDb_BasicModule {
 			list($fileManagerPath) = CallModuleFunc('fileManager' ,'Init');
 			$relUploads = FlexDB::GetRelativePath(PATH_UPLOADS);
 
-
 			$options = array();
 			$options['mode'] = "specific_textareas";
 			$options['relative_urls'] = false;
@@ -39,7 +38,7 @@ class module_TinyMCE extends flexDb_BasicModule {
 			$options['theme_advanced_toolbar_location'] = "top";
 			$options['theme_advanced_toolbar_align'] = "left";
 			$options['forced_root_block'] = false;
-			$options['content_css'] = '{utopia.templatedir}styles.css';
+			$options['content_css'] = '{utopia.templatedir}styles.css,'.PATH_REL_CORE.'default.css';
 
 			$richOpts = $options;
 			$htmlOpts = $options;

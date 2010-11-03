@@ -2687,6 +2687,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
+    echo "//".gettype($pkVal);
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
@@ -2831,7 +2832,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//	}
 		} else { // update existing record
 			$updateQry = "UPDATE $table SET `$field` = $newValue WHERE `$tablePk` = '$pkVal'";
-			//echo "//$updateQry";
+			echo "//$updateQry";
 			sql_query($updateQry);
 			if (mysql_error()) { return FALSE; }
 			if ($fieldAlias == $this->GetPrimaryKey()) {
