@@ -136,7 +136,7 @@ FIN;
 			echo '<div onclick="$(\'#previewFrame\').attr(\'src\',\''.CallModuleFunc('uCMS_View','GetURL',array('cms_id'=>$child['cms_id'])).'\')">'.$child['title'].$data;
 			//			echo '<a href="?_action=edit" style="position:absolute;top:1px;right:3em;margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(\'/CubeCore/styles/images/add.png\')" class="btn"></a>';
       echo '<div style="float:right;padding-left:10px">';
-      echo $this->GetDeleteButton($child['cms_id']);
+      echo CallModuleFunc('uCMS_List','GetDeleteButton',$child['cms_id']);
 //      echo '<a class="btn btn-del" name="'.$delLink.'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="Delete \''.$child['cms_id'].'\'"></a>';
       echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
       echo '</div>';
