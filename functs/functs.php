@@ -91,8 +91,8 @@ function CreateButton($btnText,$attrs = NULL) {
 	//return "<input type=\"button\" value=\"$btnText\"$attrStr />";
 }
 
-function CreateNavButton($btnText,$url,$vals = array(),$attrs=array()){
-	$url = BuildQueryString($url,$vals);
+function CreateNavButton($btnText,$url,$attrs=array()){
+	//$url = BuildQueryString($url,$vals);
 
 	/*	if (isset($attrs['onclick']) && !empty($attrs['onclick']))
 		$attrs['onclick'] .= '; nav(\''.htmlentities($url,ENT_QUOTES,CHARSET_ENCODING).'\')';
@@ -158,13 +158,6 @@ function ErrorLog($text) {
 		//    FlexDB::AppendVar('error_log','<span style="color:#EE3333; border-style:solid; border-width:1px; background-color:#DDDDDD; padding:3px">'.$text.'</span>');
 	}
 
-}
-
-function DebugMail($subject,$message) {
-	if (!is_string($message)) $message = print_r($message,true);
-	$ref = array_key_exists('HTTP_REFERER',$_SERVER) ? 'Referrer: '.$_SERVER['HTTP_REFERER']."\n" : '';
-	$message = 'URL: http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']."\n".$ref."$message";
-	mail('tom.kay@utopiasystems.co.uk',$subject,$message);
 }
 
 function DebugOutput() {
@@ -265,8 +258,9 @@ function UrlReadable($string) {
 	return trim($string,'-');
 }
 
-function BuildQueryString($url,$vl,$encodeAmp=false) {
-	$url = htmlspecialchars_decode($url);
+function BuildQueryString($ourl,$vl,$encodeAmp=false) {
+  if (!$vl) return $ourl;
+	$url = htmlspecialchars_decode($ourl);
 	if (empty($url)) $url = $_SERVER['REQUEST_URI'];
   
   $qsPairs = GetQSPairs($url);
@@ -279,7 +273,6 @@ function BuildQueryString($url,$vl,$encodeAmp=false) {
   $endSlash = substr($url,-1) === '/' ? '/' : '';
   $startSlash = substr($url,0,1) === '/' ? '/' : '';
 	$url = trim($url,'/');
-	if (is_null($vl) || empty($vl)) return $startSlash.$url.$endSlash;
 	if (is_string($vl)) $vl = explode('&',$vl);
 
 	foreach ($vl as $name => $val)

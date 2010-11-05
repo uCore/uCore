@@ -36,4 +36,10 @@ function EchoException($e) {
 	DebugMail('Server Error: '.$e->getCode(),$fullError);
 	echo $fullError;
 }
+function DebugMail($subject,$message) {
+  if (!is_string($message)) $message = print_r($message,true);
+  $ref = array_key_exists('HTTP_REFERER',$_SERVER) ? 'Referrer: '.$_SERVER['HTTP_REFERER']."\n" : '';
+  $message = 'URL: http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']."\n".$ref."$message";
+  mail('tom.kay@utopiasystems.co.uk',$subject,$message);
+}
 ?>
