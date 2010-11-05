@@ -556,7 +556,7 @@ abstract class flexDb_BasicModule {
 		$url = DEFAULT_FILE;
 		if ($this->rewriteMapping !== NULL)
 			$url = $this->RewriteURL($filters);
-
+   
 		return BuildQueryString($url,$filters,$encodeAmp);
 	}
 	public function IsActive() {
@@ -861,8 +861,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				//	else
 				$filArr[$fieldName] = $val;
 			}
-		}//print_r($filArr);
-
+		}
+//print_r($filArr);
 		return parent::GetURL($filArr,$encodeAmp);
 		//return BuildQueryString($url,$filArr);
 		/*		if (empty($filArr)) return $url;
@@ -3169,7 +3169,7 @@ SCR_END
 						&& is_subclass_of($link['moduleName'],'flexDb_SingleDataModule')
 						&& empty($link['fieldLinks'])) {
 					$url = CallModuleFunc($link['moduleName'],'GetURL',array($GLOBALS['modules'][$link['moduleName']]['module_id'].'_new'=>1));
-					FlexDB::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,null,array('class'=>'greenbg')),1);
+					FlexDB::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
 			}
 		}

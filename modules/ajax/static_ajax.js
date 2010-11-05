@@ -49,7 +49,7 @@ $(document).ready(function(){
 		// set a unique id 
 		id: 'datetime',   
 		is: function(s) {
-			// return false so this parser is not auto detected      
+ detected      
 			return false;   
 		},        
 		format: function(s) {
@@ -165,7 +165,7 @@ function InitAutocomplete() {
 
 				request.gv = $(this.element).metadata().gv;
 				$.ajax({
-					url: '/index.php?__ajax=Suggest',
+					url: PATH_REL_CORE+'index.php?__ajax=Suggest',
 					dataType: "json",
 					data: request,
 					success: function( data ) {
