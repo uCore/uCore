@@ -293,7 +293,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 		}
 		$path = array_reverse($path);
     //print_r($rec);
-		if (!$ishome) $path[] = $cms_id;//.'.php';
+		if (!$ishome) $path[] = $cms_id.'.php';
 //    header('test: '.json_encode($filters).'/'.implode('/',$path).$qs);
 		return '/'.implode('/',$path).$qs;
 	}
