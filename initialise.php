@@ -1,4 +1,5 @@
 <?php
+timer_start('full process');
 //ob_start("ob_gzhandler");
 //header('Content-Encoding: gzip');
 //define('DEVELOPMENT_MODE',true || array_key_exists('_dev',$_GET));
@@ -49,9 +50,8 @@ if(!ob_start("ob_gzhandler")) ob_start();
 
 if (!array_key_exists('_noTemplate',$_GET))	FlexDB::UseTemplate();
 
-timer_start('full process');
 $allmodules = FlexDB::GetModules(true,true);
-if ($allmodules === NULL || count($allmodules) === 0 || (internalmodule_AdminLogin::IsLoggedIn() && array_key_exists('__rebuild',$_REQUEST))) {
+if ($allmodules === NULL || count($allmodules) === 0) {// || (internalmodule_AdminLogin::IsLoggedIn() && array_key_exists('__rebuild',$_REQUEST))) {
 	InstallAllModules();
 	header('Location: '.preg_replace('/__rebuild(=[^&]*)?/','',$_SERVER['REQUEST_URI'])); exit();
 }
@@ -67,12 +67,15 @@ if (GetCurrentModule() !== NULL) {
 */
 
 timer_start('Module Initialise');
-foreach ($allmodules as $row) {
-	$GLOBALS['modules'][$row['uuid']] = $row['module_name'];
-	$GLOBALS['modules'][$row['module_name']] = $row;
-}
-foreach ($allmodules as $row) // must run second due to requiring GLOB_MOD to be setup fully
+//foreach ($allmodules as $row) {
+//	$GLOBALS['modules'][$row['uuid']] = $row['module_name'];
+//	$GLOBALS['modules'][$row['module_name']] = $row;
+//}
+foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to be setup fully
+  timer_start('Init: '.$row['module_name']);
 	CallModuleFunc($row['module_name'],'Initialise'); // setup Parents
+	timer_end('Init: '.$row['module_name']);
+}
 
 //foreach ($GLOBALS['modules'] as $modName => $info) {
 //echo $modName.'<br>';
