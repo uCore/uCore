@@ -915,7 +915,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function IsNewRecord() {
 		if ($this->forceNewRec === TRUE) return true;
-		if (array_key_exists($GLOBALS['modules'][get_class($this)]['module_id'].'_new',$_REQUEST)) return true;
+    $m = FlexDB::ModuleExists(get_class($this));
+		if (array_key_exists($m['module_id'].'_new',$_REQUEST)) return true;
 		//		$dset = GetModuleVar(GetCurrentModule(),'dataset');
 		//		if ($dset == NULL) return true;
 		//		if (mysql_num_rows($dset) == 0) return true;
@@ -1601,7 +1602,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//		if (get_class($this) != GetCurrentModule()) return CallModuleFunc(GetCurrentModule(),'GetNewUID');
 
 		$this->filterUID = $this->filterUID +1;
-		return $GLOBALS['modules'][get_class($this)]['module_id'].'_'.($this->filterUID - 1);
+    $m = FlexDB::ModuleExists(get_class($this));
+		return $m['module_id'].'_'.($this->filterUID - 1);
 	}
 
 	// private - must use addfilter or addfilterwhere.
@@ -3168,7 +3170,8 @@ SCR_END
 						&& flag_is_set(CallModuleFunc($link['moduleName'],'GetOptions'),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'flexDb_SingleDataModule')
 						&& empty($link['fieldLinks'])) {
-					$url = CallModuleFunc($link['moduleName'],'GetURL',array($GLOBALS['modules'][$link['moduleName']]['module_id'].'_new'=>1));
+					$m = FlexDB::ModuleExists($link['moduleName']);
+					$url = CallModuleFunc($link['moduleName'],'GetURL',array($m['module_id'].'_new'=>1));
 					FlexDB::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
 			}
