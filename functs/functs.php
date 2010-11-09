@@ -144,7 +144,7 @@ function CreateNavLink($linkText,$url,$vals=array()){
 		return $out;*/
 }
 
-function ErrorLog($text) {
+function ErrorLog($text) { return;
 	AjaxEcho('ErrorLog("'.addcslashes(str_replace("\n",'',$text),'"').'")');
 	if (FlexDB::UsingTemplate()) { echo $text; }
 	$cLog = FlexDB::GetVar('error_log');
