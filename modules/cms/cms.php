@@ -288,14 +288,13 @@ class uCMS_View extends flexDb_SingleDataModule {
 		$path = array();
 		while ($rec['parent']) {
 			$path[] = $rec['parent'];
-
 			$rec = $this->LookupRecord($rec['parent']);
 			if (!$rec) break;
 		}
 		$path = array_reverse($path);
     //print_r($rec);
 		if (!$ishome) $path[] = $cms_id;//.'.php';
-    header('test: '.json_encode($filters).'/'.implode('/',$path).$qs);
+//    header('test: '.json_encode($filters).'/'.implode('/',$path).$qs);
 		return '/'.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
@@ -339,7 +338,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 //	}
 
 	static function GetHomepage() {
-	  header('gh: yes');
+//	  header('gh: yes');
 //		$rows = CallModuleFunc('uCMS_List','GetNestedArray');
 //		$row = reset($rows);
       $row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
@@ -363,7 +362,7 @@ class uCMS_View extends flexDb_SingleDataModule {
     preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
 
 		if (array_key_exists(1,$matches)) {
-		  header('fp: yes');
+//		  header('fp: yes');
 			$row = CallModuleFunc('uCMS_View','LookupRecord',$matches[1]);
 			if ($row) return $row;
 		}
