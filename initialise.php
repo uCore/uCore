@@ -31,6 +31,10 @@ if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
  }
  }*/
 
+timer_start('Load Files');
+LoadFiles();
+timer_end('Load Files');
+ /*
 timer_start('Load Internal');
 LoadModulesDir(PATH_ABS_CORE.'classes/');	// load base classes
 LoadModulesDir(PATH_ABS_CORE.'modules/');	// load internal modules
@@ -40,7 +44,7 @@ timer_end('Load Internal');
 timer_start('Load Modules');
 LoadModulesDir(PATH_ABS_MODULES); // load custom modules
 timer_end('Load Modules');
-
+*/
 if(!ob_start("ob_gzhandler")) ob_start();
 
 if (!array_key_exists('_noTemplate',$_GET))	FlexDB::UseTemplate();
