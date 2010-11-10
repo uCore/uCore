@@ -60,7 +60,8 @@ class uCMS_List extends flexDb_DataModule {
 	public function ParentLoad($parent) {
 	}
 	public function RunModule() {
-		$newUrl = CallModuleFunc('uCMS_Edit','GetURL',array($GLOBALS['modules']['uCMS_Edit']['module_id'].'_new'=>1));
+	  $m = FlexDB::ModuleExists('uCMS_Edit');
+		$newUrl = CallModuleFunc('uCMS_Edit','GetURL',array($m['module_id'].'_new'=>1));
 		$relational = $this->GetNestedArray();
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
 		echo '<div style="font-size:0.8em;white-space:nowrap"><a class="btn" style="font-size:0.8em" href="'.$newUrl.'">New Page</a><a class="btn" style="font-size:0.8em" href="javascript:t()">Toggle Hidden</a>';
