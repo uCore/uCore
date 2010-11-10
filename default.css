@@ -1,7 +1,7 @@
 body.centerWrap {width:100%; text-align:center}
 div.centerWrap {width: 950px; margin: 0 auto; position: relative; text-align:left }
 
-.mceContentBody  { background-color: white; border:4px solid transparent; padding:10px; margin:0; background-image:none; } /* remove opacity */
+.mceContentBody  { background-color: white; border:4px solid transparent; padding:10px; margin:0; background-image:none; overflow:auto; } /* remove opacity */
 .utopia-filter-default { color: #AAA; }
 *:focus { outline: 1px; }
 
