@@ -44,6 +44,20 @@ $(document).ready(function(){
 		 // allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
 		$(this).bind('selectstart', function (event) {event.stopPropagation(); return true;});
 	});
+	
+	window.onscroll = function() {
+    // Thanks to Johan SundstrÃ¶m (http://ecmanaut.blogspot.com/) and David Lantner (http://lantner.net/david) 
+    // for their help getting Safari working as documented at http://www.derekallard.com/blog/post/conditionally-sticky-sidebar
+    if( window.XMLHttpRequest ) { // IE 6 doesn't implement position fixed nicely...
+//      if (document.documentElement.scrollTop > 328 || self.pageYOffset > 328) {
+        $('#uPanel').css('position', 'fixed');
+        $('#uPanel').css('top', '0');
+//      } else if (document.documentElement.scrollTop < 328 || self.pageYOffset < 328) {
+//        $('#content_sub').css('position', 'absolute');
+//        $('#content_sub').css('top', '328px');
+      }
+    }
+  }
 	/*
 	$.tablesorter.addParser({
 		// set a unique id 

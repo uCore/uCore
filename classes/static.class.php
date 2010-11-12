@@ -623,15 +623,14 @@ class FlexDB {
 
 		$time_taken = timer_findtime('full process');
 		self::SetVar('admin_panel',
-				'<div id="utopiaImg" onclick="$(\'#adminSlave\').toggle();"></div>'.
+				'<div id="uPanel"><div id="utopiaImg" onclick="$(\'#adminSlave\').toggle();"></div>'.
 				//'<div style="">'.
 				'<div id="adminSlave">'.
 				'<div id="adminClose" onclick="$(\'#adminSlave\').toggle()"></div>'.
 				'<div style="font-size:16px; margin-right:14px">Powered by <a target="_blank" href="http://www.utopiasystems.co.uk">Utopia Systems Ltd</a>.</div>'.
 				'<div>[ '.$time_taken.'ms ] [ '.$GLOBALS['sql_query_count'].' queries ]</div>'.
 				$adminPanel.
-				//'</div>'.
-				'</div>');
+				'</div></div>');
 
 		while (self::MergeVars($template));
 
