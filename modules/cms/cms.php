@@ -1,25 +1,24 @@
 <?php
 
 class tabledef_CMS extends flexDb_TableDefinition {
-	public $tablename = 'cms';
-	public function SetupFields() {
-		//$this->AddField('id',ftNUMBER);
-		$this->AddField('cms_id',ftVARCHAR,150);
-		$this->AddField('parent',ftVARCHAR,150);
-		$this->AddField('rewrite',ftVARCHAR,200);
-		$this->AddField('position',ftNUMBER);
-		$this->AddField('nav_text',ftVARCHAR,66);
-		$this->AddField('hide',ftBOOL);
-		$this->AddField('noindex',ftBOOL);
-		$this->AddField('nofollow',ftBOOL);
-		$this->AddField('title',ftVARCHAR,66);  // google only shows 66 chars in title
-		$this->AddField('description',ftVARCHAR,150); // google only shows 150 chars in description
-		$this->AddField('content',ftTEXT);
+  public $tablename = 'cms';
+  public function SetupFields() {
+    //$this->AddField('id',ftNUMBER);
+    $this->AddField('cms_id',ftVARCHAR,150);
+    $this->AddField('parent',ftVARCHAR,150);
+    $this->AddField('rewrite',ftVARCHAR,200);
+    $this->AddField('position',ftNUMBER);
+    $this->AddField('nav_text',ftVARCHAR,66);
+    $this->AddField('hide',ftBOOL);
+    $this->AddField('noindex',ftBOOL);
+    $this->AddField('nofollow',ftBOOL);
+    $this->AddField('title',ftVARCHAR,66);  // google only shows 66 chars in title
+    $this->AddField('description',ftVARCHAR,150); // google only shows 150 chars in description
+    $this->AddField('content',ftTEXT);
 
-		$this->SetPrimaryKey('cms_id');
-		$this->SetFieldProperty('position','default',999);
-		//$this->SetUniqueField('cms_id');
-	}
+    $this->SetPrimaryKey('cms_id');
+    $this->SetFieldProperty('position','default',999);
+  }
 }
 
 class uCMS_List extends flexDb_DataModule {
@@ -262,20 +261,19 @@ class uCMS_View extends flexDb_SingleDataModule {
 	}
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 	  if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
+    if (!is_array($filters) && is_string($filters)) $filters = array('cms_id'=>$filters);
+    
+    $cPage = self::findPage();
+    
 		$rec = NULL;
 		if ($filters && (is_string($filters) || is_array($filters))) {
+      if ($cPage && !array_key_exists('cms_id',$filters)) $filters['cms_id'] = $cPage['cms_id'];
 			$rec = $this->LookupRecord($filters);
     }
-//		DebugMail('gu',array($_SERVER['REQUEST_URI'],$rec));
-		if (!$rec)
-			$rec = self::findPage();
-//		DebugMail('gu',array($_SERVER['REQUEST_URI'],$rec));
+
+		if (!$rec && $cPage) $rec = $cPage;
+
 		if (!$rec) return $_SERVER['REQUEST_URI'];
-//		DebugMail('gu',array($_SERVER['REQUEST_URI'],$rec));
-//			print_r($filters);
-	//		die('not found');
-	//	}
-		//if (!$rec) $rec = $this->GetRecord($this->GetDataset(),0);
 
 		// build QS
 		$qs = '';
@@ -286,6 +284,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 		}
 		$cms_id = $rec['cms_id'];
     $ishome = $rec['is_home'];
+
 		$path = array();
 		while ($rec['parent']) {
 			$path[] = $rec['parent'];
@@ -293,9 +292,9 @@ class uCMS_View extends flexDb_SingleDataModule {
 			if (!$rec) break;
 		}
 		$path = array_reverse($path);
-    //print_r($rec);
+
 		if (!$ishome) $path[] = $cms_id.'.php';
-//    header('test: '.json_encode($filters).'/'.implode('/',$path).$qs);
+
 		return '/'.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
@@ -339,10 +338,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 //	}
 
 	static function GetHomepage() {
-//	  header('gh: yes');
-//		$rows = CallModuleFunc('uCMS_List','GetNestedArray');
-//		$row = reset($rows);
-      $row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
+    $row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
 		if ($row) return $row;
 		return FALSE;
 	}
@@ -351,14 +347,15 @@ class uCMS_View extends flexDb_SingleDataModule {
 		$uri = $_SERVER['REQUEST_URI'];
 
 		// if file is directly requested then don't use findPage. Only for CMS pages.
-		$test = realpath($_SERVER['DOCUMENT_ROOT']).$uri;
-		if (file_exists($test) && is_file($test)) return FALSE;
-
-		if ($uri == '/') {
-			return self::GetHomepage();
-		}
+//		$test = realpath($_SERVER['DOCUMENT_ROOT']).$uri;
+//		if (file_exists($test) && is_file($test)) return FALSE;
 
 		$uri = preg_replace('/(\?.*)?/','',$uri);
+
+    if ($uri == '/') {
+      return self::GetHomepage();
+    }
+    
 //    preg_match('/([^\/]+)\.php$/Ui',$uri,$matches);
     preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
 
