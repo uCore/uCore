@@ -14,12 +14,13 @@ class uSitemap {
 		if (!$children) return;
 		$level = $level -1;
 		array_sort_subkey($children,'position');
-		echo '<ul>';
+		echo '<ul class="u-menu">';
 		foreach ($children as $child) {
 			if ($child['hide']) continue;
 			$hide = $child['hide'] ? 'hiddenItem' : '';
 			$url = CallModuleFunc('uCMS_View','GetURL',$child['cms_id']);
-			$sel = (strpos($_SERVER['REQUEST_URI'],$url) !== FALSE) ? ' selected' : '';
+			//$sel = (strpos($url,$_SERVER['REQUEST_URI']) !== FALSE) ? ' u-menu-active' : '';
+      $sel = ($url == $_SERVER['REQUEST_URI']) ? ' u-menu-active' : '';
 			echo '<li id="'.$child['cms_id'].'" class="'.$hide.$sel.'" style="position:relative;cursor:pointer">';
 			echo '<a class="cmsEdit" href="'.$url.'">'.$child['title'].'</a>';
 			if ($level !== 0) self::DrawChildren($child['children'],$child['cms_id'],$level);
