@@ -105,7 +105,7 @@ img { border: none }
 	color: #eee !important;
 }
 
-#adminSlave {z-index:100001; position:absolute; top:0; left:0; font-size:14px; max-height:100%; white-space:nowrap; text-align:left;
+#adminSlave {z-index:100001; position:absolute; top:0; left:0; font-size:14px; white-space:nowrap; text-align:left;
 			display:none;background-color:#EFEFEF; border:2px groove #CCCCCC; padding:5px;}
 #adminSlave form { margin:0 }
 #adminClose {float:right; width:10px; height:10px;font-size:10px; top:2px; right:2px; cursor:pointer; background-image:url('images/utopia-close.png'); }

@@ -55,7 +55,7 @@ $(document).ready(function(){
 //      } else if (document.documentElement.scrollTop < 328 || self.pageYOffset < 328) {
 //        $('#content_sub').css('position', 'absolute');
 //        $('#content_sub').css('top', '328px');
-      }
+//      }
     }
   }
 	/*
