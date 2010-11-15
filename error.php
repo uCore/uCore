@@ -37,9 +37,16 @@ function EchoException($e) {
 	echo $fullError;
 }
 function DebugMail($subject,$message) {
+  if (!array_key_exists('dm_time',$_SESSION)) $_SESSION['dm_time'] = time();
+  if (!array_key_exists('dm_count',$_SESSION)) $_SESSION['dm_count'] = 0;
+
+  if (time() > $_SESSION['dm_time'] + 300) { $_SESSION['dm_time'] = time(); $_SESSION['dm_count'] = 0; }
+  $_SESSION['dm_count']++;
+  if ($_SESSION['dm_count'] > 4) return;
+
   if (!is_string($message)) $message = print_r($message,true);
   $ref = array_key_exists('HTTP_REFERER',$_SERVER) ? 'Referrer: '.$_SERVER['HTTP_REFERER']."\n" : '';
-  $ua = 'User Agent: '.$_SERVER['HTTP_USER_AGENT']."\n";
+  $ua = array_key_exists('HTTP_USER_AGENT',$_SERVER) ? 'User Agent: '.$_SERVER['HTTP_USER_AGENT']."\n" : '';
   $message = 'URL: http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']."\n".$ref.$ua."$message";
   mail('tom.kay@utopiasystems.co.uk',$subject,$message);
 }
