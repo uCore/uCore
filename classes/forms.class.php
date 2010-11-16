@@ -89,11 +89,28 @@ define('DEFAULT_OPTIONS',ALLOW_FILTER);
  * No field or data access is available, use flexDb_DataModule and its decendants.
  */
 abstract class flexDb_BasicModule {
+/*  static $singleton = NULL;
+  public static function &call($method) {
+    $null = NULL;
+    if (self::$singleton == NULL) { ErrorLog('Singleton not configured'); }//ErrorLog("Error Calling {$classname}->{$funcname}"); return $null;}
+    if (!method_exists(self::$singleton,$method)) { return $null; }
+        
+    $stack = debug_backtrace();
+    $args = array();
+    if (isset($stack[0]["args"]))
+      for($i=2; $i < count($stack[0]["args"]); $i++)
+        $args[$i-2] = & $stack[0]["args"][$i];
+    
+    $call = array(self::$singleton,$funcname);
+    $return = call_user_func_array($call,$args);
+  
+    return $return;
+  }
 	public static function __callStatic($name, $arguments) {
 		// Note: value of $name is case sensitive.
 		$instance = FlexDB::GetInstance(get_class($this));
 		return call_user_func_array(array($instance,$name),$arguments);
-	}
+	}*/
 
 	public function GetOptions() { return DEFAULT_OPTIONS; }
 
@@ -110,7 +127,6 @@ abstract class flexDb_BasicModule {
 	public function Initialise() {
 		if ($this->isInitialised === TRUE) return false;
 		$this->isInitialised = true;
-
 		//		if (!array_key_exists('last_module',$_SESSION)) $_SESSION['last_module'] = NULL;
 		//		if (array_key_exists('this_module',$_SESSION) && GetCurrentModule() != $_SESSION['this_module'])
 		//			$_SESSION['last_module'] = $_SESSION['this_module'];
@@ -237,14 +253,19 @@ abstract class flexDb_BasicModule {
 	}
 
 	public function LoadChildren() {
-		$children = FlexDB::GetChildren(get_class($this));
+	  $class=get_class($this);
+		$children = FlexDB::GetChildren($class);
 		//print_r($children);
 		//$keys = array_keys($children);
 		//echo 'loading children for '.get_class($this).': '.implode(', ',$keys).'<br/>';
 
-		foreach ($children as $child => $links) {
+    $keys = array_keys($children);
+    $size = sizeof($keys);
+		//foreach ($children as $child => $links) {
+		for ($i = 0;$i<$size;$i++) {
 			//echo 'RUNNING: '.$child.' for '.get_class($this).'<br/>';
-			$result = CallModuleFunc($child,'_ParentLoad',get_class($this));
+			$child = $keys[$i];
+			$result = CallModuleFunc($child,'_ParentLoad',$class);
 			if ($result === FALSE) return FALSE;
 			if (is_numeric($result) && $result > 0) return $result -1;
 		}
@@ -1318,7 +1339,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			}
 			$arr = array_flip($arr);
 			$stringify = true;
-		} elseif (is_string($values) && !empty($this->fields[$aliasName]['vtable'])) {
+		} elseif (is_string($values) && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$pk = CallModuleFunc($tbl['tModule'],'GetPrimaryKey');
 			$table = $tbl['table'];
@@ -1410,6 +1431,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
+    timer_start(get_class($this).':AF1:'.$aliasName);
 		//$tdfields = GetModuleVar($this->GetTabledef(),"fields");
 		//$this->fields[$fieldName] = $tdfields[$fieldName];
 		//		$aliasName = strtolower($aliasName);
@@ -1417,37 +1439,40 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//			$fieldName = strtolower($fieldName);
 		//		$tableAlias = strtolower($tableAlias);
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
-		$fieldName = trim($fieldName);
+//		$fieldName = trim($fieldName);
 		// field is mix?
 		//if (isset($this->fields[$aliasName])) { trigger_error("Field with alias ($aliasName) already exists in this module (".get_class($this).")."); return FALSE;}
-		if ((!is_array($this->sqlTableSetupFlat) || !array_key_exists($tableAlias,$this->sqlTableSetupFlat)) && !empty($tableAlias)) { trigger_error("No table ($tableAlias) has been created in this module (".get_class($this)."). Field: $aliasName."); return FALSE;}
+//		if ((!is_array($this->sqlTableSetupFlat) || !array_key_exists($tableAlias,$this->sqlTableSetupFlat)) && !empty($tableAlias)) { trigger_error("No table ($tableAlias) has been created in this module (".get_class($this)."). Field: $aliasName."); return FALSE;}
+    timer_end(get_class($this).':AF1:'.$aliasName);
 
+    timer_start(get_class($this).':AF2:'.$aliasName);    
 		//if (!array_key_exists($aliasName,$this->fields)) // always replace so we can re-order automatic fields (like file data)
-			$this->fields[$aliasName] = array();
+		$this->fields[$aliasName] = array(
+		  'alias'       => $aliasName,
+      'tablename'   => $tableAlias,
+      'visiblename' => $visiblename,
+      'inputtype'   => $inputtype,
+      'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
+      'field'       => $fieldName,
+    );
+    if ($tableAlias) $this->fields[$aliasName]['vtable'] = $this->sqlTableSetupFlat[$tableAlias];
 		//		if (preg_match_all('/{[^}]+}/',$fieldName,$matches) > 0)
 		//			$this->SetFieldProperty($aliasName,'pragma',$fieldName);
-
 		//		$tablename = $this->GetPrimaryTable();// GetModuleVar($tabledef,'tablename');
-		$this->fields[$aliasName]['alias'] = $aliasName;
-		$this->fields[$aliasName]['tablename'] = $tableAlias;
-		$this->fields[$aliasName]['visiblename'] = $visiblename;
-		$this->fields[$aliasName]['inputtype'] = $inputtype;
-		$this->fields[$aliasName]['options'] = ALLOW_ADD | ALLOW_EDIT; // this can be re-set using $this->SetFieldOptions
 		//		$this->SetFieldProperty($aliasName,'values',$values);
-		$this->fields[$aliasName]['field'] = $fieldName;
+    timer_end(get_class($this).':AF2:'.$aliasName);
 
-		if (!empty($tableAlias)) {
-			$this->fields[$aliasName]['vtable'] = $this->sqlTableSetupFlat[$tableAlias];
-		}
-
+    timer_start(get_class($this).':AF3:'.$aliasName);
 		if ($this->GetFieldType($aliasName) == ftFILE) {
 			$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
 			$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 		}
+    timer_end(get_class($this).':AF3:'.$aliasName);
 		//		if ($inputtype == itDATE) {
 		//			$this->SetFieldProperty($aliasName,'dateformat','dd/MMM/yyyy');
 		//		}
 		// values here
+    timer_start(get_class($this).':AF4:'.$aliasName);
 		if ($values === NULL) switch ($inputtype) {
 			case itCOMBO:
 			case itOPTION:
@@ -1458,6 +1483,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				break;
 		}
 		$this->SetValues($aliasName,$values);
+    timer_end(get_class($this).':AF4:'.$aliasName);
 		//		} else {
 		//			switch ($inputtype) {
 		//				case itCOMBO:
@@ -1465,10 +1491,12 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//					break;
 		//			}
 		//		}
+    timer_start(get_class($this).':AF5:'.$aliasName);
 		if ($visiblename !== NULL) {
 			if (empty($this->layoutSections)) $this->NewSection();
 			$this->fields[$aliasName]['layoutsection'] = count($this->layoutSections)-1;
 		}
+    timer_end(get_class($this).':AF5:'.$aliasName);
 		return TRUE;
 		//		$lookupData = CallModuleFunc($this->GetTabledef(),'GetLookupData',$fieldName);
 
@@ -1722,20 +1750,20 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	}
 
 	public function FieldExists($fieldName) {
-		return array_key_exists($fieldName,$this->fields);
+		return isset($this->fields[$fieldName]);
 	}
 
 	public function SetFieldProperty($fieldName,$propertyName,$propertyValue) {
-		if (!array_key_exists($fieldName,$this->fields)) { ErrorLog(get_class($this)."->SetFieldProperty($fieldName,$propertyName). Field does not exist."); return; }
+		if (!isset($this->fields[$fieldName])) { ErrorLog(get_class($this)."->SetFieldProperty($fieldName,$propertyName). Field does not exist."); return; }
 		$this->fields[$fieldName][$propertyName] = $propertyValue;
 	}
 
 	public function GetFieldProperty($fieldName,$propertyName) {
 		//		if (!$this->AssertField($fieldName)) return NULL;
-		if (!array_key_exists($fieldName,$this->fields)) return NULL;
-		if (!array_key_exists($propertyName,$this->fields[$fieldName])) return NULL;
+		if (!isset($this->fields[$fieldName])) return NULL;
+		if (!isset($this->fields[$fieldName][$propertyName])) return NULL;
 
-		return $this->fields[$fieldName][strtolower($propertyName)];
+		return $this->fields[$fieldName][$propertyName];//[strtolower($propertyName)];
 	}
 
 	public function SetFieldType($alias,$type) {
@@ -1745,7 +1773,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function GetFieldType($alias) {
 		$type = $this->GetFieldProperty($alias,'datatype');
-		if (empty($type)) $type = $this->GetTableProperty($alias,'type');
+		if (!$type) $type = $this->GetTableProperty($alias,'type');
 
 		return $type;
 	}
@@ -1962,8 +1990,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function GetTableProperty($alias,$property) {
 		//		if (!$this->AssertField($alias,$alias.'.'.$property)) return NULL;
-		if (!array_key_exists($alias,$this->fields)) return NULL;
-		if (!array_key_exists('vtable',$this->fields[$alias])) return NULL;
+		if (!isset($this->fields[$alias])) return NULL;
+		if (!isset($this->fields[$alias]['vtable'])) return NULL;
 
 		$tabledef = $this->fields[$alias]['vtable']['tModule'];
 		//		$fieldName = $this->GetRootField($alias);
@@ -2233,6 +2261,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	 * @returns Array containing Field=>Value key pairs
 	 */
 	public function GetRecord($dataset, $rowNum) {
+	  static $aaaa = 0; $aaaa++;
 		//		ErrorLog(get_class($this).".GetRecord($rowNum)");
 		//        if (is_bool($refresh)) {
 		//
@@ -2242,20 +2271,22 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		if ($dataset === NULL) return NULL;
 		if ($dataset === $this->dataset && $this->IsNewRecord()) return NULL;
-
+    $num_rows = mysql_num_rows($dataset);
 		//        if ($rowNum === NULL) {
 		//			$rowNum = $this->internalRowNum;
 		//			$this->internalRowNum++;
 		//		}
 		if ($rowNum < 0) { // negative rowNum means find record from end of the set (-1 = last record)
-			$rowNum = mysql_num_rows($dataset) + $rowNum;
+			$rowNum = $num_rows + $rowNum;
 		}
 
-		if ($rowNum > mysql_num_rows($dataset)-1 || $rowNum < 0 || mysql_num_rows($dataset) == 0) { // requested row is greater than total rows or less than 0 or no rows exist
+		if ($rowNum > $num_rows-1 || $rowNum < 0 || $num_rows == 0) { // requested row is greater than total rows or less than 0 or no rows exist
 			$row = NULL;
 		} else {
 			//mysql_data_seek($dataset,$rowNum);
+    //timer_start('zz'.$aaaa);
 			$row = GetRow($dataset,$rowNum);
+    //timer_end('zz'.$aaaa);
 		}
 
 		if ($dataset === $this->dataset) {
@@ -2263,7 +2294,6 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			$this->lastRowNum = $rowNum;
 			//$_SESSION['datastore'][get_class($this)] = $this->currentRecord;
 		}
-
 		return $row;
 	}
 
@@ -2911,6 +2941,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		return $ret;
 	}
 
+  static $targetChildren = array();
 	public function GetTargetURL($field,$row,$includeFilter = true) {
 		$fURL = $this->GetFieldProperty($field,'url');
 		if ($fURL) return $fURL;
@@ -2919,11 +2950,11 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$searchModule = is_array($row) && array_key_exists('__module__',$row) ? $row['__module__'] : get_class($this);
 		//		print_r($GLOBALS['children']);
 		//echo "$searchModule<br/>";
-		$children = FlexDB::GetChildren($searchModule);
+		$children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : FlexDB::GetChildren($searchModule);
 
 		$info = NULL;
 		// get specific field
-		foreach ($children as $childName => $links) {
+		foreach ($children as $links) {
 			foreach ($links as $link) {
 				if ($link['parentField'] == $field) { $info = $link; break; }
 			}
@@ -2953,12 +2984,11 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		if ($row == NULL) return NULL;
 		$searchModule = is_array($row) && array_key_exists('__module__',$row) ? $row['__module__'] : get_class($this);
 
-
-		$children = FlexDB::GetChildren($searchModule);
+    $children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : FlexDB::GetChildren($searchModule);
 
 		$info = NULL;
 		// get specific field
-		foreach ($children as $child => $links) {
+		foreach ($children as $links) {
 			foreach ($links as $link) {
 				if ($link['parentField'] == $field) { $info = $link; break; }
 			}
@@ -2973,11 +3003,11 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		// fieldLinks: array: parentField => childField
 		// need to replace the values
 		$targetModule = $info['moduleName'];
-		CallModuleFunc($targetModule,'_SetupFields');
-		$targetModuleFields = GetModuleVar($targetModule,'fields');
+		//CallModuleFunc($targetModule,'_SetupFields');
+/*		$targetModuleFields = GetModuleVar($targetModule,'fields');
 		// check $targetModule filters have a target field
 		$targetFilters = GetModuleVar($targetModule,'filters');
-		if (is_array($targetFilters)) foreach ($targetFilters as $setType) {
+		if (isset($targetFilters) && is_array($targetFilters)) foreach ($targetFilters as $setType) {
 			foreach ($setType as $set) {
 				foreach ($set as $fltr) {
 					if (strpos($fltr['fieldName'],' ') === FALSE && !array_key_exists($fltr['fieldName'],$targetModuleFields)) {
@@ -2986,9 +3016,9 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				}
 			}
 		}
-
+*/
 		$newFilter = array();
-		$additional = array();
+//		$additional = array();
 		//print_r($info['fieldLinks']);
 		foreach ($info['fieldLinks'] as $linkInfo) {
 			// fromfield == mortgage_id
@@ -3003,16 +3033,20 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				if (CallModuleFunc($row['__module__'],'AssertField',$linkInfo['fromField'],$targetModule)) {
 					$unionFields = GetModuleVar($row['__module__'],'fields');
 					$uFieldCount = 0;
-					foreach ($unionFields as $uFieldAlias => $uFieldInfo) {
+          $keys = array_keys($unionFields);
+					foreach ($keys as $uFieldAlias) {
 						if ($uFieldAlias == $linkInfo['fromField']) break;
 						$uFieldCount++;
 					}
 
-					reset($this->fields);
+          $ourKeys = array_keys($this->fields);
+          $correspondingKey = $ourKeys[$uFieldCount];
+          $value = $row[$correspondingKey];
+/*					reset($this->fields);
 					for ($i = 0; $i < $uFieldCount; $i++) {
 						next($this->fields);
 					}
-					$value = $row[key($this->fields)];
+					$value = $row[key($this->fields)];*/
 					//			} else {
 					//				ErrorLog("Cannot find field ({$linkInfo['fromField']}) linking from ($targetModule)");
 					//				continue;
@@ -3027,22 +3061,23 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 					} */
 			} else {
 				//$value = $row[$linkInfo['fromField']]; // use actual value, getting the real value on every field causes a lot of lookups, the requested field must be the field that stores the actual value
-				/**/
+				/* */
 				$tableModule = $this->fields[$linkInfo['fromField']]['vtable']['tModule'];
 				if ($this->GetRootField($linkInfo['fromField']) == $this->fields[$linkInfo['fromField']]['field']) {
 					//if ($tableModule == $this->GetTabledef()) {
 					$value = $row[$linkInfo['fromField']];
 				} else {
 					$value = $this->GetRealValue($linkInfo['fromField'],$row[$this->GetPrimaryKey()]);
-				} /**/
+				} /* */
 				//ErrorLog(print_r($linkInfo,true));
 			}
 			//echo $value."<br/>";
 			if (!empty($value))
-			$newFilter['_f_'.$linkInfo['toField']] = $value;
+        $newFilter['_f_'.$linkInfo['toField']] = $value;
 			//elseif (flag_is_set(CallModuleFunc($targetModule,'GetOptions'),ALLOW_ADD))
 			//$additional['newrec'] = 1;
 		}
+    return $newFilter;
 		//print_r(array_merge($newFilter,$additional));
 		return array_merge($newFilter,$additional);
 		// now returns an array

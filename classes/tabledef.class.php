@@ -61,7 +61,7 @@ abstract class flexDb_TableDefinition {
 	}
 
 	public function SetPrimaryKey($name, $auto_increment = true) {
-		$name = strtolower($name);
+		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'unique') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
 			$this->SetFieldProperty($name,'pk',true);
@@ -69,13 +69,13 @@ abstract class flexDb_TableDefinition {
 			if (strcasecmp($this->GetFieldProperty($name,'type'),ftNUMBER) == 0 && $auto_increment) $this->SetFieldProperty($name,'extra','auto_increment');
 	}
 	public function SetUniqueField($name) {
-		$name = strtolower($name);
+		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
 			$this->SetFieldProperty($name,'unique',true);
 	}
 	public function SetIndexField($name) {
-		$name = strtolower($name);
+		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'unique') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign index flag to $name, already an indexed field.'); return; }
 			$this->SetFieldProperty($name,'index',true);
@@ -90,7 +90,7 @@ abstract class flexDb_TableDefinition {
 	}
 
 	public function GetLookupData($fieldName) {
-		$fieldName = strtolower($fieldName);
+		//$fieldName = strtolower($fieldName);
 		$lookupData = $this->GetFieldProperty($fieldName,'lookup_data');
 		//	if (!empty($lookupData))
 		//		$lookupData['lookupField'] = $this->GetPrimaryKey();
@@ -98,14 +98,14 @@ abstract class flexDb_TableDefinition {
 	}
 
 	public function AddFieldArray($name, $type, $length, $arr) {
-		$name = strtolower($name);
+		//$name = strtolower($name);
 		$this->AddField($name,$type,$length);
 		foreach ($arr as $key => $val)
 		$this->SetFieldProperty($name,$key,$val);
 	}
 
 	public function AddField($name, $type, $length=NULL, $collation=SQL_COLLATION, $attributes=NULL, $null=SQL_NULL, $default=NULL, $extra=NULL, $comments=NULL) {
-		$name = strtolower($name);
+		//$name = strtolower($name);
 		$this->fields[$name] = array();
 		$this->SetFieldProperty($name,'type',$type);
 		if ($length == NULL && $type == ftCURRENCY) $length = "10,2";
@@ -134,19 +134,19 @@ abstract class flexDb_TableDefinition {
 	}
 
 	public function FieldExists($fieldName) {
-		$fieldName = strtolower($fieldName);
+		//$fieldName = strtolower($fieldName);
 		$this->_SetupFields();
 		return !empty($this->fields[$fieldName]);
 	}
 
 	public function SetFieldProperty($fieldName,$propertyName,$propertyValue) {
-		$fieldName = strtolower($fieldName);
+		//$fieldName = strtolower($fieldName);
 		if (!array_key_exists($fieldName,$this->fields)) return;
 		$this->fields[$fieldName][$propertyName] = $propertyValue;
 	}
 
 	public function GetFieldProperty($fieldName,$propertyName) {
-		$fieldName = strtolower($fieldName);
+		//$fieldName = strtolower($fieldName);
 		//$propertyName = strtolower($propertyName);
 		$this->_SetupFields();
 		if (!array_key_exists($fieldName,$this->fields)) return NULL;

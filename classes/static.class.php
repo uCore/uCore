@@ -12,22 +12,23 @@ FlexDB::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 class FlexDB {
 	private static $children = array();
 	static function AddChild($parent, $child, $info) {
-		if (array_key_exists($parent,self::$children) && array_key_exists($child,self::$children[$parent])) {
+		if (isset(self::$children[$parent]) && isset(self::$children[$parent][$child])) {
 			foreach (self::$children[$parent][$child] as $compare) {
 				if ($info == $compare) return;
 			}
 		}
 		self::$children[$parent][$child][] = $info;
 	}
+ // static $gc_cache = array();
 	static function GetChildren($parent) {
-		$specific = array();
-		$currentModule = array();
-		$catchAll = array();
-		if (array_key_exists($parent,self::$children)) $specific = self::$children[$parent];
-		if ($parent == GetCurrentModule() && array_key_exists('/',self::$children)) $currentModule = self::$children['/'];
-		if (array_key_exists('*',self::$children)) $catchAll = self::$children['*'];
+//	  if (isset(self::$gc_cache[$parent]) && self::$gc_cache[$parent]) return self::$gc_cache[$parent];
+    
+		$specific      = (isset(self::$children[$parent]))     ? self::$children[$parent] : array();
+		$currentModule = ($parent == GetCurrentModule() && isset(self::$children['/'])) ? self::$children['/'] : array();
+		$catchAll      = (isset(self::$children['*'])) ? self::$children['*'] : array();
 
-		$arr = array_merge_recursive($specific,$currentModule,$catchAll);
+		$arr = array_merge($specific,$currentModule,$catchAll);
+ //   self::$gc_cache[$parent] = $arr;
 		return $arr;
 	}
 
@@ -145,7 +146,7 @@ class FlexDB {
 		$null = null;
 		if (!class_exists($class)) { ErrorLog("Class ($class) doesnt exist"); return $null; }
 
-		if (!array_key_exists($class,self::$instances))
+		if (!isset(self::$instances[$class]))
 			self::$instances[$class] = new $class;
 
 		return self::$instances[$class];
@@ -160,7 +161,7 @@ class FlexDB {
 
 	private static $customInputs = array();
 	static function AddInputType($inputType,$callback) {
-		if (array_key_exists($inputType,self::$customInputs)) return;
+		if (isset(self::$customInputs[$inputType])) return;
 		define($inputType,$inputType);
 		self::$customInputs[$inputType] = $callback;
 	}
@@ -176,7 +177,7 @@ class FlexDB {
 		//		if(!isset($attributes['name']) && !$noSubmit) $attributes['name'] = $fieldName;
 		$attributes['name'] = $fieldName;
 
-		if (array_key_exists('style',$attributes) && is_array($attributes['style'])) {
+		if (isset($attributes['style']) && is_array($attributes['style'])) {
 			$style = array();
 			foreach ($attributes['style'] as $key=>$val) $style[] = "$key:$val";
 			$attributes['style'] = join(';',$style);
@@ -185,7 +186,7 @@ class FlexDB {
 		//print_r($attributes);
 		$attr = BuildAttrString($attributes);
 
-		if (array_key_exists($inputType,self::$customInputs))
+		if (isset(self::$customInputs[$inputType]))
 		return call_user_func_array(self::$customInputs[$inputType],array($fieldName,$inputType,$defaultValue,$possibleValues,$attributes,$noSubmit));
 
 		switch ($inputType) {
@@ -193,7 +194,7 @@ class FlexDB {
 			case itBUTTON:
 			case itSUBMIT:
 			case itRESET:
-				if (array_key_exists('class',$attributes))
+				if (isset($attributes['class']))
 				$attributes['class'] .= ' fdb-btn';
 				else
 				$attributes['class'] = 'fdb-btn';
@@ -278,7 +279,7 @@ class FlexDB {
 				//					$out .= "</select>";
 				//				} else if (is_string($possibleValues)) { // autocomplete info
 				//
-				if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
+				if (!isset($attributes['class'])) $attributes['class'] = '';
 				$attributes['class'] .= " autocomplete {gv:'$possibleValues'}";
 				$attr = BuildAttrString($attributes);
 				$out .= "<input type=\"text\" $attr value=\"$defaultValue\"/>\n";
@@ -289,7 +290,7 @@ class FlexDB {
 				//	settype($possibleValues,'integer');
 				//	$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " cols=\"$possibleValues\" rows=\"".floor($possibleValues*0.08)."\"" : "";
 				//					$out .= "<textarea $attr $ml>$defaultValue</textarea>";
-				if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
+				if (!isset($attributes['class'])) $attributes['class'] = '';
 				$attributes['class'] .= " autocomplete {gv:'$possibleValues'}";
 				$attr = BuildAttrString($attributes);
 				$out .= "<textarea $attr>$defaultValue</textarea>\n";
@@ -312,7 +313,7 @@ class FlexDB {
 			case itDATE:
 				//$formattedVal = ($defaultValue === SQL_FORMAT_EMPTY_TIMESTAMP) || ($defaultValue === SQL_FORMAT_EMPTY_DATE) || ($defaultValue === NULL) || ($defaultValue === '') ? '' : $defaultValue;//date('d/m/Y',strptime($defaultValue,'d/m/Y'));
 				$formattedVal = $defaultValue;
-				if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
+				if (!isset($attributes['class'])) $attributes['class'] = '';
 				$attributes['class'] .= " dPicker";
 				$attr = BuildAttrString($attributes);
 				$out .= "<input type=\"text\" $attr value=\"$formattedVal\"/>";
@@ -349,7 +350,7 @@ class FlexDB {
 	/* VAR */
 	private static $globalVariables = array();//'powered'=>'<div style="text-align:center; background-color:black; padding:0.2em"><span style="font-size:10px; background-color:#ffffee; padding:0.5em;">Powered by <a target="_blank" href="http://www.utopiasystems.co.uk">Utopia Systems</a></span></div>');
 	static function VarExists($varname) {
-		return array_key_exists($varname,self::$globalVariables);
+		return isset(self::$globalVariables[$varname]);
 	}
 
 	static function SetVar($varname,$value) {
@@ -387,7 +388,7 @@ class FlexDB {
 	private static $tabOrderCount = 1;
 	static function Tab_InitGroup($tabGroup=NULL) {
 		if (!$tabGroup) $tabGroup = GetCurrentModule().'-tabs';
-		if (array_key_exists($tabGroup,self::$tabGroups)) return $tabGroup;
+		if (isset(self::$tabGroups[$tabGroup])) return $tabGroup;
 		//			echo '<div class="tabGroup" id="'.$tabGroup.'"><ul></ul></div>';
 		self::$tabGroups[$tabGroup] = array();
 		return $tabGroup;
@@ -399,7 +400,7 @@ class FlexDB {
 		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
 		$tabID = self::Tab_GetCount($tabGroup)+1;
 		//echo $tabTitle
-		if (array_key_exists('tab'.$tabID,self::$tabGroups[$tabGroup])) { ErrorLog("TabID ($tabID) already exists in Group ($tabGroup)"); return; }
+		if (isset(self::$tabGroups[$tabGroup]['tab'.$tabID])) { ErrorLog("TabID ($tabID) already exists in Group ($tabGroup)"); return; }
 		self::$tabGroups[$tabGroup]['tab'.$tabID] = array('id'=>$tabGroup.'-'.$tabID,'title'=>$tabTitle,'content'=>$tabContent,'isURL'=>$isURL,'order'=>$order);
 
 	}
@@ -410,7 +411,7 @@ class FlexDB {
 	static function Tab_Append($tabID,$content,$tabGroup=NULL) {
 		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
 //		print_r(self::$tabGroups[$tabGroup]);
-		if (!array_key_exists('tab'.$tabID,self::$tabGroups[$tabGroup])) { ErrorLog("TabID ($tabID) doesnt exist in Group ($tabGroup) for append."); return; }
+		if (!isset(self::$tabGroups[$tabGroup]['tab'.$tabID])) { ErrorLog("TabID ($tabID) doesnt exist in Group ($tabGroup) for append."); return; }
 		self::$tabGroups[$tabGroup]['tab'.$tabID]['content'] .= $content;
 	}
 	static function Tab_GetOutput($group) {
@@ -512,18 +513,18 @@ class FlexDB {
 		foreach ($list as $order => $info) {
 			$attrsList = "";
 			$attrsLink = "";
-			if (array_key_exists('attrList',$info) && is_array($info['attrList']) && array_key_exists('class',$info['attrList']))
+			if (isset($info['attrList']) && is_array($info['attrList']) && isset($info['attrList']['class']))
 			$info['attrList']['class'] .= " linklist-link";
 			else
 			$info['attrList']['class'] = "linklist-link";
-			if (array_key_exists('attrList',$info) && is_array($info['attrList']) || is_array($listAttrs)) {
+			if (isset($info['attrList']) && is_array($info['attrList']) || is_array($listAttrs)) {
 				if (is_array($listAttrs)) foreach ($listAttrs as $attr=>$val)
 				$info['attrList'][$attr] = $val;
 				foreach ($info['attrList'] as $k => $v) {
 					$attrsList .= " $k=\"$v\"";
 				}
 			}
-			if (array_key_exists('attrLink',$info) && is_array($info['attrLink']) || is_array($linkAttrs)) {
+			if (isset($info['attrLink']) && is_array($info['attrLink']) || is_array($linkAttrs)) {
 				if (is_array($linkAttrs)) foreach ($linkAttrs as $attr=>$val)
 				$info['attrLink'][$attr] = $val;
 				foreach ($info['attrLink'] as $k => $v) {
@@ -664,7 +665,7 @@ class FlexDB {
 		foreach (self::$templateParsers as $ident => $arr) {
 			if (preg_match_all('/{'.$ident.'}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
 				$searchArr = $matches[0];
-				$varsArr = array_key_exists(1,$matches) ? $matches[1] : false;
+				$varsArr = isset($matches[1]) ? $matches[1] : false;
 	//	if (preg_match_all('/{UTOPIA\.([^}]+)}/i',$string,$matches,PREG_SET_ORDER)) {
 				foreach ($searchArr as $k => $search) {
           if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
@@ -720,7 +721,7 @@ class FlexDB {
 		}
 
 		if ($match) $ident .= '\.('.$match.')';
-		if (array_key_exists($ident,self::$templateParsers)) { error_log("$ident is already defined as a template parser."); return; }
+		if (isset(self::$templateParsers[$ident])) { error_log("$ident is already defined as a template parser."); return; }
 		//self::$templateParsers[$ident] = $function;
 		//if (array_key_exists($ident,self::$templateParsers)) { error_log("$ident is already defined as a template parser."); return; }
 		//if (!is_callable($function)) { error_log("Function for template parser ($ident) is not callable."); return; }
@@ -816,14 +817,14 @@ class FlexDB {
 		header("Cache-Control: public, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
 		header("Content-Disposition: ".$disposition.$fn,true);
 
-		if (array_key_exists('HTTP_IF_NONE_MATCH',$_SERVER) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
+		if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
 			header('HTTP/1.1 304 Not Modified', true, 304); die();
 		}
 
 		if (!$modified) $modified = 0;
 		$lm = gmdate('r',$modified);
 		header("Last-Modified: ".$lm,true);
-		if (array_key_exists('HTTP_IF_MODIFIED_SINCE',$_SERVER) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $lm) {
+		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $lm) {
 			header('HTTP/1.1 304 Not Modified', true, 304); die();
 		}
 	}
