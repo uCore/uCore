@@ -74,6 +74,7 @@ timer_start('Module Initialise');
 foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to be setup fully
   timer_start('Init: '.$row['module_name']);
 	CallModuleFunc($row['module_name'],'Initialise'); // setup Parents
+	//$row['module_name']::call('Initialise');
 	timer_end('Init: '.$row['module_name']);
 }
 

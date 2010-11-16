@@ -72,12 +72,12 @@ function LoadModulesDir($dir, $recursive = TRUE) {
 }
 
 function &CallModuleFunc($classname,$funcname) {
-	$null = NULL;
-	if (!$classname) { ErrorLog("Executing function ($funcname) in null class<br/>".print_r(useful_backtrace(),true)); return $null; }
+	static $null = NULL;
 
+	if (!$classname) { ErrorLog("Executing function ($funcname) in null class<br/>".print_r(useful_backtrace(),true)); return $null; }
 	//ErrorLog("Calling {$classname}->{$funcname}");
 
-//	$args = array_shift(array_shift(func_get_args()));
+//  $args = func_get_args();array_shift($args);array_shift($args);
 	// get args by reference.
 	$stack = debug_backtrace();
 	$args = array();
@@ -86,18 +86,20 @@ function &CallModuleFunc($classname,$funcname) {
 			$args[$i-2] = & $stack[0]["args"][$i];
 
 	if (!method_exists($classname,$funcname)) { return $null; }
-	$method = new ReflectionMethod($classname,$funcname);
-	if ($method->isStatic() || is_object($classname))
-		$instance = $classname;
-	else {
-		$instance = FlexDB::GetInstance($classname);
-	}
+
+//static methods should be called directly, not using CallModuleFunc
+//	$method = new ReflectionMethod($classname,$funcname);
+//	if ($method->isStatic() || is_object($classname))
+//		$instance = $classname;
+//	else {
+//		$instance = FlexDB::GetInstance($classname);
+//	}
+  $instance = FlexDB::GetInstance($classname);
 
 	if ($instance == NULL) { ErrorLog("Error Calling {$classname}->{$funcname}"); return $null;}
 
 	$call = array($instance,$funcname);
 	$return = call_user_func_array($call,$args);
-
 	return $return;
 }
 

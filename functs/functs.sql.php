@@ -168,9 +168,11 @@ function GetRow($result, $rowNum=NULL) {
 	// return $row;
 
 	$row = mysql_fetch_assoc($result);
-	if ($row){
-		foreach ($row as $key => $val) {
-			$row[$key] = stripslashes($val);
+	if ($row) {
+	  $keys = array_keys($row);
+    $size = sizeof($keys);
+    for ($i = 0; $i < $size; $i++) {
+      $row[$keys[$i]] = stripslashes($row[$keys[$i]]);
 		}
 	}
 
