@@ -62,6 +62,7 @@ FIN
 		list($path,$pathUpload) = $this->Init();
 
 		echo '<div id="fileMan"></div>';
+		uPlupload::Init();
 		FlexDB::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:dclick}},pluploadOptions);});");
 	}
 	static function OnRename($from,$to) {
