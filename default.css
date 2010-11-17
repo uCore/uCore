@@ -17,7 +17,6 @@ img { border: none }
 .shadeRow { background-color:#e0e0e0; }
 .new-ident { background-image:url(images/newrec-ident.gif); background-position:center; background-repeat:no-repeat; width:25px}
 
-.progressCursor {cursor: url("images/aero_busy.ani");}
 
 .linklist { padding-left:0 }
 
@@ -48,7 +47,6 @@ img { border: none }
 	padding-left: 5px;
 	height: 15px;
 	background-color: #FF9933;
-	/*background-image: url(images/layout_header_bg.jpg);*/
 	background-repeat: repeat-x;
 }
 
