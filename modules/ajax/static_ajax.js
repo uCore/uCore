@@ -172,10 +172,10 @@ function InitAutocomplete() {
 					response( cache[ request.term ] );
 					return;
 				}
-				if ($(this).attr('autocomplete') != undefined) {
+	/*			if ($(this).attr('autocomplete') != undefined) {
 					response({});
 					return;
-				}
+				}*/
 
 				request.gv = $(this.element).metadata().gv;
 				$.ajax({
