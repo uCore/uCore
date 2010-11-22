@@ -5,33 +5,35 @@ function sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
 	//    $port = is_empty(constant('SQL_PORT')) ? '' : ';port='.SQL_PORT;
 	//   $GLOBALS['dbh'] = new PDO(DB_TYPE.':dbname='.SQL_DBNAME.';host='.SQL_SERVER.$port,SQL_USERNAME,SQL_PASSWORD);
 	//    return $GLOBALS['dbh'];
+	static $sql_connection = false;
+  if ($sql_connection) return $sql_connection;
 
-	if (!array_key_exists('sql_connection',$GLOBALS) || !$GLOBALS['sql_connection']) {
-		if (!$port) $port = is_empty(constant('SQL_PORT')) ? '' : ':'.SQL_PORT;
-		if (!$srv) $srv = SQL_SERVER.$port; else $srv = $srv.$port;
-		if (!$usr) $usr = SQL_USERNAME;
-		if (!$pass) $pass = SQL_PASSWORD;
-		switch (strtolower(DB_TYPE)) {
-			case 'mysql':
-				$GLOBALS['sql_connection'] = mysql_pconnect($srv,$usr,$pass);
-				mysql_select_db(SQL_DBNAME);
-				break;
-			case 'mssql':
-				$GLOBALS['sql_connection'] = mssql_pconnect($srv,$usr,$pass);
-				break;
-		}
-		if (!$GLOBALS['sql_connection']) {
-			echo "Cannot connect to SQL server.<br>";
-			return false;
-		}
-		//sql_query("SET GLOBAL THREAD_CACHE_SIZE = 10");
-		sql_query("SET CHARACTER SET utf8");
-		sql_query("SET NAMES utf8");
-		sql_query("SET SQL_MODE = ''");
-		//sql_query("SET max_allowed_packet = 3000000");
+//	if (!array_key_exists('sql_connection',$GLOBALS) || !$GLOBALS['sql_connection']) {
+	if (!$port) $port = is_empty(constant('SQL_PORT')) ? '' : ':'.SQL_PORT;
+	if (!$srv) $srv = SQL_SERVER.$port; else $srv = $srv.$port;
+	if (!$usr) $usr = SQL_USERNAME;
+	if (!$pass) $pass = SQL_PASSWORD;
+	switch (strtolower(DB_TYPE)) {
+		case 'mysql':
+			$sql_connection = mysql_connect($srv,$usr,$pass);
+			mysql_select_db(SQL_DBNAME);
+			break;
+		case 'mssql':
+			$sql_connection = mssql_connect($srv,$usr,$pass);
+			break;
 	}
+	if (!$sql_connection) {
+		echo "Cannot connect to SQL server.<br>";
+		return false;
+	}
+	//sql_query("SET GLOBAL THREAD_CACHE_SIZE = 10");
+	sql_query("SET CHARACTER SET utf8");
+	sql_query("SET NAMES utf8");
+	sql_query("SET SQL_MODE = ''");
+	//sql_query("SET max_allowed_packet = 3000000");
+//	}
 
-	return $GLOBALS['sql_connection'];
+	return $sql_connection; // $GLOBALS['sql_connection'];
 }
 
 function fdb_sql_error() {
