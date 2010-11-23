@@ -127,8 +127,22 @@ function RefreshTables() {
 	$('.datalist TBODY TR:odd').removeClass('shadeRow');
 }
 
+function UpdateSelectedLinks() {
+  $('a').each(function() {
+    if (!$(this).attr('href')) return;
+    var _href = $(this).attr('href');
+    if ((_href != window.location.pathname) && (_href == '/' || window.location.pathname.indexOf(_href.slice(0,-4)) != 0)) return;
+	var classname = (_href == window.location.pathname) ? 'active-link' : 'active-link-parent';
+    if ($(this).parent('li').length) {
+      $(this).parent('li').addClass(classname);
+    } else {
+      $(this).addClass(classname);
+    }
+  });
+}
+
 var InitJavascript = {
-	_functs: [InitDatePickers, InitAutocomplete, RefreshTables],
+	_functs: [InitDatePickers, InitAutocomplete, RefreshTables, UpdateSelectedLinks],
 	add: function (f) {
 		this._functs.push(f);
 	},
