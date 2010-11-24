@@ -15,14 +15,14 @@ FlexConfig::AddConfigVar('SQL_PASSWORD','Database Password',CFG_TYPE_PASSWORD);
 //FlexConfig::AddConfigVar('BASE_MODULE','Initial Module'); // if none specified by uuid
 
 $templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
-foreach ($templates as $k => $v) {
+if (is_array($templates)) foreach ($templates as $k => $v) {
 	if ($v == '.' || $v == '..' || !is_dir($v)) {
 		unset($templates[$k]);
 		continue;
 	}
 	$templates[$k] = basename($v);
 }
-$templates = array_values($templates);
+$templates = is_array($templates) ? array_values($templates) : array();
 FlexConfig::AddConfigVar('DEFAULT_TEMPLATE','Default Template',$templates);
 FlexConfig::AddConfigVar('DEFAULT_CURRENCY','Default Currency');
 
