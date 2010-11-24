@@ -37,14 +37,14 @@ function EchoException($e) {
 	echo $fullError;
 }
 function DebugMail($subject,$message) {
-  if (isset($_SESSION)) {
+//  if (isset($_SESSION)) {
     if (!array_key_exists('dm_time',$_SESSION)) $_SESSION['dm_time'] = time();
     if (!array_key_exists('dm_count',$_SESSION)) $_SESSION['dm_count'] = 0;
 
     if (time() > $_SESSION['dm_time'] + 300) { $_SESSION['dm_time'] = time(); $_SESSION['dm_count'] = 0; }
     $_SESSION['dm_count']++;
     if ($_SESSION['dm_count'] > 4) return;
-  }
+//  }
 
   if (!is_string($message)) $message = print_r($message,true);
   $ref = array_key_exists('HTTP_REFERER',$_SERVER) ? 'Referrer: '.$_SERVER['HTTP_REFERER']."\n" : '';
