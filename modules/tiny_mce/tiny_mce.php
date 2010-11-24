@@ -86,10 +86,10 @@ class module_TinyMCE extends flexDb_BasicModule {
 		mb.dialog('close');
 	}
 	function InitMCE() {
-		$(document).ready(function() {
+		//$(document).ready(function() {
 			tinyMCE.init($richOpts);
 			tinyMCE.init($htmlOpts);
-		});
+		//});
 		//$(".mceRichText").live("change",function() { uf(this); });
 	}
 	InitMCE();
