@@ -4,13 +4,13 @@ define('CFG_TYPE_TEXT',flag_gen('configType'));
 define('CFG_TYPE_PATH',flag_gen('configType'));
 define('CFG_TYPE_PASSWORD',flag_gen('configType'));
 
-//FlexConfig::AddConfigVar('MODULES_PATH','Module Path',CFG_TYPE_PATH);
-FlexConfig::AddConfigVar('DB_TYPE','Database Type',array('mysql'));
+//FlexConfig::AddConfigVar('MODULES_PATH','Module Path',NULL,CFG_TYPE_PATH);
+FlexConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
 FlexConfig::AddConfigVar('SQL_SERVER','Database Server Address');
 FlexConfig::AddConfigVar('SQL_PORT','Database Port');
 FlexConfig::AddConfigVar('SQL_DBNAME','Database Name');
 FlexConfig::AddConfigVar('SQL_USERNAME','Database Username');
-FlexConfig::AddConfigVar('SQL_PASSWORD','Database Password',CFG_TYPE_PASSWORD);
+FlexConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,CFG_TYPE_PASSWORD);
 
 //FlexConfig::AddConfigVar('BASE_MODULE','Initial Module'); // if none specified by uuid
 
@@ -23,20 +23,20 @@ if (is_array($templates)) foreach ($templates as $k => $v) {
 	$templates[$k] = basename($v);
 }
 $templates = is_array($templates) ? array_values($templates) : array();
-FlexConfig::AddConfigVar('DEFAULT_TEMPLATE','Default Template',$templates);
+FlexConfig::AddConfigVar('DEFAULT_TEMPLATE','Default Template',NULL,$templates);
 FlexConfig::AddConfigVar('DEFAULT_CURRENCY','Default Currency');
 
-FlexConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Date Format</a>');
-FlexConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Time Format</a>');
+FlexConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Date Format</a>','%d %b %Y');
+FlexConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Time Format</a>','%H:%i:%s');
 
 FlexConfig::AddConfigVar('admin_user','Admin Username');
-FlexConfig::AddConfigVar('admin_pass','Admin Password',CFG_TYPE_PASSWORD);
+FlexConfig::AddConfigVar('admin_pass','Admin Password',NULL,CFG_TYPE_PASSWORD);
 
 class FlexConfig {
 	static $configVars = array();
-	static function AddConfigVar($name,$readable,$type=CFG_TYPE_TEXT) {
+	static function AddConfigVar($name,$readable,$default=NULL,$type=CFG_TYPE_TEXT) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
-		self::$configVars[$name] = array('name'=>$readable,'type'=>$type);
+		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type);
 	}
 	static function ReadConfig() {
 		$arr = array();
@@ -127,7 +127,7 @@ class FlexConfig {
 	</colgroup>
 FIN;
 		foreach (self::$configVars as $key => $info) {
-			$val = array_key_exists($key,$configArr) ? $configArr[$key] : '';
+			$val = isset($configArr[$key]) && $configArr[$key] ? $configArr[$key] : $info['default'];
 			echo "<tr><td>{$info['name']}:</td>";
 			if (is_array($info['type'])) {
 				$assoc = is_assoc($info['type']);
