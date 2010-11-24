@@ -1,4 +1,6 @@
 <?php
+//$_SESSION = array();
+if (stripos($_SERVER['HTTP_HOST'],'images.') === FALSE) session_start();
 
 include_once('error.php');
 
