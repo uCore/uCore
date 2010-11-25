@@ -6,6 +6,9 @@ define('TEMPLATE_DEFAULT','__default__');
 FlexDB::AddTemplateParser('utopia','FlexDB::parseVars');
 FlexDB::AddTemplateParser('list','FlexDB::DrawList');
 FlexDB::AddTemplateParser('tab','FlexDB::Tab_GetOutput');
+FlexDB::AddTemplateParser('get','FlexDB::parseGet');
+FlexDB::AddTemplateParser('post','FlexDB::parsePost');
+FlexDB::AddTemplateParser('request','FlexDB::parseRequest');
 
 FlexDB::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
@@ -732,6 +735,9 @@ class FlexDB {
 		$replacement = self::GetVar($id.':before').self::GetVar($id).self::GetVar($id.':after');
 		return $replacement;
 	}
+  static function parseGet($id) { return isset($_GET[$id]) ? $_GET[$id] : ''; }
+  static function parsePost($id) { return isset($_POST[$id]) ? $_POST[$id] : ''; }
+  static function parseRequest($id) { return isset($_REQUEST[$id]) ? $_REQUEST[$id] : ''; }
 
 	static function PageNotFound() {
 		header("HTTP/1.0 404 Not Found",true,404);
