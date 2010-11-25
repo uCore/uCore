@@ -1,4 +1,18 @@
 <?php
+$templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
+$nTemplates = array('Default Template'=>'','No Template'=>TEMPLATE_BLANK);
+if (is_array($templates)) foreach ($templates as $k => $v) {
+	if ($v == '.' || $v == '..' || !is_dir($v)) {
+		unset($templates[$k]);
+		continue;
+	}
+	$nTemplates[basename($v)] = basename($v);
+	//unset($templates[$k]);
+	//$templates[$k] = basename($v);
+}
+//$templates = is_array($templates) ? array_values($templates) : array();
+FlexDB::SetVar('TEMPLATE_LIST',$nTemplates);
+modOpts::AddOption('CMS','default_template','Default Template','',itCOMBO,$nTemplates);
 
 class tabledef_CMS extends flexDb_TableDefinition {
   public $tablename = 'cms';
@@ -9,6 +23,7 @@ class tabledef_CMS extends flexDb_TableDefinition {
     $this->AddField('rewrite',ftVARCHAR,200);
     $this->AddField('position',ftNUMBER);
     $this->AddField('nav_text',ftVARCHAR,66);
+    $this->AddField('template',ftVARCHAR,50);
     $this->AddField('hide',ftBOOL);
     $this->AddField('noindex',ftBOOL);
     $this->AddField('nofollow',ftBOOL);
@@ -67,10 +82,15 @@ class uCMS_List extends flexDb_DataModule {
 
 	//	if (array_key_exists('default_template',$_POST)) cubeCore::settingSet('default_template',$_POST['default_template']);
 		//$dTemplate = cubeCore::settingGet('default_template');
-		echo '<form id="dtForm" method="post">Default Template: ';
+		//DrawSqlInput($fieldName,$value,$pkVal,$attr);
+		
+		CallModuleFunc('modOpts','_SetupFields');
+//		CallModuleFunc('modOpts','SetFieldProperty','values','inputtype',itCOMBO);
+		$row = CallModuleFunc('modOpts','LookupRecord','CMS::default_template');//$this->GetCell($fieldName,$row,$targetUrl)
+		echo 'Default Template: '.CallModuleFunc('modOpts','GetCell','value',$row,NULL);
 		//cubeDB::DrawField('default_template',array('type'=>'combo','values'=>cubeCore::GetTemplates(),'attr'=>array('onchange'=>'$(\'#dtForm\').submit()')),$dTemplate);
 		//    echo 'Default Template: <input type="text" name="default_template" onchange="this.submit()" value="'.$dTemplate.'">';
-		echo '</form>';
+		//echo '</form>';
 
 		echo '<hr><div style="font-size:0.8em">Click a page below to preview it.</div>';
 		self::DrawChildren($relational);
@@ -195,8 +215,8 @@ FIN;
 
 			if (!$oldURL || $oldURL == '/') continue;
 
-			$qry = 'UPDATE '.CallModuleFunc('uCMS_View','GetPrimaryTable').' SET `content` = REPLACE(`content`,\''.$oldURL.'\',\''.$newURL.'\')';
-			sql_query($qry);
+			//$qry = 'UPDATE '.CallModuleFunc('uCMS_View','GetPrimaryTable').' SET `content` = REPLACE(`content`,\''.$oldURL.'\',\''.$newURL.'\')';
+			//sql_query($qry);
 			//print_r($rows);
 //			$rows = cubeDB::lookupSimple(cubeDB::GetTable('cubeCMS'),'*','content LIKE \'%'.cubeDB::escape($oldURL).'%\'');
 //			foreach ($rows as $row) {
@@ -214,6 +234,7 @@ class uCMS_Edit extends flexDb_SingleDataModule {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
 		$this->AddField('title','title','cms','Page Title',itTEXT);
+		$this->AddField('template','template','cms','Template',itCOMBO,FlexDB::GetVar('TEMPLATE_LIST'));
 //		$this->AddField('position','position','cms','Navigation Position',itTEXT);
 //		$this->AddField('nav_text','nav_text','cms','Navigation Text',itTEXT);
 		$this->AddField('hide','hide','cms','Hide from Menus',itCHECKBOX);
@@ -314,7 +335,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 //		$this->AddField('is_homepage','is_homepage','cms');
 		$this->AddField('parent','parent','cms','Parent');
 		$this->AddField('position','position','cms','position');
-//		$this->AddField('nav_position','nav_position','cms');
+		$this->AddField('template','template','cms','template');
 //		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('description','description','cms','description');
 		$this->AddField('content','content','cms','content');
@@ -386,6 +407,10 @@ class uCMS_View extends flexDb_SingleDataModule {
 //			header("HTTP/1.0 404 Not Found");
 //			echo 'Error 404: File not found'; return;
 		}
+		
+		if ($rec['template']) FlexDB::UseTemplate($rec['template']);
+		elseif (($dt = modOpts::GetOption('CMS','default_template'))) FlexDB::UseTemplate($dt);
+		
 		//breadcrumb::AddURL($rec['nav_text'] ? $rec['nav_text'] : $rec['title'],$this->GetURL(array('cms_id'=>$rec['cms_id'])),-1000);
 		FlexDB::SetTitle($rec['title']);
 		FlexDB::SetDescription($rec['description']);

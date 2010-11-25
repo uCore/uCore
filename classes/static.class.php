@@ -556,7 +556,7 @@ class FlexDB {
 	public static $adminTemplate = false;
 	private static $usedTemplate = NULL;
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_end_clean(); if (!$justClean) self::$usedTemplate = NULL; }
-	public static function UseTemplate($template = DEFAULT_TEMPLATE) {
+	public static function UseTemplate($template = TEMPLATE_BLANK) {
 		//if ($template == TEMPLATE_DEFAULT) $template = STYLE_PATH;
 		$ret = true;
 		if ($template != TEMPLATE_BLANK && $template != TEMPLATE_ADMIN && !file_exists(PATH_ABS_TEMPLATES.$template.'/template.php')) {

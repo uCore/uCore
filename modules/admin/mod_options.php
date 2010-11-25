@@ -29,6 +29,7 @@ class modOpts extends flexDb_ListDataModule {
     
 //    $this->AddUniqueField('ident');
 	}
+	public static $types = array();
 	public function SetupParents() {
 		$this->AddParent('internalmodule_Admin');
 	}
@@ -40,11 +41,12 @@ class modOpts extends flexDb_ListDataModule {
 		parent::UpdateField($fieldAlias,$newValue,$pkVal);
 		self::RefreshCache();
 	}
-	public static function AddOption($module,$ident,$name,$init='') {
+	public static function AddOption($module,$ident,$name,$init='',$fieldType=itTEXT,$values=NULL) {
 		$rec = self::GetOption($module,$ident);// CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
 		if ($rec === NULL) {
 			CallModuleFunc('modOpts','UpdateFields',array('ident'=>$module.'::'.$ident,'name'=>$name,'value'=>$init));
 		}
+		self::$types[$module.'::'.$ident] = array($fieldType,$values);
 	}
 	public static $optCache = array();
 	public static function RefreshCache() {
@@ -53,12 +55,20 @@ class modOpts extends flexDb_ListDataModule {
 		}
 	}
 	public static function GetOption($module,$ident) {
-    $ident = $module.'::'.$ident;
+		$ident = $module.'::'.$ident;
 		if (!array_key_exists($ident,self::$optCache)) self::RefreshCache();
 		if (!array_key_exists($ident,self::$optCache)) return NULL;
 		return self::$optCache[$ident];
 		//$rec = CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
 		//return $rec['value'];
+	}
+	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
+		$pk = $this->GetPrimaryKey();
+		if ($fieldName == 'value' && isset(self::$types[$row[$pk]])) {
+			$inputTypeOverride = self::$types[$row[$pk]][0];
+			$valuesOverride = self::$types[$row[$pk]][1];
+		}
+		return parent::GetCellData($fieldName, $row, $url, $inputTypeOverride, $valuesOverride);
 	}
 }
 ?>

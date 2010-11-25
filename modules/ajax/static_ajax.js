@@ -513,7 +513,7 @@ function _uf(ele,hourglass) {
 	eleVal = encodeURIComponent(Base64.encode(eleVal));
 
 	eleData = "__ajax=updateField&"+escape(eleName)+"="+eleVal;
-
+	
 	targetPage = window.location.toString().replace(window.location.hash,'');
 	
 //	$('#statusOverlay').show();
