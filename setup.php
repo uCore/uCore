@@ -13,7 +13,7 @@ FlexConfig::AddConfigVar('SQL_USERNAME','Database Username');
 FlexConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,CFG_TYPE_PASSWORD);
 
 //FlexConfig::AddConfigVar('BASE_MODULE','Initial Module'); // if none specified by uuid
-
+/*
 $templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
 if (is_array($templates)) foreach ($templates as $k => $v) {
 	if ($v == '.' || $v == '..' || !is_dir($v)) {
@@ -23,7 +23,7 @@ if (is_array($templates)) foreach ($templates as $k => $v) {
 	$templates[$k] = basename($v);
 }
 $templates = is_array($templates) ? array_values($templates) : array();
-FlexConfig::AddConfigVar('DEFAULT_TEMPLATE','Default Template',NULL,$templates);
+FlexConfig::AddConfigVar('DEFAULT_TEMPLATE','Default Template',NULL,$templates);*/
 FlexConfig::AddConfigVar('DEFAULT_CURRENCY','Default Currency');
 
 FlexConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Date Format</a>','%d %b %Y');

@@ -204,7 +204,7 @@ function TableExists($tblName) {
 
 function InterpretSqlString($sqlString, &$module, &$field, &$pkVal) {
 	$matches = null;
-	if (!preg_match('/(.+):([^\(]+)(\(.*\))?/',$sqlString,$matches)) return false;
+	if (!preg_match('/([^:]+):([^\(]+)(\(.*\))?/',$sqlString,$matches)) return false;
 	//	die(print_r($matches,true));
 	$module = $matches[1];
 	$field = $matches[2];

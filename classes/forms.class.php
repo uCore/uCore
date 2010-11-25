@@ -291,7 +291,7 @@ abstract class flexDb_BasicModule {
 					header('Location: '.$abs.$url,true,301); die();
 			}
 		}
-		if (flag_is_set($this->GetOptions(),IS_ADMIN) && FlexDB::UsingTemplate(DEFAULT_TEMPLATE)) FlexDB::$adminTemplate = true;
+		if (flag_is_set($this->GetOptions(),IS_ADMIN) && FlexDB::UsingTemplate(TEMPLATE_BLANK)) FlexDB::$adminTemplate = true;
 
 		if ($this->isDisabled) return;
 		//		$this->SetupFields();
@@ -1004,11 +1004,11 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 //		return "sql[{$prefix}][".cbase64_encode(get_class($this).":".$this->GetPrimaryTable()."($where)")."]";
 //	}
 
-	public function DrawSqlInput($field,$defaultValue='',$pkValue=NULL,$attributes=NULL) {
+	public function DrawSqlInput($field,$defaultValue='',$pkValue=NULL,$attributes=NULL,$inputTypeOverride=NULL,$valuesOverride=NULL) {
 		if ($attributes==NULL) $attributes = array();
-		$inputType = $this->fields[$field]['inputtype'];
+		$inputType = $inputTypeOverride ? $inputTypeOverride : $this->fields[$field]['inputtype'];
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
-		$values = $this->GetFieldProperty($field,'values');
+		$values = $valuesOverride ? $valuesOverride : $this->GetFieldProperty($field,'values');
 
 		$prefix = NULL;
 
@@ -2903,22 +2903,22 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		return $ret;
 	}
 
-	public function GetCell($fieldName, $row, $url = '') {
+	public function GetCell($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		if (is_array($row) && array_key_exists('__module__',$row) && $row['__module__'] != get_class($this)) {
-			return CallModuleFunc($row['__module__'],'GetCell',$fieldName,$row,$url);
+			return CallModuleFunc($row['__module__'],'GetCell',$fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		}
 		if ($this->UNION_MODULE)
 			$pkField = '__module_pk__';
 		else
 			$pkField = $this->GetPrimaryKey();
 		$fldId = $this->GetEncodedFieldName($fieldName,$row[$pkField]);
-		$celldata = $this->GetCellData($fieldName,$row,$url);
-		return "<!-- NoProcess --><div style=\"display:inline\" id=\"$fldId\">$celldata</div><!-- /NoProcess -->";
+		$celldata = $this->GetCellData($fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
+		return "<!-- NoProcess --><div id=\"$fldId\">$celldata</div><!-- /NoProcess -->";
 	}
 
-	public function GetCellData($fieldName, $row, $url = '') {
+	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		if (is_array($row) && array_key_exists('__module__',$row) && $row['__module__'] != get_class($this)) {
-			return CallModuleFunc($row['__module__'],'GetCellData',$fieldName,$row,$url);
+			return CallModuleFunc($row['__module__'],'GetCellData',$fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		}
 		$pkVal = NULL;
 		if (is_array($row)) $pkVal = array_key_exists('__module_pk__',$row) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
@@ -2929,11 +2929,11 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$fieldData = $this->fields[$fieldName];
 		//$url = htmlentities($url);
 		// htmlentities moved here from the to do.
-		$inputType = array_key_exists('inputtype',$fieldData) ? $fieldData['inputtype'] : itNONE;
+		$inputType = $inputTypeOverride ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
 		if ((array_key_exists('htmlencode',$fieldData) && $fieldData['htmlencode']) || $inputType == itTEXTAREA) $value = htmlentities($value,ENT_COMPAT,CHARSET_ENCODING);
 		if ($inputType !== itNONE && (($row !== NULL && flag_is_set($this->GetOptions(),ALLOW_EDIT)) || ($row === NULL  && flag_is_set($this->GetOptions(),ALLOW_ADD)))) {
 			$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
-			$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr);
+			$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 		} else {
 			//possible problems where value contains html? (html will be displayed in full)
 			$ret = (!empty($url) && ($value != '' && $value[0] != '<')) ? "<a href=\"$url\">$value</a>" : $value;
