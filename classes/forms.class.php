@@ -2269,7 +2269,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//        } else
 		//            $dataset = $refresh;
 
-		if ($dataset === NULL) return NULL;
+		if (!is_resource($dataset)) return NULL;
 		if ($dataset === $this->dataset && $this->IsNewRecord()) return NULL;
     $num_rows = mysql_num_rows($dataset);
 		//        if ($rowNum === NULL) {
