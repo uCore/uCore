@@ -2261,7 +2261,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	 * @returns Array containing Field=>Value key pairs
 	 */
 	public function GetRecord($dataset, $rowNum) {
-	  static $aaaa = 0; $aaaa++;
+	  //static $aaaa = 0; $aaaa++;
 		//		ErrorLog(get_class($this).".GetRecord($rowNum)");
 		//        if (is_bool($refresh)) {
 		//
