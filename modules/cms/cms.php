@@ -87,7 +87,7 @@ class uCMS_List extends flexDb_DataModule {
 		CallModuleFunc('modOpts','_SetupFields');
 //		CallModuleFunc('modOpts','SetFieldProperty','values','inputtype',itCOMBO);
 		$row = CallModuleFunc('modOpts','LookupRecord','CMS::default_template');//$this->GetCell($fieldName,$row,$targetUrl)
-		echo 'Default Template: '.CallModuleFunc('modOpts','GetCell','value',$row,NULL);
+		echo '<br>Default Template: '.CallModuleFunc('modOpts','GetCell','value',$row,NULL);
 		//cubeDB::DrawField('default_template',array('type'=>'combo','values'=>cubeCore::GetTemplates(),'attr'=>array('onchange'=>'$(\'#dtForm\').submit()')),$dTemplate);
 		//    echo 'Default Template: <input type="text" name="default_template" onchange="this.submit()" value="'.$dTemplate.'">';
 		//echo '</form>';
