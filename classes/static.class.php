@@ -558,6 +558,7 @@ class FlexDB {
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_end_clean(); if (!$justClean) self::$usedTemplate = NULL; }
 	public static function UseTemplate($template = TEMPLATE_DEFAULT) {
 		if ($template == TEMPLATE_DEFAULT) $template = modOpts::GetOption('CMS','default_template');
+		if (!$template) $template = TEMPLATE_BLANK;
 		$ret = true;
 		if ($template != TEMPLATE_BLANK && $template != TEMPLATE_ADMIN && !file_exists(PATH_ABS_TEMPLATES.$template.'/template.php')) {
 			echo 'Template not found: '.PATH_ABS_TEMPLATES.$template.'/template.php';
