@@ -50,8 +50,8 @@ $(document).ready(function(){
     // for their help getting Safari working as documented at http://www.derekallard.com/blog/post/conditionally-sticky-sidebar
     if( window.XMLHttpRequest ) { // IE 6 doesn't implement position fixed nicely...
 //      if (document.documentElement.scrollTop > 328 || self.pageYOffset > 328) {
-        $('#uPanel').css('position', 'fixed');
-        $('#uPanel').css('top', '0');
+        $('#uPanel').css({'position':'fixed','top':0,'left':0});
+//        $('#uPanel').css('top', '0');
 //      } else if (document.documentElement.scrollTop < 328 || self.pageYOffset < 328) {
 //        $('#content_sub').css('position', 'absolute');
 //        $('#content_sub').css('top', '328px');
