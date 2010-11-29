@@ -1,12 +1,13 @@
 <?php
 
 function GetFiles($refresh = false) {
+  sql_query('CREATE TABLE IF NOT EXISTS __u_filelist (`id` int AUTO_INCREMENT PRIMARY KEY, `filename` LONGTEXT)');
   $result = sql_query('SELECT * FROM __u_filelist');
   $rows = $result ? GetRows($result) : NULL;
 
   $files = array();
   if ($refresh || !$rows) {
-    sql_query('CREATE TABLE IF NOT EXISTS __u_filelist (`id` int AUTO_INCREMENT PRIMARY KEY, `filename` LONGTEXT)');
+//    sql_query('CREATE TABLE IF NOT EXISTS __u_filelist (`id` int AUTO_INCREMENT PRIMARY KEY, `filename` LONGTEXT)');
     $files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'classes/')); // load base classes
     $files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'modules/')); // load internal modules
     $files = array_merge($files,LoadModulesDir(PATH_ABS_MODULES)); // load custom modules
