@@ -1,6 +1,6 @@
 <?php
 $templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
-$nTemplates = array('Default Template'=>'','No Template'=>TEMPLATE_BLANK);
+$nTemplates = array('Default Template'=>TEMPLATE_DEFAULT,'No Template'=>TEMPLATE_BLANK);
 if (is_array($templates)) foreach ($templates as $k => $v) {
 	if ($v == '.' || $v == '..' || !is_dir($v)) {
 		unset($templates[$k]);
@@ -12,6 +12,8 @@ if (is_array($templates)) foreach ($templates as $k => $v) {
 }
 //$templates = is_array($templates) ? array_values($templates) : array();
 FlexDB::SetVar('TEMPLATE_LIST',$nTemplates);
+unset($nTemplates['Default Template']);
+$nTemplates['No Template'] = '';
 modOpts::AddOption('CMS','default_template','Default Template','',itCOMBO,$nTemplates);
 
 class tabledef_CMS extends flexDb_TableDefinition {
@@ -235,7 +237,9 @@ class uCMS_Edit extends flexDb_SingleDataModule {
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
 		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}.php">'.PATH_REL_ROOT.'{cms_id}.php</a>','cms','View Page');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
-		$this->AddField('template','template','cms','Template',itCOMBO,FlexDB::GetVar('TEMPLATE_LIST'));
+		$templates = FlexDB::GetVar('TEMPLATE_LIST');
+		$templates['Default Template'] = '';
+		$this->AddField('template','template','cms','Template',itCOMBO,$templates);
 //		$this->AddField('position','position','cms','Navigation Position',itTEXT);
 //		$this->AddField('nav_text','nav_text','cms','Navigation Text',itTEXT);
 		$this->AddField('hide','hide','cms','Hide from Menus',itCHECKBOX);
