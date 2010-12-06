@@ -159,6 +159,9 @@ abstract class flexDb_TableDefinition {
 		// is table already existing?
 		if ($this->isDisabled) return;
 		$this->_SetupFields();
+    
+//    $this->tablename = get_class($this);
+    
 		if (empty($this->tablename)) return;
 		if (empty($this->fields)) return;
 
@@ -174,7 +177,7 @@ abstract class flexDb_TableDefinition {
     } else {
       // insert checksum
       sql_query('INSERT INTO `__table_checksum` VALUES (\''.$classname.'\',\''.$checksum.'\')');
-    }    
+    }
 
 		$unique = array();
 		$index = array();
@@ -189,11 +192,11 @@ abstract class flexDb_TableDefinition {
 
 			// lets keep the sql querys to a minimum, get all the rows first, and process them locally.
 			$rows = GetRows(sql_query("SHOW FULL FIELDS FROM `$this->tablename`"));
-			foreach ($rows as $data) {
+/*			foreach ($rows as $data) {
 				if (!array_key_exists($data['Field'],$this->fields)) {
 					$alterArray[] = "DROP `{$data['Field']}`";
 				}
-			}
+			}*/
 			//print_r($this->fields);
 			foreach ($this->fields as $fieldName => $fieldData) {
 				// build field
