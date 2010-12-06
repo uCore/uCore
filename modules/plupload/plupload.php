@@ -1,7 +1,9 @@
 <?php
 FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/plupload.full.min.js'));
-FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.plupload.queue.min.js'));
-FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/plupload.queue.css'));
+FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.min.js'));
+//FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.plupload.queue.min.js'));
+//FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/plupload.queue.css'));
+FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.css'));
 $pathUpload = CallModuleFunc('fileManager','GetAjaxUploadPath');
 $pathCore = PATH_REL_CORE;
 FlexDB::AppendVar('script_include',<<<FIN
