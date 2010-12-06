@@ -1785,7 +1785,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function GetFieldLookupString($alias,$fieldData) {
 		$fieldName = $fieldData['field'];
-		if (empty($fieldName)) $fieldName = "''";
+		if (empty($fieldName)) return "'' as `$alias`";
 		if ($fieldData['tablename'] === NULL) return;
 
 		/* THIS FUNCTION HAS BEEN SIMPLIFIED!
