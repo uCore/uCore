@@ -52,10 +52,11 @@ class module_TinyMCE extends flexDb_BasicModule {
 			$richOpts['theme_advanced_buttons4'] = "";
 
 			$htmlOpts['editor_selector'] = "mceEditorHTML";
-			$htmlOpts['extended_valid_elements'] = 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
-			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,noneditable";
+			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
+			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table";
 			$htmlOpts['theme_advanced_buttons2_add'] = "media";
-			$htmlOpts['theme_advanced_buttons3_add'] = "spellchecker";
+      $htmlOpts['theme_advanced_buttons3_add'] = "spellchecker,|,tablecontrols";
+      //$htmlOpts['theme_advanced_buttons4'] = "";
 
 			$richOpts = json_encode($richOpts);
 			$htmlOpts = json_encode($htmlOpts);
