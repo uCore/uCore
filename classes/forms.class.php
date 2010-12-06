@@ -1431,7 +1431,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
-    timer_start(get_class($this).':AF1:'.$aliasName);
+    //timer_start(get_class($this).':AF1:'.$aliasName);
 		//$tdfields = GetModuleVar($this->GetTabledef(),"fields");
 		//$this->fields[$fieldName] = $tdfields[$fieldName];
 		//		$aliasName = strtolower($aliasName);
@@ -1443,9 +1443,9 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		// field is mix?
 		//if (isset($this->fields[$aliasName])) { trigger_error("Field with alias ($aliasName) already exists in this module (".get_class($this).")."); return FALSE;}
 //		if ((!is_array($this->sqlTableSetupFlat) || !array_key_exists($tableAlias,$this->sqlTableSetupFlat)) && !empty($tableAlias)) { trigger_error("No table ($tableAlias) has been created in this module (".get_class($this)."). Field: $aliasName."); return FALSE;}
-    timer_end(get_class($this).':AF1:'.$aliasName);
+    //timer_end(get_class($this).':AF1:'.$aliasName);
 
-    timer_start(get_class($this).':AF2:'.$aliasName);    
+    //timer_start(get_class($this).':AF2:'.$aliasName);    
 		//if (!array_key_exists($aliasName,$this->fields)) // always replace so we can re-order automatic fields (like file data)
 		$this->fields[$aliasName] = array(
 		  'alias'       => $aliasName,
@@ -1460,19 +1460,19 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//			$this->SetFieldProperty($aliasName,'pragma',$fieldName);
 		//		$tablename = $this->GetPrimaryTable();// GetModuleVar($tabledef,'tablename');
 		//		$this->SetFieldProperty($aliasName,'values',$values);
-    timer_end(get_class($this).':AF2:'.$aliasName);
+    //timer_end(get_class($this).':AF2:'.$aliasName);
 
-    timer_start(get_class($this).':AF3:'.$aliasName);
+    //timer_start(get_class($this).':AF3:'.$aliasName);
 		if ($this->GetFieldType($aliasName) == ftFILE) {
 			$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
 			$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 		}
-    timer_end(get_class($this).':AF3:'.$aliasName);
+    //timer_end(get_class($this).':AF3:'.$aliasName);
 		//		if ($inputtype == itDATE) {
 		//			$this->SetFieldProperty($aliasName,'dateformat','dd/MMM/yyyy');
 		//		}
 		// values here
-    timer_start(get_class($this).':AF4:'.$aliasName);
+    //timer_start(get_class($this).':AF4:'.$aliasName);
 		if ($values === NULL) switch ($inputtype) {
 			case itCOMBO:
 			case itOPTION:
@@ -1483,7 +1483,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 				break;
 		}
 		$this->SetValues($aliasName,$values);
-    timer_end(get_class($this).':AF4:'.$aliasName);
+    //timer_end(get_class($this).':AF4:'.$aliasName);
 		//		} else {
 		//			switch ($inputtype) {
 		//				case itCOMBO:
@@ -1491,12 +1491,12 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//					break;
 		//			}
 		//		}
-    timer_start(get_class($this).':AF5:'.$aliasName);
+    //timer_start(get_class($this).':AF5:'.$aliasName);
 		if ($visiblename !== NULL) {
 			if (empty($this->layoutSections)) $this->NewSection();
 			$this->fields[$aliasName]['layoutsection'] = count($this->layoutSections)-1;
 		}
-    timer_end(get_class($this).':AF5:'.$aliasName);
+    //timer_end(get_class($this).':AF5:'.$aliasName);
 		return TRUE;
 		//		$lookupData = CallModuleFunc($this->GetTabledef(),'GetLookupData',$fieldName);
 
@@ -1788,18 +1788,26 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		if (empty($fieldName)) $fieldName = "''";
 		if ($fieldData['tablename'] === NULL) return;
 
+		/* THIS FUNCTION HAS BEEN SIMPLIFIED!
+		 * field is ReplacePragma if field has "is_function" property, or starts with "(", single quote, or double quote
+		 * else, field is CONCAT
+		 */
+		
 		// first replace pragmas
-		if (preg_match('/{[^}]+}/',$fieldName) > 0) { // has pragma code
-			$fieldName = ReplacePragma($fieldName, $fieldData['tablename']);
-		}
-
-		if ($this->GetFieldProperty($alias, 'is_function') || substr($fieldName,0,1) == '(' || substr($fieldName,0,1) == "'" || substr($fieldName,0,1) == '"') {
-			$toAdd = $fieldName;
-		} elseif (preg_match('/{[^}]+}/',$fieldData['field']) > 0) { // has pragma code
-			if (substr($fieldData['field'],0,1) === '{') // starts with a pragma, so assume we need to concat
-				$toAdd = CreateConcatString($fieldData['field'], $fieldData['tablename']);
-			else // doesnt start with a pragma, so it could well be a function, only replace the pragmas with the fields, dont make it concat
-				$toAdd = ReplacePragma($fieldData['field'], $fieldData['tablename']);
+//		echo 'check for pragma: '.$fieldName;
+//		if (preg_match('/{[^}]+}/',$fieldName) > 0) { // has pragma code
+//			echo 'yes';
+//			$fieldName = ReplacePragma($fieldName, $fieldData['tablename']);
+//		}
+//		echo '<br>';
+		$chr1 = substr($fieldName,0,1);
+		if ($this->GetFieldProperty($alias, 'is_function') || $chr1 == '(' || $chr1 == "'" || $chr1 == '"') {
+			$toAdd = ReplacePragma($fieldData['field'], $fieldData['tablename']);
+//		} elseif (preg_match('/{[^}]+}/',$fieldData['field']) > 0) { // has pragma code
+//			if (substr($fieldData['field'],0,1) === '{') // starts with a pragma, so assume we need to concat
+//				$toAdd = CreateConcatString($fieldData['field'], $fieldData['tablename']);
+//			else // doesnt start with a pragma, so it could well be a function, only replace the pragmas with the fields, dont make it concat
+//				$toAdd = ReplacePragma($fieldData['field'], $fieldData['tablename']);
 		} else {
 			// is it a date?
 			// is it a timestamp?

@@ -233,6 +233,7 @@ class uCMS_Edit extends flexDb_SingleDataModule {
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
+		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}.php">'.PATH_REL_ROOT.'{cms_id}.php</a>','cms','View Page');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
 		$this->AddField('template','template','cms','Template',itCOMBO,FlexDB::GetVar('TEMPLATE_LIST'));
 //		$this->AddField('position','position','cms','Navigation Position',itTEXT);
