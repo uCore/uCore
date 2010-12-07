@@ -58,8 +58,18 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
     $this->AddField('filter','filter','blocks','Filter',itTEXT);
     $this->AddField('order','order','blocks','Order',itTEXT);
     $this->AddField('limit','limit','blocks','Limit',itTEXT);
+    $this->AddField('fields',array($this,'getPossibleFields'),'blocks','Possible Fields');
     $this->AddField('content','content','blocks','Content',itHTML);
-    $this->AddField('preview',array($this,'getPreview'),'blocks','preview');
+    $this->AddField('preview',array($this,'getPreview'),'blocks','Preview');
+  }
+  public function getPossibleFields($originalVal,$pk,$processedVal) {
+    $rec = $this->LookupRecord($pk);
+    $fields = GetModuleVar($rec['module'],'fields');
+    $ret = '<div>Click a field to insert it.</div>';
+    foreach ($fields as $field) {
+      $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$field['alias']}</span>";
+    }   
+    return trim($ret);
   }
   public function getPreview($originalVal,$pk,$processedVal) {
     return $this->DrawBlock($pk);
@@ -72,12 +82,6 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
   public function ParentLoad($parent) { }
   public function RunModule() {
     $this->ShowData();
-    $rec = $this->GetCurrentRecord();
-    $fields = GetModuleVar($rec['module'],'fields');
-    echo 'Possible Fields: ';
-    foreach ($fields as $field) {
-      echo " {field.{$field['alias']}}";
-    }
   }
 
   static function DrawBlock($id) {
