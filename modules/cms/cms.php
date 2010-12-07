@@ -248,11 +248,20 @@ class uCMS_Edit extends flexDb_SingleDataModule {
 		$this->FieldStyles_Set('title',array('width'=>'100%'));
 		$this->AddField('description','description','cms','Meta Description',itTEXT);
 		$this->FieldStyles_Set('description',array('width'=>'100%'));
+    $this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Possible Data Blocks');
 		$this->AddField('content','content','cms','Page Content',itHTML);
 		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
 	//	$this->AddPreProcessCallback('content',array($this,'getWithTemplate'));
 		$this->AddFilter('cms_id',ctEQ);
 	}
+  public function getPossibleBlocks($val,$pk,$original) {
+    $rows = CallModuleFunc('uDataBlocks_List','GetRows');
+    $ret = '<div>Click a field to insert it.</div>';
+    foreach ($rows as $row) {
+      $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$row['block_id']}</span>";
+    }   
+    return trim($ret);
+  }
 	public function getWithTemplate($val,$pk,$original) {
 		return file_get_contents('http://'.FlexDB::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$pk),FALSE);
 	}
