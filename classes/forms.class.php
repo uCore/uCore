@@ -1456,7 +1456,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
       'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
       'field'       => $fieldName,
     );
-    if (is_callable($fieldName)) {
+    if (is_array($fieldName)) {
       $this->fields[$aliasName]['field'] = "";
       $this->AddPreProcessCallback($aliasName, $fieldName);
     }
@@ -2181,19 +2181,20 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 			if (count($setParts) >0) $having[] = '('.join(' AND ',$setParts).')';
 		}
-    $ret = join(' OR ',$having);
+		$ret = join(' OR ',$having);
     
     if (empty($this->extraHaving)) return $ret;
-    
+    if ($ret) $ret = "($ret) AND ";
+	
     if (is_array($this->extraHaving)) {
       $extraWhere = array();
       foreach ($this->extraHaving as $field => $value) {
         $value = is_numeric($value) ? $value : "'$value'";
         $extraWhere[] = "($field = $value)";
       }
-      return "($ret) AND (".implode(' AND ',$extraWhere).")";
+      return "$ret (".implode(' AND ',$extraWhere).")";
     } elseif (is_string($this->extraHaving)) {
-      return "($ret) AND (".$this->extraHaving.")";
+      return "$ret (".$this->extraHaving.")";
     }
 
 		return $ret;

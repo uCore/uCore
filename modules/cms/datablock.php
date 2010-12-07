@@ -9,6 +9,7 @@ class tabledef_DataBlocks extends flexDb_TableDefinition {
     $this->AddField('filter',ftTEXT);
     $this->AddField('order',ftVARCHAR,30);
     $this->AddField('limit',ftVARCHAR,10);
+    $this->AddField('editable',ftBOOL);
     
     $this->AddField('display',ftTEXT);
     
@@ -58,8 +59,10 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
     $this->AddField('filter','filter','blocks','Filter',itTEXT);
     $this->AddField('order','order','blocks','Order',itTEXT);
     $this->AddField('limit','limit','blocks','Limit',itTEXT);
+    $this->AddField('editable','editable','blocks','Editable',itCHECKBOX);
     $this->AddField('fields',array($this,'getPossibleFields'),'blocks','Possible Fields');
     $this->AddField('content','content','blocks','Content',itHTML);
+	$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
     $this->AddField('preview',array($this,'getPreview'),'blocks','Preview');
   }
   public function getPossibleFields($originalVal,$pk,$processedVal) {
@@ -114,7 +117,11 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
         foreach ($searchArr as $k => $search) {
           $field = $varsArr[$k];
           if (!isset($row[$field])) continue;
-          $c = str_replace($search,$row[$field],$c);
+		  $replace = $row[$field];
+		  if ($rec['editable'])
+		    $replace = CallModuleFunc($rec['module'],'GetCell',$field,$row);
+
+		  $c = str_replace($search,$replace,$c);
         }
         $content .= $c;
       }
