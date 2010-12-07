@@ -1447,6 +1447,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
     //timer_start(get_class($this).':AF2:'.$aliasName);    
 		//if (!array_key_exists($aliasName,$this->fields)) // always replace so we can re-order automatic fields (like file data)
+		
 		$this->fields[$aliasName] = array(
 		  'alias'       => $aliasName,
       'tablename'   => $tableAlias,
@@ -1455,6 +1456,10 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
       'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
       'field'       => $fieldName,
     );
+    if (is_callable($fieldName)) {
+      $this->fields[$aliasName]['field'] = "";
+      $this->AddPreProcessCallback($aliasName, $fieldName);
+    }
     if ($tableAlias) $this->fields[$aliasName]['vtable'] = $this->sqlTableSetupFlat[$tableAlias];
 		//		if (preg_match_all('/{[^}]+}/',$fieldName,$matches) > 0)
 		//			$this->SetFieldProperty($aliasName,'pragma',$fieldName);
@@ -2458,6 +2463,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			return $result;*/
 	}
 
+  // sends ARGS,originalValue,pkVal,processedVal
 	public function PreProcess($fieldName,$value,$pkVal=NULL,$forceType = NULL) {
 		$originalValue = $value;
 		$suf = ''; $pre = ''; $isNumeric=true;
@@ -2619,6 +2625,12 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 */
 		$func = 'ProcessUpdates_'.$function;
 		$this->$func($sendingField,$fieldAlias,$value,$pkVal);
+    
+    // reset all fields with preprocess.
+    foreach ($this->fields as $alias => $field) {
+      if (isset($field['preprocess'])) $this->ResetField($alias,$pkVal);
+    }
+    
 		return;
 		//CallModuleFunc($mainClass,'ProcessUpdates_'.$function,$sendingField,$fieldAlias,$value,$pkVal);
 

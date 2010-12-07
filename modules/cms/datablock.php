@@ -59,7 +59,10 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
     $this->AddField('order','order','blocks','Order',itTEXT);
     $this->AddField('limit','limit','blocks','Limit',itTEXT);
     $this->AddField('content','content','blocks','Content',itHTML);
-    $this->AddField('preview','{block_id}','blocks','preview');
+    $this->AddField('preview',array($this,'getPreview'),'blocks','preview');
+  }
+  public function getPreview($originalVal,$pk,$processedVal) {
+    return $this->DrawBlock($pk);
   }
   public function SetupParents() {
     $this->AddParent('uDataBlocks_List');
