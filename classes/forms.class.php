@@ -2099,7 +2099,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		return "($fieldToCompare $compareType $val)";
 	}
 
-	public function GetWhereStatement($extra = NULL) {
+  public $extraWhere = NULL;
+	public function GetWhereStatement() {
 		//		echo get_class($this).".GetWhereStatement()\n";
 		$filters = $this->filters;
 		//print_r($filters);
@@ -2125,26 +2126,33 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			}
 			if (count($setParts) >0) $where[] = '('.join(' AND ',$setParts).')';
 		}
-		return join(' AND ',$where);
-
-		$extraWhere = array();
-		if (is_array($extra)) {
-			foreach ($extra as $field => $value) {
+    $ret = join(' AND ',$where);
+    if (empty($this->extraWhere)) return $ret;
+    
+		if (is_array($this->extraWhere)) {
+      $extraWhere = array();
+			foreach ($this->extraWhere as $field => $value) {
 				$value = is_numeric($value) ? $value : "'$value'";
 				$extraWhere[] = "($field = $value)";
 			}
+      return "($ret) AND (".implode(' AND ',$extraWhere).")";
+		} elseif (is_string($this->extraWhere)) {
+		  return "($ret) AND (".$this->extraWhere.")";
 		}
 
-		if (empty($where) && empty($extraWhere)) return '';
+    return $ret;
+
+/*		if (empty($where) && empty($extraWhere)) return '';
 
 		if (count($where) > 0)
 		array_push($extraWhere,join(' OR ',$where));
 
 		$state = join(' AND ',$extraWhere);
 
-		return $state;
+		return $state;*/
 	}
 
+  public $extraHaving = NULL;
 	public function GetHavingStatement($onlyFilters = FALSE) {
 		$filters = $this->filters;
 
@@ -2168,24 +2176,38 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 			if (count($setParts) >0) $having[] = '('.join(' AND ',$setParts).')';
 		}
-		if (empty($having)) return '';
+    $ret = join(' OR ',$having);
+    
+    if (empty($this->extraHaving)) return $ret;
+    
+    if (is_array($this->extraHaving)) {
+      $extraWhere = array();
+      foreach ($this->extraHaving as $field => $value) {
+        $value = is_numeric($value) ? $value : "'$value'";
+        $extraWhere[] = "($field = $value)";
+      }
+      return "($ret) AND (".implode(' AND ',$extraWhere).")";
+    } elseif (is_string($this->extraHaving)) {
+      return "($ret) AND (".$this->extraHaving.")";
+    }
 
-		return join(' OR ',$having);
+		return $ret;
 	}
 
 	public function GetOrderBy() {
-		//	if ($this->grouping !== NULL || !empty($this->grouping)) return ' ORDER BY NULL';
-		if (!empty($this->ordering)) return join(', ',$this->ordering);
-
-		return 'NULL';
+		if (empty($this->ordering)) return 'NULL';
+		if (is_array($this->ordering)) return join(', ',$this->ordering);
+    return $this->ordering;
 	}
 
 	public function GetGrouping() {
-		if ($this->grouping === NULL || empty($this->grouping)) return '';
-
-		return join(', ',$this->grouping);
+    if (empty($this->grouping)) return '';
+    if (is_array($this->grouping)) return join(', ',$this->grouping);
+    return $this->grouping;
 	}
 
+  public $limit = NULL;
+  
 	/**
 	 * Get a dataset based on setup.
 	 * @param (bool|null) NULL to return a fresh dataset, TRUE to refresh the internal dataset, FALSE to return the cached dataset.
@@ -2237,6 +2259,8 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//	ob_end_clean();
 		//	print_r(useful_backtrace(0,4));
 		//print_r($this->filters);
+
+    if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
 
 		if (array_key_exists('__explain',$_REQUEST)) {
 			FlexDB::CancelTemplate();
