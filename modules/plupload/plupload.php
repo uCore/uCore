@@ -6,7 +6,7 @@ FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload
 FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.css'));
 $pathUpload = CallModuleFunc('fileManager','GetAjaxUploadPath');
 $pathCore = PATH_REL_CORE;
-FlexDB::AppendVar('script_include',<<<FIN
+uJavascript::IncludeText(<<<FIN
 var pluploadOptions = {
     runtimes : 'html5,flash,gears,silverlight,browserplus,html4',
     chunk_size : '1mb',
