@@ -20,6 +20,10 @@ class uJavascript {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
 		self::$includeFiles[] = $path;
 	}
+  private static $includeText = '';
+  public static function IncludeText($text) {
+    self::$includeText .= "\n$text";
+  }
 
 	public function SetupParents() {
 
@@ -59,6 +63,9 @@ class uJavascript {
 			if (!file_exists($filename)) continue;
 			$body .= file_get_contents($filename).';';
 		}
+    
+    $body .= self::$includeText;
+    
 		$body = JSMin::minify($body);
 		file_put_contents(PATH_ABS_CORE.'.javascript.js',$body);
 //		ob_end_clean();
