@@ -1805,8 +1805,13 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 //			$fieldName = ReplacePragma($fieldName, $fieldData['tablename']);
 //		}
 //		echo '<br>';
-		$chr1 = substr($fieldName,0,1);
-		if ($this->GetFieldProperty($alias, 'is_function') || $chr1 == '(' || $chr1 == "'" || $chr1 == '"') {
+    $chr1 = substr($fieldName,0,1);
+    if (!preg_match('/{[^}]+}/',$fieldData['field'])) {
+      if ($chr1 == '(' || $chr1 == "'" || $chr1 == '"')
+        $toAdd = $fieldData['field'];
+      else
+        $toAdd = "`{$fieldData['tablename']}`.`{$fieldData['field']}`";
+    } elseif ($this->GetFieldProperty($alias, 'is_function') || $chr1 == '(' || $chr1 == "'" || $chr1 == '"') {
 			$toAdd = ReplacePragma($fieldData['field'], $fieldData['tablename']);
 //		} elseif (preg_match('/{[^}]+}/',$fieldData['field']) > 0) { // has pragma code
 //			if (substr($fieldData['field'],0,1) === '{') // starts with a pragma, so assume we need to concat
@@ -1820,7 +1825,6 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			$toAdd = CreateConcatString($fieldName, $fieldData['tablename']);
 			//$flds[] = "$concat as $alias";
 		}
-
 		switch ($this->GetFieldType($alias)) {
 			case 'date': $toAdd = "IF($toAdd = 0,'',DATE_FORMAT($toAdd,'".FORMAT_DATE."'))"; break;
 			case 'time': $toAdd = "IF($toAdd = 0,'',TIME_FORMAT($toAdd,'".FORMAT_TIME."'))"; break;

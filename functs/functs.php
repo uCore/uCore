@@ -54,25 +54,26 @@ function cbase64_decode($str) {
 
 function ReplacePragma($string,$tbl='') {
 	$tbl = ($tbl) ? "$tbl." : '';
+  $retF = "$string";
 	if (preg_match_all('/{[^}]+}/',$string,$matches) > 0 && !empty($tbl)) {
 		$retF = "$string";
 		foreach ($matches[0] as $match) {
 			$retF = str_replace($match,"$tbl".trim($match,'{}'),$retF);
 		}
-	} else
-	$retF = "$tbl$string";
+	}
+    
 	return $retF;
 }
 
 function CreateConcatString($string,$tbl='') {
 	$tbl = ($tbl) ? "`$tbl`." : '';
+  $retF = "$tbl`$string`";
 	if (preg_match_all('/{[^}]+}/',$string,$matches) > 0 && !empty($tbl)) {
 		$retF = "CONCAT('$string')";
 		foreach ($matches[0] as $match) {
 			$retF = str_replace($match,"',$tbl".trim($match,'{}').",'",$retF);
 		}
-	} else
-		$retF = "$tbl`$string`";
+	}
 
 	return $retF;
 }
