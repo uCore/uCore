@@ -7,8 +7,12 @@ td { vertical-align: top }
 .utopia-filter-default { color: #AAA; }
 *:focus { outline: 1px; }
 
-.btn-edit { margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(images/edit.png) }
-.btn-del  { margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(images/delete.png) }
+.btn-edit { 
+margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(images/edit.png) 
+!important; }
+.btn-del  { 
+margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(images/delete.png) 
+!important; }
 
 img { border: none }
 
