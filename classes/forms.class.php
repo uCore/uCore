@@ -1,6 +1,6 @@
 <?php
 //-- debugging
-define('SHOW_QUERY'		,false);
+//define('SHOW_QUERY'		,false);
 define('BASE_MODULE','uCMS_View');
 
 //--  InputType
@@ -465,7 +465,14 @@ abstract class flexDb_BasicModule {
 		$uuid = preg_replace('((.{8})(.{4})(.{4})(.{4})(.+))','$1-$2-$3-$4-$5',md5(get_class($this)));
 		return $uuid;
 	}
-
+  private $mID = NULL;
+  public function GetModuleId() {
+    if ($this->mID !== NULL) return $this->mID;
+    $m = FlexDB::ModuleExists(get_class($this));
+    $this->mID = $m['module_id'];
+    return $this->mID;
+  }
+  
 	public $rewriteMapping=NULL;
 	public $rewriteURLReadable=NULL;
 	public function HasRewrite() { return $this->rewriteMapping !== NULL; }
@@ -858,8 +865,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 					//if (!empty($filter['default'])) continue;
 		//			$val = $this->GetFilterValue($filter['uid']);
 					//ErrorLog($val);
-					$m = FlexDB::ModuleExists(get_class($this));
-					$isNew = is_array($filters) && array_key_exists($m['module_id'].'_new',$filters);
+					$isNew = is_array($filters) && array_key_exists($this->GetModuleId().'_new',$filters);
 					if (!empty($val) && !($filter['fieldName'] == $this->GetPrimaryKey() && $isNew))
 						$filArr['_f_'.$filter['uid']] = $val;
 				}
@@ -936,8 +942,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function IsNewRecord() {
 		if ($this->forceNewRec === TRUE) return true;
-    $m = FlexDB::ModuleExists(get_class($this));
-		if (array_key_exists($m['module_id'].'_new',$_REQUEST)) return true;
+		if (array_key_exists($this->GetModuleId().'_new',$_REQUEST)) return true;
 		//		$dset = GetModuleVar(GetCurrentModule(),'dataset');
 		//		if ($dset == NULL) return true;
 		//		if (mysql_num_rows($dset) == 0) return true;
@@ -1635,8 +1640,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		//		if (get_class($this) != GetCurrentModule()) return CallModuleFunc(GetCurrentModule(),'GetNewUID');
 
 		$this->filterUID = $this->filterUID +1;
-    $m = FlexDB::ModuleExists(get_class($this));
-		return $m['module_id'].'_'.($this->filterUID - 1);
+		return $this->GetModuleId().'_'.($this->filterUID - 1);
 	}
 
 	// private - must use addfilter or addfilterwhere.
@@ -2205,8 +2209,13 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	}
 
 	public function GetOrderBy() {
+    $m = FlexDB::ModuleExists(get_class($this));
+    $sortKey = '_s_'.$this->GetModuleId();
+    if (isset($_GET[$sortKey])) return $_GET[$sortKey];
+
 		if (empty($this->ordering)) return 'NULL';
 		if (is_array($this->ordering)) return join(', ',$this->ordering);
+    
     return $this->ordering;
 	}
 
@@ -3254,8 +3263,7 @@ SCR_END
 						&& flag_is_set(CallModuleFunc($link['moduleName'],'GetOptions'),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'flexDb_SingleDataModule')
 						&& empty($link['fieldLinks'])) {
-					$m = FlexDB::ModuleExists($link['moduleName']);
-					$url = CallModuleFunc($link['moduleName'],'GetURL',array($m['module_id'].'_new'=>1));
+					$url = CallModuleFunc($link['moduleName'],'GetURL',array($this->GetModuleId().'_new'=>1));
 					FlexDB::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
 			}
@@ -3310,7 +3318,7 @@ SCR_END
 						// write the section, and reset the count
 						$sectionName = $this->layoutSections[$sectionID];
 						$secClass = empty($sectionName) ? '' : ' sectionHeader';
-						echo "<td colspan=\"$sectionCount\" class=\"{sorter: false}$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
+						echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
 						$sectionCount = 0;
 						$sectionID = $fieldData['layoutsection'];
 					}
@@ -3320,18 +3328,18 @@ SCR_END
 				}
 				$sectionName = $this->layoutSections[$sectionID];
 				$secClass = empty($sectionName) ? '' : ' sectionHeader';
-				echo "<td colspan=\"$sectionCount\" class=\"{sorter: false}$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
+				echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
 				echo "</tr>";
 			}
 
 			// start of FIELD headers
 			echo '<tr>';
-			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo "<th class=\"{sorter: false}\">&nbsp;</th>"; $colcount++; }
+			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo '<th>&nbsp;</th>'; $colcount++; }
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$colcount++;
 
-				$classes = array();
+/*				$classes = array();
 				switch ($this->GetFieldType($fieldName)) {
 					case 'date':
 					case 'time':
@@ -3344,15 +3352,16 @@ SCR_END
 				//if (array_key_exists($fieldName,$this->firsts)) $classes[] = 'sectionFirst';
 				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
 				//			$attr = $this->GetFieldType($fieldName) == ftCURRENCY ? ' style="text-align:\'.\'"' : '';
-				echo "<th$class>";
-				echo nl2br(htmlentities_skip($fieldData['visiblename'],'<>"'));
+ */
+				echo '<th class="sortable" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
+				echo nl2br(htmlentities_skip($fieldData['visiblename'],'<>"')).'<br/>';
 				if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
 					foreach ($this->filters as $fType) {
 						foreach ($fType as $filterset) { //flag_is_set($fieldData['options'],ALLOW_FILTER)) {
 							foreach ($filterset as $filterInfo) {
 								if ($fieldName != $filterInfo['fieldName']) continue;
 								if ($filterInfo['it'] === itNONE) continue;
-								echo "<br/>".$this->GetFilterBox($filterInfo);
+								echo $this->GetFilterBox($filterInfo);
 								//break 2;
 							}
 						}
