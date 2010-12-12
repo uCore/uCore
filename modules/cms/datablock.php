@@ -24,7 +24,7 @@ class uDataBlocks_List extends flexDb_ListDataModule {
   public function SetupFields() {
     $this->CreateTable('blocks');
     $this->AddField('block_id','block_id','blocks','Block ID');
-    $this->AddField('tabledef','tabledef','blocks','Table');
+    $this->AddField('module','module','blocks','Table');
 //    $this->AddField('where','where','blocks','Where');
 //    $this->AddField('order','order','blocks','Order');
   }
