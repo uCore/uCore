@@ -2605,9 +2605,9 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$pre = '';
 		if (!empty($filterInfo['title'])) {
 //			$pre = $filterInfo['title'].' ';
-			$emptyVal = $filterInfo['title'];//.' '.$filterInfo['ct'];
+			$emptyVal = $filterInfo['title'].' '.htmlentities($filterInfo['ct']);
 		} else
-			$emptyVal = $this->fields[$fieldName]['visiblename'];//.' '.$filterInfo['ct'];
+			$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']);
 
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA)
 		$vals = cbase64_encode(get_class($this)."|$fieldName");
