@@ -100,7 +100,7 @@ class FlexConfig {
 		if (count($validFields) > 0) $failure .= "Some fields are missing:\n".join("\n",$validFields)."\n\n";
 
     if (array_key_exists('SQL_SERVER',$arr) && $arr['SQL_SERVER'] && array_key_exists('SQL_USERNAME',$arr) && $arr['SQL_USERNAME'] && array_key_exists('SQL_PASSWORD',$arr) && $arr['SQL_PASSWORD'] && array_key_exists('SQL_DBNAME',$arr) && $arr['SQL_DBNAME']) {
-  		$srv = $arr['SQL_SERVER'].(array_key_exists('SQL_PORT',$arr) ? ':'.$arr['SQL_PORT'] : '');
+  		$srv = $arr['SQL_SERVER'].(isset($arr['SQL_PORT']) && $arr['SQL_PORT'] !== '' ? ':'.$arr['SQL_PORT'] : '');
 
   		if (mysql_connect($srv,$arr['SQL_USERNAME'],$arr['SQL_PASSWORD']) === FALSE)
   			$failure .= "Unable to connect to server. ".mysql_error()."\n";
