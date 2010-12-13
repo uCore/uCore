@@ -848,6 +848,20 @@ class FlexDB {
 		self::CancelTemplate();
 		die(print_r($text,true));
 	}
+	
+	// converters
+	static function convDate($originalValue,$pkVal,$processedVal) {
+		$t = strtotime( $originalValue );
+		return strftime(FORMAT_DATE,$t);
+	}
+	static function convTime($originalValue,$pkVal,$processedVal) {
+		$t = strtotime( $originalValue );
+		return strftime(FORMAT_TIME,$t);
+	}
+	static function convDateTime($originalValue,$pkVal,$processedVal) {
+		$t = strtotime( $originalValue );
+		return strftime(FORMAT_DATETIME,$t);
+	}
 }
 
 ?>
