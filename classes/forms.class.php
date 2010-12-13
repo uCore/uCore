@@ -1473,10 +1473,21 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
     //timer_end(get_class($this).':AF2:'.$aliasName);
 
     //timer_start(get_class($this).':AF3:'.$aliasName);
-		if ($this->GetFieldType($aliasName) == ftFILE) {
+	switch ($this->GetFieldType($aliasName)) {
+		case ftFILE:
 			$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
 			$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
-		}
+			break;
+		case ftDATE:
+			$this->AddPreProcessCallback($aliasName,array('FlexDB','convDate'));
+			break;
+		case ftTIME:
+			$this->AddPreProcessCallback($aliasName,array('FlexDB','convTime'));
+			break;
+		case ftDATETIME:
+			$this->AddPreProcessCallback($aliasName,array('FlexDB','convDateTime'));
+			break;
+	}
     //timer_end(get_class($this).':AF3:'.$aliasName);
 		//		if ($inputtype == itDATE) {
 		//			$this->SetFieldProperty($aliasName,'dateformat','dd/MMM/yyyy');
@@ -1595,13 +1606,13 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		if ($this->FieldExists($alias))
 			$fieldName = "`$alias`";
 
-		switch ($this->GetFieldType($alias)) {
-			case ftDATE: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_DATE."')"; break;
-			case ftTIME: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_TIME."')"; break;
-			case ftDATETIME:
-			case ftTIMESTAMP: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_DATETIME."')"; break;
+//		switch ($this->GetFieldType($alias)) {
+//			case ftDATE: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_DATE."')"; break;
+//			case ftTIME: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_TIME."')"; break;
+//			case ftDATETIME:
+//			case ftTIMESTAMP: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_DATETIME."')"; break;
 //			default: $fieldName = $fld;
-		}
+//		}
 
 		$this->ordering[] = "$fieldName $direction";
 	}
@@ -1829,12 +1840,12 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			$toAdd = CreateConcatString($fieldName, $fieldData['tablename']);
 			//$flds[] = "$concat as $alias";
 		}
-		switch ($this->GetFieldType($alias)) {
-			case 'date': $toAdd = "IF($toAdd = 0,'',DATE_FORMAT($toAdd,'".FORMAT_DATE."'))"; break;
-			case 'time': $toAdd = "IF($toAdd = 0,'',TIME_FORMAT($toAdd,'".FORMAT_TIME."'))"; break;
-			case 'datetime':
-			case 'timestamp': $toAdd = "IF($toAdd = 0,'',DATE_FORMAT($toAdd,'".FORMAT_DATETIME."'))"; break;
-		}
+//		switch ($this->GetFieldType($alias)) {
+//			case 'date': $toAdd = "IF($toAdd = 0,'',DATE_FORMAT($toAdd,'".FORMAT_DATE."'))"; break;
+//			case 'time': $toAdd = "IF($toAdd = 0,'',TIME_FORMAT($toAdd,'".FORMAT_TIME."'))"; break;
+//			case 'datetime':
+//			case 'timestamp': $toAdd = "IF($toAdd = 0,'',DATE_FORMAT($toAdd,'".FORMAT_DATETIME."'))"; break;
+//		}
 
 		return "$toAdd as `$alias`";
 	}
@@ -2024,6 +2035,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	// filterSection = [where|having]
 
 	public function FormatFieldName($fieldName, $fieldType = NULL) {
+//	return $fieldName;
 		if ($fieldType === NULL)
 		$fieldType = $this->GetFieldType($fieldName);
 
@@ -2092,6 +2104,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			case $compareType == ctISNOT:
 			case is_numeric($value):
 				$val = $value; break;
+				// convert dates to mysql version for filter
 			case ($inputType==itDATE): $val = "(STR_TO_DATE('$value', '".FORMAT_DATE."'))"; break;
 			case ($inputType==itTIME): $val = "(STR_TO_DATE('$value', '".FORMAT_TIME."'))"; break;
 			case ($inputType==itDATETIME): $val = "(STR_TO_DATE('$value', '".FORMAT_DATETIME."'))"; break;
@@ -2211,8 +2224,14 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	public function GetOrderBy() {
     $m = FlexDB::ModuleExists(get_class($this));
     $sortKey = '_s_'.$this->GetModuleId();
-    if (isset($_GET[$sortKey])) return $_GET[$sortKey];
-
+    if (isset($_GET[$sortKey])) {
+		$arr = explode(',',$_GET[$sortKey]);
+		foreach ($arr as $sorter) {
+			$s = explode(' ',$sorter);
+			$this->AddOrderBy($s[0],isset($s[1]) ? $s[1] : NULL);
+		}
+//		return $_GET[$sortKey];
+	}
 		if (empty($this->ordering)) return 'NULL';
 		if (is_array($this->ordering)) return join(', ',$this->ordering);
     

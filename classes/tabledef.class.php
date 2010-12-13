@@ -5,9 +5,9 @@ define('ftVARCHAR'			,'varchar');
 define('ftTEXT'				,'text');
 define('ftLONGTEXT'			,'longtext');
 // time
-define('ftDATETIME'			,'datetime');
 define('ftDATE'				,'date');
 define('ftTIME'				,'time');
+define('ftDATETIME'			,'datetime');
 define('ftTIMESTAMP'		,'timestamp');
 // numbers
 define('ftBOOL'				,'bool');
