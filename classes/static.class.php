@@ -9,6 +9,8 @@ FlexDB::AddTemplateParser('tab','FlexDB::Tab_GetOutput');
 FlexDB::AddTemplateParser('get','FlexDB::parseGet');
 FlexDB::AddTemplateParser('post','FlexDB::parsePost');
 FlexDB::AddTemplateParser('request','FlexDB::parseRequest');
+FlexDB::AddTemplateParser('session','FlexDB::parseSession');
+FlexDB::AddTemplateParser('const','FlexDB::parseConst');
 
 FlexDB::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
@@ -739,6 +741,8 @@ class FlexDB {
   static function parseGet($id) { return isset($_GET[$id]) ? $_GET[$id] : ''; }
   static function parsePost($id) { return isset($_POST[$id]) ? $_POST[$id] : ''; }
   static function parseRequest($id) { return isset($_REQUEST[$id]) ? $_REQUEST[$id] : ''; }
+  static function parseSession($id) { return isset($_SESSION[$id]) ? $_SESSION[$id] : ''; }
+  static function parseConst($id) { return defined($id) ? constant($id) : ''; }
 
 	static function PageNotFound() {
 		header("HTTP/1.0 404 Not Found",true,404);
