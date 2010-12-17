@@ -942,7 +942,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function IsNewRecord() {
 		if ($this->forceNewRec === TRUE) return true;
-		if (array_key_exists($this->GetModuleId().'_new',$_REQUEST)) return true;
+		if (isset($_REQUEST[$this->GetModuleId().'_new'])) return true;
 		//		$dset = GetModuleVar(GetCurrentModule(),'dataset');
 		//		if ($dset == NULL) return true;
 		//		if (mysql_num_rows($dset) == 0) return true;
@@ -3282,7 +3282,7 @@ SCR_END
 						&& flag_is_set(CallModuleFunc($link['moduleName'],'GetOptions'),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'flexDb_SingleDataModule')
 						&& empty($link['fieldLinks'])) {
-					$url = CallModuleFunc($link['moduleName'],'GetURL',array($this->GetModuleId().'_new'=>1));
+					$url = CallModuleFunc($link['moduleName'],'GetURL',array(CallModuleFunc($link['moduleName'],'GetModuleId').'_new'=>1));
 					FlexDB::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
 			}
@@ -3577,10 +3577,10 @@ abstract class flexDb_SingleDataModule extends flexDb_DataModule {
 		//		$newRec = ($this->HasFilter($this->GetPrimaryKey()) === FALSE);
 		//		$result = $this->GetCurrentRecord();
 		//		$row == NULL;
-		$dataset = $this->GetDataset(TRUE);
 
 		$row = NULL;
 		if (!$this->IsNewRecord()) { // records exist, lets get the first.
+      $dataset = $this->GetDataset(TRUE);
 			$row = $this->GetRecord($dataset,0);
 			if (!$row) {
 				echo "The record you requested is not available.";
