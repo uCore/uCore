@@ -67,6 +67,7 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
   }
   public function getPossibleFields($originalVal,$pk,$processedVal) {
     $rec = $this->LookupRecord($pk);
+    if (!$rec) return 'Please select a module.';
     $fields = GetModuleVar($rec['module'],'fields');
     $ret = '<div>Click a field to insert it.</div>';
     foreach ($fields as $field) {
