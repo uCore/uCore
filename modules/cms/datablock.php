@@ -67,7 +67,7 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
   }
   public function getPossibleFields($originalVal,$pk,$processedVal) {
     $rec = $this->LookupRecord($pk);
-    if (!$rec) return 'Please select a module.';
+    if (!$rec || !$rec['module']) return 'Please select a module.';
     $fields = GetModuleVar($rec['module'],'fields');
     $ret = '<div>Click a field to insert it.</div>';
     foreach ($fields as $field) {
@@ -91,22 +91,24 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
   static function DrawBlock($id) {
     $rec = CallModuleFunc('uDataBlocks_Edit','LookupRecord',$id);
     if (!$rec) return NULL;
-    
-    // create module instance
-    $instance = FlexDB::GetInstance($rec['module']);
 
-    // add filters
-    $instance->extraHaving = $rec['filter'];
+    if ($rec['module']) {
+      // create module instance
+      $instance = FlexDB::GetInstance($rec['module']);
 
-    // add Order
-    $instance->ordering = $rec['order'];
+      // add filters
+      $instance->extraHaving = $rec['filter'];
 
-    // init limit
-    $instance->limit = $rec['limit'];
+      // add Order
+      $instance->ordering = $rec['order'];
 
-    // get rows    
-    $dataset = $instance->GetDataset(NULL);
-    $rows = GetRows($dataset);
+      // init limit
+      $instance->limit = $rec['limit'];
+
+      // get rows    
+      $dataset = $instance->GetDataset(NULL);
+      $rows = GetRows($dataset);
+    } else $rows = array();
     
     $content = '';
     
