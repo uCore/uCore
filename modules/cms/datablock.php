@@ -60,6 +60,7 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
     $this->AddField('order','order','blocks','Order',itTEXT);
     $this->AddField('limit','limit','blocks','Limit',itTEXT);
     $this->AddField('editable','editable','blocks','Editable',itCHECKBOX);
+    $this->AddField('content_info','"The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element an id of _r (id=\"_r\") or _ri to repeat contained elements only (innerHTML)."','','');
     $this->AddField('fields',array($this,'getPossibleFields'),'blocks','Possible Fields');
     $this->AddField('content','content','blocks','Content',itHTML);
 	$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
@@ -69,9 +70,9 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
     $rec = $this->LookupRecord($pk);
     if (!$rec || !$rec['module']) return 'Please select a module.';
     $fields = GetModuleVar($rec['module'],'fields');
-    $ret = '<div>Click a field to insert it.</div>';
+    $ret = '';
     foreach ($fields as $field) {
-      $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$field['alias']}</span>";
+      $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">{$field['alias']}</span>";
     }   
     return trim($ret);
   }
@@ -97,9 +98,11 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
       $instance = FlexDB::GetInstance($rec['module']);
 
       // add filters
+	  FlexDB::MergeVars($rec['filter']);
       $instance->extraHaving = $rec['filter'];
 
       // add Order
+	  FlexDB::MergeVars($rec['order']);
       $instance->ordering = $rec['order'];
 
       // init limit
@@ -110,17 +113,31 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
       $rows = GetRows($dataset);
     } else $rows = array();
     
-    $content = '';
-    
-    if (preg_match_all('/{field\.([^}]+)}/Ui',$rec['content'],$matches,PREG_PATTERN_ORDER)) {
+    $content = $append = $prepend = '';
+    	
+	$repeatable = $rec['content'];
+	
+	$html = str_get_html($repeatable);
+	$ele = ($e = $html->find('#_ri',0)) ? $e->innertext : NULL;
+	if (!$ele) $ele = ($e = $html->find('#_r',0)) ? $e->outertext : NULL;
+
+	if ($ele) {
+		// found a repeatable element
+		// split content at this element. prepare for append and prepend.
+		list($append,$prepend) = explode($ele,$repeatable);
+		$repeatable = $ele;
+	}
+	
+    if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$repeatable,$matches,PREG_PATTERN_ORDER)) {
       $searchArr = $matches[0];
-      $varsArr = isset($matches[1]) ? $matches[1] : false;
+      $typeArr = isset($matches[1]) ? $matches[1] : false;
+      $varsArr = isset($matches[2]) ? $matches[2] : false;
       foreach ($rows as $row) {
-        $c = $rec['content'];
+        $c = $repeatable;
         foreach ($searchArr as $k => $search) {
           $field = $varsArr[$k];
           if (!isset($row[$field])) continue;
-		  $replace = $row[$field];
+		  $replace = $typeArr[$k] == 'u' ? UrlReadable($row[$field]) : $row[$field];
 		  if ($rec['editable'])
 		    $replace = CallModuleFunc($rec['module'],'GetCell',$field,$row);
 
@@ -129,8 +146,10 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
         $content .= $c;
       }
     }
-    
-    return $content;
+	    
+	$ret = $append.$content.$prepend;
+	while (FlexDB::MergeVars($ret));	
+    return $ret;
   } 
 }
 
