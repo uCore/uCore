@@ -1,6 +1,6 @@
 Utopia Core Web Framework
 http://www.utopiasystems.co.uk
 
-Copyright 2007-2010, Tom Kay
+Copyright 2011, Tom Kay
 Dual licensed under the MIT or GPL Version 2 licenses.
 http://www.utopiasystems.co.uk/license.php
