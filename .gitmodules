@@ -1,0 +1,3 @@
+[submodule "./modules/jquery.fileManager"]
+	path = ./modules/jquery.fileManager
+	url = git@github.com:oridan/jquery.fileManager.git
