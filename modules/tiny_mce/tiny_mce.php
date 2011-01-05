@@ -54,7 +54,8 @@ class module_TinyMCE extends flexDb_BasicModule {
 			$htmlOpts['editor_selector'] = "mceEditorHTML";
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table";
-			$htmlOpts['theme_advanced_buttons2_add'] = "media";
+			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor';
+			$htmlOpts['theme_advanced_buttons2_add'] = 'media';
       $htmlOpts['theme_advanced_buttons3_add'] = "spellchecker,|,tablecontrols";
       //$htmlOpts['theme_advanced_buttons4'] = "";
 
