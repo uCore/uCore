@@ -1,6 +1,0 @@
-[submodule "jquery.fileManager"]
-	path = modules/jquery.fileManager
-	url = git@github.com:oridan/jquery.fileManager.git
-[submodule "modules/jquery.treeSort"]
-	path = modules/jquery.treeSort
-	url = git@github.com:oridan/jquery.treeSort.git
