@@ -108,7 +108,7 @@ abstract class flexDb_BasicModule {
   }
 	public static function __callStatic($name, $arguments) {
 		// Note: value of $name is case sensitive.
-		$instance = FlexDB::GetInstance(get_class($this));
+		$instance = utopia::GetInstance(get_class($this));
 		return call_user_func_array(array($instance,$name),$arguments);
 	}*/
 
@@ -218,13 +218,13 @@ abstract class flexDb_BasicModule {
 //ErrorLog(get_class($this).': p3');
 //ErrorLog(GetCurrentModule().':'.$parent.'->'.get_class($this));
 
-		$lm = FlexDB::GetVar('loadedModules',array());
+		$lm = utopia::GetVar('loadedModules',array());
 		if (array_search($this,$lm,true) === FALSE) $lm[] = $this;
 //echo 'PL '.get_class($this).' for '.$parent.'<br/>';
 		$this->activeParent = $parent;
 		$this->parentLoaded[$parent] = 0;
 
-//		timer_start('LoadChildren 0 '.get_class($this)."->_ParentLoad($parent)",FlexDB::GetChildren(get_class($this)));
+//		timer_start('LoadChildren 0 '.get_class($this)."->_ParentLoad($parent)",utopia::GetChildren(get_class($this)));
 		$lc = $this->LoadChildren();
 //		timer_end('LoadChildren 0 '.get_class($this)."->_ParentLoad($parent)");
 		//echo get_class($this).' '.$parent.' '.$lc.(is_numeric($lc) ? 'n':'');
@@ -242,7 +242,7 @@ abstract class flexDb_BasicModule {
 		timer_end('ParentLoad: '.get_class($this).' for '.$parent);
 		$this->parentLoaded[$parent] = 1;
 
-//		timer_start('LoadChildren 1 '.get_class($this)."->_ParentLoad($parent)",FlexDB::GetChildren(get_class($this)));
+//		timer_start('LoadChildren 1 '.get_class($this)."->_ParentLoad($parent)",utopia::GetChildren(get_class($this)));
 		$lc = $this->LoadChildren();
 //		timer_end('LoadChildren 1 '.get_class($this)."->_ParentLoad($parent)");
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
@@ -254,7 +254,7 @@ abstract class flexDb_BasicModule {
 
 	public function LoadChildren() {
 	  $class=get_class($this);
-		$children = FlexDB::GetChildren($class);
+		$children = utopia::GetChildren($class);
 		//print_r($children);
 		//$keys = array_keys($children);
 		//echo 'loading children for '.get_class($this).': '.implode(', ',$keys).'<br/>';
@@ -286,12 +286,12 @@ abstract class flexDb_BasicModule {
 					if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) {
 						$layer = 'http';
 						if ($this->isSecurePage) $layer .= 's';
-						$abs = $layer.'://'.FlexDB::GetDomainName();
+						$abs = $layer.'://'.utopia::GetDomainName();
 					}
 					header('Location: '.$abs.$url,true,301); die();
 			}
 		}
-		if (flag_is_set($this->GetOptions(),IS_ADMIN)) FlexDB::$adminTemplate = true;
+		if (flag_is_set($this->GetOptions(),IS_ADMIN)) utopia::$adminTemplate = true;
 
 		if ($this->isDisabled) return;
 		//		$this->SetupFields();
@@ -325,11 +325,11 @@ abstract class flexDb_BasicModule {
 
 	public $parents = array();
 	public function HasParent($parentModule) {
-		$children = FlexDB::GetChildren($parentModule);
+		$children = utopia::GetChildren($parentModule);
 		return array_key_exists(get_class($this),$children);
 	}
 	public function HasChild($childModule) {
-		$children = FlexDB::GetChildren(get_class($this));
+		$children = utopia::GetChildren(get_class($this));
 		return array_key_exists($childModule,$children);
 	}
 
@@ -403,7 +403,7 @@ abstract class flexDb_BasicModule {
 		}*/
 
 		//if (!array_key_exists('children',$GLOBALS)) $GLOBALS['children'] = array();
-		$children = FlexDB::GetChildren($parentModule);
+		$children = utopia::GetChildren($parentModule);
 		// check parent field hasnt already been selected
 		if ($parentField !== NULL && $parentField !== '*') {
 			//if (array_key_exists($parentModule,$children))
@@ -424,7 +424,7 @@ abstract class flexDb_BasicModule {
 
 		$info = array('moduleName'=>get_class($this), 'parentField'=>$parentField, 'fieldLinks' => $fieldLinks, 'text' => $text);
 		$this->parents[$parentModule][] = $info;
-		FlexDB::AddChild($parentModule, get_class($this), $info);
+		utopia::AddChild($parentModule, get_class($this), $info);
 
 		return $fieldLinks;
 	}
@@ -468,7 +468,7 @@ abstract class flexDb_BasicModule {
   private $mID = NULL;
   public function GetModuleId() {
     if ($this->mID !== NULL) return $this->mID;
-    $m = FlexDB::ModuleExists(get_class($this));
+    $m = utopia::ModuleExists(get_class($this));
     $this->mID = $m['module_id'];
     return $this->mID;
   }
@@ -589,7 +589,7 @@ abstract class flexDb_BasicModule {
 	}
 	public function IsActive() {
 		if (flag_is_set($this->GetOptions(),ALWAYS_ACTIVE)) return true;
-		return FlexDB::ModuleExists(get_class($this),true);
+		return utopia::ModuleExists(get_class($this),true);
 	}
 	public function CanBeActive() {
 		// check dependancies exist
@@ -607,7 +607,7 @@ abstract class flexDb_BasicModule {
 	public function IsInstalled() {
 		//check if its installed in the db
 		//$result = sql_query("SELECT * FROM internal_modules WHERE (`module_name` = '". get_class($this) ."')");
-		return FlexDB::ModuleExists(get_class($this));
+		return utopia::ModuleExists(get_class($this));
 		//$row = $GLOBALS['modules'][get_class($this)];
 		//$row = GetRow($result);
 		//if ($row !== NULL) return $row;
@@ -620,7 +620,7 @@ abstract class flexDb_BasicModule {
 		if (!is_array($uuids)) $uuids = array($uuids);
 		foreach ($uuids as $uuid) {
 			//echo $uuid.'<br/>';
-			$row = FlexDB::UUIDExists($uuid);
+			$row = utopia::UUIDExists($uuid);
 			if ($row === FALSE) {
 				//echo "not installed:".get_class($this);
 				//if (($row = $this->IsInstalled()) == FALSE) {
@@ -716,12 +716,12 @@ abstract class flexDb_BasicModule {
 		$sortOrder = $this->GetSortOrder();
 		$listDestination =  'child_buttons';
 		if (flag_is_set($this->GetOptions(),IS_ADMIN)) {
-			if (get_class($this) == GetCurrentModule()) FlexDB::LinkList_Add($listDestination,'',NULL,-500);
+			if (get_class($this) == GetCurrentModule()) utopia::LinkList_Add($listDestination,'',NULL,-500);
 			$sortOrder = $sortOrder - 1000;
 		}
 
 			if ($parentName == '/') return;
-	//	$lm = FlexDB::GetVar('loadedModules',array());
+	//	$lm = utopia::GetVar('loadedModules',array());
 	//	foreach ($this->parents as $parentName => $linkArray) {
 //			$parentName = $linkArray['moduleName'];
 			if (flag_is_set(CallModuleFunc(get_class($this),'GetOptions'),NO_NAV)) return;
@@ -752,13 +752,13 @@ abstract class flexDb_BasicModule {
 							if (array_key_exists($li['fromField'],$cr))
 							$filters["_f_".$li['toField']] = $cr[$li['fromField']];
 						}
-						FlexDB::LinkList_Add($listDestination,$btnText,$this->GetURL($filters),$sortOrder,NULL,array('class'=>'fdb-btn'));
+						utopia::LinkList_Add($listDestination,$btnText,$this->GetURL($filters),$sortOrder,NULL,array('class'=>'fdb-btn'));
 						//echo "<a id=\"fhtest\" href=\"".BuildQueryString($this->GetURL(),$filters)."\" class=\"draggable {tabTitle:'$btnText', tabPosition:'".$GLOBALS['modules'][get_class($this)]['sort_order']."'}\">$btnText</a>";
-						//		FlexDB::AppendVar('child_buttons',CreateNavButton($linkInfo['text'],BuildQueryString($this->GetURL(),$filters)));
+						//		utopia::AppendVar('child_buttons',CreateNavButton($linkInfo['text'],BuildQueryString($this->GetURL(),$filters)));
 					}
 				} else { // not linked to fields (so no filters)
-					FlexDB::LinkList_Add($listDestination,$btnText,$this->GetURL(),$sortOrder,NULL,array('class'=>'fdb-btn'));
-					//	FlexDB::AppendVar('child_buttons',CreateNavButton($linkInfo['text'],$this->GetURL()));
+					utopia::LinkList_Add($listDestination,$btnText,$this->GetURL(),$sortOrder,NULL,array('class'=>'fdb-btn'));
+					//	utopia::AppendVar('child_buttons',CreateNavButton($linkInfo['text'],$this->GetURL()));
 				}
 			}
 		//}
@@ -1049,7 +1049,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		$fieldName = $this->CreateSqlField($field,$pkValue,$prefix);
 		if ($inputType == itFILE) $attributes['id'] = $fieldName;
-		return FlexDB::DrawInput($fieldName,$inputType,$defaultValue,$values,$attributes);
+		return utopia::DrawInput($fieldName,$inputType,$defaultValue,$values,$attributes);
 	}
 
 	public function GetPrimaryKey() {
@@ -2222,7 +2222,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 	}
 
 	public function GetOrderBy() {
-    $m = FlexDB::ModuleExists(get_class($this));
+    $m = utopia::ModuleExists(get_class($this));
     $sortKey = '_s_'.$this->GetModuleId();
     if (isset($_GET[$sortKey])) {
 		$arr = explode(',',$_GET[$sortKey]);
@@ -2301,7 +2301,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
     if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
 
 		if (array_key_exists('__explain',$_REQUEST)) {
-			FlexDB::CancelTemplate();
+			utopia::CancelTemplate();
 			$this->explain = GetRows(sql_query("EXPLAIN EXTENDED $query"));
 			print_r($this->explain);
 			die();
@@ -2537,7 +2537,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			case ftUPLOAD:
 				if ($value) {
 					$value = $this->GetUploadURL($fieldName,$pkVal);
-					//$value = FlexDB::GetRelativePath($value);
+					//$value = utopia::GetRelativePath($value);
 					$value = "<a href=\"$value\">Download</a>";
 				}
 				break;
@@ -2628,7 +2628,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		$spanAttr = BuildAttrString($spanAttributes);
 
-		return '<span '.$spanAttr.'>'.$pre.FlexDB::DrawInput('_f_'.$filterInfo['uid'],$filterInfo['it'],$default,$vals,$attributes,false).'</span>';
+		return '<span '.$spanAttr.'>'.$pre.utopia::DrawInput('_f_'.$filterInfo['uid'],$filterInfo['it'],$default,$vals,$attributes,false).'</span>';
 	}
 
 	//	public function __construct() { $this->SetupFields(); }
@@ -2645,7 +2645,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function ProcessUpdates($function,$sendingField,$fieldAlias,$value,&$pkVal = NULL) {
 		$this->_SetupFields();
-/*		$lm = FlexDB::GetVar('loadedModules');
+/*		$lm = utopia::GetVar('loadedModules');
 		$mainClass = get_class($this);// GetCurrentModule();
 
 		$arrBefore = array(); $arrAfter = array();
@@ -2771,7 +2771,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 	public function UploadFile($fieldAlias,$fileInfo,&$pkVal = NULL) {
 		//$allowedTypes = $this->GetFieldProperty($fieldAlias, 'allowed');
-		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.FlexDB::ReadableBytes(FlexDB::GetMaxUpload()).'");'); return; }
+		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); return; }
 		$value = file_get_contents($fileInfo['tmp_name']);
 		if ($this->GetFieldType($fieldAlias) === ftUPLOAD) {
 			$this->UpdateField($fieldAlias,'',$pkVal);
@@ -2937,7 +2937,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 			// new record has been created.  pass the info on to child modules, incase they need to act on it.
 			$this->OnNewRecord($pkVal);
-			$children = FlexDB::GetChildren(get_class($this));
+			$children = utopia::GetChildren(get_class($this));
 			//if (array_key_exists('children',$GLOBALS) && array_key_exists(get_class($this),$GLOBALS['children']))
 			foreach ($children as $child => $links) CallModuleFunc($child,'OnParentNewRecord',$pkVal);
 
@@ -3027,7 +3027,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		$searchModule = is_array($row) && array_key_exists('__module__',$row) ? $row['__module__'] : get_class($this);
 		//		print_r($GLOBALS['children']);
 		//echo "$searchModule<br/>";
-		$children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : FlexDB::GetChildren($searchModule);
+		$children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : utopia::GetChildren($searchModule);
 
 		$info = NULL;
 		// get specific field
@@ -3061,7 +3061,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 		if ($row == NULL) return NULL;
 		$searchModule = is_array($row) && array_key_exists('__module__',$row) ? $row['__module__'] : get_class($this);
 
-    $children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : FlexDB::GetChildren($searchModule);
+    $children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : utopia::GetChildren($searchModule);
 
 		$info = NULL;
 		// get specific field
@@ -3175,7 +3175,7 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 
 		$data = $this->GetCellData($fieldAlias,$newRec,$this->GetTargetURL($fieldAlias,$newRec));
 
-		FlexDB::AjaxUpdateElement($enc_name,$data);
+		utopia::AjaxUpdateElement($enc_name,$data);
 		//$ov = base64_encode($data);
 		//AjaxEcho("$('div#$enc_name').html(Base64.decode('$ov'));\n");
 	}
@@ -3272,7 +3272,7 @@ SCR_END
 		$dataset = $this->GetDataset(TRUE);
 		if (mysql_error()) return;
 
-		$children = FlexDB::GetChildren(get_class($this));
+		$children = utopia::GetChildren(get_class($this));
 		//print_r($children);
 		foreach ($children as $childModule => $links) {
 			foreach ($links as $link) {
@@ -3283,7 +3283,7 @@ SCR_END
 						&& is_subclass_of($link['moduleName'],'flexDb_SingleDataModule')
 						&& empty($link['fieldLinks'])) {
 					$url = CallModuleFunc($link['moduleName'],'GetURL',array(CallModuleFunc($link['moduleName'],'GetModuleId').'_new'=>1));
-					FlexDB::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
+					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
 			}
 		}
@@ -3295,9 +3295,9 @@ SCR_END
 		if (!isset($GLOBALS['inlineListCount'])) $GLOBALS['inlineListCount'] = 0;
 		else $GLOBALS['inlineListCount']++;
 
-		$tabGroupName = FlexDB::Tab_InitGroup();
+		$tabGroupName = utopia::Tab_InitGroup();
 
-		//$layoutID = FlexDB::tab_ //$tabGroupName.'-'.get_class($this)."_list_".$GLOBALS['inlineListCount'];
+		//$layoutID = utopia::tab_ //$tabGroupName.'-'.get_class($this)."_list_".$GLOBALS['inlineListCount'];
 		$metadataTitle = ' {tabTitle:\''.$this->GetTitle().'\', tabPosition:\''.$this->GetSortOrder().'\'}';
 		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
@@ -3518,14 +3518,14 @@ SCR_END
 		$cont = ob_get_contents();
 		ob_end_clean();
 
-		FlexDB::Tab_Add($this->GetTitle(),$cont,$tabGroupName,false,$this->GetSortOrder());
-		FlexDB::Tab_InitDraw($tabGroupName);
+		utopia::Tab_Add($this->GetTitle(),$cont,$tabGroupName,false,$this->GetSortOrder());
+		utopia::Tab_InitDraw($tabGroupName);
 	}
 
 	function DrawRow($row) {
 		$body = "<tr>";
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) {
-			//$delbtn = FlexDB::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'fdb-btn redbg','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
+			//$delbtn = utopia::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'fdb-btn redbg','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
 			$delbtn = $this->GetDeleteButton($row[$this->GetPrimaryKey()]);
 			$body .= '<td style="width:1px">'.$delbtn.'</td>';
 		}
@@ -3554,7 +3554,7 @@ abstract class flexDb_SingleDataModule extends flexDb_DataModule {
 		if ($linkInfo['parentField'] !== NULL) continue; // is linked to fields in the list, skip it
 		if (flag_is_set($this->GetOptions(),ALLOW_ADD)) { // create an addition button  --  && GetCurrentModule() == get_class($this)
 		$filters = array('newrec'=>1); // set this filter so that the primary key is negative, this will force no policy to be found, and show a new form
-		FlexDB::AppendVar('footer_left',CreateNavButton('New Record',BuildQueryString($this->GetURL(),$filters),NULL,array('class'=>'fdb-btn-new')));
+		utopia::AppendVar('footer_left',CreateNavButton('New Record',BuildQueryString($this->GetURL(),$filters),NULL,array('class'=>'fdb-btn-new')));
 		}
 		}
 		}
@@ -3597,10 +3597,10 @@ abstract class flexDb_SingleDataModule extends flexDb_DataModule {
 
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE) && !$this->IsNewRecord()) {
 			$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
-			//$delbtn = FlexDB::DrawInput($this->CreateSqlDeleteField($this->GetPrimaryKey().'='.$this->GetFilterValue($fltr['uid'])),itBUTTON,'Delete Record',NULL,array('class'=>'fdb-btn-del','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
+			//$delbtn = utopia::DrawInput($this->CreateSqlDeleteField($this->GetPrimaryKey().'='.$this->GetFilterValue($fltr['uid'])),itBUTTON,'Delete Record',NULL,array('class'=>'fdb-btn-del','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
 			$delbtn = $this->GetDeleteButton($this->GetFilterValue($fltr['uid']),'Delete Record');
 			//$delbtn = '<a name="'.$this->CreateSqlField('del',$this->GetFilterValue($fltr['uid']),'del').'" class="fdb-btn redbg" onclick="if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);">Delete Record</a>';
-			FlexDB::AppendVar('footer_left',$delbtn);
+			utopia::AppendVar('footer_left',$delbtn);
 		}
 
 		//		if (!$this->IsNewRecord()) { // records exist, lets get the first.
@@ -3614,7 +3614,7 @@ abstract class flexDb_SingleDataModule extends flexDb_DataModule {
 		$order = $this->GetSortOrder();
 		$extraCount = 1;
 		if (!flag_is_set($this->GetOptions(), NO_TABS))
-			$tabGroupName = FlexDB::Tab_InitGroup();
+			$tabGroupName = utopia::Tab_InitGroup();
 		foreach ($this->layoutSections as $sectionID => $sectionName) {
 			//$secCount++;
 			//			echo "<div class='layoutSection' >";
@@ -3658,13 +3658,13 @@ abstract class flexDb_SingleDataModule extends flexDb_DataModule {
 			}
 			$out .= "</table>";
 			if (!flag_is_set($this->GetOptions(), NO_TABS))
-				FlexDB::Tab_Add($SN,$out,$tabGroupName,false,$order);
+				utopia::Tab_Add($SN,$out,$tabGroupName,false,$order);
 			else
 				echo $out;
 		}
 
 		if (!flag_is_set($this->GetOptions(), NO_TABS))
-			FlexDB::Tab_InitDraw($tabGroupName);
+			utopia::Tab_InitDraw($tabGroupName);
 	}
 }
 

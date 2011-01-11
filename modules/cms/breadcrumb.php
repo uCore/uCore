@@ -1,6 +1,6 @@
 <?php
 
-FlexDB::AddTemplateParser('breadcrumb','uBreadcrumb::GetTrail','');
+utopia::AddTemplateParser('breadcrumb','uBreadcrumb::GetTrail','');
 class uBreadcrumb {
 	private static $extras = array();
 	static function AddCrumb($name,$url) {

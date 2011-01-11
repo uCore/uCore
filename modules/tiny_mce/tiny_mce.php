@@ -7,8 +7,8 @@ class module_TinyMCE extends flexDb_BasicModule {
 	public function GetOptions() { return ALLOW_FILTER; }
 
 	public function SetupParents() {
-		FlexDB::AddInputType(itRICHTEXT,array($this,'drti_func'));
-		FlexDB::AddInputType(itHTML,array($this,'drti_func'));
+		utopia::AddInputType(itRICHTEXT,array($this,'drti_func'));
+		utopia::AddInputType(itHTML,array($this,'drti_func'));
 		//$this->AddParent('/');
 	}
 
@@ -19,11 +19,11 @@ class module_TinyMCE extends flexDb_BasicModule {
 	static function InitScript() {
 		if (!self::$hasDrawnJS) {
 			self::$hasDrawnJS = true;
-			FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__)).'/tiny_mce.js');
-			$scUrl = FlexDB::GetRelativePath(dirname(__FILE__)).'/plugins/spellchecker/rpc.php';
-			$previewUrl = FlexDB::GetRelativePath(dirname(__FILE__)).'/plugins/preview/preview.php';
+			utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce.js');
+			$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/spellchecker/rpc.php';
+			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/preview/preview.php';
 			list($fileManagerPath) = CallModuleFunc('fileManager' ,'Init');
-			$relUploads = FlexDB::GetRelativePath(PATH_UPLOADS);
+			$relUploads = utopia::GetRelativePath(PATH_UPLOADS);
 
 			$options = array();
 			$options['mode'] = "specific_textareas";
@@ -62,7 +62,7 @@ class module_TinyMCE extends flexDb_BasicModule {
 			$richOpts = json_encode($richOpts);
 			$htmlOpts = json_encode($htmlOpts);
 
-			FlexDB::AppendVar('script_include',<<< FIN
+			utopia::AppendVar('script_include',<<< FIN
 	function updateMCE(className,hourglass) {
 		var field = $("."+className);
 		var val = tinyMCE.get(field.attr('id')).getContent();
@@ -115,7 +115,7 @@ FIN
 		$saveClass = 'mceSave'.rand(1,5000);
 		$attributes['class'] .= ' '.$saveClass;
 		$ajax = array_key_exists('__ajax',$_REQUEST) ? '<script>InitMCE();</script>' : '';
-		return FlexDB::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).'<br><input type="button" value="Save" onclick="updateMCE(\''.$saveClass.'\',this)">'.$ajax;
+		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).'<br><input type="button" value="Save" onclick="updateMCE(\''.$saveClass.'\',this)">'.$ajax;
 	}
 	public function RunModule() {
 	}

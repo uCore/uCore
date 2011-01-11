@@ -45,9 +45,9 @@ timer_end('Load Modules');
 */
 if(!ob_start("ob_gzhandler")) ob_start();
 
-if (!array_key_exists('_noTemplate',$_GET))	FlexDB::UseTemplate();
+if (!array_key_exists('_noTemplate',$_GET))	utopia::UseTemplate();
 
-$allmodules = FlexDB::GetModules(true,true);
+$allmodules = utopia::GetModules(true,true);
 if ($allmodules === NULL || count($allmodules) === 0) {// || (internalmodule_AdminLogin::IsLoggedIn() && array_key_exists('__rebuild',$_REQUEST))) {
 	InstallAllModules();
 	header('Location: '.preg_replace('/__rebuild(=[^&]*)?/','',$_SERVER['REQUEST_URI'])); exit();
@@ -91,7 +91,7 @@ timer_end('Setup Fields');
 
 // process ajax function
 if (array_key_exists('__ajax',$_REQUEST)) {
-	FlexDB::CancelTemplate();
+	utopia::CancelTemplate();
 	// TODO: ajax parentloading?  EG: login modules
 	$lc = CallModuleFunc(GetCurrentModule(),'LoadChildren'); // now part of runmodule and loadparents, call here to check for
 	if ($lc !== TRUE && $lc !== NULL) die();
@@ -118,8 +118,8 @@ if (array_key_exists('__ajax',$_REQUEST)) {
 	//RunModule();
 	//ErrorLog(print_r($callback,true));
 	call_user_func($callback);
-	//echo FlexDB::GetVar('error_log');
-	FlexDB::Finish(); // commented why ?
+	//echo utopia::GetVar('error_log');
+	utopia::Finish(); // commented why ?
 	die();
 }
 

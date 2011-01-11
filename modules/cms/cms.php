@@ -11,7 +11,7 @@ if (is_array($templates)) foreach ($templates as $k => $v) {
 	//$templates[$k] = basename($v);
 }
 //$templates = is_array($templates) ? array_values($templates) : array();
-FlexDB::SetVar('TEMPLATE_LIST',$nTemplates);
+utopia::SetVar('TEMPLATE_LIST',$nTemplates);
 unset($nTemplates['Default Template']);
 $nTemplates['No Template'] = '';
 modOpts::AddOption('CMS','default_template','Default Template','',itCOMBO,$nTemplates);
@@ -76,7 +76,7 @@ class uCMS_List extends flexDb_DataModule {
 	public function ParentLoad($parent) {
 	}
 	public function RunModule() {
-	  $m = FlexDB::ModuleExists('uCMS_Edit');
+	  $m = utopia::ModuleExists('uCMS_Edit');
 		$newUrl = CallModuleFunc('uCMS_Edit','GetURL',array($m['module_id'].'_new'=>1));
 		$relational = $this->GetNestedArray();
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
@@ -100,7 +100,7 @@ class uCMS_List extends flexDb_DataModule {
 		echo '<td style="width:100%;height:100%;vertical-align:top"><iframe style="width:100%;height:100%;min-height:600px" id="previewFrame"></iframe></td></tr></table>';
 
 		treeSort::Init();
-		FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/cms.css'));
+		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
 		echo <<<FIN
 		<script>
 		var hidden=true;
@@ -207,7 +207,7 @@ FIN;
 	}
 
 	public function reorderCMS() {
-		FlexDB::cancelTemplate();
+		utopia::cancelTemplate();
 		if (!$_POST['data']) return;
 		foreach ($_POST['data'] as $cms_id => $val) {
 			list($newParent,$pos) = explode(':',$val);
@@ -237,7 +237,7 @@ class uCMS_Edit extends flexDb_SingleDataModule {
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
 		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}.php">'.PATH_REL_ROOT.'{cms_id}.php</a>','cms','View Page');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
-		$templates = FlexDB::GetVar('TEMPLATE_LIST');
+		$templates = utopia::GetVar('TEMPLATE_LIST');
 		$templates['Default Template'] = '';
 		$this->AddField('template','template','cms','Template',itCOMBO,$templates);
 //		$this->AddField('position','position','cms','Navigation Position',itTEXT);
@@ -263,7 +263,7 @@ class uCMS_Edit extends flexDb_SingleDataModule {
     return trim($ret);
   }
 	public function getWithTemplate($val,$pk,$original) {
-		return file_get_contents('http://'.FlexDB::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$pk),FALSE);
+		return file_get_contents('http://'.utopia::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$pk),FALSE);
 	}
 	public function SetupParents() {
 		//$this->AddParent('uCMS_List');
@@ -283,7 +283,7 @@ class uCMS_Edit extends flexDb_SingleDataModule {
 	}
 }
 
-FlexDB::AddTemplateParser('cms','uCMS_View::templateParser');
+utopia::AddTemplateParser('cms','uCMS_View::templateParser');
 class uCMS_View extends flexDb_SingleDataModule {
 	public function GetOptions() { return ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
@@ -366,10 +366,10 @@ class uCMS_View extends flexDb_SingleDataModule {
 	//	$this->RegisterAjax('showCMS',array($this,'showCMS'));
 	}
 //	public function showCMS() {
-//		FlexDB::UseTemplate();
+//		utopia::UseTemplate();
 //		$page = self::findPage();
 //		echo '{cms.'.$page['cms_id'].'}';
-//		FlexDB::Finish();
+//		utopia::Finish();
 //	}
 
 	static function GetHomepage() {
@@ -408,7 +408,7 @@ class uCMS_View extends flexDb_SingleDataModule {
 /*		$rows = $this->GetRows(array('cms_id'=>NULL));
 		foreach ($rows as $row) {
 			if ($row['nav_position'] !== '') {
-				FlexDB::LinkList_Add('navbar', $row['nav_text'] ? $row['nav_text'] : $row['title'], $this->GetURL(array('cms_id'=>$row['cms_id'])),$row['nav_position']);
+				utopia::LinkList_Add('navbar', $row['nav_text'] ? $row['nav_text'] : $row['title'], $this->GetURL(array('cms_id'=>$row['cms_id'])),$row['nav_position']);
 			}
 		}*/
 	}
@@ -417,21 +417,21 @@ class uCMS_View extends flexDb_SingleDataModule {
 		//breadcrumb::ShowHome(false);
 		$rec = self::findPage();
 		if (empty($rec)) {
-			FlexDB::PageNotFound();
+			utopia::PageNotFound();
 //			header("HTTP/1.0 404 Not Found");
 //			echo 'Error 404: File not found'; return;
 		}
 		
-		if ($rec['template']) FlexDB::UseTemplate($rec['template']);
-		elseif (($dt = modOpts::GetOption('CMS','default_template'))) FlexDB::UseTemplate($dt);
+		if ($rec['template']) utopia::UseTemplate($rec['template']);
+		elseif (($dt = modOpts::GetOption('CMS','default_template'))) utopia::UseTemplate($dt);
 		
 		//breadcrumb::AddURL($rec['nav_text'] ? $rec['nav_text'] : $rec['title'],$this->GetURL(array('cms_id'=>$rec['cms_id'])),-1000);
-		FlexDB::SetTitle($rec['title']);
-		FlexDB::SetDescription($rec['description']);
+		utopia::SetTitle($rec['title']);
+		utopia::SetDescription($rec['description']);
 		$robots = array();
 		if ($rec['nofollow']) $robots[] = 'NOFOLLOW';
 		if ($rec['noindex']) $robots[] = 'NOINDEX';
-		if (!empty($robots)) FlexDB::AppendVar('<head>','<META NAME="ROBOTS" CONTENT="'.implode(', ',$robots).'">');
+		if (!empty($robots)) utopia::AppendVar('<head>','<META NAME="ROBOTS" CONTENT="'.implode(', ',$robots).'">');
 		echo '{cms.'.$rec['cms_id'].'}';
 	}
 }

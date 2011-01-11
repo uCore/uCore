@@ -5,8 +5,8 @@ class treeSort {
 		if (self::$init) return;
 		self::$init = true;
 
-		FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.treeSort/jquery.treeSort.js'));
-		FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.treeSort/jquery.treeSort.css'));
+		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.treeSort/jquery.treeSort.js'));
+		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.treeSort/jquery.treeSort.css'));
 	}
 }
 ?>

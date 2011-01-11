@@ -1,7 +1,7 @@
 <?php
 
-FlexDB::AddTemplateParser('top_menu','uSitemap::DrawMenu','',true);
-FlexDB::AddTemplateParser('sitemap','uSitemap::DrawSitemap','',true);
+utopia::AddTemplateParser('top_menu','uSitemap::DrawMenu','',true);
+utopia::AddTemplateParser('sitemap','uSitemap::DrawSitemap','',true);
 class uSitemap {
 	static function DrawSitemap() {
 		self::DrawMenu(-1);
@@ -39,13 +39,13 @@ class uSitemapXML extends flexDb_BasicModule {
 	}
 	public function ParentLoad($parent) { }
 	public function RunModule() {
-		FlexDB::CancelTemplate();
+		utopia::CancelTemplate();
 		$arr = CallModuleFunc('uCMS_List','GetRows');
 
 		echo '<?xml version="1.0" encoding="UTF-8"?>';
 		echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 		foreach ($arr as $entry) {
-			$url = 'http://'.FlexDB::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$entry['cms_id']);
+			$url = 'http://'.utopia::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$entry['cms_id']);
 			echo <<<FIN
 
 <url>

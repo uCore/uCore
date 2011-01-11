@@ -8,13 +8,13 @@ class fileManager extends flexDb_BasicModule {
 	function SetupParents() {
 		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
-		FlexDB::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
+		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 	}
 	function show_fileman($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
 		list($path) = $this->Init();
 		//if (!is_array($attributes)) $attributes = array();
 		//$attributes['onclick'] = 'alert("moo");return false;';
-		FlexDB::AppendVar('script_include', <<<FIN
+		utopia::AppendVar('script_include', <<<FIN
 	function filesel(id,item) {
 		if (item.type != 0) return;
 		$('#fileMan').dialog('close');
@@ -33,16 +33,16 @@ FIN
 	function GetOptions() {return IS_ADMIN;}
 	function ParentLoad($parent) {}
 	function ajax() {
-		FlexDB::CancelTemplate();
+		utopia::CancelTemplate();
 		if (array_key_exists('upload',$_GET))
 			jqFileManager::ProcessUpload(PATH_UPLOADS);
 		else
 			jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');
 	}
 	function Init() {
-		FlexDB::AddJSFile(jqFileManager::GetPathJS());
-		FlexDB::AddCSSFile(jqFileManager::GetPathCSS());
-		FlexDB::AppendVar('script_include', <<<FIN
+		utopia::AddJSFile(jqFileManager::GetPathJS());
+		utopia::AddCSSFile(jqFileManager::GetPathCSS());
+		utopia::AppendVar('script_include', <<<FIN
 	function dclick(event) {
 		var item = $(this).data('item');
 		if (item.type != 0) return;
@@ -63,7 +63,7 @@ FIN
 
 		echo '<div id="fileMan"></div>';
 		//uPlupload::Init();
-		FlexDB::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:dclick}},pluploadOptions);});");
+		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:dclick}},pluploadOptions);});");
 	}
 	static function OnRename($from,$to) {
 		// has been renamed.. fix in CMS

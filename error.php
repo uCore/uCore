@@ -9,7 +9,7 @@ register_shutdown_function('fatalErrorShutdownHandler');
 function myErrorHandler($code, $message, $file, $line) {
 	try {
     $last_error = error_get_last();
-    if ($last_error['type'] === E_ERROR && class_exists('FlexDB')) FlexDB::CancelTemplate();
+    if ($last_error['type'] === E_ERROR && class_exists('FlexDB')) utopia::CancelTemplate();
 		throw new ErrorException($message, 0, $code, $file, $line);
     } catch (Exception $e) {
     	EchoException($e);

@@ -7,7 +7,7 @@
 <body>
 
 <div id="framecontentTop">
-	<div id="headerGrad"><img alt="" src="<?php echo FlexDB::GetTemplateDir(true); ?>images/longgrad.jpg" width="100%" height="100%" /></div>
+	<div id="headerGrad"><img alt="" src="<?php echo utopia::GetTemplateDir(true); ?>images/longgrad.jpg" width="100%" height="100%" /></div>
 	<div id="logo"></div>
 	<div id='titleWrap'><div id="title"><h1 style="margin:0;text-align:right;">Utopia Core</h1><h2 style="margin:0;text-align:right;">{UTOPIA.title}</h2></div></div>
 </div>
@@ -17,7 +17,7 @@
 if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) {
   //echo "<a class=\"btn\" href=\"".PATH_REL_CORE."index.php\">Admin Home</a>";
   $arr = array();
-  $children = FlexDB::GetChildren('internalmodule_Admin');
+  $children = utopia::GetChildren('internalmodule_Admin');
   foreach ($children as $links) {
     foreach ($links as $child) { 
       if ($child['fieldLinks']) continue;

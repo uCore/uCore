@@ -13,11 +13,11 @@ class internalmodule_Reconfigure extends flexDb_BasicModule {
 	public function GetSortOrder() { return -10; }
 
 	public function ParentLoad($parent) {
-		//FlexDB::LinkList_Add('child_buttons',$this->GetTitle(),$this->GetURL(),$this->GetSortOrder(),NULL,array('class'=>'fdb-btn'));
+		//utopia::LinkList_Add('child_buttons',$this->GetTitle(),$this->GetURL(),$this->GetSortOrder(),NULL,array('class'=>'fdb-btn'));
 	}
 
 	public function RunModule() {
-		//FlexDB::CancelTemplate();
+		//utopia::CancelTemplate();
 		FlexConfig::ShowConfig();
 	}
 }
@@ -92,24 +92,24 @@ class internalmodule_Admin extends flexDb_BasicModule {
 	//public function ParentLoadPoint() { return 0; }
 	public function ParentLoad($parent) {
 	//	if ($parent == GetCurrentModule()) {
-	//		$m = FlexDB::GetModules(true);
+	//		$m = utopia::GetModules(true);
 	//		foreach ($m as $module) CallModuleFunc($module['module_name'],'CreateParentNavButtons');
 	//	}
 //		if (!flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return;
 //		if ($parent == GetCurrentModule()) {
-			//FlexDB::LinkList_Add('child_buttons','Admin Home',$this->GetURL(),-50,NULL,array('class'=>'fdb-btn'));
-//			FlexDB::PrependVar('content','{list.child_buttons}');//FlexDB::LinkList_Get('child_buttons',null,null,array('class'=>'fdb-btn')));
+			//utopia::LinkList_Add('child_buttons','Admin Home',$this->GetURL(),-50,NULL,array('class'=>'fdb-btn'));
+//			utopia::PrependVar('content','{list.child_buttons}');//utopia::LinkList_Get('child_buttons',null,null,array('class'=>'fdb-btn')));
 //		}
 
 //		if (is_subclass_of($parent,'flexDb_ListDataModule')) {
-//			FlexDB::LinkList_Add('list_functions:'.$parent,'Home',$this->GetURL(),-5,NULL,array('class'=>'fdb-btn','style'=>'background-color:#ff2222'));
+//			utopia::LinkList_Add('list_functions:'.$parent,'Home',$this->GetURL(),-5,NULL,array('class'=>'fdb-btn','style'=>'background-color:#ff2222'));
 //		}
 	}
 
 	public function RunModule() {
 		//echo 'admin';
 //		if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER,false))
-		FlexDB::AppendVar('content:before',"<h1>Welcome to Admin Home</h1>");
+		utopia::AppendVar('content:before',"<h1>Welcome to Admin Home</h1>");
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_UTOPIA)) return;
 		GetFiles(true);

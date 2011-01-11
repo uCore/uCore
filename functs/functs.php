@@ -147,22 +147,22 @@ function CreateNavLink($linkText,$url,$vals=array()){
 
 function ErrorLog($text) { return;
 	AjaxEcho('ErrorLog("'.addcslashes(str_replace("\n",'',$text),'"').'")');
-	if (FlexDB::UsingTemplate()) { echo $text; }
-	$cLog = FlexDB::GetVar('error_log');
+	if (utopia::UsingTemplate()) { echo $text; }
+	$cLog = utopia::GetVar('error_log');
 
 	if (array_key_exists('__ajax',$_REQUEST)) {
-		if (!empty($cLog)) FlexDB::AppendVar('error_log',"\n");
-		FlexDB::AppendVar('error_log','ErrorLog("'.$text.'");');
+		if (!empty($cLog)) utopia::AppendVar('error_log',"\n");
+		utopia::AppendVar('error_log','ErrorLog("'.$text.'");');
 	} else {
-		if (!empty($cLog)) FlexDB::AppendVar('error_log','<br/>');
-		FlexDB::AppendVar('error_log','<span><b>*</b> '.$text.'</span>');
-		//    FlexDB::AppendVar('error_log','<span style="color:#EE3333; border-style:solid; border-width:1px; background-color:#DDDDDD; padding:3px">'.$text.'</span>');
+		if (!empty($cLog)) utopia::AppendVar('error_log','<br/>');
+		utopia::AppendVar('error_log','<span><b>*</b> '.$text.'</span>');
+		//    utopia::AppendVar('error_log','<span style="color:#EE3333; border-style:solid; border-width:1px; background-color:#DDDDDD; padding:3px">'.$text.'</span>');
 	}
 
 }
 
 function DebugOutput() {
-	return FlexDB::GetVar('error_log');
+	return utopia::GetVar('error_log');
 }
 
 function get_include_contents($filename) {
@@ -374,7 +374,7 @@ function is_empty( $var ) {
 
 function AjaxEcho($text) {
 	// only reset field if this is performed inside an ajax routine (javascript)
-	//if (FlexDB::UsingTemplate()) return;
+	//if (utopia::UsingTemplate()) return;
 	if (!array_key_exists('__ajax',$_REQUEST)) return false;
 	$text = trim($text,"\n;");
 	echo "\n$text;";
@@ -463,7 +463,7 @@ function browser_version( $browser_user_agent, $search_string )
 }
 
 function ProtectedScript() {
-	if ($_SERVER['SCRIPT_NAME'] == $_SERVER['REQUEST_URI']) { FlexDB::CancelTemplate(); die("Protected Script\nCannot access directly"); }
+	if ($_SERVER['SCRIPT_NAME'] == $_SERVER['REQUEST_URI']) { utopia::CancelTemplate(); die("Protected Script\nCannot access directly"); }
 }
 
 //register_shutdown_function('showTemplate');
@@ -471,12 +471,12 @@ function ProtectedScript() {
  function showTemplate() {
  if (array_key_exists('NO_TEMPLATE',$GLOBALS) && $GLOBALS['NO_TEMPLATE'] === TRUE) return;
  $time_taken = timer_findtime('full process');
- if (FlexDB::GetVar('footer_right') != '')
- FlexDB::AppendVar('footer_right',"<br/>Page processed in: {$time_taken}s");
+ if (utopia::GetVar('footer_right') != '')
+ utopia::AppendVar('footer_right',"<br/>Page processed in: {$time_taken}s");
  else
- FlexDB::SetVar('footer_right',"Page processed in: {$time_taken}s");
+ utopia::SetVar('footer_right',"Page processed in: {$time_taken}s");
 
- FlexDB::AppendVar('footer_right','<br/>Total Queries: '.$GLOBALS['sql_query_count']);
+ utopia::AppendVar('footer_right','<br/>Total Queries: '.$GLOBALS['sql_query_count']);
 
  //ses_gc(0);
 
@@ -561,7 +561,7 @@ function RunAjaxScript($path) {
 	if ($requestPath !== str_replace($_SERVER['DOCUMENT_ROOT'],'',$path)) return FALSE; // is being included
 
 	LoadChildren('*'); // to ensure that security is passed on all ajax scripts
-	//FlexDB::CancelTemplate();
+	//utopia::CancelTemplate();
 	return true;
 }
 

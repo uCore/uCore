@@ -39,7 +39,7 @@ class uDataBlocks_List extends flexDb_ListDataModule {
   }
 }
 
-FlexDB::AddTemplateParser('block','uDataBlocks_Edit::DrawBlock');
+utopia::AddTemplateParser('block','uDataBlocks_Edit::DrawBlock');
 class uDataBlocks_Edit extends flexDb_SingleDataModule {
   public function GetTitle() { return 'Edit Data Block'; }
   public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT | ALLOW_ADD; }
@@ -95,14 +95,14 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
 
     if ($rec['module']) {
       // create module instance
-      $instance = FlexDB::GetInstance($rec['module']);
+      $instance = utopia::GetInstance($rec['module']);
 
       // add filters
-	  FlexDB::MergeVars($rec['filter']);
+	  utopia::MergeVars($rec['filter']);
       $instance->extraHaving = $rec['filter'];
 
       // add Order
-	  FlexDB::MergeVars($rec['order']);
+	  utopia::MergeVars($rec['order']);
       $instance->ordering = $rec['order'];
 
       // init limit
@@ -148,7 +148,7 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
     }
 	    
 	$ret = $append.$content.$prepend;
-	while (FlexDB::MergeVars($ret));	
+	while (utopia::MergeVars($ret));	
     return $ret;
   } 
 }
