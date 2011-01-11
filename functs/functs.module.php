@@ -93,9 +93,9 @@ function &CallModuleFunc($classname,$funcname) {
 //	if ($method->isStatic() || is_object($classname))
 //		$instance = $classname;
 //	else {
-//		$instance = FlexDB::GetInstance($classname);
+//		$instance = utopia::GetInstance($classname);
 //	}
-  $instance = FlexDB::GetInstance($classname);
+  $instance = utopia::GetInstance($classname);
 
 	if ($instance == NULL) { ErrorLog("Error Calling {$classname}->{$funcname}"); return $null;}
 
@@ -108,7 +108,7 @@ function &CallModuleFuncByRef($classname,$funcname,&$one=null,&$two=null,&$three
 	$null = NULL;
 	if (!$classname) { ErrorLog("Executing function ($funcname) in null class<br/>".print_r(useful_backtrace(),true)); return $null; }
 
-	$instance =& FlexDB::GetInstance($classname);
+	$instance =& utopia::GetInstance($classname);
 	if ($instance == NULL) { ErrorLog($funcname); return $null;}
 
 	if (!method_exists($instance,$funcname)) return $null;
@@ -125,14 +125,14 @@ function &CallModuleFuncByRef($classname,$funcname,&$one=null,&$two=null,&$three
 
 function &GetModuleVar($classname,$varname) {
 	$null = NULL;
-	if (($instance = FlexDB::GetInstance($classname)) == NULL) return $null;
+	if (($instance = utopia::GetInstance($classname)) == NULL) return $null;
 	if (!property_exists($instance,$varname)) return $null;
 
 	return $instance->$varname;
 }
 
 function SetModuleVar($classname,$varname,$value) {
-	if (($instance = FlexDB::GetInstance($classname)) == NULL) return NULL;
+	if (($instance = utopia::GetInstance($classname)) == NULL) return NULL;
 
 	$instance->$varname = $value;
 }
@@ -179,7 +179,7 @@ function &recurseSqlSetupSearch(&$searchin,$searchfor) {
 }
 
 function _LoadChildren($withParent = NULL,$tiers=1) {
-	//	FlexDB::CancelTemplate();
+	//	utopia::CancelTemplate();
 	//	ErrorLog("LoadChildren($withParent = NULL,$tiers=1)");
 	if (!array_key_exists('children',$GLOBALS)) return TRUE;
 	if (empty($withParent)/* || $withParent === '*'*/) $withParent = GetCurrentModule();
@@ -234,28 +234,28 @@ function _LoadChildren($withParent = NULL,$tiers=1) {
  }*/
 
 function GetCurrentModule() {
-	if (FlexDB::VarExists('current_module')) return FlexDB::GetVar('current_module');
+	if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
 	if (!array_key_exists('uuid',$_GET)) {
 		if (!class_exists(BASE_MODULE)) return NULL;
 		return BASE_MODULE;
 	}
 
-	$m = FlexDB::UUIDExists($_GET['uuid']);
+	$m = utopia::UUIDExists($_GET['uuid']);
 	return $m['module_name'];
 }
 
 function RunModule($module = NULL) {
 	if ($module == NULL) $module = GetCurrentModule();
 	
-	if (!FlexDB::ModuleExists($module,true)) {
-		FlexDB::PageNotFound();
+	if (!utopia::ModuleExists($module,true)) {
+		utopia::PageNotFound();
 	}
-	FlexDB::SetVar('current_module',$module);
-	FlexDB::SetVar('title',CallModuleFunc($module,'GetTitle'));
+	utopia::SetVar('current_module',$module);
+	utopia::SetVar('title',CallModuleFunc($module,'GetTitle'));
 	// run module
 	if (!is_empty($module)) CallModuleFunc($module,'_RunModule');
 
-	FlexDB::Finish();
+	utopia::Finish();
 }
 
 function InstallAllModules() {

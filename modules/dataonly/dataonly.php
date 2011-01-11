@@ -20,10 +20,10 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 		if (!is_subclass_of($parent,'flexDb_ListDataModule')) return;
 
 		$url = CallModuleFunc($parent,'GetURL',array_merge($_GET,array('__ajax'=>'excel')));
-		FlexDB::LinkList_Add('list_functions:'.$parent,'Export to Excel',$url,10,NULL,array('class'=>'fdb-btn bluebg'));
+		utopia::LinkList_Add('list_functions:'.$parent,'Export to Excel',$url,10,NULL,array('class'=>'fdb-btn bluebg'));
 
 		$url = CallModuleFunc($parent,'GetURL',array_merge($_GET,array('__ajax'=>'print')));
-		FlexDB::LinkList_Add('list_functions:'.$parent,'Print',$url,10,NULL,array('class'=>'fdb-btn bluebg','target'=>'_blank'));
+		utopia::LinkList_Add('list_functions:'.$parent,'Print',$url,10,NULL,array('class'=>'fdb-btn bluebg','target'=>'_blank'));
 	}
 	
 	public function rawOutput() {
@@ -35,11 +35,11 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 		
 		$etag = sha1($_SERVER['REQUEST_URI']);
 		
-		FlexDB::Cache_Check($etag,'application/json','',NULL,$_GET['_expires']);
+		utopia::Cache_Check($etag,'application/json','',NULL,$_GET['_expires']);
 		switch ($type) {
 			case 'json':
 				$data = json_encode(CallModuleFunc(GetCurrentModule(),'GetRawData'));
-				FlexDB::Cache_Output($data,$etag,'application/json','',NULL,$_GET['_expires']);
+				utopia::Cache_Output($data,$etag,'application/json','',NULL,$_GET['_expires']);
 //				die();
 			break;
 		}
@@ -49,7 +49,7 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 	}
 
 	public function showPrint() {
-		FlexDB::UseTemplate(TEMPLATE_BLANK);
+		utopia::UseTemplate(TEMPLATE_BLANK);
 		RunModule();
 		return;
 		$modules = array(GetCurrentModule());
@@ -96,10 +96,10 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 		}
 		if (!empty($filterOutput)) echo "<p><b>Filters:</b><br>$filterOutput</p>";
 		//echo "moo";
-		//FlexDB::UseTemplate(TEMPLATE_PRINT_PATH);
+		//utopia::UseTemplate(TEMPLATE_PRINT_PATH);
 		RunModule();
 		//die();
-		//echo FlexDB::GetVar('content');
+		//echo utopia::GetVar('content');
 		//CancelTemplate();
 		//include(TEMPLATE_PRINT_PATH);
 	}

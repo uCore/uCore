@@ -1,9 +1,9 @@
 <?php
-FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/plupload.full.min.js'));
-FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.min.js'));
-//FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.plupload.queue.min.js'));
-//FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/plupload.queue.css'));
-FlexDB::AddCSSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.css'));
+utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/plupload.full.min.js'));
+utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.min.js'));
+//utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.plupload.queue.min.js'));
+//utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/plupload.queue.css'));
+utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.css'));
 $pathUpload = CallModuleFunc('fileManager','GetAjaxUploadPath');
 $pathCore = PATH_REL_CORE;
 uJavascript::IncludeText(<<<FIN

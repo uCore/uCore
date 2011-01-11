@@ -11,6 +11,6 @@ if (array_key_exists('admin_showT',$_SESSION) && $_SESSION['admin_showT'] === tr
 	echo '</table></pre>';
 }
 
-FlexDB::OutputTemplate();
+utopia::OutputTemplate();
 
 ?>

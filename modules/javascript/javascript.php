@@ -8,11 +8,11 @@ uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
-FlexDB::AddJSFile(PATH_REL_CORE.'.javascript.js');
-$s = (FlexDB::IsRequestSecure()) ? 's' : '';
-FlexDB::AddJSFile('http'.$s.'://www.google.com/jsapi?autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}]}'),true);
-FlexDB::AddCSSFile('http'.$s.'://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css');
-FlexDB::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
+utopia::AddJSFile(PATH_REL_CORE.'.javascript.js');
+$s = (utopia::IsRequestSecure()) ? 's' : '';
+utopia::AddJSFile('http'.$s.'://www.google.com/jsapi?autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}]}'),true);
+utopia::AddCSSFile('http'.$s.'://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css');
+utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 
 class uJavascript {
 	private static $includeFiles = array();
@@ -29,7 +29,7 @@ class uJavascript {
 
 		// register ajax
 		//$this->RegisterAjax('getJavascript',array($this,'BuildJavascript'),false);
-		//FlexDB::AddJSFile(PATH_REL_CORE.'index.php?__ajax=getJavascript',true);
+		//utopia::AddJSFile(PATH_REL_CORE.'index.php?__ajax=getJavascript',true);
 	}
 
 	public function ParentLoad($parent) {
@@ -56,7 +56,7 @@ class uJavascript {
 		}
 
 		$etag = sha1($lastTime.'-'.count(self::$includeFiles).'-'.strlen($body));
-		FlexDB::Cache_Check($etag,'text/javascript');
+		utopia::Cache_Check($etag,'text/javascript');
 */
 		foreach (self::$includeFiles as $filename) {
 //			//does it exist?
@@ -71,7 +71,7 @@ class uJavascript {
 //		ob_end_clean();
 //		header('Content-Encoding: ',true);
 		
-//		FlexDB::Cache_Output($body,$etag,'text/javascript');
+//		utopia::Cache_Output($body,$etag,'text/javascript');
 	}
 }
 

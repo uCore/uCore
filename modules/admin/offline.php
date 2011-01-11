@@ -17,7 +17,7 @@ class module_Offline extends flexDb_BasicModule {
 		if (flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return;
 
 		$this->_RunModule();
-		//FlexDB::SetVar('current_module',get_class($this));
+		//utopia::SetVar('current_module',get_class($this));
 		return FALSE;
 	}
 

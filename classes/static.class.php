@@ -3,18 +3,18 @@ define('TEMPLATE_BLANK','__blank__');
 define('TEMPLATE_ADMIN','__admin__');
 define('TEMPLATE_DEFAULT','__default__');
 
-FlexDB::AddTemplateParser('utopia','FlexDB::parseVars');
-FlexDB::AddTemplateParser('list','FlexDB::DrawList');
-FlexDB::AddTemplateParser('tab','FlexDB::Tab_GetOutput');
-FlexDB::AddTemplateParser('get','FlexDB::parseGet');
-FlexDB::AddTemplateParser('post','FlexDB::parsePost');
-FlexDB::AddTemplateParser('request','FlexDB::parseRequest');
-FlexDB::AddTemplateParser('session','FlexDB::parseSession');
-FlexDB::AddTemplateParser('const','FlexDB::parseConst');
+utopia::AddTemplateParser('utopia','utopia::parseVars');
+utopia::AddTemplateParser('list','utopia::DrawList');
+utopia::AddTemplateParser('tab','utopia::Tab_GetOutput');
+utopia::AddTemplateParser('get','utopia::parseGet');
+utopia::AddTemplateParser('post','utopia::parsePost');
+utopia::AddTemplateParser('request','utopia::parseRequest');
+utopia::AddTemplateParser('session','utopia::parseSession');
+utopia::AddTemplateParser('const','utopia::parseConst');
 
-FlexDB::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
+utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
-class FlexDB {
+class utopia {
 	private static $children = array();
 	static function AddChild($parent, $child, $info) {
 		if (isset(self::$children[$parent]) && isset(self::$children[$parent][$child])) {
@@ -80,25 +80,25 @@ class FlexDB {
 		return '<meta name="keywords" content="'.$content.'" />'."\n";
 	}
 	static function AddMetaTag($name,$content) {
-		FlexDB::AppendVar('<head>','<meta name="'.$name.'" content="'.$content.'" />');
+		utopia::AppendVar('<head>','<meta name="'.$name.'" content="'.$content.'" />');
 	}
 
 	static $initCSShead = false;
 	static function AddCSSFile($path) {
-		if (!self::$initCSShead) FlexDB::PrependVar('</head>',"{UTOPIA.cssHead}\n");
+		if (!self::$initCSShead) utopia::PrependVar('</head>',"{UTOPIA.cssHead}\n");
 		self::$initCSShead = true;
 
-		FlexDB::AppendVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
+		utopia::AppendVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
 	}
 	static $initJShead = false;
 	static function AddJSFile($path,$start=false) {
-		if (!self::$initJShead) FlexDB::AppendVar('</head>',"{UTOPIA.jsHead}\n");
+		if (!self::$initJShead) utopia::AppendVar('</head>',"{UTOPIA.jsHead}\n");
 		self::$initJShead = true;
 
 		if ($start)
-			FlexDB::PrependVar('jsHead',"<script type=\"text/javascript\" src=\"$path\"></script>\n");
+			utopia::PrependVar('jsHead',"<script type=\"text/javascript\" src=\"$path\"></script>\n");
 		else
-			FlexDB::AppendVar('jsHead',"<script type=\"text/javascript\" src=\"$path\"></script>\n");
+			utopia::AppendVar('jsHead',"<script type=\"text/javascript\" src=\"$path\"></script>\n");
 	}
 
 	private static $allmodules = NULL;
@@ -473,14 +473,14 @@ class FlexDB {
 /*	static function Tab_FinaliseDrawing() {
 		if (count(self::$tabs_drawing)<=0) return;
 		ob_flush();
-		$body = FlexDB::GetVar('content');
+		$body = utopia::GetVar('content');
 		foreach (self::$tabs_drawing as $group) {
 			ob_start();
 			self::Tab_DrawGroup($group);
 			$tabBlock = ob_get_contents();
 			ob_end_clean();
 			$
-			FlexDB::SetVar('content',str_replace('{tab.'.$group.'}', $tabBlock, $body));
+			utopia::SetVar('content',str_replace('{tab.'.$group.'}', $tabBlock, $body));
 		}
 		return;
 		$contents = "";
@@ -495,11 +495,11 @@ class FlexDB {
 
 	/*  LINKLIST  */
 	static function DrawList($id) {
-		$replacement = FlexDB::LinkList_Get($id).FlexDB::LinkList_Get('list_functions:'.$id);
+		$replacement = utopia::LinkList_Get($id).utopia::LinkList_Get('list_functions:'.$id);
 		return $replacement;
 	}
 	static function LinkList_Add($listName,$text,$url,$order = 100,$listAttrs = NULL,$linkAttrs = NULL) {
-		$list =& FlexDB::GetVar("linklist_$listName");
+		$list =& utopia::GetVar("linklist_$listName");
 		if ($list == NULL) $list = array();
 //$bt = useful_backtrace(0,4);
 		$list[] = array('text'=>$text,'url'=>$url,'order'=>$order,'attrList'=>$listAttrs,'attrLink'=>$linkAttrs);//,$bt);
@@ -508,7 +508,7 @@ class FlexDB {
 	static function LinkList_Get($listName,$id=NULL,$listAttrs = NULL,$linkAttrs = NULL) {
 		if (!$id) $id = "ulist_$listName";
 		$id = " id=\"$id\"";
-		$list = FlexDB::GetVar("linklist_$listName");
+		$list = utopia::GetVar("linklist_$listName");
 		if (!is_array($list)) return;
 
 		array_sort_subkey($list,'order');
@@ -567,8 +567,8 @@ class FlexDB {
 			$template = TEMPLATE_BLANK;
 			$ret = false;
 		}
-		if (!FlexDB::UsingTemplate()) {
-			ob_start('FlexDB::output_buffer');
+		if (!utopia::UsingTemplate()) {
+			ob_start('utopia::output_buffer');
 		}
 		self::$usedTemplate = $template;
 		return $ret;
@@ -592,7 +592,7 @@ class FlexDB {
 		return $path.'/';
 	}
 	public static function OutputTemplate() {
-		self::SetVar('templatedir',FlexDB::GetTemplateDir(true));
+		self::SetVar('templatedir',utopia::GetTemplateDir(true));
 		if (self::$adminTemplate) self::UseTemplate(TEMPLATE_ADMIN);
 		if (!self::UsingTemplate()) return;
 
@@ -616,15 +616,15 @@ class FlexDB {
 				$template = get_include_contents(PATH_ABS_ROOT.$temp);
 				break;
 		}*/
-		//FlexDB::CancelTemplate();
+		//utopia::CancelTemplate();
 
 		self::AddCSSFile(PATH_REL_CORE.'default.css');
 		if (file_exists($templateDir.'styles.css'))
 			self::AddCSSFile(self::GetRelativePath($templateDir.'styles.css'));
 
-		self::PrependVar('<head>',FlexDB::GetTitle().FlexDB::GetDescription().FlexDB::GetKeywords());
+		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
 		if (self::VarExists('script_include'))
-			self::AppendVar('</head>','<script type="text/javascript">'.FlexDB::GetVar('script_include').'</script>'."\n");
+			self::AppendVar('</head>','<script type="text/javascript">'.utopia::GetVar('script_include').'</script>'."\n");
 //		self::AppendVar('</head>','<base href="http://'.self::GetDomainName().self::GetRelativePath($templateDir).'/" />'."\n");
 
 		self::AppendVar('</body>','{UTOPIA.powered}{UTOPIA.admin_panel}');
@@ -746,10 +746,10 @@ class FlexDB {
 
 	static function PageNotFound() {
 		header("HTTP/1.0 404 Not Found",true,404);
-		FlexDB::SetTitle('404 Not Found');
+		utopia::SetTitle('404 Not Found');
 		echo '<h1>404 Not Found</h1>';
 		echo '<p>The page you requested could not be found. Return to the <a href="/">homepage</a>.</p>';
-		FlexDB::Finish(); die();
+		utopia::Finish(); die();
 	}
 
 	static function SecureRedirect() {
@@ -767,8 +767,8 @@ class FlexDB {
 
 	/*  MISC  */
 	static function output_buffer($text) {
-		if (!FlexDB::UsingTemplate()) return FALSE;
-		FlexDB::AppendVar('content',$text);
+		if (!utopia::UsingTemplate()) return FALSE;
+		utopia::AppendVar('content',$text);
 		return $text;
 	}
 
