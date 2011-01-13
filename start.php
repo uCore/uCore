@@ -40,15 +40,15 @@ include(PATH_ABS_CORE.'setup.php');
 if (array_key_exists('__config_submit',$_REQUEST))
 	$configArr = $_REQUEST;
 else
-	$configArr = FlexConfig::ReadConfig();
+	$configArr = uConfig::ReadConfig();
 
 // validate
-$valid = FlexConfig::ValidateConfig($configArr);
+$valid = uConfig::ValidateConfig($configArr);
 if ($valid) {
-	if ($valid === 2 || array_key_exists('__config_submit',$_REQUEST)) FlexConfig::SaveConfig($configArr);
-	FlexConfig::DefineConfig($configArr);
+	if ($valid === 2 || array_key_exists('__config_submit',$_REQUEST)) uConfig::SaveConfig($configArr);
+	uConfig::DefineConfig($configArr);
 	require_once(PATH_ABS_CORE.'initialise.php'); // init
 } else {
-	FlexConfig::ShowConfig($configArr);
+	uConfig::ShowConfig($configArr);
 	die();
 }
