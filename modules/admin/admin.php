@@ -6,7 +6,7 @@ class internalmodule_Reconfigure extends uBasicModule {
 	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
 
 	public function SetupParents() {
-		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_UTOPIA)) return;
+		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		$this->AddParent('internalmodule_Admin');
 	}
 
@@ -18,7 +18,7 @@ class internalmodule_Reconfigure extends uBasicModule {
 
 	public function RunModule() {
 		//utopia::CancelTemplate();
-		FlexConfig::ShowConfig();
+		uConfig::ShowConfig();
 	}
 }
 
@@ -111,7 +111,7 @@ class internalmodule_Admin extends uBasicModule {
 //		if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER,false))
 		utopia::AppendVar('content:before',"<h1>Welcome to Admin Home</h1>");
 
-		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_UTOPIA)) return;
+		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		GetFiles(true);
 		uJavascript::BuildJavascript();
     
