@@ -26,9 +26,9 @@ class fileManager extends uBasicModule {
 //	}
 FIN
 );
-		return '<div id="fileMan"></div>'.flexDB::DrawInput($fieldName,itTEXT,$defaultValue,$possibleValues,$attributes,$noSubmit).
+		return '<div id="fileMan"></div>'.utopia::DrawInput($fieldName,itTEXT,$defaultValue,$possibleValues,$attributes,$noSubmit).
 			'<input id="'.$fieldName.'" type="button" onclick="$(\'#fileMan\').fileManager({ajaxPath:\''.$path.'\',events:{dblclick:function(event) {filesel(\''.$fieldName.'\',$(this).data(\'item\'))} }}).dialog();" value="Choose File">';
-		//return $out.$defaultValue.flexDB::DrawInput($fieldName,itBUTTON,'Choose File',$possibleValues,$attributes,$noSubmit);
+		//return $out.$defaultValue.utopia::DrawInput($fieldName,itBUTTON,'Choose File',$possibleValues,$attributes,$noSubmit);
 	}
 	function GetOptions() {return IS_ADMIN;}
 	function ParentLoad($parent) {}
