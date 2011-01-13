@@ -4,15 +4,15 @@ define('CFG_TYPE_TEXT',flag_gen('configType'));
 define('CFG_TYPE_PATH',flag_gen('configType'));
 define('CFG_TYPE_PASSWORD',flag_gen('configType'));
 
-//FlexConfig::AddConfigVar('MODULES_PATH','Module Path',NULL,CFG_TYPE_PATH);
-FlexConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
-FlexConfig::AddConfigVar('SQL_SERVER','Database Server Address');
-FlexConfig::AddConfigVar('SQL_PORT','Database Port');
-FlexConfig::AddConfigVar('SQL_DBNAME','Database Name');
-FlexConfig::AddConfigVar('SQL_USERNAME','Database Username');
-FlexConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,CFG_TYPE_PASSWORD);
+//uConfig::AddConfigVar('MODULES_PATH','Module Path',NULL,CFG_TYPE_PATH);
+uConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
+uConfig::AddConfigVar('SQL_SERVER','Database Server Address');
+uConfig::AddConfigVar('SQL_PORT','Database Port');
+uConfig::AddConfigVar('SQL_DBNAME','Database Name');
+uConfig::AddConfigVar('SQL_USERNAME','Database Username');
+uConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,CFG_TYPE_PASSWORD);
 
-//FlexConfig::AddConfigVar('BASE_MODULE','Initial Module'); // if none specified by uuid
+//uConfig::AddConfigVar('BASE_MODULE','Initial Module'); // if none specified by uuid
 /*
 $templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
 if (is_array($templates)) foreach ($templates as $k => $v) {
@@ -23,16 +23,16 @@ if (is_array($templates)) foreach ($templates as $k => $v) {
 	$templates[$k] = basename($v);
 }
 $templates = is_array($templates) ? array_values($templates) : array();
-FlexConfig::AddConfigVar('DEFAULT_TEMPLATE','Default Template',NULL,$templates);*/
-FlexConfig::AddConfigVar('DEFAULT_CURRENCY','Default Currency');
+uConfig::AddConfigVar('DEFAULT_TEMPLATE','Default Template',NULL,$templates);*/
+uConfig::AddConfigVar('DEFAULT_CURRENCY','Default Currency');
 
-FlexConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Date Format</a>','%d %b %Y');
-FlexConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Time Format</a>','%H:%i:%s');
+uConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Date Format</a>','%d %b %Y');
+uConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Time Format</a>','%H:%i:%s');
 
-FlexConfig::AddConfigVar('admin_user','Admin Username');
-FlexConfig::AddConfigVar('admin_pass','Admin Password',NULL,CFG_TYPE_PASSWORD);
+uConfig::AddConfigVar('admin_user','Admin Username');
+uConfig::AddConfigVar('admin_pass','Admin Password',NULL,CFG_TYPE_PASSWORD);
 
-class FlexConfig {
+class uConfig {
 	static $configVars = array();
 	static function AddConfigVar($name,$readable,$default=NULL,$type=CFG_TYPE_TEXT) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
@@ -76,7 +76,7 @@ class FlexConfig {
 		define("FORMAT_DATETIME"         , FORMAT_DATE.' '.FORMAT_TIME);
 	}
 	static function ValidateConfig(&$arr) {
-		$oConfig = FlexConfig::ReadConfig();
+		$oConfig = uConfig::ReadConfig();
 		$changed = false;
 //		$validFields = array('MODULES_PATH','DB_TYPE','SQL_SERVER','SQL_PORT','SQL_DBNAME','SQL_USERNAME','SQL_PASSWORD',
 //	                         'DEFAULT_FILE','BASE_MODULE','STYLE_PATH','DEFAULT_CURRENCY','FORMAT_DATE','FORMAT_TIME',
@@ -125,7 +125,7 @@ class FlexConfig {
 		return false;
 	}
 	static function ShowConfig($configArr = NULL) {
-		if (!$configArr) $configArr = FlexConfig::ReadConfig();
+		if (!$configArr) $configArr = uConfig::ReadConfig();
 		echo <<<FIN
 <form method="post">
 <table>
