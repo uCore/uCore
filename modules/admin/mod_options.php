@@ -1,6 +1,6 @@
 <?php
 
-class tabledef_ModOpts extends flexDb_TableDefinition {
+class tabledef_ModOpts extends uTableDef {
 	public $tablename = 'internal_modopts';
 
 	public function SetupFields() {
@@ -16,7 +16,7 @@ class tabledef_ModOpts extends flexDb_TableDefinition {
 		$this->SetPrimaryKey('ident');
 	}
 }
-class modOpts extends flexDb_ListDataModule {
+class modOpts extends uListDataModule {
 	public function GetTitle() { return 'Module Options'; }
 	public function GetOptions() { return IS_ADMIN | ALLOW_FILTER | ALLOW_EDIT | ALLOW_DELETE; }
 	public function GetTabledef() { return 'tabledef_ModOpts'; }

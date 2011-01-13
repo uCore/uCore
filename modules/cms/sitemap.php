@@ -30,7 +30,7 @@ class uSitemap {
 	}
 }
 
-class uSitemapXML extends flexDb_BasicModule {
+class uSitemapXML extends uBasicModule {
 	public function GetTitle() { return 'XML Sitemap'; }
 	//public function GetOptions() { return IS_ADMIN | ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE | ALLOW_FILTER; }
 	public function GetUUID() { return 'sitemap';}

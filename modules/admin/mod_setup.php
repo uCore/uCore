@@ -3,7 +3,7 @@
 // dependancies
 // check dependancies exist - Move to install?
 
-class tabledef_Modules extends flexDb_TableDefinition {
+class tabledef_Modules extends uTableDef {
 	public $tablename = 'internal_modules';
 
 	public function SetupFields() {
@@ -22,7 +22,7 @@ class tabledef_Modules extends flexDb_TableDefinition {
 	}
 }
 
-class internalmodule_ModuleSetup extends flexDb_ListDataModule {
+class internalmodule_ModuleSetup extends uListDataModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Module Setup'; }
 

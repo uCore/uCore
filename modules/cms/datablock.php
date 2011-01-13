@@ -1,6 +1,6 @@
 <?php
 
-class tabledef_DataBlocks extends flexDb_TableDefinition {
+class tabledef_DataBlocks extends uTableDef {
   public $tablename = 'datablocks';
   public function SetupFields() {
     $this->AddField('block_id',ftVARCHAR,150);
@@ -17,7 +17,7 @@ class tabledef_DataBlocks extends flexDb_TableDefinition {
   }
 }
 
-class uDataBlocks_List extends flexDb_ListDataModule {
+class uDataBlocks_List extends uListDataModule {
   public function GetTitle() { return 'Data Blocks'; }
   public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER; }
   public function GetTabledef() { return 'tabledef_DataBlocks'; }
@@ -40,7 +40,7 @@ class uDataBlocks_List extends flexDb_ListDataModule {
 }
 
 utopia::AddTemplateParser('block','uDataBlocks_Edit::DrawBlock');
-class uDataBlocks_Edit extends flexDb_SingleDataModule {
+class uDataBlocks_Edit extends uSingleDataModule {
   public function GetTitle() { return 'Edit Data Block'; }
   public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT | ALLOW_ADD; }
   public function GetTabledef() { return 'tabledef_DataBlocks'; }
@@ -51,7 +51,8 @@ class uDataBlocks_Edit extends flexDb_SingleDataModule {
     $installed = array();
     $classes = get_declared_classes();
     foreach ($classes as $classname){ // install tables
-      if ($classname == 'flexDb_DataModule' || $classname == 'flexDb_ListDataModule' || $classname == 'flexDb_SingleDataModule' || !is_subclass_of($classname,'flexDb_DataModule')) continue;
+      if ($classname == 'uDataModule' || $classname == 'uListDataModule' || $classname == 'uSingleDataModule' || 
+!is_subclass_of($classname,'uDataModule')) continue;
       $installed[] = $classname;
     }
   

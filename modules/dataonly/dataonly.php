@@ -1,6 +1,6 @@
 <?php
 
-class internalmodule_DataOnly extends flexDb_BasicModule {
+class internalmodule_DataOnly extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return ''; }
 	public function GetOptions() { return DEFAULT_OPTIONS | NO_NAV | PERSISTENT_PARENT; }
@@ -17,7 +17,7 @@ class internalmodule_DataOnly extends flexDb_BasicModule {
 
 //	public function ParentLoadPoint() { return 0; }
 	public function ParentLoad($parent) {
-		if (!is_subclass_of($parent,'flexDb_ListDataModule')) return;
+		if (!is_subclass_of($parent,'uListDataModule')) return;
 
 		$url = CallModuleFunc($parent,'GetURL',array_merge($_GET,array('__ajax'=>'excel')));
 		utopia::LinkList_Add('list_functions:'.$parent,'Export to Excel',$url,10,NULL,array('class'=>'fdb-btn bluebg'));

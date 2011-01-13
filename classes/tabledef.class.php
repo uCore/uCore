@@ -43,7 +43,7 @@ function getSqlTypeFromFieldType($fieldType) {
 	}
 }
 
-abstract class flexDb_TableDefinition {
+abstract class uTableDef {
 	public $fields = array();
 	public abstract function SetupFields();
 

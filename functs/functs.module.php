@@ -277,7 +277,7 @@ function InstallAllModules() {
 	$classes = get_declared_classes();
 	timer_start('table installation');
 	foreach ($classes as $classname){ // install tables
-		if ($classname == 'flexDb_TableDefinition' || !is_subclass_of($classname,'flexDb_TableDefinition')) continue;
+		if ($classname == 'uTableDefinition' || !is_subclass_of($classname,'uTableDefinition')) continue;
     
 		timer_start('table install ('.$classname.')');
 		CallModuleFunc($classname,'InstallTable');
@@ -288,11 +288,11 @@ function InstallAllModules() {
 
 	timer_start('module installation');
 	foreach ($classes as $classname) // install modules
-	if (is_subclass_of($classname,'flexDb_BasicModule')
-	&& $classname != 'flexDb_BasicModule'
-	&& $classname != 'flexDb_DataModule'
-	&& $classname != 'flexDb_ListDataModule'
-	&& $classname != 'flexDb_SingleDataModule') {
+	if (is_subclass_of($classname,'uBasicModule')
+	&& $classname != 'uBasicModule'
+	&& $classname != 'uDataModule'
+	&& $classname != 'uListDataModule'
+	&& $classname != 'uSingleDataModule') {
 		//mail('oridan82@gmail.com','installmodule',$classname);
 		$installed[] = $classname;
 		CallModuleFunc($classname,'InstallModule');

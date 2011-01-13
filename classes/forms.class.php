@@ -85,10 +85,10 @@ define('DEFAULT_OPTIONS',ALLOW_FILTER);
 // START CLASSES
 
 /**
- * Basic flexDb module. Enables use of adding parents and module to be installed and run.
- * No field or data access is available, use flexDb_DataModule and its decendants.
+ * Basic Utopia module. Enables use of adding parents and module to be installed and run.
+ * No field or data access is available, use uDataModule and its decendants.
  */
-abstract class flexDb_BasicModule {
+abstract class uBasicModule {
 /*  static $singleton = NULL;
   public static function &call($method) {
     $null = NULL;
@@ -169,7 +169,7 @@ abstract class flexDb_BasicModule {
 		//if (array_key_exists($parent,$this->parentLoaded)) return false;
 
 //ErrorLog(get_class($this).': can1 '.(GetModuleVar($parent,'hasRun') ? 1:0).$this->ParentLoadPoint());
-	//	flexdb::CancelTemplate();
+	//	utopia::CancelTemplate();
 //echo $parent.' '.get_class($this);
 		if ($parent == GetCurrentModule()) return GetModuleVar($parent,'hasRun') == $this->ParentLoadPoint();
 //ErrorLog(get_class($this).': can2');
@@ -372,7 +372,8 @@ abstract class flexDb_BasicModule {
 		if (is_array($fieldLinks)) {
 			foreach ($fieldLinks as &$linkInfo) {
 				if (empty($linkInfo['ct'])) $linkInfo['ct'] = ctEQ;
-				if (is_subclass_of($this,'flexDb_DataModule')) {
+				if (is_subclass_of($this,'uDataModule')) 
+{
 					$fltr =& $this->FindFilter($linkInfo['toField'],$linkInfo['ct'],itNONE,FILTER_WHERE);
 					if ($fltr === NULL) {
 						$uid = $this->AddFilterWhere($linkInfo['toField'],$linkInfo['ct']);
@@ -769,7 +770,7 @@ abstract class flexDb_BasicModule {
  * Abstract class extending the basic module, adding data access and filtering.
  *
  */
-abstract class flexDb_DataModule extends flexDb_BasicModule {
+abstract class uDataModule extends uBasicModule {
 	public $fields = array();
 	public $filters = array(FILTER_WHERE=>array(),FILTER_HAVING=>array());
 	public $pk = NULL;
@@ -1479,13 +1480,13 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 			$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 			break;
 		case ftDATE:
-			$this->AddPreProcessCallback($aliasName,array('FlexDB','convDate'));
+			$this->AddPreProcessCallback($aliasName,array('utopia','convDate'));
 			break;
 		case ftTIME:
-			$this->AddPreProcessCallback($aliasName,array('FlexDB','convTime'));
+			$this->AddPreProcessCallback($aliasName,array('utopia','convTime'));
 			break;
 		case ftDATETIME:
-			$this->AddPreProcessCallback($aliasName,array('FlexDB','convDateTime'));
+			$this->AddPreProcessCallback($aliasName,array('utopia','convDateTime'));
 			break;
 	}
     //timer_end(get_class($this).':AF3:'.$aliasName);
@@ -3182,10 +3183,10 @@ abstract class flexDb_DataModule extends flexDb_BasicModule {
 }
 
 /**
- * List implimentation of flexDb_DataModule.
+ * List implimentation of uDataModule.
  * Default module for displaying results in a list format. Good for statistics and record searches.
  */
-abstract class flexDb_ListDataModule extends flexDb_DataModule {
+abstract class uListDataModule extends uDataModule {
 	public $injectionFields = array();
 
 	//private $maxRecs = NULL;
@@ -3280,7 +3281,7 @@ SCR_END
 				//ErrorLog(print_r($child,true));
 				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
 						&& flag_is_set(CallModuleFunc($link['moduleName'],'GetOptions'),ALLOW_ADD)
-						&& is_subclass_of($link['moduleName'],'flexDb_SingleDataModule')
+						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
 						&& empty($link['fieldLinks'])) {
 					$url = CallModuleFunc($link['moduleName'],'GetURL',array(CallModuleFunc($link['moduleName'],'GetModuleId').'_new'=>1));
 					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
@@ -3542,10 +3543,10 @@ SCR_END
 }
 
 /**
- * Single form implimentation of flexDb_DataModule.
+ * Single form implimentation of uDataModule.
  * Default module for displaying results in a form style. Good for Data Entry.
  */
-abstract class flexDb_SingleDataModule extends flexDb_DataModule {
+abstract class uSingleDataModule extends uDataModule {
 	/*
 	 public function CreateParentNavButtons() {
 		foreach ($this->parents as $parentName => $linkArray){

@@ -3,7 +3,7 @@
 // dependancies
 // check dependancies exist - Move to install?
 
-class internalmodule_StaticAjax extends flexDb_BasicModule {
+class internalmodule_StaticAjax extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return ''; }
 	public function GetOptions() { return ALWAYS_ACTIVE | PERSISTENT_PARENT; }
@@ -24,10 +24,10 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 
 //	public function ParentLoadPoint() { return 0; }
 	public function ParentLoad($parent) {
-		//if (!is_subclass_of($parent,'flexDb_ListDataModule')) return true;
+		//if (!is_subclass_of($parent,'uListDataModule')) return true;
 
 		//$url = BuildQueryString($_SERVER['REQUEST_URI'],array('__ajax'=>'printable'));
-		//FlexDB::LinkList_Add('admin_buttons','Printable',$url,50);//,NULL,array('onclick'=>"window.location = qsUpdate(window.location.href,{__ajax:'printable'});"));
+		//utopia::LinkList_Add('admin_buttons','Printable',$url,50);//,NULL,array('onclick'=>"window.location = qsUpdate(window.location.href,{__ajax:'printable'});"));
 		//,'class'=>'linklist-options'
 	}
 
@@ -57,14 +57,14 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 			default:
 				$type = 'text/html';
 		}
-//		FlexDB::Cache_Check($etag,$type);
+//		utopia::Cache_Check($etag,$type);
 
-		FlexDB::Cache_Output($contents,$etag,$type);
+		utopia::Cache_Output($contents,$etag,$type);
 		die($contents);
 	}
 
 	public function getUpload() {
-		//$module = FlexDB::UUIDExists($_GET['uuid']);
+		//$module = utopia::UUIDExists($_GET['uuid']);
 		//print_r($module);
 		$rec = CallModuleFunc(GetCurrentModule(),'LookupRecord',$_GET['p']);
 		//print_r($rec);
@@ -93,9 +93,9 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 			ob_start();system("file -bi '$path'",$cType);ob_end_clean();
 		}
 
-		FlexDB::Cache_Check($etag,$cType,basename($path),$fileMod);
+		utopia::Cache_Check($etag,$cType,basename($path),$fileMod);
 
-		FlexDB::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
+		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
 	}
 	public function getFile() {
 		$last_load    =  isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime(trim($_SERVER['HTTP_IF_MODIFIED_SINCE'])) : false;
@@ -124,7 +124,7 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 			$data = file_get_contents(PATH_ABS_ROOT.'no-img.png');
 
 		$etag = sha1($_SERVER['REQUEST_URI'].'-'.strlen($data));
-		FlexDB::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
+		utopia::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 
 //		try {
 			$src = imagecreatefromstring($data);
@@ -176,7 +176,7 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 		$c = ob_get_contents();
 		ob_end_clean();
 
-		FlexDB::Cache_Output($c,$etag,'image/png',$_GET['p'].$_GET['f'].'.png');
+		utopia::Cache_Output($c,$etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 		die();
 	}
 
@@ -198,7 +198,7 @@ class internalmodule_StaticAjax extends flexDb_BasicModule {
 
 
 		function output_handler($img) {
-			return FlexDB::Cache_Output($img,sha1($img),'image/gif',"fltrText_".strip_tags($_GET['t']).".gif");
+			return utopia::Cache_Output($img,sha1($img),'image/gif',"fltrText_".strip_tags($_GET['t']).".gif");
 		}
 
 		//    Image output

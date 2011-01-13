@@ -16,7 +16,7 @@ unset($nTemplates['Default Template']);
 $nTemplates['No Template'] = '';
 modOpts::AddOption('CMS','default_template','Default Template','',itCOMBO,$nTemplates);
 
-class tabledef_CMS extends flexDb_TableDefinition {
+class tabledef_CMS extends uTableDef {
   public $tablename = 'cms';
   public function SetupFields() {
     //$this->AddField('id',ftNUMBER);
@@ -38,7 +38,7 @@ class tabledef_CMS extends flexDb_TableDefinition {
   }
 }
 
-class uCMS_List extends flexDb_DataModule {
+class uCMS_List extends uDataModule {
 	public function GetTitle() { return 'Page Editor'; }
 	public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
@@ -228,7 +228,7 @@ FIN;
 		}
 	}
 }
-class uCMS_Edit extends flexDb_SingleDataModule {
+class uCMS_Edit extends uSingleDataModule {
 	public function GetTitle() { return 'Edit Content'; }
 	public function GetOptions() { return IS_ADMIN | ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE | ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
@@ -284,7 +284,7 @@ class uCMS_Edit extends flexDb_SingleDataModule {
 }
 
 utopia::AddTemplateParser('cms','uCMS_View::templateParser');
-class uCMS_View extends flexDb_SingleDataModule {
+class uCMS_View extends uSingleDataModule {
 	public function GetOptions() { return ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
 	public function GetUUID() { return 'cms'; }
