@@ -1,6 +1,5 @@
 <?php
 define('ADMIN_USER',flag_gen());
-define('ADMIN_UTOPIA',flag_gen());
 
 class internalmodule_AdminLogin extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
@@ -11,14 +10,20 @@ class internalmodule_AdminLogin extends uBasicModule {
 		$this->RegisterAjax('adminLogout',array($this,'AdminLogout'));
 		$this->AddParent('/');
 
-		// login attempted.
+		// admin account has not been set up, redirect to config.
+		if (!constant('admin_user')) {
+			utopia::cancelTemplate();
+			echo 'No admin user has been set up.';
+			uConfig::ShowConfig();
+			die();
+		}
+
+		// login not attempted.
 		if (!array_key_exists('__admin_login_u',$_REQUEST)) return;
 
 		$un = $_REQUEST['__admin_login_u']; $pw = $_REQUEST['__admin_login_p'];
 		if ( $un==constant('admin_user') && $pw===constant('admin_pass') ) {
 			$_SESSION['admin_auth'] = ADMIN_USER;
-		} elseif ($un == 'utopia' && md5($pw) === '74618b22f9baca17be03aa47cb1ea718') {
-			$_SESSION['admin_auth'] = ADMIN_UTOPIA;
 		} else {
 			ErrorLog('Username and password do not match.');
 		}

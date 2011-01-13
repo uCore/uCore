@@ -32,7 +32,7 @@ class internalmodule_ModuleSetup extends uListDataModule {
 	public function GetSortOrder() { return -9; }
 
 	public function SetupParents() {
-		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_UTOPIA)) return;
+		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		$this->AddParent('internalmodule_Admin');
 	}
 
