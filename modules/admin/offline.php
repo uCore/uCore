@@ -1,6 +1,6 @@
 <?php
 
-class module_Offline extends flexDb_BasicModule {
+class module_Offline extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Site Offline'; }
 	public function GetOptions() { return DEFAULT_OPTIONS; }

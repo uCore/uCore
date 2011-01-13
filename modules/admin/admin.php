@@ -1,6 +1,6 @@
 <?php
 
-class internalmodule_Reconfigure extends flexDb_BasicModule {
+class internalmodule_Reconfigure extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Reconfigure Database'; }
 	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
@@ -23,7 +23,7 @@ class internalmodule_Reconfigure extends flexDb_BasicModule {
 }
 
 
-class internalmodule_Admin extends flexDb_BasicModule {
+class internalmodule_Admin extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Home'; }
 	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
@@ -101,7 +101,7 @@ class internalmodule_Admin extends flexDb_BasicModule {
 //			utopia::PrependVar('content','{list.child_buttons}');//utopia::LinkList_Get('child_buttons',null,null,array('class'=>'fdb-btn')));
 //		}
 
-//		if (is_subclass_of($parent,'flexDb_ListDataModule')) {
+//		if (is_subclass_of($parent,'uListDataModule')) {
 //			utopia::LinkList_Add('list_functions:'.$parent,'Home',$this->GetURL(),-5,NULL,array('class'=>'fdb-btn','style'=>'background-color:#ff2222'));
 //		}
 	}

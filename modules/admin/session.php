@@ -104,7 +104,7 @@ function ses_gc($maxlifetime = NULL) {
 	}
 }
 
-class tabledef_Session extends flexDb_TableDefinition {
+class tabledef_Session extends uTableDef {
 	public $tablename = "internal_sessions";
 
 	public function SetupFields() {

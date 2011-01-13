@@ -2,7 +2,7 @@
 define('ADMIN_USER',flag_gen());
 define('ADMIN_UTOPIA',flag_gen());
 
-class internalmodule_AdminLogin extends flexDb_BasicModule {
+class internalmodule_AdminLogin extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Login'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | IS_ADMIN | NO_NAV; }

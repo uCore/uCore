@@ -489,7 +489,7 @@ function ProtectedScript() {
 
 ///  EVENT CODE
 
-// Hook Event code within flexDb_BasicModule
+// Hook Event code within uBasicModule
 
 function TriggerEvent($eventName) {
 	if (!array_key_exists('events',$GLOBALS)) return;
