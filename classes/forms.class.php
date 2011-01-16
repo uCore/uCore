@@ -655,13 +655,13 @@ abstract class uBasicModule {
 	}
 
 	public function GetFileFromTable($field,$table,$key,$pkVal,$att = 'inline') {
-		return PATH_REL_SELF."?__ajax=getFile&amp;f=$field&amp;t=$table&amp;k=$key&amp;p=$pkVal&amp;a=$att";
+		return PATH_REL_SELF."?__ajax=getFile&f=$field&t=$table&k=$key&p=$pkVal&a=$att";
 	}
 
 	public function GetImageLinkFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL) {
-		if ($width) $width = "&amp;w=$width";
-		if ($height) $height = "&amp;h=$height";
-		return PATH_REL_SELF."?__ajax=getImage&amp;f=$field&amp;t=$table&amp;k=$key&amp;p=$pkVal$width$height";
+		if ($width) $width = "&w=$width";
+		if ($height) $height = "&h=$height";
+		return PATH_REL_SELF."?__ajax=getImage&f=$field&t=$table&k=$key&p=$pkVal$width$height";
 	}
 
 	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {
@@ -2585,7 +2585,7 @@ abstract class uDataModule extends uBasicModule {
 
 		//return BuildQueryString(PATH_REL_SELF,$filters);
 		return $this->GetURL($filters);
-//		return PATH_REL_ROOT.DEFAULT_FILE."?__ajax=getUpload&amp;f=$fieldAlias&amp;m=$uuid&amp;p=$pkVal";
+//		return PATH_REL_ROOT.DEFAULT_FILE."?__ajax=getUpload&f=$fieldAlias&m=$uuid&p=$pkVal";
 	}
 
 	// TODO: Requests for XML data (ajax)
