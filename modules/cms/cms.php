@@ -49,6 +49,7 @@ class uCMS_List extends uDataModule {
 		$this->AddField('parent','parent','cms','Parent');
 		$this->AddField('position','position','cms','position');
 		$this->AddField('title','title','cms','Page Title');
+		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('hide','hide','cms','Parent');
 	}
 	public function SetupParents() {
@@ -237,11 +238,11 @@ class uCMS_Edit extends uSingleDataModule {
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
 		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}.php">'.PATH_REL_ROOT.'{cms_id}.php</a>','cms','View Page');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
+		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
 		$templates = utopia::GetVar('TEMPLATE_LIST');
 		$templates['Default Template'] = '';
 		$this->AddField('template','template','cms','Template',itCOMBO,$templates);
 //		$this->AddField('position','position','cms','Navigation Position',itTEXT);
-//		$this->AddField('nav_text','nav_text','cms','Navigation Text',itTEXT);
 		$this->AddField('hide','hide','cms','Hide from Menus',itCHECKBOX);
 		$this->AddField('noindex','noindex','cms','noindex',itCHECKBOX);
 		$this->AddField('nofollow','nofollow','cms','nofollow',itCHECKBOX);
@@ -350,7 +351,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('parent','parent','cms','Parent');
 		$this->AddField('position','position','cms','position');
 		$this->AddField('template','template','cms','template');
-//		$this->AddField('nav_text','nav_text','cms');
+		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('description','description','cms','description');
 		$this->AddField('content','content','cms','content');
     $this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');

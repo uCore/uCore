@@ -17,12 +17,13 @@ class uSitemap {
 		echo '<ul class="u-menu">';
 		foreach ($children as $child) {
 			if ($child['hide']) continue;
+			$menu_title = $child['nav_text'] ? $child['nav_text'] : $child['title'];
 			//$hide = $child['hide'] ? 'hiddenItem' : '';  //class="'.$hide.'" 
 			$url = CallModuleFunc('uCMS_View','GetURL',$child['cms_id']);
 			//$sel = (strpos($url,$_SERVER['REQUEST_URI']) !== FALSE) ? ' u-menu-active' : '';
 			//$sel = ($url == $_SERVER['REQUEST_URI']) ? ' u-menu-active' : ''; //handled by javascript
 			echo '<li id="'.$child['cms_id'].'" style="position:relative;cursor:pointer">';
-			echo '<a class="cmsEdit" href="'.$url.'">'.$child['title'].'</a>';
+			echo '<a class="cmsEdit" href="'.$url.'">'.$menu_title.'</a>';
 			if ($level !== 0) self::DrawChildren($child['children'],$child['cms_id'],$level);
 			echo '</li>';
 		}
