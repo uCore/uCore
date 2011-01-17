@@ -3614,8 +3614,8 @@ abstract class uSingleDataModule extends uDataModule {
 
 		$order = $this->GetSortOrder();
 		$extraCount = 1;
-		if (!flag_is_set($this->GetOptions(), NO_TABS))
-			$tabGroupName = utopia::Tab_InitGroup();
+//		if (!flag_is_set($this->GetOptions(), NO_TABS))
+		$tabGroupName = utopia::Tab_InitGroup();
 		foreach ($this->layoutSections as $sectionID => $sectionName) {
 			//$secCount++;
 			//			echo "<div class='layoutSection' >";
@@ -3658,13 +3658,13 @@ abstract class uSingleDataModule extends uDataModule {
 				$out .= "</tr>";
 			}
 			$out .= "</table>";
-			if (!flag_is_set($this->GetOptions(), NO_TABS))
+//			if (!flag_is_set($this->GetOptions(), NO_TABS))
 				utopia::Tab_Add($SN,$out,$tabGroupName,false,$order);
-			else
-				echo $out;
+//			else
+//				echo $out;
 		}
 
-		if (!flag_is_set($this->GetOptions(), NO_TABS))
+//		if (!flag_is_set($this->GetOptions(), NO_TABS))
 			utopia::Tab_InitDraw($tabGroupName);
 	}
 }
