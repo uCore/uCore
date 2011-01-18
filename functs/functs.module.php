@@ -277,7 +277,7 @@ function InstallAllModules() {
 	$classes = get_declared_classes();
 	timer_start('table installation');
 	foreach ($classes as $classname){ // install tables
-		if ($classname == 'uTableDefinition' || !is_subclass_of($classname,'uTableDefinition')) continue;
+		if ($classname == 'uTableDef' || !is_subclass_of($classname,'uTableDef')) continue;
     
 		timer_start('table install ('.$classname.')');
 		CallModuleFunc($classname,'InstallTable');
