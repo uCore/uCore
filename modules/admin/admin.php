@@ -35,7 +35,6 @@ class internalmodule_Admin extends uBasicModule {
 	public function SetupParents() {
 		//$this->AddParent('*');
 		$this->AddParent('internalmodule_Admin');
-		$this->RegisterAjax('goAdmin',array($this,'RedirectToAdmin'),false);
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->RegisterAjax('toggleQ',array($this,'toggleQ'));
 //		$this->RegisterAjax('optimizeTables',array($this,'optimizeTables'),false);
@@ -114,7 +113,16 @@ class internalmodule_Admin extends uBasicModule {
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		GetFiles(true);
 		uJavascript::BuildJavascript();
-    
+
+		// if uModules doesnt exist, create it
+		if (!file_exists(PATH_ABS_MODULES)) mkdir(PATH_ABS_MODULES);
+
+		// if uTemplates doesnt exist, create it and copy CORE/styles/default to it
+		if (!file_exists(PATH_ABS_TEMPLATES)) {
+			mkdir(PATH_ABS_TEMPLATES);
+			smartCopy(PATH_ABS_CORE.'styles/default',PATH_ABS_TEMPLATES);
+		}
+
 		$rc = PATH_REL_CORE;
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
@@ -170,11 +178,5 @@ FIN;
 		echo '<h3 style="cursor:pointer" onclick="$(\'#modulesList\').toggle();">Installed Modules</h3><div id="modulesList" style="display:none"><pre>'.join("\n",$installed).'</pre></div>';
 		$this->optimizeTables();
 	}
-
-	public function RedirectToAdmin() {
-		// redirect
-		header('Location: '.$this->GetURL(),true); die();
-	}
 }
-
 ?>
