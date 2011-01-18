@@ -40,15 +40,11 @@ class internalmodule_ModuleSetup extends uListDataModule {
 		$this->CreateTable('modules', 'tabledef_Modules');
 		$this->AddField('uuid','uuid','modules','UUID');
 		$this->AddField('module_name','module_name','modules','Module Name');
-		$this->AddField('module_title','','','Module Title');
-		$this->AddPreProcessCallback('module_title',array($this,'findTitle'));
-		//$this->AddField('module_parents','','','Module Parents');
-		//$this->AddPreProcessCallback('module_parents',array($this,'findParents'));
+		$this->AddField('module_title',array($this,'findTitle'),'','Module Title');
+		//$this->AddPreProcessCallback('module_title',array($this,'findTitle'));
 
 		$this->AddField('module_active','module_active','modules','Module Active',itYESNO);//OPTION,array('Yes'=>1,'No'=>0));
-		//$this->AddField('sort_order','sort_order','modules','Sort Order',itTEXT);
 
-//		$this->AddFilter('module_name',ctLIKE,itCOMBO,'module_%',array('Show All'=>'%','Custom modules'=>'module_%','Internal modules'=>'internalmodule_%'));
 		$this->AddFilter('module_name',ctLIKE,itTEXT);
 	}
 
@@ -56,10 +52,6 @@ class internalmodule_ModuleSetup extends uListDataModule {
 		$rec = $this->GetCurrentRecord();
 		return CallModuleFunc($rec['module_name'],'GetTitle');
 	}
-	//public function findParents($value) {
-		//$rec = $this->GetCurrentRecord();
-		//return CallModuleFunc($rec['module_name'],'GetTitle');
-	//}
 
 	public function ParentLoad($parent) {
 	}
