@@ -48,7 +48,7 @@ class internalmodule_ModuleSetup extends uListDataModule {
 		$this->AddField('module_active','module_active','modules','Module Active',itOPTION,array('Yes'=>1,'No'=>0));
 		//$this->AddField('sort_order','sort_order','modules','Sort Order',itTEXT);
 
-		$this->AddFilter('module_name',ctLIKE,itCOMBO,'module_%',array('Show All'=>'%','Custom modules'=>'module_%','Internal modules'=>'internalmodule_%'));
+//		$this->AddFilter('module_name',ctLIKE,itCOMBO,'module_%',array('Show All'=>'%','Custom modules'=>'module_%','Internal modules'=>'internalmodule_%'));
 		$this->AddFilter('module_name',ctLIKE,itTEXT);
 	}
 
