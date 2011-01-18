@@ -7,6 +7,8 @@ uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/js/DD_belatedPNG-min.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/js/DD_roundies-min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
 utopia::AddJSFile(PATH_REL_CORE.'.javascript.js');
 $s = (utopia::IsRequestSecure()) ? 's' : '';
