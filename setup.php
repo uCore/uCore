@@ -5,6 +5,7 @@ define('CFG_TYPE_PATH',flag_gen('configType'));
 define('CFG_TYPE_PASSWORD',flag_gen('configType'));
 
 //uConfig::AddConfigVar('MODULES_PATH','Module Path',NULL,CFG_TYPE_PATH);
+uConfig::AddConfigVar('ERROR_EMAIL','Debug Email Address');
 uConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
 uConfig::AddConfigVar('SQL_SERVER','Database Server Address');
 uConfig::AddConfigVar('SQL_PORT','Database Port');
