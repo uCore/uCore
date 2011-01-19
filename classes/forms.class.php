@@ -479,6 +479,7 @@ abstract class uBasicModule {
 	public function HasRewrite() { return $this->rewriteMapping !== NULL; }
 	//    array( 'u' , 'fieldName' , 'some-random-text' , 'another_field' )
 	public function SetRewrite($mapping,$URLReadable = false) {
+		if (getenv('HTTP_MOD_REWRITE')!='On') return false;
 		if ($mapping === FALSE || $mapping === NULL) {
 			$this->rewriteMapping = NULL; return;
 		}
