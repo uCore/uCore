@@ -88,12 +88,15 @@ class utopia {
 		if (!self::$initCSShead) utopia::PrependVar('</head>',"{UTOPIA.cssHead}\n");
 		self::$initCSShead = true;
 
+		if (file_exists($path)) $path = self::GetRelativePath($path);
 		utopia::AppendVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
 	}
 	static $initJShead = false;
 	static function AddJSFile($path,$start=false) {
 		if (!self::$initJShead) utopia::AppendVar('</head>',"{UTOPIA.jsHead}\n");
 		self::$initJShead = true;
+
+		if (file_exists($path)) $path = self::GetRelativePath($path);
 
 		if ($start)
 			utopia::PrependVar('jsHead',"<script type=\"text/javascript\" src=\"$path\"></script>\n");
@@ -620,7 +623,7 @@ class utopia {
 
 		self::AddCSSFile(PATH_REL_CORE.'default.css');
 		if (file_exists($templateDir.'styles.css'))
-			self::AddCSSFile(self::GetRelativePath($templateDir.'styles.css'));
+			self::AddCSSFile($templateDir.'styles.css');
 
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
 		if (self::VarExists('script_include'))
@@ -777,6 +780,7 @@ class utopia {
 	}
 
 	static function GetRelativePath($fullpath) {
+		$fullpath = realpath($fullpath);
 		$pos = strpos($fullpath,PATH_ABS_ROOT);
 		return PATH_REL_ROOT.trim(substr($fullpath,$pos+strlen(PATH_ABS_ROOT)),DIRECTORY_SEPARATOR);
 	}
