@@ -423,8 +423,7 @@ class uCMS_View extends uSingleDataModule {
 //			echo 'Error 404: File not found'; return;
 		}
 		
-		if ($rec['template']) utopia::UseTemplate($rec['template']);
-		elseif (($dt = modOpts::GetOption('CMS','default_template'))) utopia::UseTemplate($dt);
+		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 		
 		//breadcrumb::AddURL($rec['nav_text'] ? $rec['nav_text'] : $rec['title'],$this->GetURL(array('cms_id'=>$rec['cms_id'])),-1000);
 		utopia::SetTitle($rec['title']);
@@ -434,6 +433,17 @@ class uCMS_View extends uSingleDataModule {
 		if ($rec['noindex']) $robots[] = 'NOINDEX';
 		if (!empty($robots)) utopia::AppendVar('<head>','<META NAME="ROBOTS" CONTENT="'.implode(', ',$robots).'">');
 		echo '{cms.'.$rec['cms_id'].'}';
+	}
+
+	static function GetTemplate($id) {
+		$template = NULL;
+		while ($id != NULL) {
+			$rec = CallModuleFunc('uCMS_View','LookupRecord',$id);
+			if ($rec['template']) { $template = $rec['template']; break; }
+			$id = $rec['parent'];
+		}
+		if (!$template) $template = modOpts::GetOption('CMS','default_template');
+		return $template;
 	}
 }
 ?>
