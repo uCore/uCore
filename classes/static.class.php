@@ -855,14 +855,17 @@ class utopia {
 	
 	// converters
 	static function convDate($originalValue,$pkVal,$processedVal) {
+		if (!$originalValue) return '';
 		$t = strtotime( $originalValue );
 		return strftime(FORMAT_DATE,$t);
 	}
 	static function convTime($originalValue,$pkVal,$processedVal) {
+		if (!$originalValue) return '';
 		$t = strtotime( $originalValue );
 		return strftime(FORMAT_TIME,$t);
 	}
 	static function convDateTime($originalValue,$pkVal,$processedVal) {
+		if (!$originalValue) return '';
 		$t = strtotime( $originalValue );
 		return strftime(FORMAT_DATETIME,$t);
 	}
