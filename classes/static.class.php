@@ -638,7 +638,7 @@ class utopia {
 				//'<div style="">'.
 				'<div id="adminSlave">'.
 				'<div id="adminClose" onclick="$(\'#adminSlave\').toggle()"></div>'.
-				'<div style="font-size:16px; margin-right:14px">Powered by <a target="_blank" href="http://www.utopiasystems.co.uk">Utopia Systems Ltd</a>.</div>'.
+				'<div style="font-size:16px; margin-right:14px">Powered by <a target="_blank" href="http://www.utopiasystems.co.uk">Utopia</a>.</div>'.
 				'<div>[ '.$time_taken.'ms ] [ '.$GLOBALS['sql_query_count'].' queries ]</div>'.
 				$adminPanel.
 				'</div></div>');
