@@ -1,5 +1,10 @@
 Options -Indexes
 
+<Files .config.php>
+order deny,allow
+deny from all
+</Files>
+
 RewriteEngine on
 RewriteRule ^(.*/)?\.svn/ - [F,L]
 ErrorDocument 403 "Access Forbidden"
