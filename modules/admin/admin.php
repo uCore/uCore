@@ -136,17 +136,23 @@ Header set Expires "Thu, 15 Jan 2015 20:00:00 GMT"
 php_value short_open_tag 0
 php_value display_errors 1
 
-RewriteEngine on
-RewriteRule ^(.*/)?\.svn/ - [F,L]
-ErrorDocument 403 "Access Forbidden"
 
-RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
+<IfModule mod_rewrite.c>
+	# Tell PHP that the mod_rewrite module is ENABLED.
+	SetEnv HTTP_MOD_REWRITE On
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d [OR]
-RewriteCond %{REQUEST_URI} ^/$
-RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
-#RewriteRule ^(.*\.(js|css))$ {$rc}index.php?__ajax=getCompressed&file=$1 [L]
+	RewriteEngine on
+	RewriteRule ^(.*/)?\.svn/ - [F,L]
+	ErrorDocument 403 "Access Forbidden"
+
+	RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
+
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d [OR]
+	RewriteCond %{REQUEST_URI} ^/$
+	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
+	#RewriteRule ^(.*\.(js|css))$ {$rc}index.php?__ajax=getCompressed&file=$1 [L]
+</IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
 		$htaccess = '';
