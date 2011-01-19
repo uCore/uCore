@@ -1,10 +1,48 @@
 <?php
 define('ADMIN_USER',flag_gen());
 
-class internalmodule_AdminLogin extends uBasicModule {
+class tabledef_AdminUsers extends uTableDef {
+  public $tablename = 'admin_users';
+  public function SetupFields() {
+    $this->AddField('username',ftVARCHAR,40);
+    $this->AddField('password',ftVARCHAR,40);
+
+    $this->SetPrimaryKey('username');
+  }
+}
+
+class uAdminUsersList extends uListDataModule {
+        public function GetTitle() { return 'Admin Accounts'; }
+        public function GetOptions() { return ALWAYS_ACTIVE | IS_ADMIN | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT; }
+
+        public function GetTabledef() { return 'tabledef_AdminUsers'; }
+        public function SetupFields() {
+                $this->CreateTable('users','tabledef_AdminUsers');
+		$this->AddField('username','username','users','Username',itTEXT);
+                $this->AddField('password','password','users','Password',itPASSWORD);
+        }
+
+        public function SetupParents() {
+		$this->AddParent('internalmodule_Admin');
+	}
+
+	public function ParentLoad($parent) {}
+
+	public function RunModule() {
+		$this->ShowData();
+	}
+}
+
+class internalmodule_AdminLogin extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Login'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | IS_ADMIN | NO_NAV; }
+
+	public function GetTabledef() { return 'tabledef_AdminUsers'; }
+	public function SetupFields() {
+		$this->CreateTable('users','tabledef_AdminUsers');
+		$this->AddField('password','password','users');
+	}
 
 	public function SetupParents() {
 		$this->RegisterAjax('adminLogout',array($this,'AdminLogout'));
@@ -22,8 +60,12 @@ class internalmodule_AdminLogin extends uBasicModule {
 		if (!array_key_exists('__admin_login_u',$_REQUEST)) return;
 
 		$un = $_REQUEST['__admin_login_u']; $pw = $_REQUEST['__admin_login_p'];
+		unset($_REQUEST['__admin_login_u']); unset($_REQUEST['__admin_login_p']);
+
 		if ( strcasecmp($un,constant('admin_user')) == 0 && $pw===constant('admin_pass') ) {
 			$_SESSION['admin_auth'] = ADMIN_USER;
+		} elseif ($this->LookupRecord(array('username'=>$un,'password'=>md5($pw)))) {
+			$_SESSION['admin_auth'] = $un;
 		} else {
 			ErrorLog('Username and password do not match.');
 		}
@@ -38,11 +80,11 @@ class internalmodule_AdminLogin extends uBasicModule {
 		die('window.location.reload();');
 	}
 
-	public static function IsLoggedIn($authType = ADMIN_USER, $orHigher=true) {
-		if ($orHigher)
-			return array_key_exists('admin_auth',$_SESSION) && ($_SESSION['admin_auth'] >= $authType);
-		else
-			return array_key_exists('admin_auth',$_SESSION) && ($_SESSION['admin_auth'] == $authType);
+	public static function IsLoggedIn($authType = NULL) {
+		if (!isset($_SESSION['admin_auth'])) return false;
+		if ($authType === NULL) return true;
+
+		return ($_SESSION['admin_auth'] === $authType);
 	}
 /*
 	private $map = array();

@@ -14,7 +14,7 @@
 
 <div id="maincontent"><a id="top"></a>
 <?php
-if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) {
+if (internalmodule_AdminLogin::IsLoggedIn()) {
   //echo "<a class=\"btn\" href=\"".PATH_REL_CORE."index.php\">Admin Home</a>";
   $arr = array();
   $children = utopia::GetChildren('internalmodule_Admin');
