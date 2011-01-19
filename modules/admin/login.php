@@ -22,7 +22,7 @@ class internalmodule_AdminLogin extends uBasicModule {
 		if (!array_key_exists('__admin_login_u',$_REQUEST)) return;
 
 		$un = $_REQUEST['__admin_login_u']; $pw = $_REQUEST['__admin_login_p'];
-		if ( $un==constant('admin_user') && $pw===constant('admin_pass') ) {
+		if ( strcasecmp($un,constant('admin_user')) == 0 && $pw===constant('admin_pass') ) {
 			$_SESSION['admin_auth'] = ADMIN_USER;
 		} else {
 			ErrorLog('Username and password do not match.');
