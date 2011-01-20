@@ -1,12 +1,13 @@
 <?php
-utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/plupload.full.min.js'));
-utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.min.js'));
-//utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.plupload.queue.min.js'));
-//utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/plupload.queue.css'));
-utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.css'));
-$pathUpload = CallModuleFunc('fileManager','GetAjaxUploadPath');
-$pathCore = PATH_REL_CORE;
-uJavascript::IncludeText(<<<FIN
+class plupload extends uBasicModule {
+	function SetupParents() {
+		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/plupload.full.min.js'));
+		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.min.js'));
+		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.css'));
+
+		$pathUpload = CallModuleFunc('fileManager','GetAjaxUploadPath');
+		$pathCore = PATH_REL_CORE;
+		uJavascript::IncludeText(<<<FIN
 var pluploadOptions = {
     runtimes : 'html5,flash,gears,silverlight,browserplus,html4',
     chunk_size : '1mb',
@@ -17,5 +18,10 @@ var pluploadOptions = {
     rename:true
 };
 FIN
-);
+		);
+	}
+	function ParentLoad($parent) {}
+	function RunModule() {}
+}
+
 ?>
