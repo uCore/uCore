@@ -21,7 +21,7 @@
 ;(function($){
 	var optionDefaults = {
 		path			: '',
-		upload			: false,
+		upload			: true,
 		readonly		: false,
 		fixedPath		: false,
 		
