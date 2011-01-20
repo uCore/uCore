@@ -6,7 +6,7 @@ class fileManager extends uBasicModule {
 		return 'File Manager';
 	}
 	function SetupParents() {
-		$this->AddParent('internalmodule_Admin');
+//		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 	}
@@ -63,7 +63,7 @@ FIN
 
 		echo '<div id="fileMan"></div>';
 		//uPlupload::Init();
-		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:dclick}},pluploadOptions);});");
+		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',events:{dblclick:dclick}},pluploadOptions);});");
 	}
 	static function OnRename($from,$to) {
 		// has been renamed.. fix in CMS
