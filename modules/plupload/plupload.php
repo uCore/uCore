@@ -17,7 +17,6 @@ var pluploadOptions = {
     silverlight_xap_url : '{$pathCore}modules/plupload/plupload.silverlight.xap',
     rename:true
 };
-console.log(pluploadOptions);
 FIN
 		);
 	}
