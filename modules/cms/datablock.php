@@ -36,11 +36,17 @@ class uDataBlocks_List extends uListDataModule {
   
   public function RunModule() {
     $this->ShowData();
+    // show conclicts between static block ids and custom ids
+    $rows = $this->GetRows();
+    foreach ($rows as $row) {
+      if (uDataBlocks::StaticBlockExists($row['block_id'])) echo "Conflict: DataBlock ({$row['block_id']}) already exists as a static DataBlock.  Please 
+rename it.";
+    }
   }
 }
 
-utopia::AddTemplateParser('block','uDataBlocks_Edit::DrawBlock');
-class uDataBlocks_Edit extends uSingleDataModule {
+utopia::AddTemplateParser('block','uDataBlocks::DrawBlock');
+class uDataBlocks extends uSingleDataModule {
   public function GetTitle() { return 'Edit Data Block'; }
   public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT | ALLOW_ADD; }
   public function GetTabledef() { return 'tabledef_DataBlocks'; }
@@ -51,8 +57,7 @@ class uDataBlocks_Edit extends uSingleDataModule {
     $installed = array();
     $classes = get_declared_classes();
     foreach ($classes as $classname){ // install tables
-      if ($classname == 'uDataModule' || $classname == 'uListDataModule' || $classname == 'uSingleDataModule' || 
-!is_subclass_of($classname,'uDataModule')) continue;
+      if ($classname == 'uDataModule' || $classname == 'uListDataModule' || $classname == 'uSingleDataModule' || !is_subclass_of($classname,'uDataModule')) continue;
       $installed[] = $classname;
     }
   
@@ -74,7 +79,7 @@ class uDataBlocks_Edit extends uSingleDataModule {
     $ret = '';
     foreach ($fields as $field) {
       $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">{$field['alias']}</span>";
-    }   
+    }
     return trim($ret);
   }
   public function getPreview($originalVal,$pk,$processedVal) {
@@ -91,7 +96,9 @@ class uDataBlocks_Edit extends uSingleDataModule {
   }
 
   static function DrawBlock($id) {
-    $rec = CallModuleFunc('uDataBlocks_Edit','LookupRecord',$id);
+    if (isset(self::$staticBlocks[$id])) return call_user_func(self::$staticBlocks[$id]);
+
+    $rec = CallModuleFunc('uDataBlocks','LookupRecord',$id);
     if (!$rec) return NULL;
 
     if ($rec['module']) {
@@ -151,7 +158,15 @@ class uDataBlocks_Edit extends uSingleDataModule {
 	$ret = $append.$content.$prepend;
 	while (utopia::MergeVars($ret));	
     return $ret;
-  } 
+  }
+
+  public static $staticBlocks = array();
+  public static function AddStaticBlock($ident,$callback) {
+    self::$staticBlocks[$ident] = $callback;
+  }
+  public static function StaticBlockExists($id) {
+    return isset(self::$staticBlocks[$id]);
+  }
 }
 
 ?>
