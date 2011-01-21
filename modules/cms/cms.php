@@ -83,17 +83,9 @@ class uCMS_List extends uDataModule {
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
 		echo '<div style="font-size:0.8em;white-space:nowrap"><a class="btn" style="font-size:0.8em" href="'.$newUrl.'">New Page</a><a class="btn" style="font-size:0.8em" href="javascript:t()">Toggle Hidden</a>';
 
-	//	if (array_key_exists('default_template',$_POST)) cubeCore::settingSet('default_template',$_POST['default_template']);
-		//$dTemplate = cubeCore::settingGet('default_template');
-		//DrawSqlInput($fieldName,$value,$pkVal,$attr);
-		
 		CallModuleFunc('modOpts','_SetupFields');
-//		CallModuleFunc('modOpts','SetFieldProperty','values','inputtype',itCOMBO);
 		$row = CallModuleFunc('modOpts','LookupRecord','CMS::default_template');//$this->GetCell($fieldName,$row,$targetUrl)
 		echo '<br>Default Template: '.CallModuleFunc('modOpts','GetCell','value',$row,NULL);
-		//cubeDB::DrawField('default_template',array('type'=>'combo','values'=>cubeCore::GetTemplates(),'attr'=>array('onchange'=>'$(\'#dtForm\').submit()')),$dTemplate);
-		//    echo 'Default Template: <input type="text" name="default_template" onchange="this.submit()" value="'.$dTemplate.'">';
-		//echo '</form>';
 
 		echo '<hr><div style="font-size:0.8em">Click a page below to preview it.</div>';
 		self::DrawChildren($relational);
@@ -151,19 +143,19 @@ FIN;
 		array_sort_subkey($children,'position');
 		echo '<ul>';
 		foreach ($children as $child) {
-			$hide = $child['hide'] ? 'hiddenItem' : '';
-      $editLink = CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
-      $delLink = CallModuleFunc('uCMS_List','CreateSqlField','del',$child['cms_id'],'del');// CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
-			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="/CubeCore/styles/images/data16.png">' : '';
-			echo '<li id="'.$child['cms_id'].'" class="'.$hide.'" style="position:relative;cursor:pointer">';
-			echo '<div onclick="$(\'#previewFrame\').attr(\'src\',\''.CallModuleFunc('uCMS_View','GetURL',array('cms_id'=>$child['cms_id'])).'\')">'.$child['title'].$data;
-			//			echo '<a href="?_action=edit" style="position:absolute;top:1px;right:3em;margin:0;width:16px;height:16px;padding:2px;background-repeat:no-repeat;background-image:url(\'/CubeCore/styles/images/add.png\')" class="btn"></a>';
-      echo '<div style="float:right;padding-left:10px">';
-      echo CallModuleFunc('uCMS_List','GetDeleteButton',$child['cms_id']);
-//      echo '<a class="btn btn-del" name="'.$delLink.'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="Delete \''.$child['cms_id'].'\'"></a>';
-      echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
-      echo '</div>';
+			$hide = $child['hide'] ? ' hiddenItem' : '';
+			$editLink = CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
+			$delLink = CallModuleFunc('uCMS_List','CreateSqlField','del',$child['cms_id'],'del');// CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
+			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
+
+			echo '<li id="'.$child['cms_id'].'" class="cmsItem'.$hide.'">';
+		//	echo '<div onclick="$(\'#previewFrame\').attr(\'src\',\''.CallModuleFunc('uCMS_View','GetURL',array('cms_id'=>$child['cms_id'])).'\')">';
+			echo $child['title'].$data;
+			echo '<div class="cmsItemActions">';
+			echo CallModuleFunc('uCMS_List','GetDeleteButton',$child['cms_id']);
+			echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			echo '</div>';
+		//	echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
 			echo '</li>';
 		}
@@ -221,11 +213,6 @@ FIN;
 			//$qry = 'UPDATE '.CallModuleFunc('uCMS_View','GetPrimaryTable').' SET `content` = REPLACE(`content`,\''.$oldURL.'\',\''.$newURL.'\')';
 			//sql_query($qry);
 			//print_r($rows);
-//			$rows = cubeDB::lookupSimple(cubeDB::GetTable('cubeCMS'),'*','content LIKE \'%'.cubeDB::escape($oldURL).'%\'');
-//			foreach ($rows as $row) {
-//				$newVal = str_replace($oldURL,$newURL,$row['content']);
-//				cubeDB::updateRecord(cubeDB::GetTable('cubeCMS'),array('content'=>$newVal),array(cubeCMS::GetPrimaryKey()=>$row[cubeCMS::GetPrimaryKey()]));
-//			}
 		}
 	}
 }
@@ -257,7 +244,8 @@ class uCMS_Edit extends uSingleDataModule {
 	}
   public function getPossibleBlocks($val,$pk,$original) {
     $rows = CallModuleFunc('uDataBlocks_List','GetRows');
-    $ret = '<div>Click a field to insert it.</div>';
+    foreach (uDataBlocks::$staticBlocks as $blockID => $callback) $rows[]['block_id'] = $blockID;
+    $ret = '<div>Click on a block to insert it.</div>';
     foreach ($rows as $row) {
       $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$row['block_id']}</span>";
     }   
