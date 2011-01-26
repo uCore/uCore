@@ -1,6 +1,6 @@
 #tree ul { list-style-type: none; margin:0; padding:0 }
 #tree li { margin-top:1px; padding-top:1px; padding-bottom:0; min-height:18px; }
-#tree li li { margin-top:1px; padding-top:1px; margin-bottom:0; min-height:18px; }
+#tree li li { padding-top:1px; min-height:18px; margin: 1px -50px 0 10px; }
 #tree li div:hover { background-color: #D5E2EA; background-repeat:repeat-x; }
 .hiddenItem { display:none; }
 
