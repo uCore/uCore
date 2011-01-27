@@ -1477,6 +1477,7 @@ abstract class uDataModule extends uBasicModule {
     //timer_start(get_class($this).':AF3:'.$aliasName);
 	switch ($this->GetFieldType($aliasName)) {
 		case ftFILE:
+		case ftIMAGE:
 			$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
 			$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 			break;

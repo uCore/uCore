@@ -127,7 +127,7 @@ abstract class uTableDef {
 		$this->SetFieldProperty($name,'extra',$extra);
 		$this->SetFieldProperty($name,'comments',$comments);
 
-		if ($type == ftFILE) {
+		if ($type == ftFILE || $type == ftIMAGE) {
 			$this->AddField($name.'_filename', ftVARCHAR, 255);
 			$this->AddField($name.'_filetype', ftVARCHAR, 255);
 		}
