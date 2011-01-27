@@ -152,11 +152,12 @@ $(document).ready(function(){
 
 	$("[name^=sql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
 	
-	InitJavascript.run();
+	//InitJavascript.run();
 	//InitAjax();
 	//InitAutocomplete();
 	//InitDatePickers();
 });
+$(window).load(function () { InitJavascript.run(); });
 
 function RefreshTableSorters() {
 	$('.datalist:has(SPAN.pager)').each(function () {
