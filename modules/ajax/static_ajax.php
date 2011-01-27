@@ -304,12 +304,23 @@ class internalmodule_StaticAjax extends uBasicModule {
 					'value'	=> $value,
 					'label'	=> $key.($key == $value ? '' : ' ('.$value.')'),
 					'desc' => 'ID: '.$value,
+					'key' => $key,
 				);
 				//$out .= preg_replace('/(\r\n|\n|\r|\f)/',"\r","$key|$value")."\n";
 				//$out .= preg_replace('/(\r\n|\n|\r|\f)/',"\r","$key,");
 			}
 		}
 		// value, label, desc, icon;
+
+		//echo $justNumeric ? 'numeric':'NN';
+		if ($justNumeric) {
+			// this is an array of values, so make 'value' = 'key' and remove 'desc' and 'label'
+			foreach ($found as $k=>$v) {
+				$found[$k]['value'] = $v['key'];
+				unset($found[$k]['label']);
+				unset($found[$k]['desc']);
+			}
+		}
 
 		echo json_encode($found);
 		//echo ($justNumeric) ? "|0\n$out" : "|\n$out";
