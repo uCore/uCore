@@ -7,13 +7,15 @@ uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
-uJavascript::IncludeFile(dirname(__FILE__).'/js/DD_belatedPNG-min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
 utopia::AddJSFile(PATH_REL_CORE.'.javascript.js');
 $s = (utopia::IsRequestSecure()) ? 's' : '';
 utopia::AddJSFile('http'.$s.'://www.google.com/jsapi?autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}]}'),true);
 utopia::AddCSSFile('http'.$s.'://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css');
 utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
+
+$b = $_SERVER['HTTP_USER_AGENT'];
+if (strpos($b,'MSIE 6') !== FALSE || strpos($b,'MSIE 7') !== FALSE) utopia::AddJSFile(dirname(__FILE__).'/js/DD_belatedPNG-min.js');
 
 class uJavascript {
 	private static $includeFiles = array();

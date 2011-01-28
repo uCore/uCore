@@ -24,7 +24,7 @@ $(document).ready(function(){
 	$("<img>").attr("src", PATH_REL_CORE+'images/hourglass.png');
 	$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
 	
-	DD_belatedPNG.fix('*');
+	if (typeof(DD_belatedPNG) != 'undefined') DD_belatedPNG.fix('*');
 
 	$(".tabGroup").tabs();
 	$(".tabGroup").bind("tabsshow", function(event, ui) { 
