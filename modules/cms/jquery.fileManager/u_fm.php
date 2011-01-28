@@ -6,7 +6,7 @@ class fileManager extends uBasicModule {
 		return 'File Manager';
 	}
 	function SetupParents() {
-//		$this->AddParent('internalmodule_Admin');
+		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 	}

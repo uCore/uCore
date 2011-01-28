@@ -24,7 +24,7 @@ $(document).ready(function(){
 	$("<img>").attr("src", PATH_REL_CORE+'images/hourglass.png');
 	$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
 	
-	DD_belatedPNG.fix('*');
+	if (typeof(DD_belatedPNG) != 'undefined') DD_belatedPNG.fix('*');
 
 	$(".tabGroup").tabs();
 	$(".tabGroup").bind("tabsshow", function(event, ui) { 
@@ -152,11 +152,12 @@ $(document).ready(function(){
 
 	$("[name^=sql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
 	
-	InitJavascript.run();
+	//InitJavascript.run();
 	//InitAjax();
 	//InitAutocomplete();
 	//InitDatePickers();
 });
+$(window).load(function () { InitJavascript.run(); });
 
 function RefreshTableSorters() {
 	$('.datalist:has(SPAN.pager)').each(function () {

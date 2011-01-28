@@ -681,6 +681,16 @@ abstract class uBasicModule {
 		return "<a$linkAttr href=\"$linkUrl\" target=\"_blank\"><img$attr src=\"$url\"></a>";
 	}
 
+        public function GetImageLink($fieldAlias,$pkVal,$width=NULL,$height=NULL) {
+                if ($pkVal == NULL) return '';
+                $field = $this->GetFieldProperty($fieldAlias ,'field');
+                $setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
+
+                $table = $setup['table'];
+                $key = $setup['pk'];
+		return $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$width,$height);
+        }
+
 	public function DrawSqlImage($fieldAlias,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE,$linkAttr=NULL) {
 		if ($pkVal == NULL) return '';
 		$field = $this->GetFieldProperty($fieldAlias ,'field');
@@ -1477,6 +1487,7 @@ abstract class uDataModule extends uBasicModule {
     //timer_start(get_class($this).':AF3:'.$aliasName);
 	switch ($this->GetFieldType($aliasName)) {
 		case ftFILE:
+		case ftIMAGE:
 			$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
 			$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 			break;
@@ -2597,6 +2608,8 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function GetFilterBox($filterInfo,$attributes=NULL,$spanAttributes=NULL) {
+		if (is_string($filterInfo))
+			$filterInfo = $this->GetFilterInfo($filterInfo);
 		// already filtered?
 
 		if ($filterInfo['it'] === itNONE) return '';
