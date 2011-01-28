@@ -122,7 +122,7 @@ class uCMS_List extends uDataModule {
 		function serialiseTree() {
 			var data = {};
 			$('#tree li').each(function () {
-				parent = $(this).parents('.ui-treesort-item:first').attr('id');
+				var parent = $(this).parents('.ui-treesort-item:first').attr('id');
 				if (!parent) parent = '';
 				data[$(this).attr('id')] = parent+':'+$(this).parents('ul:first').children('li').index(this);
 			});
