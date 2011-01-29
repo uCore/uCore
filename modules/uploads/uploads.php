@@ -27,7 +27,7 @@ class uUploads extends uBasicModule {
 		$fileName = pathinfo($path,PATHINFO_BASENAME);
                 $fileMod = filemtime($path);
                 $etag = sha1($fileMod.'-'.$_SERVER['REQUEST_URI']);
-//                utopia::Cache_Check($etag,$cType,$fileName);
+                utopia::Cache_Check($etag,$cType,$fileName);
 
 		$output = file_get_contents($path);
 
@@ -51,8 +51,7 @@ class uUploads extends uBasicModule {
 
 		header("Content-Type: $cType");
 
-		echo $output;
-//		utopia::Cache_Output($output,$etag,$cType,$fileName);
+		utopia::Cache_Output($output,$etag,$cType,$fileName);
 	}
 }
 
