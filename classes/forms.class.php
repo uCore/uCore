@@ -477,13 +477,15 @@ abstract class uBasicModule {
 	public $rewriteMapping=NULL;
 	public $rewriteURLReadable=NULL;
 	public function HasRewrite() { return $this->rewriteMapping !== NULL; }
-	//    array( 'u' , 'fieldName' , 'some-random-text' , 'another_field' )
+
+	//    array( '{fieldName}' , 'some-random-text' , '{another_field}' )
 	public function SetRewrite($mapping,$URLReadable = false) {
 		if (getenv('HTTP_MOD_REWRITE')!='On') return false;
-		if ($mapping === FALSE || $mapping === NULL) {
+		if ($mapping === NULL) {
 			$this->rewriteMapping = NULL; return;
 		}
 		if (is_string($mapping) && $mapping !== '') $mapping = array($mapping);
+		if ($mapping === true) $mapping = array(true);
 		if (!is_array($mapping)) $mapping = array();
 		array_unshift($mapping,'{uuid}');
 
@@ -561,13 +563,17 @@ abstract class uBasicModule {
 		}
 
 		foreach ($mapped as $key => $val) {
+			if (is_bool($val)) break;
 			$URLreadable = is_array($this->rewriteURLReadable) ? $this->rewriteURLReadable[$key] : $this->rewriteURLReadable;
 			$mapped[$key] = ($URLreadable) ? urlencode(UrlReadable($val)) : urlencode($val);
 		//	print_r($mapped[$key]);
 		}
 
+		$newPath = PATH_REL_ROOT.'u/'.join('/',$mapped);
+                if (isset($mapped[1]) && $mapped[1]===TRUE) $newPath = str_replace($newPath,$_SERVER['REQUEST_URI'],$newPath);
+
 		// DONE: ensure all rewrite segments are accounted for (all '/' are present)
-		return PATH_REL_ROOT.'u/'.join('/',$mapped);
+		return $newPath;
 	}
 
 	public function GetURL($filters = NULL, $encodeAmp = false) {
