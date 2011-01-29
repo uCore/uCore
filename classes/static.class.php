@@ -856,6 +856,44 @@ class utopia {
 		self::CancelTemplate();
 		die(print_r($text,true));
 	}
+
+	// helpers
+	static function constrainImage($src,$maxW=NULL,$maxH=NULL) {
+		if ($maxW === NULL && $maxH === NULL) return $src;
+
+		if (imageistruecolor($src)) {
+			imageAlphaBlending($src, true);
+			imageSaveAlpha($src, true);
+		}
+		$srcW = imagesx($src);
+		$srcH = imagesy($src);
+
+		$width = array_key_exists('w',$_GET) ? $_GET['w'] : $srcW;
+		$height = array_key_exists('h',$_GET) ? $_GET['h'] : $srcH;
+
+		$ratio_orig = $srcW/$srcH;
+		if ($width/$height > $ratio_orig) {
+			$width = $height*$ratio_orig;
+		} else {
+			$height = $width/$ratio_orig;
+		}
+		$maxW = $maxW ? $maxW : $width;
+		$maxH = $maxH ? $maxH : $height;
+
+		$img = imagecreatetruecolor($maxW,$maxH);
+		$trans_colour = imagecolorallocatealpha($img, 0, 0, 0, 127);
+		imagefill($img, 0, 0, $trans_colour);
+
+		$offsetX = ($maxW - $width) /2;
+		$offsetY = ($maxH - $height) /2;
+
+		//fastimagecopyresampled($img,$src,$offsetX,$offsetY,0,0,$width,$height,$srcW,$srcH,1);
+		imagecopyresampled($img,$src,$offsetX,$offsetY,0,0,$width,$height,$srcW,$srcH);
+		imagealphablending($img, true);
+		imagesavealpha($img, true);
+
+		return $img;
+	}
 	
 	// converters
 	static function convDate($originalValue,$pkVal,$processedVal) {
