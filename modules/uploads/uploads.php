@@ -40,7 +40,7 @@ class uUploads extends uBasicModule {
 			$ext = pathinfo($path,PATHINFO_EXTENSION);
 
 			ob_start();
-			if (function_exists("image$ext"))
+			if (function_exists(strtolower("image$ext")))
 				call_user_func("image$ext",$img);
 			else {
 				imagepng($img);
