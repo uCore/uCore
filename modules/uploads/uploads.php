@@ -42,14 +42,15 @@ class uUploads extends uBasicModule {
 			ob_start();
 			if (function_exists("image$ext"))
 				call_user_func("image$ext",$img);
-			else
+			else {
 				imagepng($img);
+				$cType = 'image/png';
+				$fileName = str_replace(".$ext",'.png',$fileName);
+			}
 			$output = ob_get_contents();
 			ob_end_clean();
 			imagedestroy($img);
 		}
-
-		header("Content-Type: $cType");
 
 		utopia::Cache_Output($output,$etag,$cType,$fileName);
 	}
