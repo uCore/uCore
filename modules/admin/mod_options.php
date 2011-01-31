@@ -23,7 +23,7 @@ class modOpts extends uListDataModule {
 	public function SetupFields() {
 		$this->CreateTable('opts');
 //		$this->AddField('module','module','opts','Home');
-		$this->AddField('ident','ident','opts','id');
+//		$this->AddField('ident','ident','opts','id');
 		$this->AddField('name','name','opts','Name');
 		$this->AddField('value','value','opts','Value',itTEXT);
     
