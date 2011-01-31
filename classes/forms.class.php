@@ -159,7 +159,6 @@ abstract class uBasicModule {
 		///		}
 
 		if ($this->isDisabled) return false;
-		if (!$this->IsActive()) return false;
 		//if (flag_is_set($this->GetOptions(),IS_ADMIN) && !internalmodule_AdminLogin::IsLoggedIn()) return false;
 		//if (!$this->HasParent($parent)) return false;
 
@@ -595,23 +594,6 @@ abstract class uBasicModule {
    
 		return BuildQueryString($url,$filters,$encodeAmp);
 	}
-	public function IsActive() {
-		if (flag_is_set($this->GetOptions(),ALWAYS_ACTIVE)) return true;
-		return utopia::ModuleExists(get_class($this),true);
-	}
-	public function CanBeActive() {
-		// check dependancies exist
-		if (!$this->CheckDependencies()) return FALSE;
-
-		// check parent is active
-		//		if ($this->module_parent == '' || $this->module_parent == '*') return true;
-		/*
-		 if ((!empty($this->module_parent) && $this->module_parent != '*') && (!class_exists($this->module_parent) || !CallModuleFunc($this->module_parent,'IsActive'))) {
-			if ($showErrors) ErrorLog("Class (".get_class($this).") cannot be active due to inactive parent ($this->module_parent)");
-			$result = false;
-			} */
-		return TRUE;
-	}
 	public function IsInstalled() {
 		//check if its installed in the db
 		//$result = sql_query("SELECT * FROM internal_modules WHERE (`module_name` = '". get_class($this) ."')");
@@ -638,7 +620,6 @@ abstract class uBasicModule {
 			} else {
 				//			$qry = "UPDATE db_modules SET `module_parent` = '".$this->module_parent."', `module_name` = '". get_class($this) ."'"; // removed because parent no longer used
 				$qry = "UPDATE internal_modules SET `uuid` = '".$uuid."', `module_name` = '". get_class($this) ."', `sort_order` = '".$this->GetSortOrder()."'";
-				//$cba = true;// $this->CanBeActive($row['module_active'] == 1);
 				if (flag_is_set($this->GetOptions(),ALWAYS_ACTIVE))
 					$qry .= ", `module_active` = '1'";
 				//			else
@@ -649,16 +630,6 @@ abstract class uBasicModule {
 			}
 		}
 		//		$GLOBALS['modules'][$this->GetUUID()] = get_class($this);
-	}
-
-	public function CheckDependencies() {
-		$result = true;
-
-		foreach (array_keys($this->parents) as $parentName) {
-			if ($parentName == '*' || $parentName == '') continue;
-			if (!class_exists($parentName)) { ErrorLog( "Class (".get_class($this).") cannot be active due to missing dependency ($parentName)"); $result = false; continue; }
-		}
-		return $result;
 	}
 
 	public function GetFileFromTable($field,$table,$key,$pkVal,$att = 'inline') {
@@ -921,7 +892,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function CanParentLoad($parent) {
-		if ($this->IsActive() && $this->HasParent($parent)) $this->_SetupFields();
+		if ($this->HasParent($parent)) $this->_SetupFields();
 		return parent::CanParentLoad($parent);
 	}
 	public function Initialise() {
@@ -2493,27 +2464,6 @@ abstract class uDataModule extends uBasicModule {
 	}	
 
 //	private $navCreated = FALSE;
-
-	public function CheckDependencies($showErrors = false) {
-		$result = true;
-		if (!parent::CheckDependencies($showErrors)) $result = false;
-		return $result;
-		/*
-		 // alert dependancies:
-		 foreach ($this->fields as $fieldName => $fieldData) {
-			if (!array_key_exists('comments',$fieldData)) continue;
-			@list(,$dataField,$lookupField,$lookupTable) = ParseFieldComments($fieldData['comments']);
-			if (empty($lookupField)) continue;
-			//check tabledef class exists
-			if (!TableExists($lookupTable)) {
-			if ($showErrors) ErrorLog("Missing table dependency ($this->tablename) requires ($lookupTable)"); $result = false; continue; }
-
-			if (GetRow(sql_query("SHOW FIELDS FROM `$lookupTable` LIKE '$lookupField'")) === NULL) {
-			if ($showErrors) ErrorLog("Missig table dependency ($this->tablename) requires ($lookupField in $lookupTable)"); $result = false; continue; }
-			}
-
-			return $result;*/
-	}
 
   // sends ARGS,originalValue,pkVal,processedVal
 	public function PreProcess($fieldName,$value,$pkVal=NULL,$forceType = NULL) {

@@ -105,8 +105,7 @@ class utopia {
 	}
 
 	private static $allmodules = NULL;
-	private static $activemodules = NULL;
-	static function GetModules($activeonly=false,$refresh=false) {
+	static function GetModules($refresh=false) {
 		if (self::$allmodules === NULL || $refresh) {
 
 			$result = sql_query('SELECT * FROM internal_modules');
@@ -117,32 +116,18 @@ class utopia {
 			self::$allmodules = $rows;
 		}
 
-		if ($activeonly && self::$allmodules) {
-			if (self::$activemodules === NULL || $refresh) {
-				$rows = self::$allmodules;
-
-				foreach ($rows as $key => $row) {
-					if (flag_is_set(CallModuleFunc($row['module_name'],'GetOptions'),ALWAYS_ACTIVE)) continue;
-
-					if (!$row['module_active']) unset($rows[$key]);
-				}
-				self::$activemodules = $rows;
-			}
-			return self::$activemodules;
-		}
-
 		return self::$allmodules;
 	}
 
-	static function ModuleExists($module, $activeonly = false) {
-		$modules = self::GetModules($activeonly);
+	static function ModuleExists($module) {
+		$modules = self::GetModules();
 		foreach ($modules as $m) {
 			if ($module == $m['module_name']) return $m;
 		}
 		return false;
 	}
-	static function UUIDExists($uuid, $activeonly = false) {
-		$modules = self::GetModules($activeonly);
+	static function UUIDExists($uuid) {
+		$modules = self::GetModules();
 		foreach ($modules as $m) {
 			if ($uuid == $m['uuid']) return $m;
 		}
