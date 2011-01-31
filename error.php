@@ -48,9 +48,10 @@ function DebugMail($subject,$message) {
 //  }
 
   if (!is_string($message)) $message = print_r($message,true);
+  $ip = isset($_SERVER['REMOTE_ADDR']) ? 'Remote IP: '.$_SERVER['REMOTE_ADDR']."\n" : '';
   $ref = array_key_exists('HTTP_REFERER',$_SERVER) ? 'Referrer: '.$_SERVER['HTTP_REFERER']."\n" : '';
   $ua = array_key_exists('HTTP_USER_AGENT',$_SERVER) ? 'User Agent: '.$_SERVER['HTTP_USER_AGENT']."\n" : '';
-  $message = 'URL: http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']."\n".$ref.$ua."$message";
+  $message = 'URL: http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']."\n".$ref.$ip.$ua."$message";
   mail(ERROR_EMAIL,$subject,$message);
 }
 ?>
