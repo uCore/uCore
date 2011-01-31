@@ -77,7 +77,10 @@ class uCMS_List extends uDataModule {
 	public function ParentLoad($parent) {
 	}
 	public function RunModule() {
-	  $m = utopia::ModuleExists('uCMS_Edit');
+		$tabGroupName = utopia::Tab_InitGroup();
+		ob_start();
+
+		$m = utopia::ModuleExists('uCMS_Edit');
 		$newUrl = CallModuleFunc('uCMS_Edit','GetURL',array($m['module_id'].'_new'=>1));
 		$relational = $this->GetNestedArray();
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
@@ -137,6 +140,10 @@ class uCMS_List extends uDataModule {
 		});
 		</script>
 FIN;
+		$c = ob_get_contents();
+		ob_end_clean();
+		utopia::Tab_Add('Page Editor',$c,$tabGroupName,false);
+		utopia::Tab_InitDraw($tabGroupName);
 	}
 	static function DrawChildren($children) {
 		if (!$children) return;

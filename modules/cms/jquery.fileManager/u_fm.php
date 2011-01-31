@@ -6,7 +6,8 @@ class fileManager extends uBasicModule {
 		return 'File Manager';
 	}
 	function SetupParents() {
-		$this->AddParent('internalmodule_Admin');
+		//$this->AddParent('internalmodule_Admin');
+		$this->AddParent('uCMS_List');
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 	}
@@ -31,7 +32,7 @@ FIN
 		//return $out.$defaultValue.utopia::DrawInput($fieldName,itBUTTON,'Choose File',$possibleValues,$attributes,$noSubmit);
 	}
 	function GetOptions() {return IS_ADMIN;}
-	function ParentLoad($parent) {}
+	function ParentLoad($parent) { $this->RunModule(); }
 	function ajax() {
 		utopia::CancelTemplate();
 		if (array_key_exists('upload',$_GET))
@@ -59,11 +60,18 @@ FIN
 		return $this->GetURL(array('__ajax'=>'fileManagerAjax','upload'=>1));
 	}
 	function RunModule() {
+		$tabGroupName = utopia::Tab_InitGroup();
+		ob_start();
 		list($path,$pathUpload) = $this->Init();
 
 		echo '<div id="fileMan"></div>';
 		//uPlupload::Init();
 		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',events:{dblclick:dclick}},pluploadOptions);});");
+
+		$out = ob_get_contents();
+		ob_end_clean();
+		utopia::Tab_Add($this->GetTitle(),$out,$tabGroupName,false);
+		utopia::Tab_InitDraw($tabGroupName);
 	}
 	static function OnRename($from,$to) {
 		// has been renamed.. fix in CMS

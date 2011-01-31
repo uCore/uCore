@@ -29,10 +29,11 @@ class uDataBlocks_List extends uListDataModule {
 //    $this->AddField('order','order','blocks','Order');
   }
   public function SetupParents() {
-    $this->AddParent('internalmodule_Admin');
+//    $this->AddParent('internalmodule_Admin');
+	$this->AddParent('uCMS_List');
   }
 
-  public function ParentLoad($parent) { }
+  public function ParentLoad($parent) { $this->ShowData(); }
   
   public function RunModule() {
     $this->ShowData();
