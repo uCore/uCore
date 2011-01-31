@@ -1,20 +1,4 @@
 <?php
-$templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
-$nTemplates = array('Default Template'=>TEMPLATE_DEFAULT,'No Template'=>TEMPLATE_BLANK);
-if (is_array($templates)) foreach ($templates as $k => $v) {
-	if ($v == '.' || $v == '..' || !is_dir($v)) {
-		unset($templates[$k]);
-		continue;
-	}
-	$nTemplates[basename($v)] = basename($v);
-	//unset($templates[$k]);
-	//$templates[$k] = basename($v);
-}
-//$templates = is_array($templates) ? array_values($templates) : array();
-utopia::SetVar('TEMPLATE_LIST',$nTemplates);
-unset($nTemplates['Default Template']);
-$nTemplates['No Template'] = '';
-modOpts::AddOption('CMS','default_template','Default Template','',itCOMBO,$nTemplates);
 
 class tabledef_CMS extends uTableDef {
   public $tablename = 'cms';
@@ -53,6 +37,24 @@ class uCMS_List extends uDataModule {
 		$this->AddField('hide','hide','cms','Parent');
 	}
 	public function SetupParents() {
+		$templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
+		$nTemplates = array('Default Template'=>TEMPLATE_DEFAULT,'No Template'=>TEMPLATE_BLANK);
+		if (is_array($templates)) foreach ($templates as $k => $v) {
+		        if ($v == '.' || $v == '..' || !is_dir($v)) {
+		                unset($templates[$k]);
+		                continue;
+		        }
+		        $nTemplates[basename($v)] = basename($v);
+		        //unset($templates[$k]);
+		        //$templates[$k] = basename($v);
+		}
+		//$templates = is_array($templates) ? array_values($templates) : array();
+		utopia::SetVar('TEMPLATE_LIST',$nTemplates);
+		unset($nTemplates['Default Template']);
+		$nTemplates['No Template'] = '';
+		modOpts::AddOption('CMS','default_template','Default Template','',itCOMBO,$nTemplates);
+
+
 		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 	}
