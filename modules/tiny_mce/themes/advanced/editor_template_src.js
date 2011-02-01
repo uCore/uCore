@@ -81,6 +81,7 @@
 				theme_advanced_resize_horizontal : 1,
 				theme_advanced_resizing_use_cookie : 1,
 				theme_advanced_font_sizes : "1,2,3,4,5,6,7",
+				theme_advanced_font_selector : "span",
 				readonly : ed.settings.readonly
 			}, ed.settings);
 
@@ -119,13 +120,13 @@
 			if (s.theme_advanced_statusbar_location == 'none')
 				s.theme_advanced_statusbar_location = 0;
 
+			if (ed.settings.content_css !== false)
+				ed.contentCSS.push(ed.baseURI.toAbsolute(url + "/skins/" + ed.settings.skin + "/content.css"));
+
 			// Init editor
 			ed.onInit.add(function() {
 				if (!ed.settings.readonly)
 					ed.onNodeChange.add(t._nodeChanged, t);
-
-				if (ed.settings.content_css !== false)
-					ed.dom.loadCSS(ed.baseURI.toAbsolute("themes/advanced/skins/" + ed.settings.skin + "/content.css"));
 			});
 
 			ed.onSetProgressState.add(function(ed, b, ti) {
@@ -230,9 +231,10 @@
 
 					// Toggle off the current format
 					matches = ed.formatter.matchAll(formatNames);
-					if (!name || matches[0] == name)
-						ed.formatter.remove(matches[0]);
-					else
+					if (!name || matches[0] == name) {
+						if (matches[0]) 
+							ed.formatter.remove(matches[0]);
+					} else
 						ed.formatter.apply(name);
 
 					ed.undoManager.add();
@@ -492,7 +494,7 @@
 			n = o.targetNode;
 
 			// Add classes to first and last TRs
-			nl = DOM.stdMode ? sc.getElementsByTagName('tr') : sc.rows; // Quick fix for IE 8
+			nl = sc.rows;
 			DOM.addClass(nl[0], 'mceFirst');
 			DOM.addClass(nl[nl.length - 1], 'mceLast');
 
@@ -571,7 +573,7 @@
 			this.resizeTo(e.clientWidth + dw, e.clientHeight + dh);
 		},
 
-		resizeTo : function(w, h) {
+		resizeTo : function(w, h, store) {
 			var ed = this.editor, s = this.settings, e = DOM.get(ed.id + '_tbl'), ifr = DOM.get(ed.id + '_ifr');
 
 			// Boundery fix box
@@ -589,8 +591,18 @@
 				DOM.setStyle(ifr, 'width', w);
 
 				// Make sure that the size is never smaller than the over all ui
-				if (w < e.clientWidth)
+				if (w < e.clientWidth) {
+					w = e.clientWidth;
 					DOM.setStyle(ifr, 'width', e.clientWidth);
+				}
+			}
+
+			// Store away the size
+			if (store && s.theme_advanced_resizing_use_cookie) {
+				Cookie.setHash("TinyMCE_" + ed.id + "_size", {
+					cw : w,
+					ch : h
+				});
 			}
 		},
 
@@ -810,12 +822,18 @@
 				}
 
 				ed.onPostRender.add(function() {
+					Event.add(ed.id + '_resize', 'click', function(e) {
+						e.preventDefault();
+					});
+
 					Event.add(ed.id + '_resize', 'mousedown', function(e) {
 						var mouseMoveHandler1, mouseMoveHandler2,
 							mouseUpHandler1, mouseUpHandler2,
 							startX, startY, startWidth, startHeight, width, height, ifrElm;
 
 						function resizeOnMove(e) {
+							e.preventDefault();
+
 							width = startWidth + (e.screenX - startX);
 							height = startHeight + (e.screenY - startY);
 
@@ -829,13 +847,9 @@
 							Event.remove(DOM.doc, 'mouseup', mouseUpHandler1);
 							Event.remove(ed.getDoc(), 'mouseup', mouseUpHandler2);
 
-							// Store away the size
-							if (s.theme_advanced_resizing_use_cookie) {
-								Cookie.setHash("TinyMCE_" + ed.id + "_size", {
-									cw : width,
-									ch : height
-								});
-							}
+							width = startWidth + (e.screenX - startX);
+							height = startHeight + (e.screenY - startY);
+							t.resizeTo(width, height, true);
 						};
 
 						e.preventDefault();
@@ -932,7 +946,9 @@
 				if (n.nodeName === 'SPAN') {
 					if (!cl && n.className)
 						cl = n.className;
+				}
 
+				if (ed.dom.is(n, s.theme_advanced_font_selector)) {
 					if (!fz && n.style.fontSize)
 						fz = n.style.fontSize;
 
@@ -971,7 +987,7 @@
 				getParent(function(n) {
 					var na = n.nodeName.toLowerCase(), u, pi, ti = '';
 
-					/*if (n.getAttribute('_mce_bogus'))
+					/*if (n.getAttribute('data-mce-bogus'))
 						return;
 */
 					// Ignore non element and hidden elements
@@ -1077,7 +1093,7 @@
 			var ed = this.editor;
 
 			ed.windowManager.open({
-				url : tinymce.baseURL + '/themes/advanced/anchor.htm',
+				url : this.url + '/anchor.htm',
 				width : 320 + parseInt(ed.getLang('advanced.anchor_delta_width', 0)),
 				height : 90 + parseInt(ed.getLang('advanced.anchor_delta_height', 0)),
 				inline : true
@@ -1090,7 +1106,7 @@
 			var ed = this.editor;
 
 			ed.windowManager.open({
-				url : tinymce.baseURL + '/themes/advanced/charmap.htm',
+				url : this.url + '/charmap.htm',
 				width : 550 + parseInt(ed.getLang('advanced.charmap_delta_width', 0)),
 				height : 250 + parseInt(ed.getLang('advanced.charmap_delta_height', 0)),
 				inline : true
@@ -1103,7 +1119,7 @@
 			var ed = this.editor;
 
 			ed.windowManager.open({
-				url : tinymce.baseURL + '/themes/advanced/about.htm',
+				url : this.url + '/about.htm',
 				width : 480,
 				height : 380,
 				inline : true
@@ -1118,7 +1134,7 @@
 			v = v || {};
 
 			ed.windowManager.open({
-				url : tinymce.baseURL + '/themes/advanced/color_picker.htm',
+				url : this.url + '/color_picker.htm',
 				width : 375 + parseInt(ed.getLang('advanced.colorpicker_delta_width', 0)),
 				height : 250 + parseInt(ed.getLang('advanced.colorpicker_delta_height', 0)),
 				close_previous : false,
@@ -1134,7 +1150,7 @@
 			var ed = this.editor;
 
 			ed.windowManager.open({
-				url : tinymce.baseURL + '/themes/advanced/source_editor.htm',
+				url : this.url + '/source_editor.htm',
 				width : parseInt(ed.getParam("theme_advanced_source_editor_width", 720)),
 				height : parseInt(ed.getParam("theme_advanced_source_editor_height", 580)),
 				inline : true,
@@ -1153,7 +1169,7 @@
 				return;
 
 			ed.windowManager.open({
-				url : tinymce.baseURL + '/themes/advanced/image.htm',
+				url : this.url + '/image.htm',
 				width : 355 + parseInt(ed.getLang('advanced.image_delta_width', 0)),
 				height : 275 + parseInt(ed.getLang('advanced.image_delta_height', 0)),
 				inline : true
@@ -1166,7 +1182,7 @@
 			var ed = this.editor;
 
 			ed.windowManager.open({
-				url : tinymce.baseURL + '/themes/advanced/link.htm',
+				url : this.url + '/link.htm',
 				width : 310 + parseInt(ed.getLang('advanced.link_delta_width', 0)),
 				height : 200 + parseInt(ed.getLang('advanced.link_delta_height', 0)),
 				inline : true
