@@ -121,63 +121,28 @@ class internalmodule_StaticAjax extends uBasicModule {
 		if ($result !== FALSE && mysql_num_rows($result) > 0)
 			$data = mysql_result($result,0,'img');
 		else
-			$data = file_get_contents(PATH_ABS_ROOT.'no-img.png');
+			die('Image Not Found');//$data = file_get_contents(PATH_ABS_ROOT.'no-img.png');
+
+		utopia::CancelTemplate();
 
 		$etag = sha1($_SERVER['REQUEST_URI'].'-'.strlen($data));
 		utopia::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 
-//		try {
-			$src = imagecreatefromstring($data);
-//		} catch (Exception $e) {
-//			$src = imagecreatefromstring(file_get_contents(PATH_ABS_ROOT.'no-img.png'));
-//		}
-		//mail('oridan82@gmail.com','err',print_r(error_get_last(),true));
+		$src = imagecreatefromstring($data);
 
-		if (imageistruecolor($src)) {
-			imageAlphaBlending($src, true);
-			imageSaveAlpha($src, true);
-		}
-		$srcW = imagesx($src);
-		$srcH = imagesy($src);
+		$width = isset($_GET['w']) ? $_GET['w'] : NULL;
+		$height = isset($_GET['h']) ? $_GET['h'] : NULL;
 
-		$width = array_key_exists('w',$_GET) ? $_GET['w'] : $srcW;
-		$height = array_key_exists('h',$_GET) ? $_GET['h'] : $srcH;
-		$maxW = $width; $maxH = $height;
-
-		$ratio_orig = $srcW/$srcH;
-		if ($width/$height > $ratio_orig) {
-			$width = $height*$ratio_orig;
-		} else {
-			$height = $width/$ratio_orig;
-		}
-		if (!array_key_exists('w',$_GET)) $maxW = $width;
-		if (!array_key_exists('h',$_GET)) $maxH = $height;
-
-		$img = imagecreatetruecolor($maxW,$maxH);
-		$trans_colour = imagecolorallocatealpha($img, 0, 0, 0, 127);
-		imagefill($img, 0, 0, $trans_colour);
-
-		$offsetX = ($maxW - $width) /2;
-		$offsetY = ($maxH - $height) /2;
-
-		//fastimagecopyresampled($img,$src,$offsetX,$offsetY,0,0,$width,$height,$srcW,$srcH,1);
-		imagecopyresampled($img,$src,$offsetX,$offsetY,0,0,$width,$height,$srcW,$srcH);
-		imagealphablending($img, true);
-		imagesavealpha($img, true);
+		$img = utopia::constrainImage($src,$width,$height);
 
 		//    Image output
-		//if (substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')) ob_end_clean();
-		ob_end_clean();
-		header('Content-Encoding: none',true);
 		ob_start();
-		//imagejpeg($img,NULL,1);
 		imagepng($img);
 		imagedestroy($img);
 		$c = ob_get_contents();
 		ob_end_clean();
 
 		utopia::Cache_Output($c,$etag,'image/png',$_GET['p'].$_GET['f'].'.png');
-		die();
 	}
 
 	public function showQueries() {
