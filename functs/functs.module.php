@@ -1,23 +1,11 @@
 <?php
 
 function GetFiles($refresh = false) {
-  sql_query('CREATE TABLE IF NOT EXISTS __u_filelist (`id` int AUTO_INCREMENT PRIMARY KEY, `filename` LONGTEXT)');
-  $result = sql_query('SELECT * FROM __u_filelist');
-  $rows = $result ? GetRows($result) : NULL;
-
   $files = array();
-  if ($refresh || !$rows) {
-//    sql_query('CREATE TABLE IF NOT EXISTS __u_filelist (`id` int AUTO_INCREMENT PRIMARY KEY, `filename` LONGTEXT)');
     $files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'classes/')); // load base classes
     $files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'modules/')); // load internal modules
     $files = array_merge($files,LoadModulesDir(PATH_ABS_MODULES)); // load custom modules
-    sql_query('TRUNCATE TABLE __u_filelist');
-    foreach ($files as $file) sql_query('INSERT INTO __u_filelist (`filename`) VALUES (\''.$file.'\')');
-  } else {
-    foreach ($rows as $row) $files[] = $row['filename'];
-  }
-  
-//  print_r($files); die();
+
   return $files;
 }
 function LoadFiles() {
@@ -26,7 +14,25 @@ function LoadFiles() {
   foreach ($files as $file) if (file_exists($file)) include_once($file);
 }
 
+function hasNoScan($var) {
+	return preg_match('/.u_noscan$/i',$var) > 0;
+}
+
 function LoadModulesDir($dir, $recursive = TRUE) {
+        $Directory = new RecursiveDirectoryIterator($dir);
+        $Iterator = new RecursiveIteratorIterator($Directory);
+        $Regex = new RegexIterator($Iterator, '/(\.php|.u_noscan)$/i', RecursiveRegexIterator::GET_MATCH);
+	$files = array_keys(iterator_to_array($Regex));
+	$ns = array_filter($files,'hasNoScan');
+	foreach ($ns as $noScanPath) {
+		$c = substr($noScanPath,0,-9);
+		foreach ($files as $k => $path) {
+			if (strpos($path,$c) !== FALSE) unset($files[$k]);
+		}
+	}
+	return $files;
+
+
 	$files = array();
 	$dir = rtrim($dir,'/'); 
 //	if (preg_match('/\.svn$/i',$dir)) return $files;

@@ -111,7 +111,7 @@ class internalmodule_Admin extends uBasicModule {
 		utopia::AppendVar('content:before',"<h1>Welcome to Admin Home</h1>");
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
-		GetFiles(true);
+		//GetFiles(true);
 		uJavascript::BuildJavascript();
 
 		// if uModules doesnt exist, create it
