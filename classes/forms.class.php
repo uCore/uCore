@@ -2213,13 +2213,14 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function GetOrderBy() {
-    $m = utopia::ModuleExists(get_class($this));
-    $sortKey = '_s_'.$this->GetModuleId();
-    if (isset($_GET[$sortKey])) {
-		$arr = explode(',',$_GET[$sortKey]);
-		foreach ($arr as $sorter) {
-			$s = explode(' ',$sorter);
-			$this->AddOrderBy($s[0],isset($s[1]) ? $s[1] : NULL);
+		$sortKey = '_s_'.$this->GetModuleId();
+		if (isset($_GET[$sortKey])) {
+			$this->ordering = NULL;
+			$arr = explode(',',$_GET[$sortKey]);
+			foreach ($arr as $sorter) {
+				$s = explode(' ',$sorter);
+				$this->AddOrderBy($s[0],isset($s[1]) ? $s[1] : NULL);
+			}
 		}
 //		return $_GET[$sortKey];
 	}
