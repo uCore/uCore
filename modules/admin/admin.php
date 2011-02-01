@@ -6,7 +6,7 @@ class internalmodule_Reconfigure extends uBasicModule {
 	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
 
 	public function SetupParents() {
-		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
+		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) $this->DisableModule('You must log in as the Site Administrator to use this module.');
 		$this->AddParent('internalmodule_Admin');
 	}
 

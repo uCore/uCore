@@ -146,8 +146,9 @@ abstract class uBasicModule {
 	}
 
 	public $isDisabled = false;
-	public function DisableModule() {
-		$this->isDisabled = true;
+	public function DisableModule($message='') {
+		if (!$message) $message = true;
+		$this->isDisabled = $message;
 	}
 
 	public function CanParentLoad($parent) {
@@ -292,7 +293,7 @@ abstract class uBasicModule {
 		}
 		if (flag_is_set($this->GetOptions(),IS_ADMIN)) utopia::$adminTemplate = true;
 
-		if ($this->isDisabled) return;
+		if ($this->isDisabled) { echo $this->isDisabled; return; }
 		//		$this->SetupFields();
 		//		die('setup fields');
 //		ErrorLog('run 0');
