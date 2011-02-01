@@ -2288,7 +2288,7 @@ abstract class uDataModule extends uBasicModule {
 		//	print_r(useful_backtrace(0,4));
 		//print_r($this->filters);
 
-		$limitKey = '_l_'.$this->GetModuleId();
+		$limitKey = '_p_'.$this->GetModuleId();
 		if (empty($this->limit) && isset($_GET[$limitKey])) $this->limit = $_GET[$limitKey];
 		if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
 
