@@ -2288,7 +2288,9 @@ abstract class uDataModule extends uBasicModule {
 		//	print_r(useful_backtrace(0,4));
 		//print_r($this->filters);
 
-    if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
+		$limitKey = '_l_'.$this->GetModuleId();
+		if (empty($this->limit) && isset($_GET[$limitKey])) $this->limit = $_GET[$limitKey];
+		if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
 
 		if (array_key_exists('__explain',$_REQUEST)) {
 			utopia::CancelTemplate();
