@@ -28,10 +28,10 @@ class internalmodule_Admin extends uBasicModule {
 	public function GetTitle() { return 'Admin Home'; }
 	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
 
-  public function GetSortOrder() { return -100; }
-  public function GetURL($filters = NULL, $encodeAmp = false) {
-    return PATH_REL_CORE.'index.php';
-  }
+	public function GetSortOrder() { return -100; }
+	public function GetURL($filters = NULL, $encodeAmp = false) {
+		return PATH_REL_CORE.'index.php';
+	}
 	public function SetupParents() {
 		//$this->AddParent('*');
 		$this->AddParent('internalmodule_Admin');
@@ -88,26 +88,9 @@ class internalmodule_Admin extends uBasicModule {
 		die('window.location.reload();');
 	}
 
-	//public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
-	//	if ($parent == GetCurrentModule()) {
-	//		$m = utopia::GetModules(true);
-	//		foreach ($m as $module) CallModuleFunc($module['module_name'],'CreateParentNavButtons');
-	//	}
-//		if (!flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return;
-//		if ($parent == GetCurrentModule()) {
-			//utopia::LinkList_Add('child_buttons','Admin Home',$this->GetURL(),-50,NULL,array('class'=>'fdb-btn'));
-//			utopia::PrependVar('content','{list.child_buttons}');//utopia::LinkList_Get('child_buttons',null,null,array('class'=>'fdb-btn')));
-//		}
-
-//		if (is_subclass_of($parent,'uListDataModule')) {
-//			utopia::LinkList_Add('list_functions:'.$parent,'Home',$this->GetURL(),-5,NULL,array('class'=>'fdb-btn','style'=>'background-color:#ff2222'));
-//		}
-	}
+	public function ParentLoad($parent) {}
 
 	public function RunModule() {
-		//echo 'admin';
-//		if (internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER,false))
 		utopia::AppendVar('content:before',"<h1>Welcome to Admin Home</h1>");
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;

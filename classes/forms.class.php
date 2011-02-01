@@ -2222,21 +2222,19 @@ abstract class uDataModule extends uBasicModule {
 				$this->AddOrderBy($s[0],isset($s[1]) ? $s[1] : NULL);
 			}
 		}
-//		return $_GET[$sortKey];
-	}
 		if (empty($this->ordering)) return 'NULL';
 		if (is_array($this->ordering)) return join(', ',$this->ordering);
-    
-    return $this->ordering;
+
+		return $this->ordering;
 	}
 
 	public function GetGrouping() {
-    if (empty($this->grouping)) return '';
-    if (is_array($this->grouping)) return join(', ',$this->grouping);
-    return $this->grouping;
+		if (empty($this->grouping)) return '';
+		if (is_array($this->grouping)) return join(', ',$this->grouping);
+		return $this->grouping;
 	}
 
-  public $limit = NULL;
+	public $limit = NULL;
   
 	/**
 	 * Get a dataset based on setup.
