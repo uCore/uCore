@@ -37,9 +37,5 @@ if (internalmodule_AdminLogin::IsLoggedIn()) {
 {UTOPIA.content}
 </div>
 
-<div id="framecontentBottom"><div id='footer'>
-<div id="goTop">Valid <a target="_blank" href="http://validator.w3.org/check?uri=referer">XHTML</a>/<a target="_blank" href="http://jigsaw.w3.org/css-validator/check/referer">CSS</a> | <a href="#top">[^] Top</a></div>
-</div></div>
-
 </body>
 </html>

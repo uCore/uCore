@@ -29,8 +29,7 @@ z-index:2;
 
 #maincontent{
 right:5px;
-margin-bottom:26px;
-padding:0 4em;
+padding:0 4em 1em 4em;
 background: #f3f3f3;
 z-index:0;
 }
