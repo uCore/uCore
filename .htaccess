@@ -6,7 +6,7 @@ deny from all
 </Files>
 
 RewriteEngine on
-RewriteRule ^(.*/)?\.svn/ - [F,L]
+RewriteRule \.svn|\.git - [F,L]
 ErrorDocument 403 "Access Forbidden"
 
 RewriteRule ^$ index.php
