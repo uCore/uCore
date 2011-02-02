@@ -853,8 +853,8 @@ class utopia {
 		$srcW = imagesx($src);
 		$srcH = imagesy($src);
 
-		$width = array_key_exists('w',$_GET) ? $_GET['w'] : $srcW;
-		$height = array_key_exists('h',$_GET) ? $_GET['h'] : $srcH;
+                $width = $maxW ? $maxW : $srcW;
+                $height = $maxH ? $maxH : $srcH;
 
 		$ratio_orig = $srcW/$srcH;
 		if ($width/$height > $ratio_orig) {
