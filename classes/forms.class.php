@@ -534,9 +534,8 @@ abstract class uBasicModule {
 					$return[$replace[$key-1]] = $match;
 				}
 			}
-			//echo $this->rewriteMapping[$key].' '.$map.'<br/>';
 		}
-		//print_r($return);die();
+
 		// TODO: named filters not being picked up
 		$_GET = array_merge($_GET,$return);
 		$_REQUEST = array_merge($_REQUEST,$return);
@@ -548,21 +547,13 @@ abstract class uBasicModule {
 		foreach ($mapped as $key => $val) {
 			if (preg_match_all('/{([a-zA-Z_]+)}/',$val,$matches)) {
 				foreach ($matches[1] as $fieldName) {
-					//echo $match;
 					$newVal = '';
 					if (array_key_exists($fieldName,$filters)) $newVal = $filters[$fieldName];
 					elseif (array_key_exists('_f_'.$fieldName,$filters)) $newVal = $filters['_f_'.$fieldName];
-			//		else $newVal = '';
 
 					unset($filters[$fieldName]);
 					unset($filters['_f_'.$fieldName]);
 
-					//					else {
-					// check filter names for this field ($match)
-					//$filter = $this->find
-					//}
-
-					//if ($newVal !== NULL)
 					$mapped[$key] = str_replace('{'.$fieldName.'}',$newVal,$mapped[$key]);
 				}
 			}
@@ -571,7 +562,6 @@ abstract class uBasicModule {
 		foreach ($mapped as $key => $val) {
 			$URLreadable = is_array($this->rewriteURLReadable) ? $this->rewriteURLReadable[$key] : $this->rewriteURLReadable;
 			$mapped[$key] = ($URLreadable) ? urlencode(UrlReadable($val)) : urlencode($val);
-		//	print_r($mapped[$key]);
 		}
 
 		if (isset($filters['uuid'])) unset($filters['uuid']);
