@@ -9,7 +9,7 @@ class plupload extends uBasicModule {
 		$pathCore = PATH_REL_CORE;
 		uJavascript::IncludeText(<<<FIN
 var pluploadOptions = {
-    runtimes : 'html5,flash,gears,silverlight,browserplus,html4',
+    runtimes : 'gears,html5,flash,silverlight,browserplus,html4',
     chunk_size : '1mb',
     //resize : {width : 640, height : 480, quality : 90},
     url : '$pathUpload',
