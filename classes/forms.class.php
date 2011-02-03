@@ -476,16 +476,22 @@ abstract class uBasicModule {
   
 	public $rewriteMapping=NULL;
 	public $rewriteURLReadable=NULL;
+	public $rewritePersistPath=FALSE;
 	public function HasRewrite() { return $this->rewriteMapping !== NULL; }
 
-	//    array( '{fieldName}' , 'some-random-text' , '{another_field}' )
+	
+	/**
+	 * Indicate that this module should rewrite its URL
+	 * @param mixed $mapping NULL to turn off rewriting. FALSE to strip all but uuid. TRUE to allow longer path.  ARRAY( '{fieldName}' , 'some-random-text' , '{another_field}' )
+	 * @param bool $URLReadable specifies that all segments of the url should be stripped of non-alphanumeric characters.
+	 */
 	public function SetRewrite($mapping,$URLReadable = false) {
 		if (getenv('HTTP_MOD_REWRITE')!='On') return false;
 		if ($mapping === NULL) {
 			$this->rewriteMapping = NULL; return;
 		}
 		if (is_string($mapping) && $mapping !== '') $mapping = array($mapping);
-		if ($mapping === true) $mapping = array(true);
+		if ($mapping === true) $this->rewritePersistPath = true;
 		if (!is_array($mapping)) $mapping = array();
 		array_unshift($mapping,'{uuid}');
 
@@ -563,31 +569,28 @@ abstract class uBasicModule {
 		}
 
 		foreach ($mapped as $key => $val) {
-			if (is_bool($val)) break;
 			$URLreadable = is_array($this->rewriteURLReadable) ? $this->rewriteURLReadable[$key] : $this->rewriteURLReadable;
 			$mapped[$key] = ($URLreadable) ? urlencode(UrlReadable($val)) : urlencode($val);
 		//	print_r($mapped[$key]);
 		}
 
+		if (isset($filters['uuid'])) unset($filters['uuid']);
+		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
+
 		$newPath = PATH_REL_ROOT.'u/'.join('/',$mapped);
-                if (isset($mapped[1]) && $mapped[1]===TRUE) $newPath = str_replace($newPath,$_SERVER['REQUEST_URI'],$newPath);
+		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+
+                if ($this->rewritePersistPath) $newPath .= str_replace($newPath,'',$oldPath);
 
 		// DONE: ensure all rewrite segments are accounted for (all '/' are present)
 		return $newPath;
 	}
 
 	public function GetURL($filters = NULL, $encodeAmp = false) {
-		if (!is_array($filters))
-			$filters = array();
-		//			foreach ($filters as $fieldName => $val) {
-		//				$filArr[$fieldName] = $val;
-		//			}
-		//		}
-		$uuidArr = array('uuid'=>$this->GetUUID());
-		if (is_array($uuidArr['uuid'])) $uuidArr['uuid'] = $uuidArr['uuid'][0];
+		if (!is_array($filters)) $filters = array();
 
-		if (get_class($this) !== BASE_MODULE || $this->rewriteMapping !== NULL)
-			$filters = array_merge($uuidArr,$filters);
+		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
+		$filters['uuid'] = $uuid;
 
 		$url = DEFAULT_FILE;
 		if ($this->rewriteMapping !== NULL)
