@@ -304,7 +304,7 @@ abstract class uBasicModule {
 		//if ($this->LoadChildren() === FALSE) return FALSE;
 //		ErrorLog('run 1');
 		timer_start('Run Module');
-		if (!$this->RunModule()) return false;
+		if ($this->RunModule() === FALSE) return false;
 		timer_end('Run Module');
 		$this->hasRun = true;
 //		echo 'run 2';
