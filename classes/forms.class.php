@@ -570,7 +570,7 @@ abstract class uBasicModule {
 		$newPath = PATH_REL_ROOT.'u/'.join('/',$mapped);
 		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-                if ($this->rewritePersistPath) $newPath .= str_replace($newPath,'',$oldPath);
+                if ($this->rewritePersistPath && GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
 
 		// DONE: ensure all rewrite segments are accounted for (all '/' are present)
 		return $newPath;
