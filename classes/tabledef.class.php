@@ -167,7 +167,7 @@ abstract class uTableDef implements iUtopiaModule {
 		$this->tablename = TABLE_PREFIX.get_class($this);
 
 		// rename old table name to class name
-		if (TableExists($oldTable))
+		if (TableExists($oldTable) && !TableExists($this->tablename))
 			sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename);
 
 		if (empty($this->tablename)) return;
