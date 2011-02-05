@@ -67,21 +67,21 @@ abstract class uTableDef implements iUtopiaModule {
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'unique') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
-			$this->SetFieldProperty($name,'pk',true);
-			$this->SetFieldProperty($name,'default',NULL);
-			if (strcasecmp($this->GetFieldProperty($name,'type'),ftNUMBER) == 0 && $auto_increment) $this->SetFieldProperty($name,'extra','auto_increment');
+			$this->fields[$name]['pk'] = true;
+			$this->fields[$name]['default'] = NULL;
+			if (strcasecmp($this->fields[$name]['type'],ftNUMBER) == 0 && $auto_increment) $this->fields[$name]['extra'] = 'auto_increment';
 	}
 	public function SetUniqueField($name) {
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
-			$this->SetFieldProperty($name,'unique',true);
+			$this->fields[$name]['unique'] = true;
 	}
 	public function SetIndexField($name) {
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'unique') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign index flag to $name, already an indexed field.'); return; }
-			$this->SetFieldProperty($name,'index',true);
+			$this->fields[$name]['index'] = true;
 	}
 
 	public function GetPrimaryKey() {
@@ -101,34 +101,35 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function AddFieldArray($name, $type, $length, $arr) {
-		//$name = strtolower($name);
 		$this->AddField($name,$type,$length);
 		foreach ($arr as $key => $val)
-		$this->SetFieldProperty($name,$key,$val);
+			$this->fields[$name][$key] = $val;
 	}
 
 	public function AddField($name, $type, $length=NULL, $collation=SQL_COLLATION, $attributes=NULL, $null=SQL_NULL, $default=NULL, $extra=NULL, $comments=NULL) {
 		//$name = strtolower($name);
 		$this->fields[$name] = array();
-		$this->SetFieldProperty($name,'type',$type);
+		$field =& $this->fields[$name];
+
+		$field['type'] = $type;
 		if ($length == NULL && $type == ftCURRENCY) $length = "10,2";
 		if ($length == NULL && $type == ftPERCENT) $length = "5,2";
 		$sqltype = getSqlTypeFromFieldType($type);
-		$this->SetFieldProperty($name,'length',$length);
-		$this->SetFieldProperty($name,'collation',(!stristr($sqltype, 'binary') && !stristr($sqltype, 'blob')) ? $collation : NULL);
-		$this->SetFieldProperty($name,'attributes',$attributes);
-		$this->SetFieldProperty($name,'null',$null);
+		$field['length'] = $length;
+		$field['collation'] = (!stristr($sqltype, 'binary') && !stristr($sqltype, 'blob')) ? $collation : NULL;
+		$field['attributes'] = $attributes;
+		$field['null'] = $null;
 
 		$zeroIfNull = array(ftNUMBER,ftBOOL,ftDECIMAL,ftPERCENT,ftCURRENCY,ftTIMESTAMP,ftTIME);
 		$emptyIfNull = array();
 		if ($default === NULL && array_search($sqltype,$zeroIfNull))
-		$default = 0;
+			$default = 0;
 		if ($default === NULL && array_search($sqltype,$emptyIfNull))
-		$default = '';
+			$default = '';
 
-		$this->SetFieldProperty($name,'default',$default);
-		$this->SetFieldProperty($name,'extra',$extra);
-		$this->SetFieldProperty($name,'comments',$comments);
+		$field['default'] = $default;
+		$field['extra'] = $extra;
+		$field['comments'] = $comments;
 
 		if ($type == ftFILE || $type == ftIMAGE) {
 			$this->AddField($name.'_filename', ftVARCHAR, 255);
