@@ -158,38 +158,46 @@ abstract class uTableDef implements iUtopiaModule {
 		return $this->fields[$fieldName][$propertyName];
 	}
 
+	static $tableCache = NULL;
+	static function TableExists($tableName,$refresh=false) {
+		if ($refresh || self::$tableCache === NULL) self::$tableCache = GetRows(sql_query('SHOW TABLES'));
+		foreach (self::$tableCache as $tbl) {
+			if ($tbl['Tables_in_'.SQL_DBNAME] == $tableName) return TRUE;
+		}
+		return FALSE;
+	}
+
+	static $tableChecksum = NULL;
+	public function checksumValid($checksum,$refresh=false) {
+		if ($refresh || self::$tableChecksum === NULL) self::$tableChecksum = GetRows(sql_query('SELECT * FROM `__table_checksum`'));
+		foreach (self::$tableChecksum as $row) {
+			if ($row['name'] == TABLE_PREFIX.get_class($this)) return $row['checksum'] === $checksum;
+		}
+		return FALSE;
+	}
+
 	public function InstallTable() {
 		// create / update table
 		// is table already existing?
 		if ($this->isDisabled) return;
 		$this->_SetupFields();
+		if (empty($this->fields)) return;
 
 		$oldTable = isset($this->tablename) ? $this->tablename : NULL;
 		$this->tablename = TABLE_PREFIX.get_class($this);
 
 		// rename old table name to class name
-		if (TableExists($oldTable) && !TableExists($this->tablename))
+		if (self::TableExists($oldTable) && !self::TableExists($this->tablename))
 			sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename);
-
-		if (empty($this->tablename)) return;
-		if (empty($this->fields)) return;
 
 		// checksum
 		$checksum = sha1(print_r($this->fields,true));
-		$r = sql_query('SELECT * FROM `__table_checksum` WHERE `name` = \''.$this->tablename.'\'');
-		if (mysql_num_rows($r)) {
-			$info = mysql_fetch_assoc($r);
-			if (TableExists($this->tablename) && $info['checksum'] === $checksum) return;
-			// update checksum
-			sql_query('UPDATE `__table_checksum` SET `checksum` = \''.$checksum.'\' WHERE `name` = \''.$this->tablename.'\'');
-		} else {
-			// insert checksum
-			sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\')');
-		}
+		if ($this->checksumValid($checksum)) return;
+		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE (\''.$this->tablename.'\',\''.$checksum.'\')');
 
 		$unique = array();
 		$index = array();
-		if (TableExists($this->tablename)) {
+		if (self::TableExists($this->tablename)) {
 			// loop fields
 			$pk = NULL;
 			$currentPK = NULL;
