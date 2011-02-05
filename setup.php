@@ -38,6 +38,7 @@ class uConfig {
 	static function AddConfigVar($name,$readable,$default=NULL,$type=CFG_TYPE_TEXT) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
 		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type);
+		if (self::$isDefined && !defined($name)) define($name,$default);
 	}
 	static function ReadConfig() {
 		$arr = array();
@@ -47,6 +48,7 @@ class uConfig {
 			$lines = explode(PHP_EOL,$conf);
 			array_shift($lines);
 			foreach ($lines as $line) {
+				if (!$line) continue;
 				list($ident,$val) = explode('=',$line);
 				$arr[trim($ident)] = trim($val);
 			}
@@ -60,11 +62,13 @@ class uConfig {
 		// no config exists, save now
 		$text = "<?php die('Direct access to this file is prohibited.'); ?>".PHP_EOL;
 		foreach ($arr as $key => $val) {
+			if (!$key) continue;
 			//        if (strtolower($key) == 'config_submit' || strtolower($key) == 'phpsessid') continue;
 			$text .= "$key=$val".PHP_EOL;
 		}
 		file_put_contents(PATH_ABS_CONFIG,trim($text,PHP_EOL));
 	}
+	static $isDefined = FALSE;
 	static function DefineConfig($arr) {
 		foreach ($arr as $key => $val) define($key,$val);
 
@@ -74,6 +78,8 @@ class uConfig {
 		define('SQL_COLLATION'           , 'utf8_general_ci');
 
 		define("FORMAT_DATETIME"         , FORMAT_DATE.' '.FORMAT_TIME);
+
+		self::$isDefined = TRUE;
 	}
 	static function ValidateConfig(&$arr) {
 		$oConfig = uConfig::ReadConfig();
