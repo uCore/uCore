@@ -265,13 +265,6 @@ function RunModule($module = NULL) {
 }
 
 function InstallAllModules() {
-	// uninstall any non-existant
-	timer_start('module uninstallation');
-	//	sql_query("TRUNCATE TABLE internal_modules");
-	$result = sql_query("SELECT * FROM internal_modules");
-	while (($row = GetRow($result))) if (!class_exists($row['module_name'])) sql_query("DELETE FROM internal_modules WHERE `module_id` = '{$row['module_id']}'");
-	timer_end('module uninstallation');
-  
   // TABLE CHANGE CHECKER
   sql_query('CREATE TABLE IF NOT EXISTS __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40))');
 //  $r = sql_query('SHOW TABLES LIKE \'__table_checksum\'');
@@ -280,11 +273,9 @@ function InstallAllModules() {
 //  }
 
 	$installed = array();
-	$classes = get_declared_classes();
+	$classes = utopia::GetModulesOf('uTableDef');
 	timer_start('table installation');
-	foreach ($classes as $classname){ // install tables
-		if ($classname == 'uTableDef' || !is_subclass_of($classname,'uTableDef')) continue;
-    
+	foreach ($classes as $classname => $class) { // install tables
 		timer_start('table install ('.$classname.')');
 		CallModuleFunc($classname,'InstallTable');
 		$installed[] = $classname;
@@ -292,18 +283,6 @@ function InstallAllModules() {
 	}
 	timer_end('table installation');
 
-	timer_start('module installation');
-	foreach ($classes as $classname) // install modules
-	if (is_subclass_of($classname,'uBasicModule')
-	&& $classname != 'uBasicModule'
-	&& $classname != 'uDataModule'
-	&& $classname != 'uListDataModule'
-	&& $classname != 'uSingleDataModule') {
-		//mail('oridan82@gmail.com','installmodule',$classname);
-		$installed[] = $classname;
-		CallModuleFunc($classname,'InstallModule');
-	}
-	timer_end('module installation');
 	return $installed;
 }
 
