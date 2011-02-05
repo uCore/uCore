@@ -93,7 +93,6 @@ class uConfig {
 		foreach ($arr as $key => $val) {
 			if (($pos = array_search($key,$validFields)) === FALSE) {
 				$changed = true;
-				unset($arr[$key]);
 				continue;
 			}
 			unset($validFields[$pos]);
