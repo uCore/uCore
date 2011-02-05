@@ -22,7 +22,7 @@ if (internalmodule_AdminLogin::IsLoggedIn()) {
     foreach ($links as $child) { 
       if ($child['fieldLinks']) continue;
       $opts = CallModuleFunc($child['moduleName'],'GetOptions');
-      if (!flag_is_set($opts,IS_ADMIN) || GetModuleVar($child['moduleName'],'isDisabled')) continue;
+      if (!flag_is_set($opts,IS_ADMIN) || flag_is_set($opts,NO_NAV) || GetModuleVar($child['moduleName'],'isDisabled')) continue;
       $url = CallModuleFunc($child['moduleName'],'GetURL');
       $title = CallModuleFunc($child['moduleName'],'GetTitle');
       if (!$url || !$title) continue;
