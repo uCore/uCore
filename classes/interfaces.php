@@ -1,4 +1,6 @@
 <?php
+interface iUtopiaModule {}
+
 /*
  interface iOutput {
  // ShowData is the main function which processes each field in turn and returns the resulting html to be output to the browser.

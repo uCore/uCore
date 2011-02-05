@@ -122,20 +122,13 @@ class utopia {
 				$class['module_id'] = $id;
 				$class['types'] = array_merge($parents,$interfaces);
 				$class['uuid'] = $class['module_name'];
-				$class['sort_order'] = 0;
 
 				if ($ref->isSubclassOf('uBasicModule')) {
         	                        $class['uuid'] = CallModuleFunc($class['module_name'],'GetUUID');
 					if (is_array($class['uuid'])) $class['uuid'] = reset($class['uuid']);
-//	                                $class['sort_order'] = CallModuleFunc($class['module_name'],'GetSortOrder');
 				}
 				$rows[$class['module_name']] = $class;
 			}
-
-/*			$result = sql_query('SELECT * FROM internal_modules');
-			$rows = GetRows($result);*/
-
-			array_sort_subkey($rows,'sort_order');
 
 			self::$allmodules = $rows;
 		}
@@ -146,10 +139,6 @@ class utopia {
 	static function ModuleExists($module) {
 		$modules = self::GetModules();
 		if (isset($modules[$module])) return $modules[$module];
-//		foreach ($modules as $m) {
-//			if ($module == $m['module_name']) return $m;
-//		}
-		return false;
 	}
 	static function UUIDExists($uuid) {
 		$modules = self::GetModules();

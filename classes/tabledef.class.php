@@ -1,4 +1,6 @@
 <?php
+include_once('interfaces.php');
+
 // text
 define('ftNONE'				,'');
 define('ftVARCHAR'			,'varchar');
@@ -43,7 +45,7 @@ function getSqlTypeFromFieldType($fieldType) {
 	}
 }
 
-abstract class uTableDef {
+abstract class uTableDef implements iUtopiaModule {
 	public $fields = array();
 	public abstract function SetupFields();
 

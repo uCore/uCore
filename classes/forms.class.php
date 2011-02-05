@@ -1,4 +1,6 @@
 <?php
+include_once('interfaces.php');
+
 //-- debugging
 //define('SHOW_QUERY'		,false);
 define('BASE_MODULE','uCMS_View');
@@ -83,8 +85,6 @@ define('LIST_HIDE_HEADER',flag_gen());
 define('DEFAULT_OPTIONS',ALLOW_FILTER);
 
 // START CLASSES
-
-interface iUtopiaModule {}
 
 /**
  * Basic Utopia module. Enables use of adding parents and module to be installed and run.
@@ -681,7 +681,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 	public function GetSortOrder() {
 		//if (is_object($module)) $module = get_class($module);
-		if (get_class($this) == GetCurrentModule()) return 1;
+//		if (get_class($this) == GetCurrentModule()) return 1;
 		return NULL;
 	}
 	//	public function __construct() { $this->_SetupFields(); } //$this->SetupParents(); }
