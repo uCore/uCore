@@ -84,11 +84,13 @@ define('DEFAULT_OPTIONS',ALLOW_FILTER);
 
 // START CLASSES
 
+interface iUtopiaModule {}
+
 /**
  * Basic Utopia module. Enables use of adding parents and module to be installed and run.
  * No field or data access is available, use uDataModule and its decendants.
  */
-abstract class uBasicModule {
+abstract class uBasicModule implements iUtopiaModule {
 /*  static $singleton = NULL;
   public static function &call($method) {
     $null = NULL;

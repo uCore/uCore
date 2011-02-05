@@ -107,9 +107,33 @@ class utopia {
 	private static $allmodules = NULL;
 	static function GetModules($refresh=false) {
 		if (self::$allmodules === NULL || $refresh) {
+			$rows = array();
+			$classes = get_declared_classes();
+			foreach ($classes as $id => $class) {
+				$ref = new ReflectionClass($class);
+				if ($ref->isAbstract()) continue;
 
-			$result = sql_query('SELECT * FROM internal_modules');
-			$rows = GetRows($result);
+				if (!$ref->implementsInterface('iUtopiaModule')) continue;
+
+				$parents = array_values(class_parents($class));
+                                $interfaces = $ref->getInterfaceNames();
+				
+				$class = array('module_name'=>$class);
+				$class['module_id'] = $id;
+				$class['types'] = array_merge($parents,$interfaces);
+				$class['uuid'] = $class['module_name'];
+				$class['sort_order'] = 0;
+
+				if ($ref->isSubclassOf('uBasicModule')) {
+        	                        $class['uuid'] = CallModuleFunc($class['module_name'],'GetUUID');
+					if (is_array($class['uuid'])) $class['uuid'] = reset($class['uuid']);
+//	                                $class['sort_order'] = CallModuleFunc($class['module_name'],'GetSortOrder');
+				}
+				$rows[$class['module_name']] = $class;
+			}
+
+/*			$result = sql_query('SELECT * FROM internal_modules');
+			$rows = GetRows($result);*/
 
 			array_sort_subkey($rows,'sort_order');
 
@@ -121,9 +145,10 @@ class utopia {
 
 	static function ModuleExists($module) {
 		$modules = self::GetModules();
-		foreach ($modules as $m) {
-			if ($module == $m['module_name']) return $m;
-		}
+		if (isset($modules[$module])) return $modules[$module];
+//		foreach ($modules as $m) {
+//			if ($module == $m['module_name']) return $m;
+//		}
 		return false;
 	}
 	static function UUIDExists($uuid) {
@@ -132,6 +157,14 @@ class utopia {
 			if ($uuid == $m['uuid']) return $m;
 		}
 		return false;
+	}
+
+	static function GetModulesOf($type) {
+		$inputs = self::GetModules();
+		foreach ($inputs as $k => $m) {
+			if (array_search($type,$m['types']) === FALSE) unset($inputs[$k]);
+		}
+		return $inputs;
 	}
 
 	static $instances = array();
