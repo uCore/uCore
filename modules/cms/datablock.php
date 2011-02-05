@@ -118,8 +118,9 @@ class uDataBlocks extends uSingleDataModule {
       $instance->limit = $rec['limit'];
 
       // get rows    
-      $dataset = $instance->GetDataset(NULL);
-      $rows = GetRows($dataset);
+//      $dataset = $instance->GetDataset(NULL);
+//      $rows = GetRows($dataset);
+	$rows = $instance->GetRows();
     } else $rows = array();
     
     $content = $append = $prepend = '';
