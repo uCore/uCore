@@ -38,7 +38,6 @@ class uConfig {
 	static function AddConfigVar($name,$readable,$default=NULL,$type=CFG_TYPE_TEXT) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
 		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type);
-		if (self::$isDefined && !defined($name)) define($name,$default);
 	}
 	static function ReadConfig() {
 		$arr = array();
@@ -94,6 +93,7 @@ class uConfig {
 		foreach ($arr as $key => $val) {
 			if (($pos = array_search($key,$validFields)) === FALSE) {
 				$changed = true;
+				unset($arr[$key]);
 				continue;
 			}
 			unset($validFields[$pos]);

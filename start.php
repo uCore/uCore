@@ -35,20 +35,5 @@ define('PATH_ABS_TEMPLATES',fix_path(PATH_ABS_CORE.'../uTemplates/'));
 // glob and load all functs files
 foreach (glob(PATH_ABS_CORE.'functs/*.php') as $fn) include($fn);
 
-include(PATH_ABS_CORE.'setup.php');
-
-if (array_key_exists('__config_submit',$_REQUEST))
-	$configArr = $_REQUEST;
-else
-	$configArr = uConfig::ReadConfig();
-
-// validate
-$valid = uConfig::ValidateConfig($configArr);
-if ($valid) {
-	if ($valid === 2 || array_key_exists('__config_submit',$_REQUEST)) uConfig::SaveConfig($configArr);
-	uConfig::DefineConfig($configArr);
-	require_once(PATH_ABS_CORE.'initialise.php'); // init
-} else {
-	uConfig::ShowConfig($configArr);
-	die();
-}
+require_once(PATH_ABS_CORE.'setup.php');
+require_once(PATH_ABS_CORE.'initialise.php'); // init

@@ -1,14 +1,24 @@
 <?php
 timer_start('full process');
 
+timer_start('Load Files');
+LoadFiles();
+timer_end('Load Files');
+
+$configArr = (isset($_REQUEST['__config_submit'])) ? $_REQUEST : uConfig::ReadConfig();
+$valid = uConfig::ValidateConfig($configArr);
+if ($valid) {
+        if ($valid === 2 || isset($_REQUEST['__config_submit'])) uConfig::SaveConfig($configArr);
+        uConfig::DefineConfig($configArr);
+} else {
+        uConfig::ShowConfig($configArr);
+        die();
+}
+
 ini_set('default_charset',CHARSET_ENCODING);
 header('Content-type: text/html; charset='.CHARSET_ENCODING);
 
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
-
-timer_start('Load Files');
-LoadFiles();
-timer_end('Load Files');
 
 if(!ob_start("ob_gzhandler")) ob_start();
 
