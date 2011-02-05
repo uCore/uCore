@@ -28,6 +28,7 @@ define('ftRAW'				,'raw');
 define('SQL_NULL'			,'null');
 define('SQL_NOT_NULL'		,'not null');
 
+uConfig::AddConfigVar('TABLE_PREFIX','Table Prefix','');
 
 function getSqlTypeFromFieldType($fieldType) {
 	switch ($fieldType) {
@@ -161,25 +162,29 @@ abstract class uTableDef implements iUtopiaModule {
 		// is table already existing?
 		if ($this->isDisabled) return;
 		$this->_SetupFields();
-    
-//    $this->tablename = get_class($this);
-    
+
+		$oldTable = isset($this->tablename) ? $this->tablename : NULL;
+		$this->tablename = TABLE_PREFIX.get_class($this);
+
+		// rename old table name to class name
+		if (TableExists($oldTable))
+			sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename);
+
 		if (empty($this->tablename)) return;
 		if (empty($this->fields)) return;
 
-    // checksum
-    $classname = get_class($this);
-    $checksum = sha1(print_r($this->fields,true));
-    $r = sql_query('SELECT * FROM `__table_checksum` WHERE `name` = \''.$classname.'\'');
-    if (mysql_num_rows($r)) {
-      $info = mysql_fetch_assoc($r);
-      if ($info['checksum'] == $checksum) return;
-      // update checksum
-      sql_query('UPDATE `__table_checksum` SET `checksum` = \''.$checksum.'\' WHERE `name` = \''.$classname.'\'');
-    } else {
-      // insert checksum
-      sql_query('INSERT INTO `__table_checksum` VALUES (\''.$classname.'\',\''.$checksum.'\')');
-    }
+		// checksum
+		$checksum = sha1(print_r($this->fields,true));
+		$r = sql_query('SELECT * FROM `__table_checksum` WHERE `name` = \''.$this->tablename.'\'');
+		if (mysql_num_rows($r)) {
+			$info = mysql_fetch_assoc($r);
+			if (TableExists($this->tablename) && $info['checksum'] === $checksum) return;
+			// update checksum
+			sql_query('UPDATE `__table_checksum` SET `checksum` = \''.$checksum.'\' WHERE `name` = \''.$this->tablename.'\'');
+		} else {
+			// insert checksum
+			sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\')');
+		}
 
 		$unique = array();
 		$index = array();

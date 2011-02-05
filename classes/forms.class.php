@@ -1045,7 +1045,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function GetPrimaryTable() {
 		if ($this->pt == NULL)
-		$this->pt = GetModuleVar($this->GetTabledef(),'tablename');
+		$this->pt = TABLE_PREFIX.$this->GetTabledef();
 		return $this->pt;
 	}
 
@@ -1242,7 +1242,7 @@ abstract class uDataModule extends uBasicModule {
 		$newTable = array();
 		$this->sqlTableSetupFlat[$alias] =& $newTable;
 		$newTable['alias']	= $alias;
-		$newTable['table']	= GetModuleVar($tableModule,'tablename');
+		$newTable['table']	= TABLE_PREFIX.$tableModule;
 		$newTable['pk']		= CallModuleFunc($tableModule,'GetPrimaryKey');
 		$newTable['tModule']= $tableModule;
 		if ($parent==NULL) {
@@ -2471,7 +2471,7 @@ abstract class uDataModule extends uBasicModule {
 			case ftFILE:
 				$rec = $this->LookupRecord($pkVal);
 				$filename = '';
-				$link = $this->GetFileFromTable($fieldName,GetModuleVar($this->GetTabledef(),'tablename'),$this->GetPrimaryKey(),$pkVal);
+				$link = $this->GetFileFromTable($fieldName,TABLE_PREFIX.$this->GetTabledef(),$this->GetPrimaryKey(),$pkVal);
 				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
 				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
