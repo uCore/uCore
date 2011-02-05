@@ -95,7 +95,9 @@ class internalmodule_Admin extends uBasicModule {
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		//GetFiles(true);
+		timer_start('Rebuild Javascript');
 		uJavascript::BuildJavascript();
+		timer_end('Rebuild Javascript');
 
 		// if uModules doesnt exist, create it
 		if (!file_exists(PATH_ABS_MODULES)) mkdir(PATH_ABS_MODULES);
