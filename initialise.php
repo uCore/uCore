@@ -15,6 +15,8 @@ if ($valid) {
         die();
 }
 
+InstallAllModules();
+
 ini_set('default_charset',CHARSET_ENCODING);
 header('Content-type: text/html; charset='.CHARSET_ENCODING);
 
