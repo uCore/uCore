@@ -105,6 +105,7 @@ class uDataBlocks extends uSingleDataModule {
     if ($rec['module']) {
       // create module instance
       $instance = utopia::GetInstance($rec['module']);
+	$instance->ClearFilters();
 
       // add filters
 	  utopia::MergeVars($rec['filter']);
