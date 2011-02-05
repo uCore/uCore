@@ -66,8 +66,7 @@ class uConfig {
 		file_put_contents(PATH_ABS_CONFIG,trim($text,PHP_EOL));
 	}
 	static function DefineConfig($arr) {
-		foreach ($arr as $key => $val)
-		define($key,$val);
+		foreach ($arr as $key => $val) define($key,$val);
 
 		//--  Charset
 		define('CHARSET_ENCODING'        , 'utf-8');
@@ -79,13 +78,9 @@ class uConfig {
 	static function ValidateConfig(&$arr) {
 		$oConfig = uConfig::ReadConfig();
 		$changed = false;
-//		$validFields = array('MODULES_PATH','DB_TYPE','SQL_SERVER','SQL_PORT','SQL_DBNAME','SQL_USERNAME','SQL_PASSWORD',
-//	                         'DEFAULT_FILE','BASE_MODULE','STYLE_PATH','DEFAULT_CURRENCY','FORMAT_DATE','FORMAT_TIME',
-//	                         'admin_user','admin_pass');
 		foreach (self::$configVars as $key => $info) {
 			if ($info['type']==CFG_TYPE_PASSWORD && (!isset($arr[$key]) || empty($arr[$key])) && !empty($oConfig[$key])) {
 				$arr[$key] = $oConfig[$key];
-//				die('test:'.$val.':'.$oConfig[$key]);
 			}
 		}
 
