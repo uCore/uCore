@@ -1,6 +1,6 @@
 <?php
 
-class internalmodule_DataOnly extends uBasicModule {
+class uDataOnly extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return ''; }
 	public function GetOptions() { return DEFAULT_OPTIONS | NO_NAV | PERSISTENT_PARENT; }
@@ -9,7 +9,7 @@ class internalmodule_DataOnly extends uBasicModule {
 		//		$this->AddParent('module_AdvisorCommissionMortgageProc');
 		//		$this->AddParent('module_MortgageList');
 		//		$this->AddParent('module_LifeList');
-		$this->AddParent('*');
+		//$this->AddParent('*');  // COMMENTED - modules should call AddChild to append this
 		$this->RegisterAjax('excel',array($this,'excel'));
 		$this->RegisterAjax('print',array($this,'showPrint'));
 		$this->RegisterAjax('raw',array($this,'rawOutput'));
