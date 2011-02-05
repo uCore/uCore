@@ -1,8 +1,10 @@
-#tree ul { list-style-type: none; margin:0; padding:0 }
-#tree li { margin-top:1px; padding-top:1px; padding-bottom:0; min-height:18px; }
-#tree li li { padding-top:1px; min-height:18px; margin: 1px -50px 0 10px; }
-#tree li div:hover { background-color: #D5E2EA; background-repeat:repeat-x; }
 .hiddenItem { display:none; }
 
-.cmsItem { padding-right:50px; min-height:23px; line-height:23px; position:relative; cursor:pointer }
-.cmsItemActions { position:absolute; right:0; top:0; bottom:0 }
+.cmsTree { list-style-type: none; margin:0; padding:0 }
+
+.cmsItem { margin-top:1px; padding-top:1px; padding-bottom:0; min-height:18px; padding-right:50px; min-height:23px; line-height:23px; position:relative; cursor:pointer }
+.cmsItem:hover { background-color: #D5E2EA; }
+.cmsItemActions { position:absolute; right:0; top:0; bottom:0; }
+.cmsItemActions a { background-color:white !important; }
+
+.cmsItem .cmsItem { padding-top:1px; min-height:18px; margin: 1px -50px 0 10px; }

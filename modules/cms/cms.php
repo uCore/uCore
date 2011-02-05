@@ -150,7 +150,7 @@ FIN;
 	static function DrawChildren($children) {
 		if (!$children) return;
 		array_sort_subkey($children,'position');
-		echo '<ul>';
+		echo '<ul class="cmsTree">';
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? ' hiddenItem' : '';
 			$editLink = CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
