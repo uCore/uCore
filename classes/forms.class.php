@@ -2676,7 +2676,7 @@ abstract class uDataModule extends uBasicModule {
 		AjaxEcho('//'.get_class($this)."@ProcessUpdates_del($fieldAlias,$value,$pkVal)");
 		//if (!$pkVal) return;
 
-		$table = GetModuleVar($this->GetTabledef(),'tablename');
+		$table = TABLE_PREFIX.$this->GetTabledef();
 		$where = $this->GetPrimaryKey()." = '$pkVal'";
 
 		sql_query("DELETE FROM $table WHERE $where");
