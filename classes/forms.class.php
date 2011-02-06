@@ -850,9 +850,9 @@ abstract class uDataModule extends uBasicModule {
 					//if (!empty($filter['default'])) continue;
 		//			$val = $this->GetFilterValue($filter['uid']);
 					//ErrorLog($val);
-					$isNew = is_array($filters) && array_key_exists($this->GetModuleId().'_new',$filters);
-					if (!empty($val) && !($filter['fieldName'] == $this->GetPrimaryKey() && $isNew))
-						$filArr['_f_'.$filter['uid']] = $val;
+				//	$isNew = is_array($filters) && array_key_exists($this->GetModuleId().'_new',$filters);
+				//	if (!empty($val) && !($filter['fieldName'] == $this->GetPrimaryKey() && $isNew))
+				//		$filArr['_f_'.$filter['uid']] = $val;
 				}
 			}
 		}
