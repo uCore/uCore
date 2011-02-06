@@ -865,7 +865,7 @@ class utopia {
 	}
 
 	// helpers
-	static function constrainImage($src,$maxW=NULL,$maxH=NULL) {
+	static function constrainImage($src,$maxW=NULL,$maxH=NULL,$enlarge=false) {
 		if ($maxW === NULL && $maxH === NULL) return $src;
 
 		if (imageistruecolor($src)) {
@@ -875,8 +875,8 @@ class utopia {
 		$srcW = imagesx($src);
 		$srcH = imagesy($src);
 
-                $width = $maxW ? $maxW : $srcW;
-                $height = $maxH ? $maxH : $srcH;
+                $width	= $maxW && ($enlarge || $maxW <= $srcW) ? $maxW : $srcW;
+                $height	= $maxH && ($enlarge || $maxH <= $srcW) ? $maxH : $srcH;
 
 		$ratio_orig = $srcW/$srcH;
 		if ($width/$height > $ratio_orig) {
