@@ -12,8 +12,8 @@ th.sortable { cursor:pointer; }
 .utopia-filter-default { color: #AAA; }
 *:focus { outline: 1px; }
 
-.btn-edit { margin:0;width:16px;height:16px;padding:2px;background:url(images/edit.png) no-repeat center center !important; }
-.btn-del  { margin:0;width:16px;height:16px;padding:2px;background:url(images/delete.png) no-repeat center center !important; }
+.btn-edit { display:block;margin:0;width:16px;height:16px;padding:2px;background:url(images/edit.png) no-repeat center center white !important; }
+.btn-del  { display:block;margin:0;width:16px;height:16px;padding:2px;background:url(images/delete.png) no-repeat center center white !important; }
 
 img { border: none }
 
@@ -38,6 +38,7 @@ img { border: none }
 	display: inline;
 }
 
+.layoutListSection td { vertical-align:middle }
 .layoutDetailSection,.layoutListSection {
 	width: 100%;
 	/*margin: 10px;*/
