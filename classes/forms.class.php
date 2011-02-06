@@ -588,7 +588,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$url = DEFAULT_FILE;
 		if ($this->rewriteMapping !== NULL)
 			$url = $this->RewriteURL($filters);
-   
+
 		return BuildQueryString($url,$filters,$encodeAmp);
 	}
 	public function IsInstalled() {
