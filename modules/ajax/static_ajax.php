@@ -252,13 +252,12 @@ class internalmodule_StaticAjax extends uBasicModule {
 			$fltr = CallModuleFunc($module,'FindFilter',$field);
 			$vals = $fltr['values'];
 		}
-		$out = ''; $justNumeric = true;
+		$out = '';
 		$linebreaks = array("\n\r","\n","\r\r");
 		$found = array();
-		if (!$_GET['term']) $found[] = array('value'=>'','label'=>'-');
+		if (!$_GET['term']) $found[] = array('value'=>'','label'=>'-','key'=>'');
 		if (is_array($vals)) foreach ($vals as $key=>$value) {
 			if (empty($key) && empty($value)) continue;
-			if (!is_numeric($value)) $justNumeric = false;
 			if (empty($_GET['term']) || strpos(strtolower($key), strtolower($_GET['term'])) !== false) {
 				// old cases are \n\r,
 				// new cases are \n
@@ -277,10 +276,10 @@ class internalmodule_StaticAjax extends uBasicModule {
 		}
 		// value, label, desc, icon;
 
-		//echo $justNumeric ? 'numeric':'NN';
-		if ($justNumeric) {
+		if (!is_assoc($vals)) {
 			// this is an array of values, so make 'value' = 'key' and remove 'desc' and 'label'
 			foreach ($found as $k=>$v) {
+				if (!isset($v['key'])) print_r($v);
 				$found[$k]['value'] = $v['key'];
 				unset($found[$k]['label']);
 				unset($found[$k]['desc']);
@@ -288,7 +287,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 		}
 
 		echo json_encode($found);
-		//echo ($justNumeric) ? "|0\n$out" : "|\n$out";
 	}
 }
 
