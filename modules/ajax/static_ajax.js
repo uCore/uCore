@@ -256,11 +256,11 @@ function InitAutocomplete() {
 					.append( "<a>" + item.label + desc + "</a>" )
 					.appendTo( ul );
 			};
-		});//.change(function(event, ui){
+		}).select(function () {});//function(event, ui){
 			// ui.item
 			//data, $li
 		//	uf(this,data.value);
-	//	});
+//		});
 //		.result(function(event, data, formatted) {
 //			if (isFilterField)
 //				ReloadFilters();
