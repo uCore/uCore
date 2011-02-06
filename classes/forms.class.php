@@ -378,8 +378,9 @@ abstract class uBasicModule implements iUtopiaModule {
 {
 					$fltr =& $this->FindFilter($linkInfo['toField'],$linkInfo['ct'],itNONE,FILTER_WHERE);
 					if ($fltr === NULL) {
-						$uid = $this->AddFilterWhere($linkInfo['toField'],$linkInfo['ct']);
-						$fltr =& $this->GetFilterInfo($uid);
+						$fltr =& $this->AddFilterWhere($linkInfo['toField'],$linkInfo['ct']);
+						$uid = $fltr['uid'];
+						//$fltr =& $this->GetFilterInfo($uid);
 					} else $uid = $fltr['uid'];
 					$fltr['linkFrom'] = $parentModule.':'.$linkInfo['fromField'];
 					$linkInfo['_toField'] = $linkInfo['toField'];
@@ -1617,19 +1618,19 @@ abstract class uDataModule extends uBasicModule {
 		$this->filters = array(FILTER_WHERE=>array(),FILTER_HAVING=>array());
 	}
 
-	public function AddFilterWhere($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
+	public function &AddFilterWhere($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
 		//	if (!array_key_exists($fieldName,$this->fields) && $inputType !== itNONE) { ErrorLog("Cannot add editable WHERE filter on field '$fieldName' as the field does not exist."); return; }
 		if (!isset($this->filters[FILTER_WHERE]) || count(@$this->filters[FILTER_WHERE]) == 0) $this->NewFiltersetWhere();
 		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_WHERE,$title);
 	}
 
-	public function AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
+	public function &AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
 		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE)
 			return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 
 		//	if (!array_key_exists($fieldName,$this->fields)) { ErrorLog("Cannot add HAVING filter on field '$fieldName' as the field does not exist.");ErrorLog(print_r(useful_backtrace(),true)); return; }
 		if (!isset($this->filters[FILTER_HAVING]) || count(@$this->filters[FILTER_HAVING]) == 0) $this->NewFiltersetHaving();
-			return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$title);
+		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$title);
 	}
 
 	private $filterUID = 0;
@@ -1641,7 +1642,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	// private - must use addfilter or addfilterwhere.
-	private function AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) { // enforce forces any new records to be set to this value
+	private function &AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) {
 		//		if (!isset($value) || empty($value)) return;
 		$uid = $this->GetNewUID();
 		$value = $dvalue;
@@ -1737,8 +1738,8 @@ abstract class uDataModule extends uBasicModule {
 
 		if ($inputType != itNONE) $this->hasEditableFilters = true;
 
-		$filterset[count($filterset)-1][] = $fieldData;
-		return $fieldData['uid'];
+		$filterset[count($filterset)-1][] =& $fieldData;
+		return $fieldData;//['uid'];
 	}
 
 	// returns false if filter not found, otherwise returns filter information as array
