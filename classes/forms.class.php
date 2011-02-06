@@ -2064,7 +2064,7 @@ abstract class uDataModule extends uBasicModule {
 
 		$value = $this->GetFilterValue($uid);//$filterData['value'];
 		//echo "$uid::$value<br/>";
-		if ($value === NULL && (!isset($filterData['linkFrom']) || !$filterData['linkFrom'])) return '';
+		if ($value === NULL && (!isset($filterData['linkFrom']) || !$filterData['linkFrom'] || (isset($filterData['allow_empty'])))) return '';
 		// set filter VALUE
 		if ($compareType == ctLIKE && strpos($value,'%') === FALSE ) $value = "%$value%";
 
