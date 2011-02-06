@@ -125,7 +125,6 @@ class utopia {
 
 				if ($ref->isSubclassOf('uBasicModule')) {
         	                        $class['uuid'] = CallModuleFunc($class['module_name'],'GetUUID');
-					if (is_array($class['uuid'])) $class['uuid'] = reset($class['uuid']);
 				}
 				$rows[$class['module_name']] = $class;
 			}
@@ -144,6 +143,7 @@ class utopia {
 		$modules = self::GetModules();
 		foreach ($modules as $m) {
 			if ($uuid == $m['uuid']) return $m;
+			if (is_array($m['uuid']) && array_search($uuid,$m['uuid']) !== FALSE) return $m;
 		}
 		return false;
 	}
