@@ -19,7 +19,7 @@ function FilterOnLeave(sender) {
 }
 
 $(document).ready(function(){
-	$('.btn').button();
+	//$('.btn').button();
 	// preload hourglass image
 	$("<img>").attr("src", PATH_REL_CORE+'images/hourglass.png');
 	$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
@@ -152,10 +152,7 @@ $(document).ready(function(){
 
 	$("[name^=sql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
 	
-	//InitJavascript.run();
-	//InitAjax();
-	//InitAutocomplete();
-	//InitDatePickers();
+	InitJavascript.run();
 });
 $(window).load(function () { InitJavascript.run(); });
 
@@ -185,8 +182,12 @@ function UpdateSelectedLinks() {
   });
 }
 
+function UIButtons() {
+	$('.btn').not('.ui-button').button();
+}
+
 var InitJavascript = {
-	_functs: [InitDatePickers, InitAutocomplete, RefreshTables, UpdateSelectedLinks],
+	_functs: [InitDatePickers, InitAutocomplete, RefreshTables, UpdateSelectedLinks, UIButtons],
 	add: function (f) {
 		this._functs.push(f);
 	},
