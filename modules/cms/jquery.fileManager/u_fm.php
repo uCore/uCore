@@ -65,8 +65,13 @@ FIN
 		list($path,$pathUpload) = $this->Init();
 
 		echo '<div id="fileMan"></div>';
-		//uPlupload::Init();
-		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',events:{dblclick:dclick}},pluploadOptions);});");
+		$includeOpts = '';
+		if (class_exists('uPlupload')) {
+			$jsOptionVar = 'filemanagerOptions';
+			uPlupload::Init($jsOptionVar,$pathUpload);
+			$includeOpts = ','.$jsOptionVar;
+		}
+		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',events:{dblclick:dclick}}$includeOpts);});");
 
 		$out = ob_get_contents();
 		ob_end_clean();
