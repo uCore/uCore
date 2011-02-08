@@ -76,10 +76,21 @@
 				$sel.append('<div style="clear:both"></div>');
 				if (!mbOptions.readonly)
 					$sel.append($('<div>New Folder</div>').button().bind('click',NewFolder));
-				if (mbOptions.upload) {
-					var ul = $('<div></div>').hide();
-					$sel.append($('<div>Upload Files</div>').button().bind('click',{container:ul},UploadFiles));
+				if (mbOptions.upload && plupload && pluploadOptions) {
+					var ul = $('<div></div>');
+					$sel.append($('<div>Upload Files</div>').button().bind('click',function() { ul.toggle(); }));
 					$sel.append(ul);
+
+                                        if (!$(ul).plupload) {
+                                                $(ul).html('Must install Plupload jquery plugin.');
+                                        } else {
+                                        	var opts = $.extend({},pluploadOptions,{init: {FileUploaded: onFileUploaded}});
+                                        	opts.url = opts.url+ (opts.url.indexOf('?') < 0 ? '?' : '&') +'path='+$sel.data('result').path;
+                                	        $(ul).plupload(opts);
+					}
+
+
+					ul.hide();
 				}
 				
 				// end processing
@@ -89,24 +100,12 @@
 //				DocReady(); // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~> event
 			});
 
-			function UploadFiles(event) {
-				$(event.data.container).toggle();
-				if (plupload && pluploadOptions) {
-					if (!$(event.data.container).pluploadQueue) {
-						$(event.data.container).html('Must install Plupload jquery plugin.'); return;
-					}
-					var opts = pluploadOptions;
-					opts.url = opts.url+ (opts.url.indexOf('?') < 0 ? '?' : '&') +'path='+$sel.data('result').path;
-					$(event.data.container).pluploadQueue(opts);
-					$(event.data.container).pluploadQueue().bind('FileUploaded',function (uploader,file,response) {
-						if (uploader.total.queued == 0) {
-							RefreshView($sel);
-						}
-					});
-				} else {
-					$(event.data.container).html('Must install Plupload.');
+			function onFileUploaded(uploader,file,response) {
+				if (uploader.total.queued == 0) {
+					RefreshView($sel);
 				}
 			}
+
 			function NewFolder() {
 				var path = prompt('Enter Folder Name:');
 				if (!path) return;
