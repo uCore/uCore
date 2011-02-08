@@ -376,7 +376,8 @@ class uCMS_View extends uSingleDataModule {
 //	}
 
 	static function GetHomepage() {
-    $row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
+		$row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
+		if (!$row) $row = CallModuleFunc('uCMS_View','LookupRecord');
 		if ($row) return $row;
 		return FALSE;
 	}
