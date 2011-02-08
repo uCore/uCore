@@ -23,13 +23,15 @@ class uJavascript {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
 		self::$includeFiles[] = $path;
 	}
-  private static $includeText = '';
-  public static function IncludeText($text) {
-    self::$includeText .= "\n$text";
-  }
+	private static $includeText = '';
+	public static function IncludeText($text) {
+		self::$includeText .= "\n$text";
+	}
+	public static function AddText($text) {
+		utopia::AppendVar('script_include',$text);
+	}
 
 	public function SetupParents() {
-
 		// register ajax
 		//$this->RegisterAjax('getJavascript',array($this,'BuildJavascript'),false);
 		//utopia::AddJSFile(PATH_REL_CORE.'index.php?__ajax=getJavascript',true);
