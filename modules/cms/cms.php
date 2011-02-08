@@ -251,15 +251,20 @@ class uCMS_Edit extends uSingleDataModule {
 	//	$this->AddPreProcessCallback('content',array($this,'getWithTemplate'));
 		$this->AddFilter('cms_id',ctEQ);
 	}
-  public function getPossibleBlocks($val,$pk,$original) {
-    $rows = CallModuleFunc('uDataBlocks_List','GetRows');
-    foreach (uDataBlocks::$staticBlocks as $blockID => $callback) $rows[]['block_id'] = $blockID;
-    $ret = '<div>Click on a block to insert it.</div>';
-    foreach ($rows as $row) {
-      $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$row['block_id']}</span>";
-    }   
-    return trim($ret);
-  }
+	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		$newValue = UrlReadable($newValue);
+		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
+	}
+
+	public function getPossibleBlocks($val,$pk,$original) {
+		$rows = CallModuleFunc('uDataBlocks_List','GetRows');
+		foreach (uDataBlocks::$staticBlocks as $blockID => $callback) $rows[]['block_id'] = $blockID;
+		$ret = '<div>Click on a block to insert it.</div>';
+		foreach ($rows as $row) {
+			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$row['block_id']}</span>";
+		}   
+		return trim($ret);
+	}
 	public function getWithTemplate($val,$pk,$original) {
 		return file_get_contents('http://'.utopia::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$pk),FALSE);
 	}
