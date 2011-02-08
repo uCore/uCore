@@ -119,15 +119,6 @@ class internalmodule_Admin extends uBasicModule {
 		uJavascript::BuildJavascript();
 		timer_end('Rebuild Javascript');
 
-		// if uModules doesnt exist, create it
-		if (!file_exists(PATH_ABS_MODULES)) mkdir(PATH_ABS_MODULES);
-
-		// if uTemplates doesnt exist, create it and copy CORE/styles/default to it
-		if (!file_exists(PATH_ABS_TEMPLATES)) {
-			mkdir(PATH_ABS_TEMPLATES);
-			smartCopy(PATH_ABS_CORE.'styles/default',PATH_ABS_TEMPLATES);
-		}
-
 		$rc = PATH_REL_CORE;
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
