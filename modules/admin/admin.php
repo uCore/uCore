@@ -33,7 +33,7 @@ class internalmodule_Admin extends uBasicModule {
 		return PATH_REL_CORE.'index.php';
 	}
 	public function SetupParents() {
-		//$this->AddParent('*');
+		$this->AddParent('*');
 		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->RegisterAjax('toggleQ',array($this,'toggleQ'));
@@ -88,10 +88,30 @@ class internalmodule_Admin extends uBasicModule {
 		die('window.location.reload();');
 	}
 
-	public function ParentLoad($parent) {}
+	public function ParentLoadPoint() { return 0; }
+	public function ParentLoad($parent) {
+		if (!flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return;
+
+		if (internalmodule_AdminLogin::IsLoggedIn()) {
+			$arr = array();
+			$children = utopia::GetChildren('internalmodule_Admin');
+			foreach ($children as $links) {
+				foreach ($links as $child) {
+					if ($child['fieldLinks']) continue;
+					$opts = CallModuleFunc($child['moduleName'],'GetOptions');
+					if (!flag_is_set($opts,IS_ADMIN) || flag_is_set($opts,NO_NAV) || GetModuleVar($child['moduleName'],'isDisabled')) continue;
+					$url = CallModuleFunc($child['moduleName'],'GetURL');
+					$title = CallModuleFunc($child['moduleName'],'GetTitle');
+					if (!$url || !$title) continue;
+					$arr[] = "<a class=\"btn\" href=\"$url\">$title</a>";
+				}
+			}
+			echo '<ul id="adminButtons"><li>'.implode('</li><li>',$arr).'</li></ul>';
+		}
+	}
 
 	public function RunModule() {
-		utopia::AppendVar('content:before',"<h1>Welcome to Admin Home</h1>");
+		echo '<h1>Welcome to Admin Home</h1>';
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		//GetFiles(true);
