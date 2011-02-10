@@ -9,15 +9,11 @@ uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
 utopia::AddJSFile(PATH_REL_CORE.'.javascript.js');
-$s = (utopia::IsRequestSecure()) ? 's' : '';
-utopia::AddJSFile('http'.$s.'://www.google.com/jsapi?autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}]}'),true);
-utopia::AddCSSFile('http'.$s.'://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css');
-utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 
 $b = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 if (strpos($b,'MSIE 6') !== FALSE || strpos($b,'MSIE 7') !== FALSE) utopia::AddJSFile(dirname(__FILE__).'/js/DD_belatedPNG-min.js');
 
-class uJavascript {
+class uJavascript extends uBasicModule {
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
@@ -32,9 +28,18 @@ class uJavascript {
 	}
 
 	public function SetupParents() {
-		// register ajax
-		//$this->RegisterAjax('getJavascript',array($this,'BuildJavascript'),false);
-		//utopia::AddJSFile(PATH_REL_CORE.'index.php?__ajax=getJavascript',true);
+		modOpts::AddOption('uJavascript','gmaps','Google Maps',0,itYESNO);
+                modOpts::AddOption('uJavascript','gmaps_sensor','Google Maps Sensor',0,itYESNO);
+                $gmapsSensor = modOpts::GetOption(get_class(),'gmaps_sensor') ? 'true' : 'false';
+                $gmaps = modOpts::GetOption('uJavascript','gmaps') ? ',{"name":"maps","version":"3","other_params":"sensor='.$gmapsSensor.'"}' : '';
+
+		modOpts::AddOption('uJavascript','googleAPI','Google API Key');
+		$key = ($gAPI = modOpts::GetOption(get_class(),'googleAPI')) ? 'key='.$gAPI.'&' : '';
+
+		$s = (utopia::IsRequestSecure()) ? 's' : '';
+		utopia::AddJSFile('http'.$s.'://www.google.com/jsapi?'.$key.'autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}'.$gmaps.']}'),true);
+		utopia::AddCSSFile('http'.$s.'://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css');
+		utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
 
 	public function ParentLoad($parent) {
