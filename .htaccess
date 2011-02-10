@@ -5,8 +5,10 @@ order deny,allow
 deny from all
 </Files>
 
-RewriteEngine on
-RewriteRule \.svn|\.git - [F,L]
-ErrorDocument 403 "Access Forbidden"
+<IfModule mod_rewrite.c>
+	RewriteEngine on
+	RewriteRule \.svn|\.git - [F,L]
+	ErrorDocument 403 "Access Forbidden"
 
-RewriteRule ^$ index.php
+	RewriteRule ^$ index.php
+</IfModule>
