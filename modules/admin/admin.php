@@ -125,14 +125,15 @@ class internalmodule_Admin extends uBasicModule {
 		$ucEnd	 = '##-uCore-##';
 		$content = <<<FIN
 <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
-SetOutputFilter DEFLATE
-Header set Cache-Control "max-age=290304000, public"
-Header set Expires "Thu, 15 Jan 2015 20:00:00 GMT"
+	SetOutputFilter DEFLATE
+	<IfModule mod_headers.c>
+		Header set Cache-Control "max-age=290304000, public"
+		Header set Expires "Thu, 15 Jan 2015 20:00:00 GMT"
+	</IfModule>
 </FilesMatch>
 
 php_value short_open_tag 0
 php_value display_errors 1
-
 
 <IfModule mod_rewrite.c>
 	# Tell PHP that the mod_rewrite module is ENABLED.
