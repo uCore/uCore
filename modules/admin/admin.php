@@ -91,6 +91,7 @@ class internalmodule_Admin extends uBasicModule {
 	public function ParentLoadPoint() { return 0; }
 	public function ParentLoad($parent) {
 		if (!flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return;
+		if (isset($_REQUEST['__ajax'])) return;
 
 		if (internalmodule_AdminLogin::IsLoggedIn()) {
 			$arr = array();
