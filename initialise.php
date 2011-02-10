@@ -7,7 +7,7 @@ if (!file_exists(PATH_ABS_MODULES)) mkdir(PATH_ABS_MODULES);
 // if uTemplates doesnt exist, create it and copy CORE/styles/default to it
 if (!file_exists(PATH_ABS_TEMPLATES)) {
 	mkdir(PATH_ABS_TEMPLATES);
-	smartCopy(PATH_ABS_CORE.'styles/default',PATH_ABS_TEMPLATES);
+	smartCopy(PATH_ABS_CORE.'styles'.DIRECTORY_SEPARATOR.'default',PATH_ABS_TEMPLATES);
 }
 
 timer_start('Load Files');
