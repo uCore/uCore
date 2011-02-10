@@ -16,7 +16,7 @@ function fix_path($path,$slash = '') {
 
 define('PATH_ABS_ROOT',fix_path(realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR));
 define('PATH_ABS_CORE',fix_path(dirname(__FILE__).DIRECTORY_SEPARATOR));
-define('PATH_ABS_SELF',fix_path($_SERVER['PHP_SELF']));
+define('PATH_ABS_SELF',fix_path(realpath($_SERVER['PHP_SELF'])));
 
 $coreDiff = str_replace(PATH_ABS_ROOT,'',PATH_ABS_CORE);
 define('PATH_REL_ROOT','/');
