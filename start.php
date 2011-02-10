@@ -6,8 +6,6 @@ include_once('error.php');
 
 date_default_timezone_set('GMT');
 
-define('OS_WIN',stristr(PHP_OS, 'WIN'));
-
 function fix_path($path,$slash = '') {
 	if (!$slash) $slash = DIRECTORY_SEPARATOR;
 	$path = str_replace(array('\\','/'),$slash,$path);
