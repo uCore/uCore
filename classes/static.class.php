@@ -789,7 +789,10 @@ class utopia {
 	static function GetRelativePath($fullpath) {
 		$fullpath = realpath($fullpath);
 		$pos = strpos($fullpath,PATH_ABS_ROOT);
-		return PATH_REL_ROOT.trim(substr($fullpath,$pos+strlen(PATH_ABS_ROOT)),DIRECTORY_SEPARATOR);
+		
+		$path = PATH_REL_ROOT.trim(substr($fullpath,$pos+strlen(PATH_ABS_ROOT)),DIRECTORY_SEPARATOR);
+		$path = str_replace(DIRECTORY_SEPARATOR,'/',$path);
+		return $path;
 	}
 
 	static function AjaxUpdateElement($eleName,$html) {
