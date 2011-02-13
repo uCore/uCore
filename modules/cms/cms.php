@@ -252,7 +252,7 @@ class uCMS_Edit extends uSingleDataModule {
 		$this->AddFilter('cms_id',ctEQ);
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
-		$newValue = UrlReadable($newValue);
+		if ($fieldAlias == 'cms_id') $newValue = UrlReadable($newValue);
 		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
 
