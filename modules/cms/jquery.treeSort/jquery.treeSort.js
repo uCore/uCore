@@ -34,7 +34,7 @@
 		$(options.tree,this).not(options.tree+' '+options.tree).each(function () {
 			var self = $(this);
 			// clone first branch for placeholder
-			var place = $(options.branch,self).first().clone().empty().attr('id','ui-treesort-placeholder').text('treeSort Placeholder').addClass(options.placeholder).hide().appendTo(this);
+			var place = $(options.branch,self).first().clone(false).empty().attr('id','ui-treesort-placeholder').text('treeSort Placeholder').addClass(options.placeholder).hide().appendTo(this);
 			var overElement = null;
 			var dragging = false;
 			
@@ -79,7 +79,7 @@
 					if (oX > 20) {
 						// add as a child to the current item
 						var c = overElement.children(options.tree+':first');
-						if (c.length === 0) { c = $(self).andSelf().filter(options.tree).first().clone().empty().appendTo(overElement); }
+						if (c.length === 0) { c = $(self).andSelf().filter(options.tree).first().clone(false).empty().appendTo(overElement); }
 						c.append(place);
 						return;
 					} else if (oX < 0) {
