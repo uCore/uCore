@@ -605,6 +605,7 @@ function _uf(ele,hourglass) {
 				$('.auto-complete-list').hide();
 				$(hourglass).remove();
 				$('.fdb-uf').change(_fieldChange);
+				InitJavascript.run();
  //               $('#statusOverlay').hide();
             }
 		});
@@ -658,6 +659,7 @@ function _uf(ele,hourglass) {
 			$('.auto-complete-list').hide();
 			$(hourglass).remove();
 			$('.fdb-uf').change(_fieldChange);
+			InitJavascript.run();
 //			$('#statusOverlay').hide();
 		}
 	});
