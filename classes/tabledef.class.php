@@ -193,7 +193,7 @@ abstract class uTableDef implements iUtopiaModule {
 		// checksum
 		$checksum = sha1(print_r($this->fields,true));
 		if ($this->checksumValid($checksum)) return;
-		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE (\''.$this->tablename.'\',\''.$checksum.'\')');
+		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `name` = \''.$this->tablename.'\', `checksum` = \''.$checksum.'\'');
 
 		$unique = array();
 		$index = array();
