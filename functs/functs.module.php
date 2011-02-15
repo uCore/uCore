@@ -11,7 +11,7 @@ function GetFiles($refresh = false) {
 function LoadFiles() {
   $files = GetFiles();
   if (!$files) return;
-  foreach ($files as $file) if (file_exists($file)) include_once($file);
+  foreach ($files as $file) include_once($file);
 }
 
 function hasNoScan($var) {
