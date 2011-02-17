@@ -2613,6 +2613,7 @@ abstract class uDataModule extends uBasicModule {
 		}   */
 
 	public function ProcessUpdates($function,$sendingField,$fieldAlias,$value,&$pkVal = NULL) {
+		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) return;
 		$this->_SetupFields();
 /*		$lm = utopia::GetVar('loadedModules');
 		$mainClass = get_class($this);// GetCurrentModule();

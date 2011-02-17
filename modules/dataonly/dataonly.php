@@ -105,6 +105,7 @@ class uDataOnly extends uBasicModule {
 	}
 
 	public function excel() {
+		$title = GetCurrentModule();
 		header('Content-disposition: attachment; filename="'.$title.'.csv"');
 		header('Content-type: excel/ms-excel; name="'.$title.'.csv"');
 
