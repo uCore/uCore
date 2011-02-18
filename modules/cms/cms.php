@@ -103,7 +103,7 @@ class uCMS_List extends uDataModule {
 		<script>
 		var hidden=true;
 		function t() {
-			if (hidden) $('.hiddenItem').show();
+			if (hidden) $('.hiddenItem').not('#ui-treesort-placeholder').show();
 			else $('.hiddenItem').hide();
 			hidden = !hidden;
 		}
