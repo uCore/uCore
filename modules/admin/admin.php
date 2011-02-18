@@ -111,8 +111,35 @@ class internalmodule_Admin extends uBasicModule {
 		}
 	}
 
+	static function compareVersions($ver1,$ver2) {
+		if ($ver1 == $ver2) return 0;
+
+		//major.minor.maintenance.build
+		preg_match_all('/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?\.?([0-9]+)?/',$ver1,$matches1,PREG_SET_ORDER); $matches1 = $matches1[0]; array_shift($matches1);
+		preg_match_all('/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?\.?([0-9]+)?/',$ver2,$matches2,PREG_SET_ORDER); $matches2 = $matches2[0]; array_shift($matches2);
+
+		if ($matches1 == $matches2) return 0;
+		foreach ($matches1 as $k => $v) {
+			if (!isset($matches2[$k])) return -1;
+			if ($v == $matches2[$k]) continue;
+			if ($v < $matches2[$k]) return -1;
+			if ($v > $matches2[$k]) return 1;
+		}
+		return 0;
+	}
+
 	public function RunModule() {
 		echo '<h1>Welcome to Admin Home</h1>';
+
+		$gitTags = json_decode(file_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
+		$gitTags = array_keys($gitTags['tags']);
+		usort($gitTags,'internalmodule_Admin::compareVersions');
+		
+		$latestVer = end($gitTags);
+		$myVer = file_get_contents(PATH_ABS_CORE.'version.txt');
+		echo '<table><tr><td>Current Version:</td><td>'.$myVer.'</td></tr><tr><td>Latest Version:</td><td>'.$latestVer.'</td></tr></table>';
+		if (self::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
+		else echo 'You are using the latest version of uCore.';
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		//GetFiles(true);
