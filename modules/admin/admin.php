@@ -119,8 +119,9 @@ class internalmodule_Admin extends uBasicModule {
 		preg_match_all('/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?\.?([0-9]+)?/',$ver2,$matches2,PREG_SET_ORDER); $matches2 = $matches2[0]; array_shift($matches2);
 
 		if ($matches1 == $matches2) return 0;
+		while (count($matches1) < 4) $matches1[] = 0;
+		while (count($matches2) < 4) $matches2[] = 0;
 		foreach ($matches1 as $k => $v) {
-			if (!isset($matches2[$k])) return -1;
 			if ($v == $matches2[$k]) continue;
 			if ($v < $matches2[$k]) return -1;
 			if ($v > $matches2[$k]) return 1;
