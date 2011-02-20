@@ -220,53 +220,37 @@ function DatePickerFormatDate (format, date, dayNamesShort, dayNames, monthNames
 function InitAutocomplete() {
 	var cache = {};
 	$('.autocomplete').autocomplete({
-		//this.onclick = null;
-		//isFilterField = $(this).attr('name').substr(0,3).toLowerCase() == '_f_';
+		source: function(request, response) {
+			if ( request.term in cache ) {
+				response( cache[ request.term ] );
+				return;
+			}
 
-//		console.log( $(this).metadata());
-		//$(this).autoComplete({ajax:url,minChars:0,requestType:'get',postVar:'q',autoFill:0,mustMatch:false/*(!isFilterField)*/,selectFirst:false,max:50,useCache:true,matchSubset:true,postData:{gv:$(this).metadata().gv}})
-		//$(this)
-			source: function(request, response) {
-				if ( request.term in cache ) {
-					response( cache[ request.term ] );
-					return;
+			request.gv = $(this.element).metadata().gv;
+			$.ajax({
+				url: PATH_REL_CORE+'index.php?__ajax=Suggest',
+				dataType: "json",
+				data: request,
+				success: function( data ) {
+					cache[ request.term ] = data;
+					response( data );
 				}
-	/*			if ($(this).attr('autocomplete') != undefined) {
-					response({});
-					return;
-				}*/
-
-				request.gv = $(this.element).metadata().gv;
-				$.ajax({
-					url: PATH_REL_CORE+'index.php?__ajax=Suggest',
-					dataType: "json",
-					data: request,
-					success: function( data ) {
-						cache[ request.term ] = data;
-						response( data );
-					}
-				});
-			},
-			minLength:0,delay:200
-		}).each(function () {
-			$(this).data( "autocomplete" )._renderItem = function( ul, item ) {
-				var desc = item.desc ? '<br><span style="font-size:0.7em">' + item.desc + '</span>' : '';
-				return $( "<li></li>" )
-					.data( "item.autocomplete", item )
-					.append( "<a>" + item.label + desc + "</a>" )
-					.appendTo( ul );
-			};
-		}).select(function () {});//function(event, ui){
-			// ui.item
-			//data, $li
-		//	uf(this,data.value);
-//		});
-//		.result(function(event, data, formatted) {
-//			if (isFilterField)
-//				ReloadFilters();
-//			else
-//				uf(this,data[1]);
-//		});
+			});
+		},
+		select: function (event,ui) {
+			// is filter?
+			$(this).trigger('change');
+		},
+		minLength:0,delay:200
+	}).each(function () {
+		$(this).data( "autocomplete" )._renderItem = function( ul, item ) {
+			var desc = item.desc ? '<br><span style="font-size:0.7em">' + item.desc + '</span>' : '';
+			return $( "<li></li>" )
+				.data( "item.autocomplete", item )
+				.append( "<a>" + item.label + desc + "</a>" )
+				.appendTo( ul );
+		};
+	});
 }
 function gup( name ){  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  var regexS = "[\\?&/]"+name+"=([^&#]*)";  var regex = new RegExp( regexS );  var results = regex.exec( window.location.href );  if( results == null )    return "";  else  return decodeURIComponent(results[1].replace(/\+/g,' ')); }
 

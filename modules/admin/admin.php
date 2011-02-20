@@ -160,9 +160,6 @@ class internalmodule_Admin extends uBasicModule {
 	</IfModule>
 </FilesMatch>
 
-php_value short_open_tag 0
-php_value display_errors 1
-
 <IfModule mod_rewrite.c>
 	# Tell PHP that the mod_rewrite module is ENABLED.
 	SetEnv HTTP_MOD_REWRITE On
@@ -174,8 +171,8 @@ php_value display_errors 1
 	RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
 
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d [OR]
-	RewriteCond %{REQUEST_URI} ^/$
+#	RewriteCond %{REQUEST_FILENAME} !-d [OR]
+#	RewriteCond %{REQUEST_URI} ^/$
 	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
 	#RewriteRule ^(.*\.(js|css))$ {$rc}index.php?__ajax=getCompressed&file=$1 [L]
 </IfModule>

@@ -245,7 +245,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 		if (strpos($tmp,':') !== FALSE) {
 			list($module,$field) = explode(':',$tmp);
 			CallModuleFunc($module,'_SetupFields');
-			$vals = CallModuleFunc($module,'GetFieldProperty',$field,'values');
+			$vals = CallModuleFunc($module,'GetValues',$field);
 		} elseif (strpos($tmp,'|') !== FALSE) {
 			list($module,$field) = explode('|',$tmp);
 			CallModuleFunc($module,'_SetupFields');
@@ -259,19 +259,13 @@ class internalmodule_StaticAjax extends uBasicModule {
 		if (is_array($vals)) foreach ($vals as $key=>$value) {
 			if (empty($key) && empty($value)) continue;
 			if (empty($_GET['term']) || strpos(strtolower($key), strtolower($_GET['term'])) !== false) {
-				// old cases are \n\r,
-				// new cases are \n
-				// replace \n\r
-				//				$key = preg_replace('/(\r\n|\n|\r|\f)/',"\r",$key);
-				//				$value = preg_replace('/(\r\n|\n|\r|\f)/',"\r",$value);
-				$found[] = array(
+				$f = array(
 					'value'	=> $value,
-					'label'	=> $key.($key == $value ? '' : ' ('.$value.')'),
-					'desc' => 'ID: '.$value,
+					'label' => $key.($key == $value ? '' : ' ('.$value.')'),
 					'key' => $key,
 				);
-				//$out .= preg_replace('/(\r\n|\n|\r|\f)/',"\r","$key|$value")."\n";
-				//$out .= preg_replace('/(\r\n|\n|\r|\f)/',"\r","$key,");
+				if ($value !== $key) $f['desc'] = 'ID: '.$value;
+				$found[] = $f;
 			}
 		}
 		// value, label, desc, icon;

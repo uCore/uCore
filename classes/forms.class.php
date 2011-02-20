@@ -999,7 +999,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($attributes==NULL) $attributes = array();
 		$inputType = $inputTypeOverride ? $inputTypeOverride : $this->fields[$field]['inputtype'];
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
-		$values = $valuesOverride ? $valuesOverride : $this->GetFieldProperty($field,'values');
+		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field);
 
 		$prefix = NULL;
 
@@ -1285,25 +1285,19 @@ abstract class uDataModule extends uBasicModule {
 		}
 	}
 
-	public function GetValues($aliasName) {
-		//		echo get_class($this);
-		$arr = NULL;
-		if (!array_key_exists($aliasName,$this->fields)) { // field doesnt exist, check if filter exists
-			$fltr = $this->FindFilter($aliasName);
-			$arr = $fltr['values'];
-	} elseif (array_key_exists('values',$this->fields[$aliasName])) {
-			//			ErrorLog("finding vals of $aliasName");
-			$arr = $this->fields[$aliasName]['values'];
+	public function GetValues($alias) {
+		if (!isset($this->fields[$alias])) {
+                        $fltr = $this->FindFilter($aliasName);
+                        return $fltr['values'];
 		}
-		return $arr;
+
+		if (isset($this->fields[$alias]['values_cache'])) return $this->fields[$alias]['values_cache'];
+
+		return $this->SetValuesCache($alias,$this->FindValues($alias,$this->fields[$alias]['values']));
 	}
 
-	public function SetValues($aliasName,$values=NULL,$stringify=FALSE) {
-		//		$aliasName = strtolower($aliasName);
-		// if values == array, then set the values to the array.
-		//		print_r($values);
-		$vals = $this->FindValues($aliasName,$values,$stringify);
-		$this->SetFieldProperty($aliasName,'values',$vals);
+	public function SetValuesCache($alias,$vals) {
+		return $this->fields[$alias]['values_cache'] = $vals;
 	}
 
 	public function FindValues($aliasName,$values,$stringify = FALSE) {
@@ -1330,11 +1324,12 @@ abstract class uDataModule extends uBasicModule {
 			}
 			$arr = array_flip($arr);
 			$stringify = true;
-		} elseif (is_string($values) && $this->fields[$aliasName]['vtable']) {
+		} elseif ($values===true && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$pk = CallModuleFunc($tbl['tModule'],'GetPrimaryKey');
 			$table = $tbl['table'];
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
+			if ($table === TABLE_PREFIX.$this->GetTabledef()) $arr = array_combine(array_keys($arr),array_keys($arr));
 		}
 
 		if (is_array($arr) && $stringify)
@@ -1486,11 +1481,12 @@ abstract class uDataModule extends uBasicModule {
 			case itOPTION:
 			case itSUGGEST:
 			case itSUGGESTAREA:
-				$values = '';
+				$values = true;
 			default:
 				break;
 		}
-		$this->SetValues($aliasName,$values);
+		$this->fields[$aliasName]['values'] = $values;
+		//$this->SetValues($aliasName,$values);
     //timer_end(get_class($this).':AF4:'.$aliasName);
 		//		} else {
 		//			switch ($inputtype) {
@@ -2613,7 +2609,7 @@ abstract class uDataModule extends uBasicModule {
 		}   */
 
 	public function ProcessUpdates($function,$sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) return;
+		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { AjaxEcho('//Module Not Editable'); return; }
 		$this->_SetupFields();
 /*		$lm = utopia::GetVar('loadedModules');
 		$mainClass = get_class($this);// GetCurrentModule();
@@ -2878,7 +2874,6 @@ abstract class uDataModule extends uBasicModule {
 
 			if (mysql_error()) { return FALSE; }
 
-
 			if (!$pkVal) {
 				if ($fieldAlias == $this->GetPrimaryKey())
 					$pkVal = $pfVal;
@@ -2968,7 +2963,7 @@ abstract class uDataModule extends uBasicModule {
 			return CallModuleFunc($row['__module__'],'GetCellData',$fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		}
 		$pkVal = NULL;
-		if (is_array($row)) $pkVal = array_key_exists('__module_pk__',$row) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
+		if (is_array($row)) $pkVal = isset($row['__module_pk__']) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
 		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$pkVal);
