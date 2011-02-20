@@ -999,7 +999,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($attributes==NULL) $attributes = array();
 		$inputType = $inputTypeOverride ? $inputTypeOverride : $this->fields[$field]['inputtype'];
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
-		$values = $valuesOverride ? $valuesOverride : $this->GetFieldProperty($field,'values');
+		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field);
 
 		$prefix = NULL;
 
@@ -1285,25 +1285,19 @@ abstract class uDataModule extends uBasicModule {
 		}
 	}
 
-	public function GetValues($aliasName) {
-		//		echo get_class($this);
-		$arr = NULL;
-		if (!array_key_exists($aliasName,$this->fields)) { // field doesnt exist, check if filter exists
-			$fltr = $this->FindFilter($aliasName);
-			$arr = $fltr['values'];
-	} elseif (array_key_exists('values',$this->fields[$aliasName])) {
-			//			ErrorLog("finding vals of $aliasName");
-			$arr = $this->fields[$aliasName]['values'];
+	public function GetValues($alias) {
+		if (!isset($this->fields[$alias])) {
+                        $fltr = $this->FindFilter($aliasName);
+                        return $fltr['values'];
 		}
-		return $arr;
+
+		if (isset($this->fields[$alias]['values_cache'])) return $this->fields[$alias]['values_cache'];
+
+		return $this->SetValuesCache($alias,$this->FindValues($alias,$this->fields[$alias]['values']));
 	}
 
-	public function SetValues($aliasName,$values=NULL,$stringify=FALSE) {
-		//		$aliasName = strtolower($aliasName);
-		// if values == array, then set the values to the array.
-		//		print_r($values);
-		$vals = $this->FindValues($aliasName,$values,$stringify);
-		$this->SetFieldProperty($aliasName,'values',$vals);
+	public function SetValuesCache($alias,$vals) {
+		return $this->fields[$alias]['values_cache'] = $vals;
 	}
 
 	public function FindValues($aliasName,$values,$stringify = FALSE) {
@@ -1330,7 +1324,7 @@ abstract class uDataModule extends uBasicModule {
 			}
 			$arr = array_flip($arr);
 			$stringify = true;
-		} elseif (is_string($values) && $this->fields[$aliasName]['vtable']) {
+		} elseif ($values===true && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$pk = CallModuleFunc($tbl['tModule'],'GetPrimaryKey');
 			$table = $tbl['table'];
@@ -1487,11 +1481,12 @@ abstract class uDataModule extends uBasicModule {
 			case itOPTION:
 			case itSUGGEST:
 			case itSUGGESTAREA:
-				$values = '';
+				$values = true;
 			default:
 				break;
 		}
-		$this->SetValues($aliasName,$values);
+		$this->fields[$aliasName]['values'] = $values;
+		//$this->SetValues($aliasName,$values);
     //timer_end(get_class($this).':AF4:'.$aliasName);
 		//		} else {
 		//			switch ($inputtype) {

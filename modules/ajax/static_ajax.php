@@ -245,7 +245,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 		if (strpos($tmp,':') !== FALSE) {
 			list($module,$field) = explode(':',$tmp);
 			CallModuleFunc($module,'_SetupFields');
-			$vals = CallModuleFunc($module,'GetFieldProperty',$field,'values');
+			$vals = CallModuleFunc($module,'GetValues',$field);
 		} elseif (strpos($tmp,'|') !== FALSE) {
 			list($module,$field) = explode('|',$tmp);
 			CallModuleFunc($module,'_SetupFields');
