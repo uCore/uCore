@@ -1335,6 +1335,7 @@ abstract class uDataModule extends uBasicModule {
 			$pk = CallModuleFunc($tbl['tModule'],'GetPrimaryKey');
 			$table = $tbl['table'];
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
+			if ($table === TABLE_PREFIX.$this->GetTabledef()) $arr = array_combine(array_keys($arr),array_keys($arr));
 		}
 
 		if (is_array($arr) && $stringify)
