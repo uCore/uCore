@@ -2874,7 +2874,6 @@ abstract class uDataModule extends uBasicModule {
 
 			if (mysql_error()) { return FALSE; }
 
-
 			if (!$pkVal) {
 				if ($fieldAlias == $this->GetPrimaryKey())
 					$pkVal = $pfVal;
@@ -2964,7 +2963,7 @@ abstract class uDataModule extends uBasicModule {
 			return CallModuleFunc($row['__module__'],'GetCellData',$fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		}
 		$pkVal = NULL;
-		if (is_array($row)) $pkVal = array_key_exists('__module_pk__',$row) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
+		if (is_array($row)) $pkVal = isset($row['__module_pk__']) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
 		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$pkVal);
