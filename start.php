@@ -12,7 +12,11 @@ function fix_path($path,$slash = '') {
     return str_replace($slash.$slash,$slash,$path);
 }
 
-define('PATH_ABS_ROOT',fix_path(realpath($_SERVER['DOCUMENT_ROOT']).DIRECTORY_SEPARATOR));
+$uri = '/uCore';
+$sf = __FILE__;//$_SERVER['SCRIPT_FILENAME'];
+if (!$sf) $sf = $_SERVER['SCRIPT_NAME'];
+$root = substr($sf,0,stripos($sf,$uri));
+define('PATH_ABS_ROOT',fix_path(realpath($root).DIRECTORY_SEPARATOR));
 define('PATH_ABS_CORE',fix_path(dirname(__FILE__).DIRECTORY_SEPARATOR));
 define('PATH_ABS_SELF',fix_path(realpath($_SERVER['PHP_SELF'])));
 
@@ -35,3 +39,5 @@ foreach (glob(PATH_ABS_CORE.'functs/*.php') as $fn) include($fn);
 
 require_once(PATH_ABS_CORE.'setup.php');
 require_once(PATH_ABS_CORE.'initialise.php'); // init
+
+?>
