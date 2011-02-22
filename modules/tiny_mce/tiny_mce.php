@@ -52,12 +52,13 @@ class module_TinyMCE extends uBasicModule {
 			$richOpts['theme_advanced_buttons4'] = "";
 
 			$htmlOpts['editor_selector'] = "mceEditorHTML";
+			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table";
 			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor';
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media';
-      $htmlOpts['theme_advanced_buttons3_add'] = "spellchecker,|,tablecontrols";
-      //$htmlOpts['theme_advanced_buttons4'] = "";
+			$htmlOpts['theme_advanced_buttons3_add'] = "spellchecker,|,tablecontrols";
+			//$htmlOpts['theme_advanced_buttons4'] = "";
 
 			$richOpts = json_encode($richOpts);
 			$htmlOpts = json_encode($htmlOpts);
