@@ -632,12 +632,13 @@ class utopia {
 		if (file_exists($templateDir.'styles.css'))
 			self::AddCSSFile($templateDir.'styles.css');
 
+		self::PrependVar('<head>','<meta name="generator" content="uCore '.file_get_contents(PATH_ABS_CORE.'version.txt').' - Utopia Core PHP Framework">');
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
 		if (self::VarExists('script_include'))
 			self::AppendVar('</head>','<script type="text/javascript">'.utopia::GetVar('script_include').'</script>'."\n");
 //		self::AppendVar('</head>','<base href="http://'.self::GetDomainName().self::GetRelativePath($templateDir).'/" />'."\n");
 
-		self::AppendVar('</body>','{UTOPIA.powered}{UTOPIA.admin_panel}');
+/*		self::AppendVar('</body>','{UTOPIA.powered}{UTOPIA.admin_panel}');
 
 		$time_taken = timer_findtime('full process');
 		self::SetVar('admin_panel',
@@ -648,7 +649,7 @@ class utopia {
 				'<div style="font-size:16px; margin-right:14px">Powered by <a target="_blank" href="http://www.utopiasystems.co.uk">Utopia</a>.</div>'.
 				'<div>[ '.$time_taken.'ms ] [ '.$GLOBALS['sql_query_count'].' queries ]</div>'.
 				$adminPanel.
-				'</div></div>');
+				'</div></div>');*/
 
 		while (self::MergeVars($template));
 
