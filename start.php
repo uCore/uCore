@@ -1,6 +1,5 @@
 <?php
-//$_SESSION = array();
-if (stripos($_SERVER['HTTP_HOST'],'images.') === FALSE) session_start();
+session_start();
 
 include_once('error.php');
 
@@ -12,12 +11,8 @@ function fix_path($path,$slash = '') {
     return str_replace($slash.$slash,$slash,$path);
 }
 
-$uri = '/uCore';
-$sf = __FILE__;//$_SERVER['SCRIPT_FILENAME'];
-if (!$sf) $sf = $_SERVER['SCRIPT_NAME'];
-$root = substr($sf,0,stripos($sf,$uri));
-define('PATH_ABS_ROOT',fix_path(realpath($root).DIRECTORY_SEPARATOR));
 define('PATH_ABS_CORE',fix_path(dirname(__FILE__).DIRECTORY_SEPARATOR));
+define('PATH_ABS_ROOT',fix_path(realpath(PATH_ABS_CORE.'..').DIRECTORY_SEPARATOR));
 define('PATH_ABS_SELF',fix_path(realpath($_SERVER['PHP_SELF'])));
 
 $coreDiff = str_replace(PATH_ABS_ROOT,'',PATH_ABS_CORE);
