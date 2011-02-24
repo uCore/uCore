@@ -25,8 +25,8 @@ define('DEFAULT_FILE',PATH_REL_CORE.'index.php');
 //if (!defined('PATH_ABS_CONFIG')) // allows overriding of the config file location
 define('PATH_ABS_CONFIG',fix_path(PATH_ABS_CORE.'.config.php'));
 
-define('PATH_ABS_MODULES',fix_path(PATH_ABS_CORE.'../uModules/'));
-define('PATH_ABS_TEMPLATES',fix_path(PATH_ABS_CORE.'../uTemplates/'));
+define('PATH_ABS_MODULES',fix_path(realpath(PATH_ABS_CORE.'../uModules/')).'/');
+define('PATH_ABS_TEMPLATES',fix_path(realpath(PATH_ABS_CORE.'../uTemplates/')).'/');
 
 
 // glob and load all functs files
