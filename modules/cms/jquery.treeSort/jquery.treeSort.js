@@ -39,21 +39,21 @@
 			var dragging = false;
 			
 			$(options.branch,this).draggable({
-		  	appendTo: 'body',
+			  	appendTo: 'body',
 				helper: 'clone',
 				opacity: 0.5,
 				refreshPositions:true,
 				distance:5,
 				start: function(e, ui) {
-				  onselstart = document.onselectstart;
-          document.onselectstart = function () { return false; }
+					onselstart = document.onselectstart;
+					document.onselectstart = function () { return false; }
 					if (dragging) return false;
 					dragging = true;
 					place.html($(this).html()).show();
 					$(this).hide();
 				},
 				stop: function(e, ui) {
-          document.onselectstart = onselstart;
+					document.onselectstart = onselstart;
 					dragging = false;
 					if (!$(this).has(place)) return;
 					place.after($(this).css({top:null,left:null}));
