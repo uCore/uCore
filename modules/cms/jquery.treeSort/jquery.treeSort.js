@@ -56,7 +56,7 @@
 					document.onselectstart = onselstart;
 					dragging = false;
 					if (!$(this).has(place)) return;
-					place.after($(this).css({top:null,left:null}));
+					$(this).css({top:null,left:null}).insertAfter(place);
 					place.detach();
 					$(this).show();
 					UpdateClasses();
@@ -107,7 +107,7 @@
 			
 			function UpdateClasses() {
 				$(options.branch,self).addClass('ui-treesort-item').removeClass('ui-treesort-folder');
-				var parents = $(options.tree,self).not('.ui-draggable-dragging').not(place).not(':empty').parent(options.branch).css('position','relative');
+				var parents = $(options.tree,self).not('.ui-draggable-dragging').not(place).not(':empty').parent(options.branch);
 				parents.addClass('ui-treesort-folder');
 			}
 		});
