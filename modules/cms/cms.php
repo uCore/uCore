@@ -217,8 +217,7 @@ FIN;
 			$this->UpdateFields(array('parent'=>$newParent,'position'=>$pos),$cms_id);
 			$newURL = CallModuleFunc('uCMS_View','GetURL',$cms_id);
 
-			if (!$oldURL || $oldURL == '/') continue;
-
+			//if (!$oldURL || $oldURL == '/') continue;
 			//$qry = 'UPDATE '.CallModuleFunc('uCMS_View','GetPrimaryTable').' SET `content` = REPLACE(`content`,\''.$oldURL.'\',\''.$newURL.'\')';
 			//sql_query($qry);
 			//print_r($rows);

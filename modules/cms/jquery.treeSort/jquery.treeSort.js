@@ -39,24 +39,24 @@
 			var dragging = false;
 			
 			$(options.branch,this).draggable({
-		  	appendTo: 'body',
+			  	appendTo: 'body',
 				helper: 'clone',
 				opacity: 0.5,
 				refreshPositions:true,
 				distance:5,
 				start: function(e, ui) {
-				  onselstart = document.onselectstart;
-          document.onselectstart = function () { return false; }
+					onselstart = document.onselectstart;
+					document.onselectstart = function () { return false; }
 					if (dragging) return false;
 					dragging = true;
 					place.html($(this).html()).show();
 					$(this).hide();
 				},
 				stop: function(e, ui) {
-          document.onselectstart = onselstart;
+					document.onselectstart = onselstart;
 					dragging = false;
 					if (!$(this).has(place)) return;
-					place.after($(this).css({top:null,left:null}));
+					$(this).css({top:null,left:null}).insertAfter(place);
 					place.detach();
 					$(this).show();
 					UpdateClasses();
@@ -107,7 +107,7 @@
 			
 			function UpdateClasses() {
 				$(options.branch,self).addClass('ui-treesort-item').removeClass('ui-treesort-folder');
-				var parents = $(options.tree,self).not('.ui-draggable-dragging').not(place).not(':empty').parent(options.branch).css('position','relative');
+				var parents = $(options.tree,self).not('.ui-draggable-dragging').not(place).not(':empty').parent(options.branch);
 				parents.addClass('ui-treesort-folder');
 			}
 		});
