@@ -1,4 +1,5 @@
 <?php
+define('PATH_UPLOADS',PATH_ABS_ROOT.'uUploads');
 class uUploads extends uBasicModule {
 	function SetupParents() {
 		$this->SetRewrite(TRUE);

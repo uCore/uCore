@@ -1,5 +1,4 @@
 <?php
-define('PATH_UPLOADS',PATH_ABS_CORE.'.uploads');
 define('itFILEMANAGER' ,'fileman');
 class fileManager extends uBasicModule {
 	function GetTitle() {
