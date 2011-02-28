@@ -573,7 +573,7 @@ function RunAjaxScript($path) {
  * @param $mode //set file/folder permissions
  * @return boolean
  */
-function rcopy($source,$dest,$mode=0777) {
+function rcopy($source,$dest,$mode=0755) {
 	$source = rtrim($source,'/'); $dest = rtrim($dest,'/');
         $Directory = new RecursiveDirectoryIterator($source);
         $Iterator = new RecursiveIteratorIterator($Directory);
@@ -585,7 +585,7 @@ function rcopy($source,$dest,$mode=0777) {
 		$dFile = str_replace($source,$dest,$sFile);
 		if (file_exists($dFile)) continue;
 		if (is_dir($sFile))
-			mkdir($dFile,null,true);
+			mkdir($dFile,$mode,true);
 		else
 			copy($sFile,$dFile);
 		chmod($dFile,$mode);
