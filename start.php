@@ -22,7 +22,7 @@ define('PATH_REL_SELF',fix_path(PATH_REL_ROOT.basename(PATH_ABS_SELF),'/'));
 
 define('DEFAULT_FILE',PATH_REL_CORE.'index.php');
 
-define('PATH_ABS_CONFIG',fix_path(PATH_ABS_ROOT.'.uConfig.php'));
+define('PATH_ABS_CONFIG',fix_path(PATH_ABS_ROOT.'uConfig.php'));
 
 define('PATH_ABS_MODULES',fix_path(PATH_ABS_ROOT.'uModules').'/');
 define('PATH_ABS_TEMPLATES',fix_path(PATH_ABS_ROOT.'uTemplates').'/');
