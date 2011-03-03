@@ -319,7 +319,7 @@ abstract class uTableDef implements iUtopiaModule {
 			}
 		}
 	}
-	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); $this->tablename = strtolower($this->tablename); }
+	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
 	public function AddInputDate($fieldName = 'input_date') { $this->AddFieldArray($fieldName,ftTIMESTAMP,NULL,array('default'=>'CURRENT_TIMESTAMP')); }
 }
 
