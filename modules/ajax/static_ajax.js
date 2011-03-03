@@ -22,7 +22,7 @@ $(document).ready(function(){
 	//$('.btn').button();
 	// preload hourglass image
 	$("<img>").attr("src", PATH_REL_CORE+'images/hourglass.png');
-	$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
+	//$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
 	
 	if (typeof(DD_belatedPNG) != 'undefined') DD_belatedPNG.fix('*');
 

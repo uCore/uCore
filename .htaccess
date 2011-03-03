@@ -1,10 +1,5 @@
 Options -Indexes
 
-<Files .config.php>
-order deny,allow
-deny from all
-</Files>
-
 <IfModule mod_rewrite.c>
 	# Tell PHP that the mod_rewrite module is ENABLED.
 	SetEnv HTTP_MOD_REWRITE On
