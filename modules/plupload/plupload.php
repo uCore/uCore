@@ -8,7 +8,7 @@ class uPlupload {
 		$pathCore = PATH_REL_CORE;
 		uJavascript::AddText(<<<FIN
 var $jsVarName = {
-    runtimes : 'gears,html5,flash,browserplus,html4',
+    runtimes : 'html5,flash,browserplus,html4',
     chunk_size : '1mb',
     url : '$uploadPath',
     flash_swf_url : '{$pathCore}modules/plupload/plupload.flash.swf',
