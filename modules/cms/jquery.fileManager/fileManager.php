@@ -23,7 +23,7 @@ class jqFileManager {
 	private static $data = array();
 	static function GetRelativePath($path) {
 		//$path = realpath($path); // dont use realpath as it doesnt work with files that dont exist.
-    $path = preg_replace('/[^\/]+\/\.\.\/?/', '', $path);
+		$path = preg_replace('/[^\/]+\/\.\.\/?/', '', $path);
 		$pos = strpos($path,$_SERVER['DOCUMENT_ROOT']);
 		return '/'.ltrim(substr($path,$pos+strlen($_SERVER['DOCUMENT_ROOT'])),DIRECTORY_SEPARATOR);
 	}
@@ -46,12 +46,11 @@ class jqFileManager {
 	static function ProcessAjax($rootPath,$deleteCallback=null,$renameCallback=null) {
 		$pMod = array_key_exists('path',$_GET) ? $_GET['path'] : '';
 		$path = $rootPath.'/'.trim($pMod,'/');
+		$path = rtrim($path,'/');
 
 		// translate path
 		$path = preg_replace('/[^\/]+\/\.\.\/?/', '', $path);
-		$path = '/'.trim($path,'/');
 		if (!file_exists($path)) mkdir($path,octdec('0777'),true);
-//		chmod($path,0777);
 
 		if (array_key_exists('delete',$_GET)) {
 			$from = $path.'/'.$_GET['delete'];
