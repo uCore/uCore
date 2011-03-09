@@ -28,16 +28,11 @@ class uJavascript extends uBasicModule {
 	}
 
 	public function SetupParents() {
-		modOpts::AddOption('uJavascript','gmaps','Google Maps',0,itYESNO);
-                modOpts::AddOption('uJavascript','gmaps_sensor','Google Maps Sensor',0,itYESNO);
-                $gmapsSensor = modOpts::GetOption(get_class(),'gmaps_sensor') ? 'true' : 'false';
-                $gmaps = modOpts::GetOption('uJavascript','gmaps') ? ',{"name":"maps","version":"3","other_params":"sensor='.$gmapsSensor.'"}' : '';
-
 		modOpts::AddOption('uJavascript','googleAPI','Google API Key');
 		$key = ($gAPI = modOpts::GetOption(get_class(),'googleAPI')) ? 'key='.$gAPI.'&' : '';
 
 		$s = (utopia::IsRequestSecure()) ? 's' : '';
-		utopia::AddJSFile('http'.$s.'://www.google.com/jsapi?'.$key.'autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}'.$gmaps.']}'),true);
+		utopia::AddJSFile('http'.$s.'://www.google.com/jsapi?'.$key.'autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}]}'),true);
 		utopia::AddCSSFile('http'.$s.'://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css');
 		utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}

@@ -60,7 +60,7 @@
 					place.detach();
 					$(this).show();
 					UpdateClasses();
-					if (options.change) options.change(options);
+					if (options.change) options.change($(this));
 				},
 				drag: function(e, ui) {
 					if (!overElement || !overElement.offset()) return;
