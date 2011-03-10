@@ -34,10 +34,7 @@ FIN
 	function ParentLoad($parent) { $this->RunModule(); }
 	function ajax() {
 		utopia::CancelTemplate();
-		if (array_key_exists('upload',$_GET))
-			jqFileManager::ProcessUpload(PATH_UPLOADS);
-		else
-			jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');
+		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');
 	}
 	function Init() {
 		utopia::AddJSFile(jqFileManager::GetPathJS());

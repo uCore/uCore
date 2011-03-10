@@ -19,6 +19,22 @@
 *
 */
 
+/*
+* Uncomment the line below to enable basic operation. By default this
+* will manage a folder called 'uploads' relative to this script's path.
+* 
+* You can change this folder to anything you like. The script will not
+* allow managing of files outside of this path.
+*
+* Advanced users may wish to write a separate php script to control the
+* ajax features of the File Manager.  Including callbacks for deleting
+* or renaming files.
+*/
+
+
+//jqFileManager::ProcessAjax(  dirname(__FILE__).'/uploads'  );
+
+
 class jqFileManager {
 	private static $data = array();
 	static function GetRelativePath($path) {
@@ -39,6 +55,11 @@ class jqFileManager {
 	static function GetPathCSS() {
 		return self::GetPathFolder().'jquery.fileManager.css';
 	}
+	static function ResolvePath($path) {
+		$newpath = preg_replace('/[^\/]+\/\.\.\/?/', '', $path);
+		if ($newpath != $path) $newpath = self::ResolvePath($newpath);
+		return $newpath;
+	}
 
 	static function AddIcon($path, $title='',$folder=false) {
 		self::$data[] = array('path'=>$path,'title'=>$title,'type'=>$folder);
@@ -46,14 +67,20 @@ class jqFileManager {
 	static function ProcessAjax($rootPath,$deleteCallback=null,$renameCallback=null) {
 		$pMod = array_key_exists('path',$_GET) ? $_GET['path'] : '';
 		$path = $rootPath.'/'.trim($pMod,'/');
+		$path = self::ResolvePath($path);
 		$path = rtrim($path,'/');
+		if (strpos($path,$rootPath)===FALSE) $path = $rootPath;
 
-		// translate path
-		$path = preg_replace('/[^\/]+\/\.\.\/?/', '', $path);
 		if (!file_exists($path)) mkdir($path,octdec('0777'),true);
 
+		if (isset($_FILES['file'])) return self::ProcessUpload($path);
+
 		if (array_key_exists('delete',$_GET)) {
-			$from = $path.'/'.$_GET['delete'];
+			$from = self::ResolvePath($path.'/'.$_GET['delete']);
+	                if (strpos($from,$rootPath)===FALSE) {
+				echo 'alert("Can only perform operations within the root path");';
+				return false;
+			}
 			if (!file_exists($from)) {
 				echo 'alert("File or Folder no longer exists");';
 				return false;
@@ -68,9 +95,12 @@ class jqFileManager {
 			return true;
 		}
 		if (array_key_exists('mFrom',$_GET) && array_key_exists('mTo',$_GET)) {
-			$from = $path.'/'.$_GET['mFrom'];
-			$to = $path.'/'.$_GET['mTo'];
-			$to = preg_replace('/\w+\/\.\.\//', '', $to);
+			$from = self::ResolvePath($path.'/'.$_GET['mFrom']);
+			$to = self::ResolvePath($path.'/'.$_GET['mTo']);
+	                if (strpos($from,$rootPath)===FALSE || strpos($to,$rootPath)===FALSE) {
+				echo 'alert("Can only perform operations within the root path");';
+				return false;
+			}
 			if (file_exists($to)) {
 				echo 'alert("Destination already exists");';
 				return false;
@@ -82,8 +112,6 @@ class jqFileManager {
 				echo 'alert("Cannot move or rename.");';
 				return false;
 			}
-			$from = $path.'/'.$_GET['mFrom'];
-			$to = $path.'/'.$_GET['mTo'];
 			if (is_callable($renameCallback)) call_user_func($renameCallback,$from,$to);
 			return true;
 		}
@@ -94,9 +122,7 @@ class jqFileManager {
 			$filename = basename($file);
 			if ($filename === '..' || $filename === '.') continue;
 			if (!is_dir($file) && array_key_exists('filter',$_GET) && !preg_match('/'.$_GET['filter'].'/i',$filename)) continue;
-		//	$fldr = is_dir($file) ? 'cmsMediaFolder cmsDrop cmsDrag' : 'cmsDrag';
 			self::AddIcon($filename,$filename,is_dir($file)?1:0);
-			//echo "<div class=\"cmsMediaIcon$fldr\" title=\"$filename\">$filename</div>";
 		}
 
 		// uPath is full path less rootpath less filename
@@ -105,11 +131,9 @@ class jqFileManager {
 		die(json_encode(array('rootPath'=>self::GetRelativePath($rootPath),'path'=>$uPath,'files'=>self::$data)));
 	}
 
-	public static function ProcessUpload($rootPath) {
+	public static function ProcessUpload($path) {
 		if (ob_get_level()) ob_end_clean();
-		$pMod = array_key_exists('path',$_GET) ? $_GET['path'] : '';
-		if (!file_exists($rootPath)) mkdir($rootPath);
-		$destination = realpath(rtrim($rootPath,'/').DIRECTORY_SEPARATOR.trim($pMod,'/'));
+		$destination = realpath($path);
 
 		// HTTP headers for no cache etc
 		header('Content-type: text/plain; charset=UTF-8');
