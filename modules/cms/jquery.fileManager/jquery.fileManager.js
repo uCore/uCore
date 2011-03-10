@@ -21,25 +21,21 @@
 ;(function($){
 	var optionDefaults = {
 		path			: '',
-		upload			: true,
+		upload			: false,
 		readonly		: false,
 		fixedPath		: false,
 		
 		baseClass		: 'fmBase',
 		folderClass		: 'fmFolder',
 		trashClass		: 'fmTrash',
-		loadingClass	: 'fmLoading',
+		loadingClass		: 'fmLoading',
 
-		highlightClass	: 'ui-state-highlight',
+		highlightClass		: 'ui-state-highlight',
 		hoverClass		: 'ui-state-active'
 	};
-	
+
 	$.fn.fileManager = function(settings, pluploadOptions) {
 		var mbOptions = $.extend({}, optionDefaults, settings);
-	//	mbOptions.events = $.extend({selectstart:function () { return false; },dblclick:ItemDblClick},mbOptions.events);
-//		if (!mbOptions.uploadPath) {
-//			alert('uploadPath not specified'); return;
-//		}
 		if (!mbOptions.ajaxPath) {
 			alert('ajaxPath not specified'); return;
 		}
@@ -48,13 +44,8 @@
 		var query = $.extend({},{path:mbOptions.path},mbOptions.get);
 		this.each(function () { // swap with getJSON so not duplicating ajax
 			var $sel = $(this);
-		//	$sel.empty();
-		//	$sel.append('<div>Loading FileManager...</div>');
 			$.getJSON(mbOptions.ajaxPath, query, function(data, status) {
-				//localOptions = mbOptions;
 				$sel.data('result',data);
-//				localOptions.path = data.path;
-//				localOptions.relPath = data.relPath;
 				$sel.data('options',mbOptions);
 				if (status != "success") {
 					var msg = "Sorry but there was an error: "+status;
@@ -76,36 +67,36 @@
 				$sel.append('<div style="clear:both"></div>');
 				if (!mbOptions.readonly)
 					$sel.append($('<div>New Folder</div>').button().bind('click',NewFolder));
-				if (mbOptions.upload && plupload && pluploadOptions) {
-					var ul = $('<div></div>');
-					$sel.append($('<div>Upload Files</div>').button().bind('click',function() { ul.toggle(); }));
+				if (mbOptions.upload) {
+					var ul = $('<div></div>').hide();
+					$sel.append($('<div>Upload Files</div>').button().bind('click',{container:ul},UploadFiles));
 					$sel.append(ul);
-
-                                        if (!$(ul).plupload) {
-                                                $(ul).html('Must install Plupload jquery plugin.');
-                                        } else {
-                                        	var opts = $.extend({},pluploadOptions,{init: {FileUploaded: onFileUploaded}});
-                                        	opts.url = opts.url+ (opts.url.indexOf('?') < 0 ? '?' : '&') +'path='+$sel.data('result').path;
-                                	        $(ul).plupload(opts);
-					}
-
-
-					ul.hide();
 				}
 				
 				// end processing
 				
 				$('.'+mbOptions.baseClass,$sel).disableSelection();//bind('selectstart',function () { return false; });
 				$('.'+mbOptions.folderClass,$sel).bind('dblclick',ItemDblClick);
-//				DocReady(); // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~> event
 			});
 
-			function onFileUploaded(uploader,file,response) {
-				if (uploader.total.queued == 0) {
-					RefreshView($sel);
+			function UploadFiles(event) {
+				$(event.data.container).toggle();
+				if (plupload && pluploadOptions) {
+					if (!$(event.data.container).pluploadQueue) {
+						$(event.data.container).html('Must install Plupload jquery plugin.'); return;
+					}
+					var opts = pluploadOptions;
+					opts.url = opts.url+ (opts.url.indexOf('?') < 0 ? '?' : '&') +'path='+$sel.data('result').path;
+					$(event.data.container).pluploadQueue(opts);
+					$(event.data.container).pluploadQueue().bind('FileUploaded',function (uploader,file,response) {
+						if (uploader.total.queued == 0) {
+							RefreshView($sel);
+						}
+					});
+				} else {
+					$(event.data.container).html('Must install Plupload.');
 				}
 			}
-
 			function NewFolder() {
 				var path = prompt('Enter Folder Name:');
 				if (!path) return;
@@ -128,7 +119,6 @@
 				}
 			} else {
 				return Rename(from.data('item').target,from.data('item').path,to.data('item').path+'/'+from.data('item').path);
-				//ajaxData = {path:mbOptions.path,mFrom:from.data('item').path,mTo:to.data('item').path+'/'+from.data('item').path};
 			}
 		};
 		function Rename(view,from,to) {
@@ -140,7 +130,6 @@
 		function ItemDblClick() {
 			var item = $(this).data('item');
 			if (item.type != ICONTYPE_FOLDER) return;
-//			$(this).append($('<div></div>').addClass('fmLoading'));
 			var path = item.path;
 			if (item.target.data('result').path) path = item.target.data('result').path + '/' + path;
 			ReloadFolder(item.target,path);
@@ -209,7 +198,12 @@
 				.appendTo(icon);
 			var label = $('<div class="label">'+item.title+'</div>')
 				.prependTo(icon)//.bind('dblclick',function() {return false;})
-				.bind('click',function () { if (!mbOptions.readonly) { renamebox.show().focus(); return false;}});
+				.bind('click',function () {
+					if (!mbOptions.readonly) {
+						renamebox.show().focus();
+						return false;
+					}
+				});
 		}
 		
 		return $(this);
