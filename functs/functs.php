@@ -184,19 +184,12 @@ function array_sort_subkey(&$array,$key,$direction='<') {
 // MODULE FUNCTIONS
 
 function GetFilterArray() {
-	// split QS
 	$arr = array();
-	//if (!array_key_exists('QUERY_STRING',$_SERVER) || empty($_SERVER['QUERY_STRING'])) return $arr;
-
-	foreach ($_GET as $key=>$val) {//(split('&',$_SERVER['QUERY_STRING']) as $pair) {
-		//if (strpos($pair,'=') === FALSE) continue;
-		//list($key,$val) = split('=',$pair);
-		$key = urldecode($key); $val = urldecode($val);
+	foreach ($_GET as $key=>$val) {
 		if (substr($key,0,3) != '_f_') continue;
 		$newKey = substr($key,3);
 		$arr[$newKey] = $val;
 	}
-
 	return $arr;
 }
 
