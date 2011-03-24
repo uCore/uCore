@@ -170,11 +170,13 @@ class internalmodule_Admin extends uBasicModule {
 
 	RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
 
-	RewriteCond %{REQUEST_FILENAME} !-f
-#	RewriteCond %{REQUEST_FILENAME} !-d [OR]
-#	RewriteCond %{REQUEST_URI} ^/$
+	RewriteCond %{REQUEST_URI} ^$ [OR]
+	RewriteCond %{REQUEST_URI} ^/$
 	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
-	#RewriteRule ^(.*\.(js|css))$ {$rc}index.php?__ajax=getCompressed&file=$1 [L]
+
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d     
+	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
 </IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
