@@ -295,6 +295,10 @@ class uCMS_View extends uSingleDataModule {
 	public function GetTabledef() { return 'tabledef_CMS'; }
 	public function GetUUID() { return 'cms'; }
 
+	static function last_updated() {
+		$page = self::findPage();
+		return $page['updated'];
+	}
 	static function templateParser($id) {
 		$rec = CallModuleFunc('uCMS_View','GetRows',$id);
 		$rec = $rec[0];
@@ -353,6 +357,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('cms_id','cms_id','cms','cms_id');
 		$this->AddField('title','title','cms','title');
 //		$this->AddField('is_homepage','is_homepage','cms');
+		$this->AddField('updated','updated','cms');
 		$this->AddField('parent','parent','cms','Parent');
 		$this->AddField('position','position','cms','position');
 		$this->AddField('template','template','cms','template');
@@ -370,6 +375,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddParent('/');
 		//$this->SetRewrite('{cms_id}');
 	//	$this->RegisterAjax('showCMS',array($this,'showCMS'));
+		uDataBlocks::AddStaticBlock('page_updated','uCMS_View::last_updated');
 	}
 //	public function showCMS() {
 //		utopia::UseTemplate();
