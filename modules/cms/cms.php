@@ -350,13 +350,11 @@ class uCMS_View extends uSingleDataModule {
 		}
 		if (!$rec) $rec = $this->GetRecord($this->GetDataset(),0);
 		return $rec['title'];
-		//return $rec['nav_text'] ? $rec['nav_text'] : $rec['title'];
 	}
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','cms_id');
 		$this->AddField('title','title','cms','title');
-//		$this->AddField('is_homepage','is_homepage','cms');
 		$this->AddField('updated','updated','cms');
 		$this->AddField('parent','parent','cms','Parent');
 		$this->AddField('position','position','cms','position');
@@ -364,25 +362,16 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('description','description','cms','description');
 		$this->AddField('content','content','cms','content');
-    $this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
+		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
 		$this->AddFilter('cms_id',ctEQ);
-//		$this->AddFilter('is_homepage',ctLIKE);
 	}
 
 	public function SetupParents() {
 		$this->AddParent('/');
-		//$this->SetRewrite('{cms_id}');
-	//	$this->RegisterAjax('showCMS',array($this,'showCMS'));
 		uDataBlocks::AddStaticBlock('page_updated','uCMS_View::last_updated');
 	}
-//	public function showCMS() {
-//		utopia::UseTemplate();
-//		$page = self::findPage();
-//		echo '{cms.'.$page['cms_id'].'}';
-//		utopia::Finish();
-//	}
 
 	static function GetHomepage() {
 		$row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
