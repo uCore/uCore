@@ -17,6 +17,10 @@ class tabledef_CMS extends uTableDef {
     $this->AddField('description',ftVARCHAR,150); // google only shows 150 chars in description
     $this->AddField('content',ftTEXT);
 
+    $this->AddField('updated',ftTIMESTAMP);
+    $this->SetFieldProperty('updated','extra','ON UPDATE CURRENT_TIMESTAMP');
+    $this->SetFieldProperty('updated','default','current_timestamp');
+
     $this->SetPrimaryKey('cms_id');
     $this->SetFieldProperty('position','default',999);
   }
