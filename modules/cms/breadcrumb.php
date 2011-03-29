@@ -33,8 +33,10 @@ class uBreadcrumb {
 		foreach ($out as $k => $v) {
 			$build[] = '<a href="'.$k.'">'.$v.'</a>';
 		}
+		$build = array_unique($build);
+		if (count($build) <= 1) return '';
 
-		return '<div class="breadcrumb">'.implode(' &gt; ',array_reverse(array_unique($build))).'</div>';
+		return '<div class="breadcrumb">'.implode(' &gt; ',array_reverse($build)).'</div>';
 	}
 }
 
