@@ -34,6 +34,7 @@ class uCMS_List extends uDataModule {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID');
 //		$this->AddField('is_homepage','is_homepage','cms','Home',itCHECKBOX);
+		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('parent','parent','cms','Parent');
 		$this->AddField('position','position','cms','position');
 		$this->AddField('title','title','cms','Page Title');

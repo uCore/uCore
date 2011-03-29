@@ -25,9 +25,9 @@ class uBreadcrumb {
 			$out[$url] = $row['title'];//'<a href="'.$url.'">'.$row['title'].'</a>';
 		} while ($row['parent'] && ($row = uCMS_List::findKey($arr,$row['parent'])));
 
-		$home = uCMS_View::GetHomepage();
-		$url = CallModuleFunc('uCMS_View','GetURL',$home['cms_id']);
-		$out[$url] = $home['title'];//'<a href="'.$url.'">'.$home['title'].'</a>';
+//		$home = uCMS_View::GetHomepage();
+//		$url = CallModuleFunc('uCMS_View','GetURL',$home['cms_id']);
+//		$out[$url] = $home['title'];//'<a href="'.$url.'">'.$home['title'].'</a>';
 
 		$build = array();
 		foreach ($out as $k => $v) {
