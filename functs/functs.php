@@ -177,7 +177,8 @@ function get_include_contents($filename) {
 }
 
 function array_sort_subkey(&$array,$key,$direction='<') {
-	$func = create_function('$a,$b','$c1 = $a["'.$key.'"]; $c2 = $b["'.$key.'"]; if ($c1 == $c2) return 0;  return $c1 '.$direction.' $c2 ? -1 : 1;');
+	$key = is_string($key) ? "'$key'" : $key;
+	$func = create_function('$a,$b','$c1 = $a['.$key.']; $c2 = $b['.$key.']; if ($c1 == $c2) return 0;  return $c1 '.$direction.' $c2 ? -1 : 1;');
 	uasort($array,$func);
 }
 
