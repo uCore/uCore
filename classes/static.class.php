@@ -258,8 +258,7 @@ class utopia {
 				$out .= "<textarea $attr>$defaultValue</textarea>";
 				break;
 			case itCOMBO:
-				//				if (empty($possibleValues)) { ErrorLog('Combo field specified but no possible values found'); return; }
-				//				if (is_array($possibleValues)) { // array of combos
+				if (empty($possibleValues)) $possibleValues = array();
 				$defaultExists = false;
 				$blankKey = array_search('',$possibleValues);
 				if ($blankKey === FALSE) $blankKey = '&nbsp;';
