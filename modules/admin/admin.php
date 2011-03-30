@@ -88,28 +88,7 @@ class internalmodule_Admin extends uBasicModule {
 		die('window.location.reload();');
 	}
 
-	public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
-		if (!flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return;
-		if (isset($_REQUEST['__ajax'])) return;
-
-		if (internalmodule_AdminLogin::IsLoggedIn()) {
-			$arr = array();
-			$children = utopia::GetChildren('internalmodule_Admin');
-			foreach ($children as $links) {
-				foreach ($links as $child) {
-					if ($child['fieldLinks']) continue;
-					$opts = CallModuleFunc($child['moduleName'],'GetOptions');
-					if (!flag_is_set($opts,IS_ADMIN) || flag_is_set($opts,NO_NAV) || GetModuleVar($child['moduleName'],'isDisabled')) continue;
-					$url = CallModuleFunc($child['moduleName'],'GetURL');
-					$title = CallModuleFunc($child['moduleName'],'GetTitle');
-					if (!$url || !$title) continue;
-					$arr[] = "<a class=\"btn\" href=\"$url\">$title</a>";
-				}
-			}
-			echo '<ul id="adminButtons"><li>'.implode('</li><li>',$arr).'</li></ul>';
-		}
-	}
+	public function ParentLoad($parent) { }
 
 	static function compareVersions($ver1,$ver2) {
 		if ($ver1 == $ver2) return 0;

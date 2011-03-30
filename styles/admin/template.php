@@ -13,6 +13,7 @@
 </div>
 
 <div id="maincontent">
+{UTOPIA.modlinks}
 {UTOPIA.content}
 </div>
 
