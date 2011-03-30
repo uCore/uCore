@@ -370,7 +370,6 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	public function SetupParents() {
-		$this->AddParent('/');
 		uDataBlocks::AddStaticBlock('page_updated','uCMS_View::last_updated');
 	}
 
@@ -406,15 +405,7 @@ class uCMS_View extends uSingleDataModule {
 		return false;
 	}
 
-//	public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
-/*		$rows = $this->GetRows(array('cms_id'=>NULL));
-		foreach ($rows as $row) {
-			if ($row['nav_position'] !== '') {
-				utopia::LinkList_Add('navbar', $row['nav_text'] ? $row['nav_text'] : $row['title'], $this->GetURL(array('cms_id'=>$row['cms_id'])),$row['nav_position']);
-			}
-		}*/
-	}
+	public function ParentLoad($parent) { }
 	public function RunModule() {
 		// custom home breadcrumb
 		//breadcrumb::ShowHome(false);

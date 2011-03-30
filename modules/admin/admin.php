@@ -33,8 +33,8 @@ class internalmodule_Admin extends uBasicModule {
 		return PATH_REL_CORE.'index.php';
 	}
 	public function SetupParents() {
-		$this->AddParent('*');
-		$this->AddParent('internalmodule_Admin');
+		$this->AddParent('/');
+//		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->RegisterAjax('toggleQ',array($this,'toggleQ'));
 //		$this->RegisterAjax('optimizeTables',array($this,'optimizeTables'),false);
