@@ -683,7 +683,7 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function GetSortOrder() {
 		//if (is_object($module)) $module = get_class($module);
 //		if (get_class($this) == GetCurrentModule()) return 1;
-		return NULL;
+		return 0;
 	}
 	//	public function __construct() { $this->_SetupFields(); } //$this->SetupParents(); }
 	public abstract function ParentLoad($parent); // called when current_path = parent_path
