@@ -27,12 +27,13 @@ class utopia {
  // static $gc_cache = array();
 	static function GetChildren($parent) {
 //	  if (isset(self::$gc_cache[$parent]) && self::$gc_cache[$parent]) return self::$gc_cache[$parent];
-    
+
 		$specific      = (isset(self::$children[$parent]))     ? self::$children[$parent] : array();
 		$currentModule = ($parent == GetCurrentModule() && isset(self::$children['/'])) ? self::$children['/'] : array();
+		$baseModule    = ($parent == 'uCMS_View' && (uCMS_View::findPage() == uCMS_View::GetHomepage()) && isset(self::$children[''])) ? self::$children[''] : array();
 		$catchAll      = (isset(self::$children['*'])) ? self::$children['*'] : array();
 
-		$arr = array_merge($specific,$currentModule,$catchAll);
+		$arr = array_merge($specific,$currentModule,$baseModule,$catchAll);
  //   self::$gc_cache[$parent] = $arr;
 		return $arr;
 	}

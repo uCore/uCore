@@ -3,7 +3,6 @@ include_once('interfaces.php');
 
 //-- debugging
 //define('SHOW_QUERY'		,false);
-define('BASE_MODULE','uCMS_View');
 
 //--  InputType
 define('itNONE'		,'');
@@ -354,9 +353,6 @@ abstract class uBasicModule implements iUtopiaModule {
 	 * @param string optional $text
 	 */
 	public function AddParent($parentModule,$fieldLinks=NULL,$parentField=NULL,$text=NULL) {
-		if ($parentModule === '') $parentModule = BASE_MODULE;
-		//elseif ($parentModule === '/') $parentModule = GetCurrentModule();
-
 		if (is_string($fieldLinks)) $fieldLinks = array(array('fromField'=>$fieldLinks,'toField'=>$fieldLinks,'ct'=>ctEQ));
 		if (is_array($fieldLinks) && !array_key_exists(0,$fieldLinks)) {
 			if (array_key_exists('fromField',$fieldLinks) && array_key_exists('toField',$fieldLinks)) {
