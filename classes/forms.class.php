@@ -1662,18 +1662,20 @@ abstract class uDataModule extends uBasicModule {
 			case itSUGGEST:
 			case itSUGGESTAREA:
 				//				ErrorLog("filter on $fieldName setting values to ''");
-				$values = '';
+				$values = $this->FindValues($fieldName,true); //'';
 			default:
 				break;
 		}
 
-
-		$vals = $this->FindValues($fieldName,$values,!is_array($values));
-		if ($value !== NULL && is_array($vals) && !array_key_exists($value,$vals)) {
-			$checkVals = $this->FindValues($fieldName,$values);
-			if (!array_key_exists($value,$checkVals)) $checkVals = array_flip($checkVals);
-			if (array_key_exists($value,$checkVals)) $value = $checkVals[$value];
+		if (is_string($values)) {
+			$values = $this->FindValues($fieldName,$values);
 		}
+		//$vals = $this->FindValues($fieldName,$values,!is_array($values));
+		//if ($value !== NULL && is_array($vals) && !array_key_exists($value,$vals)) {
+		//	$checkVals = $this->FindValues($fieldName,$values);
+		//	if (!array_key_exists($value,$checkVals)) $checkVals = array_flip($checkVals);
+		//	if (array_key_exists($value,$checkVals)) $value = $checkVals[$value];
+		//}
 
 
 		/*		if ($inputType == itCOMBO) {
@@ -1724,7 +1726,7 @@ abstract class uDataModule extends uBasicModule {
 		$fieldData['uid'] = $uid;
 
 		$fieldData['title']= $title;
-		$fieldData['values']= $vals;
+		$fieldData['values']= $values;
 		$fieldData['default'] = $dvalue;
 		$fieldData['value'] = $value;
 
@@ -1879,7 +1881,7 @@ abstract class uDataModule extends uBasicModule {
 		foreach ($this->filters as $ftypeID => $filterType) {
 			if ($set != NULL && $ftypeID !== $set) continue;
 			foreach ($filterType as $fsetID => $filterset) {
-				foreach ($filterset as $arrID => $filterInfo) {
+				if (is_array($filterset)) foreach ($filterset as $arrID => $filterInfo) {
 					if ($filterInfo['fieldName'] === $fieldName && ($compareType === NULL || $filterInfo['ct'] === $compareType) && ($inputType === NULL || $filterInfo['it'] === $inputType)) {
 						//						echo "found filter matching ($fieldName $compareType $inputType) at ($uid)<br/>";
 						return $this->filters[$ftypeID][$fsetID][$arrID];
