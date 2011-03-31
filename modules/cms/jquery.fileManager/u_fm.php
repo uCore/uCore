@@ -1,6 +1,7 @@
 <?php
 define('itFILEMANAGER' ,'fileman');
 class fileManager extends uBasicModule {
+	public function GetSortOrder() { return 10; }
 	function GetTitle() {
 		return 'File Manager';
 	}
@@ -71,7 +72,7 @@ FIN
 
 		$out = ob_get_contents();
 		ob_end_clean();
-		utopia::Tab_Add($this->GetTitle(),$out,$tabGroupName,false);
+		utopia::Tab_Add($this->GetTitle(),$out,$tabGroupName,false,$this->GetSortOrder());
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 	static function OnRename($from,$to) {

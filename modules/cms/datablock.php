@@ -20,6 +20,7 @@ class tabledef_DataBlocks extends uTableDef {
 class uDataBlocks_List extends uListDataModule {
   public function GetTitle() { return 'Data Blocks'; }
   public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER; }
+  public function GetSortOrder() { return 1; }
   public function GetTabledef() { return 'tabledef_DataBlocks'; }
   public function SetupFields() {
     $this->CreateTable('blocks');
