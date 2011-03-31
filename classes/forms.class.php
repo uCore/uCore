@@ -1283,7 +1283,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function GetValues($alias) {
 		if (!isset($this->fields[$alias])) {
-                        $fltr = $this->FindFilter($aliasName);
+                        $fltr = $this->FindFilter($alias);
                         return $fltr['values'];
 		}
 
