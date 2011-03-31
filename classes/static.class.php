@@ -408,7 +408,7 @@ class utopia {
 		self::$tabGroups[$tabGroup] = array();
 		return $tabGroup;
 	}
-	static function Tab_Add($tabTitle,$tabContent,$tabGroup=NULL,$isURL=false,$order=NULL) {
+	static function Tab_Add($tabTitle,$tabContent,$tabGroup=NULL,$isURL=false,$order=0) {
 		//if ($order === NULL) $order = self::$tabOrderCount;
 		//self::$tabOrderCount++;
 		//echo "Added Tab: $tabTitle - $order<br>";
