@@ -36,7 +36,7 @@ class modLinks extends uBasicModule {
 
 		array_sort_subkey($arr,2);
 		$out = array();
-		foreach ($arr as $link) $out[] = '<li><a class="btn" href="'.$link[1].'">'.$link[0].'</a></li>';
+		foreach ($arr as $link) $out[] = '<li><a href="'.$link[1].'">'.$link[0].'</a></li>';
 		if ($arr) utopia::SetVar('modlinks','<ul id="modlinks">'.implode('',$out).'</ul>');
 	}
 

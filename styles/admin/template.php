@@ -17,5 +17,8 @@
 {UTOPIA.content}
 </div>
 
+<script>
+$('#modlinks a').button();
+</script>
 </body>
 </html>
