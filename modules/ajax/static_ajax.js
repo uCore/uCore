@@ -68,13 +68,11 @@ $(document).ready(function(){
       // else append to end.
       order['_s_'+mID] = currentSort + ', '+fieldname;
     }
-    ReloadWithForm(order);
+    ReloadWithItems(order);
   });
 
 	$(window).bind("beforeunload", function(){ uf=null; });
 //	$(window).unload(function () { alert('unloading'); uf=null; });
-	//$('<form style="display:none" id="internal_FuF" method="get" action="">'+(gup('uuid')!='' ? '<input type="hidden" name="uuid" value="'+gup('uuid')+'" />' : '')+'</form>').appendTo('body');
-  $('<form style="display:none" id="internal_FuF" method="get" action="'+window.location.pathname+'"></form>').appendTo('body');
   $(".uFilter").each(function() {
 		FilterOnLeave(this);
 		$(this).bind('click', function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
@@ -412,8 +410,6 @@ function ReloadFilters() {
 	//var oldVal;
 	var updated = false;
 	//var processed = new Array();
-//	if (!empty(gup('uuid')))
-//		$('#internal_FuF').append('<input type="hidden" name="uuid" value="'+gup('uuid')+'">');
 	
 	$(".uFilter").each(function () {
 		var name = $(this).attr('name');
@@ -436,19 +432,17 @@ function ReloadFilters() {
 		//console.log(name,'o:'+oldVal,'n:'+newVal);
 		if (valHasChanged) { updated = true;
 		//if (!empty(newVal))
-		newFilters[name] = newVal;// $('#internal_FuF').append('<input type="hidden" name="'+name+'" value="'+newVal+'">');
+		newFilters[name] = newVal;
 		}
 	});
 //console.log(updated,newFilters);
 	if (!updated) return;
 	// need to track existing filters, if they dont have a filter box then we must re-add them
 
-	ReloadWithForm(newFilters);
+	ReloadWithItems(newFilters);
 }
 
-function ReloadWithForm(items, ignoreCurrent) {
-  $("#internal_FuF").empty();
-  //console.log('before',items);
+function ReloadWithItems(items, ignoreCurrent) {
   if (!ignoreCurrent) {
     arr = window.location.search.substr(1).split('&');
     $(arr).each(function () {
@@ -457,28 +451,19 @@ function ReloadWithForm(items, ignoreCurrent) {
       var val = decodeURIComponent(arr[1].replace(/\+/g,' '));
       if (empty(name)) return;
       if (typeof(items[name]) !== 'undefined') return;
-  //    for (i in processed) if (processed[i] == name) return;
-  //    if (name.toLowerCase() == 'uuid')
-  //      newFilters[name] = val;//$('#internal_FuF').prepend('<input type="hidden" name="'+name+'" value="'+val+'">');
-  //    else
-        items[name] = val;//$('#internal_FuF').append('<input type="hidden" name="'+name+'" value="'+val+'">');
+        items[name] = val;
     });
   }
-  //console.log('after',items);
+  var newQS = '';
   for (i in items) {
     if (!items[i]) continue;
     if (i.toLowerCase() == 'uuid') // always put uuid first
-      $('#internal_FuF').prepend('<input type="hidden" name="'+i+'" value="'+items[i]+'">');
+      newQS = i + '=' + items[i] + '&' + newQS;
     else
-      $('#internal_FuF').append('<input type="hidden" name="'+i+'" value="'+items[i]+'">');
+      newQS = newQS + i + '=' + items[i] + '&';
   }
-  
-	if ($("#internal_FuF").children().length == 0) {
-		window.location.assign(window.location.pathname+window.location.hash);
-	} else {
-		//$("#internal_FuF").attr('action',($("#internal_FuF").attr('action') ? $("#internal_FuF").attr('action') :'') +window.location.hash);
-		$("#internal_FuF").submit();
-	}
+  if (newQS != '') newQS = '?' + newQS;
+  window.location.assign(window.location.pathname+newQS+window.location.hash);
 }
 
 /*
