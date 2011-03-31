@@ -1320,12 +1320,12 @@ abstract class uDataModule extends uBasicModule {
 			}
 			$arr = array_flip($arr);
 			$stringify = true;
-		} elseif ($values===true && $this->fields[$aliasName]['vtable']) {
+		} elseif (($values===true || is_string($values)) && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$pk = CallModuleFunc($tbl['tModule'],'GetPrimaryKey');
 			$table = $tbl['table'];
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
-			if ($table === TABLE_PREFIX.$this->GetTabledef()) $arr = array_combine(array_keys($arr),array_keys($arr));
+			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) $arr = array_combine(array_keys($arr),array_keys($arr));
 		}
 
 		if (is_array($arr) && $stringify)
