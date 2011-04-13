@@ -52,25 +52,17 @@ class internalmodule_Admin extends uBasicModule {
 
 		$db_name = SQL_DBNAME;
 		echo "Database : $db_name \n";
-		$res = sql_query("SHOW TABLE STATUS FROM `" . $db_name . "`") or die('Query : ' . mysql_error());
-		$to_optimize = array();
-		while ( $rec = mysql_fetch_array($res) ) {
-			if ( $rec['Data_free'] > 0 ) {
-				$to_optimize [] = $rec['Name'];
-				echo $rec['Name'] . ' needs optimization' . "\n";
-			}
+		$res = sql_query("SHOW TABLES FROM `" . $db_name . "`") or die('Query : ' . mysql_error());
+		while ( $rec = mysql_fetch_row($res) ) {
+			sql_query('OPTIMIZE TABLE `'.$rec[0].'`');
 		}
-		if ( count ( $to_optimize ) > 0 ) foreach ( $to_optimize as $tbl )
-			sql_query("OPTIMIZE TABLE `" . $tbl ."`");
-		else
-			echo "No tables require optimization.\n";
 
 		$time = microtime();
 		$time = explode(' ', $time);
 		$time = $time[1] + $time[0];
 		$finish = $time;
 		$total_time = round(($finish - $start), 6);
-		echo "\nParsed in $total_time secs\n</pre>";
+		echo "\nTables optimised in $total_time secs\n</pre>";
 	}
 
 	public function toggleT() {
@@ -187,7 +179,9 @@ FIN;
 
 		$installed = InstallAllModules();
 		echo '<h3 style="cursor:pointer" onclick="$(\'#modulesList\').toggle();">Installed Modules</h3><div id="modulesList" style="display:none"><pre>'.join("\n",$installed).'</pre></div>';
-		$this->optimizeTables();
+		
+		echo '<a href="?optimise=1">Optimise Tables</a>';
+		if (isset($_GET['optimise'])) $this->optimizeTables();
 	}
 }
 ?>
