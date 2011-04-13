@@ -132,7 +132,7 @@ FIN;
 				foreach ($info['type'] as $k => $v) {
 					$selected = (($assoc ? $k : $v) == $val) ? ' selected="selected"' : '';
 					$selVal = $assoc ? ' value="'.$k.'"' : '';
-					echo '<option'.$selVal.'>'.$v.'</option>';
+					echo '<option'.$selected.$selVal.'>'.$v.'</option>';
 				}
 				echo '</select></td>';
 			} else {

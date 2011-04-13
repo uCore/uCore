@@ -29,6 +29,7 @@ define('SQL_NULL'			,'null');
 define('SQL_NOT_NULL'		,'not null');
 
 uConfig::AddConfigVar('TABLE_PREFIX','Table Prefix','');
+uConfig::AddConfigVar('MYSQL_ENGINE','MySQL Engine','InnoDB',array('InnoDB','MyIASM'));
 
 function getSqlTypeFromFieldType($fieldType) {
 	switch ($fieldType) {
@@ -191,7 +192,8 @@ abstract class uTableDef implements iUtopiaModule {
 			sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename);
 
 		// checksum
-		$checksum = sha1(print_r($this->fields,true));
+		$engine = MYSQL_ENGINE;
+		$checksum = sha1($engine.print_r($this->fields,true));
 		if ($this->checksumValid($checksum)) return;
 		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `name` = \''.$this->tablename.'\', `checksum` = \''.$checksum.'\'');
 
@@ -280,6 +282,7 @@ abstract class uTableDef implements iUtopiaModule {
 				$alterArray[] = "\nADD UNIQUE ($val)";
 			}
 
+			sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE=$engine");
 			array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
 			//echo "ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";";
 			//sql_query("ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
