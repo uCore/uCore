@@ -264,6 +264,7 @@ function RunModule($module = NULL) {
 function InstallAllModules() {
   // TABLE CHANGE CHECKER
   sql_query('CREATE TABLE IF NOT EXISTS __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40))');
+  sql_query('ALTER TABLE __table_checksum ENGINE='.MYSQL_ENGINE);
 //  $r = sql_query('SHOW TABLES LIKE \'__table_checksum\'');
 //  if (!mysql_num_rows($r)) {
     // create internal table check
