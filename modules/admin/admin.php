@@ -30,7 +30,8 @@ class internalmodule_Admin extends uBasicModule {
 
 	public function GetSortOrder() { return -100; }
 	public function GetURL($filters = NULL, $encodeAmp = false) {
-		return PATH_REL_CORE.'index.php';
+		$qs = $filters ? '?'.http_build_query($filters) : '';
+		return PATH_REL_CORE.'index.php'.$qs;
 	}
 	public function SetupParents() {
 		$this->AddParent('/');

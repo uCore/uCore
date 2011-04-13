@@ -1,6 +1,6 @@
 <?php
 include_once('start.php');
-if (!$_SERVER['QUERY_STRING'])
+if (!isset($_GET['uuid']));
 	return RunModule('internalmodule_Admin');
 RunModule();
 ?>
