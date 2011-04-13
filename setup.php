@@ -130,6 +130,7 @@ FIN;
 				$assoc = is_assoc($info['type']);
 				echo '<td><select name="'.$key.'">';
 				foreach ($info['type'] as $k => $v) {
+					$selected = (($assoc ? $k : $v) == $val) ? ' selected="selected"' : '';
 					$selVal = $assoc ? ' value="'.$k.'"' : '';
 					echo '<option'.$selVal.'>'.$v.'</option>';
 				}
