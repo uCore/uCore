@@ -249,8 +249,8 @@ function GetCurrentModule() {
 
 function RunModule($module = NULL) {
 	if ($module == NULL) $module = GetCurrentModule();
-	
-	if (!utopia::ModuleExists($module,true)) {
+
+	if (!utopia::ModuleExists($module)) {
 		utopia::PageNotFound();
 	}
 	utopia::SetVar('current_module',$module);
