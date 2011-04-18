@@ -579,12 +579,11 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (!is_array($filters)) $filters = array();
 
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
+		$filters['uuid'] = $uuid;
 		if (isset($filters['uuid']) && $filters['uuid'] !== $uuid) {
 			$m = utopia::UUIDExists($filters['uuid']);
 			if ($m) return CallModuleFunc($m['module_name'],'GetURL',$filters);
 		}
-
-		$filters['uuid'] = $uuid;
 
 		$url = DEFAULT_FILE;
 		if ($this->rewriteMapping !== NULL)
