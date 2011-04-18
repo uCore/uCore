@@ -28,7 +28,7 @@ class internalmodule_Admin extends uBasicModule {
 	public function GetTitle() { return 'Admin Home'; }
 	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
 
-	public function GetSortOrder() { return -100; }
+	public function GetSortOrder() { return -10000; }
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 		$qs = $filters ? '?'.http_build_query($filters) : '';
 		return PATH_REL_CORE.'index.php'.$qs;

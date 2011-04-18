@@ -33,6 +33,21 @@ class uAdminUsersList extends uListDataModule {
 	}
 }
 
+class adminLogout extends uBasicModule {
+        public function GetTitle() { return 'Logout'; }
+        public function GetOptions() { return IS_ADMIN; }
+	public function GetSortOrder() { return -9999;}
+        public function SetupParents() {
+                $this->AddParent('/');
+        }
+	public function ParentLoad($parent) {}
+        public function RunModule() {
+		unset($_SESSION['admin_auth']);
+		header('Location: '.CallModuleFunc('internalmodule_Admin','GetURL'));
+		die();
+	}
+}
+
 class internalmodule_AdminLogin extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Login'; }
@@ -45,7 +60,6 @@ class internalmodule_AdminLogin extends uDataModule {
 	}
 
 	public function SetupParents() {
-		$this->RegisterAjax('adminLogout',array($this,'AdminLogout'));
 		$this->AddParent('/');
 
 		// admin account has not been set up, redirect to config.
@@ -75,11 +89,6 @@ class internalmodule_AdminLogin extends uDataModule {
 		}
 	}
   
-	public function AdminLogout() {
-		unset($_SESSION['admin_auth']);
-		die('window.location.reload();');
-	}
-
 	public static function IsLoggedIn($authType = NULL) {
 		if (!isset($_SESSION['admin_auth'])) return false;
 		if ($authType === NULL) return true;
