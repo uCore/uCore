@@ -241,7 +241,7 @@ function _LoadChildren($withParent = NULL,$tiers=1) {
 
 function GetCurrentModule() {
 	if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
-	if (!array_key_exists('uuid',$_GET)) return 'uCMS_View';
+	if (!isset($_GET['uuid'])) return 'uCMS_View';
 
 	$m = utopia::UUIDExists($_GET['uuid']);
 	return $m['module_name'];
