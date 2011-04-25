@@ -1,9 +1,9 @@
 <?php
 class uPlupload {
 	static function Init($jsVarName,$uploadPath) {
-		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/plupload.full.min.js'));
-		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.min.js'));
-		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload.css'));
+		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/plupload.full.js'));
+		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload/jquery.ui.plupload.js'));
+		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.ui.plupload/css/jquery.ui.plupload.css'));
 
 		$pathCore = PATH_REL_CORE;
 		uJavascript::AddText(<<<FIN

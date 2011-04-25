@@ -68,7 +68,7 @@ FIN
 			uPlupload::Init($jsOptionVar,$pathUpload);
 			$includeOpts = ','.$jsOptionVar;
 		}
-		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',events:{dblclick:dclick}}$includeOpts);});");
+		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:dclick}}$includeOpts);});");
 
 		$out = ob_get_contents();
 		ob_end_clean();

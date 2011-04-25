@@ -63,6 +63,13 @@ class module_TinyMCE extends uBasicModule {
 			$richOpts = json_encode($richOpts);
 			$htmlOpts = json_encode($htmlOpts);
 
+			$includeOpts = '';
+			if (class_exists('uPlupload')) {
+				$jsOptionVar = 'pluploadOptions';
+				uPlupload::Init($jsOptionVar,$fileManagerPath);
+				$includeOpts = ','.$jsOptionVar;
+			}
+
 			utopia::AppendVar('script_include',<<< FIN
 	function updateMCE(className,hourglass) {
 		var field = $("."+className);
@@ -76,7 +83,7 @@ class module_TinyMCE extends uBasicModule {
 		if (type == 'image')
 			fltr = '.jpeg|.jpg|.png|.gif|.tif|.tiff';
 
-		mb.fileManager({ajaxPath:'$fileManagerPath',get:{filter:fltr},mceInfo:{field_name:field_name,win:win,type:type},events:{click:doClick}},pluploadOptions);
+		mb.fileManager({ajaxPath:'$fileManagerPath',upload:true,get:{filter:fltr},mceInfo:{field_name:field_name,win:win,type:type},events:{click:doClick}}$includeOpts);
 		mb.dialog({modal:false,width:'60%',height:500,zIndex:999999});
 	}
 	function doClick(event) {
