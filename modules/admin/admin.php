@@ -177,8 +177,11 @@ FIN;
 		echo 'PATH_ABS_CONFIG: '.PATH_ABS_CONFIG.'<br>';
 		echo '</pre>';
 
-		$installed = InstallAllModules();
-		echo '<h3 style="cursor:pointer" onclick="$(\'#modulesList\').toggle();">Installed Modules</h3><div id="modulesList" style="display:none"><pre>'.join("\n",$installed).'</pre></div>';
+		$installed = utopia::GetModules();
+		echo '<h3 style="cursor:pointer" onclick="$(\'#modulesList\').toggle();">Installed Modules</h3><div id="modulesList" style="display:none"><pre>';
+		foreach ($installed as $m)
+			echo $m['module_name']."\n";
+		echo '</pre></div>';
 		
 		echo '<a href="?optimise=1">Optimise Tables</a>';
 		if (isset($_GET['optimise'])) $this->optimizeTables();

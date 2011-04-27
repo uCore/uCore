@@ -13,22 +13,26 @@ class modLinks extends uBasicModule {
 	public function ParentLoad($parent) {
 		$arr = array();
 
-		$admin = flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN);
+		$parentObj = utopia::GetInstance($parent);
+		$admin = flag_is_set($parentObj->GetOptions(),IS_ADMIN);
 		$isadmin = internalmodule_AdminLogin::IsLoggedIn();
 		$children = utopia::GetChildren($parent);
 		foreach ($children as $links) {
 			foreach ($links as $child) {
 				if ($child['fieldLinks']) continue;
-				$opts = CallModuleFunc($child['moduleName'],'GetOptions');
+
+				$obj = utopia::GetInstance($child['moduleName']);
+				if ($obj->isDisabled) continue;
+
+				$opts = $obj->GetOptions();
 				if (flag_is_set($opts,NO_NAV)) continue;
 				if (!$admin && flag_is_set($opts,IS_ADMIN)) continue;
 				if (!flag_is_set($opts,IS_ADMIN) && $admin) continue;
 				if (flag_is_set($opts,IS_ADMIN) && !$isadmin) continue;
-				if (GetModuleVar($child['moduleName'],'isDisabled')) continue;
 
-				$order = CallModuleFunc($child['moduleName'],'GetSortOrder');
-				$url = CallModuleFunc($child['moduleName'],'GetURL');
-				$title = CallModuleFunc($child['moduleName'],'GetTitle');
+				$order = $obj->GetSortOrder();
+				$url = $obj->GetURL();
+				$title = $obj->GetTitle();
 				if (!$url || !$title) continue;
 				$arr[] = array($title,$url,$order,$child['moduleName']);
 			}

@@ -128,21 +128,9 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function Initialise() {
 		if ($this->isInitialised === TRUE) return false;
 		$this->isInitialised = true;
-		//		if (!array_key_exists('last_module',$_SESSION)) $_SESSION['last_module'] = NULL;
-		//		if (array_key_exists('this_module',$_SESSION) && GetCurrentModule() != $_SESSION['this_module'])
-		//			$_SESSION['last_module'] = $_SESSION['this_module'];
-		//		$_SESSION['this_module'] = GetCurrentModule();
-
 
 		// setup parents
-		//timer_start('PARENTS:'.get_class($this));
 		$this->_SetupParents();
-		//timer_end('PARENTS:'.get_class($this));
-		// setup fields
-		//		$this->SetupFields(); // must be done in data subclass
-		// init parents?
-		//		foreach ($this->parents as $parentModule => $parent)
-		//			CallModuleFunc($parentModule,'Initialise');
 		return true;
 	}
 
@@ -169,26 +157,18 @@ abstract class uBasicModule implements iUtopiaModule {
 		// already loaded for this parent?
 		//if (array_key_exists($parent,$this->parentLoaded)) return false;
 
-//ErrorLog(get_class($this).': can1 '.(GetModuleVar($parent,'hasRun') ? 1:0).$this->ParentLoadPoint());
-	//	utopia::CancelTemplate();
-//echo $parent.' '.get_class($this);
-		if ($parent == GetCurrentModule()) return GetModuleVar($parent,'hasRun') == $this->ParentLoadPoint();
-//ErrorLog(get_class($this).': can2');
+		$parentObj = utopia::GetInstance($parent);
 
-		//echo "$parent ".(GetModuleVar($parent,'hasRun')?'Run':'noRun').' '.get_class($this).'='.$this->ParentLoadPoint()."<br/>";#
+		if ($parent == GetCurrentModule()) return $parentObj->hasRun == $this->ParentLoadPoint();
+
 		// parent is child itself, if we're not persistant, dont load
 		if (!flag_is_set($this->GetOptions(), PERSISTENT_PARENT)) return false;
-//ErrorLog(get_class($this).': can3');
 
 		// we are persistent, so check if our loadpoint matches the parents loaded state.
-		$activeParent = GetModuleVar($parent, 'activeParent');
-		$ploaded = GetModuleVar($parent, 'parentLoaded');
-	//	echo $activeParent;
-	//	print_r($ploaded);
-		//die();
-		return (array_key_exists($activeParent,$ploaded) && $ploaded[$activeParent] === 1) == $this->ParentLoadPoint();
+		$activeParent = $parentObj->activeParent;
+		$ploaded = $parentObj->parentLoaded;
 
-//		return true;
+		return (array_key_exists($activeParent,$ploaded) && $ploaded[$activeParent] === 1) == $this->ParentLoadPoint();
 	}
 
 	public function ParentLoadPoint() { return 1; }
@@ -266,7 +246,8 @@ abstract class uBasicModule implements iUtopiaModule {
 		for ($i = 0;$i<$size;$i++) {
 			//echo 'RUNNING: '.$child.' for '.get_class($this).'<br/>';
 			$child = $keys[$i];
-			$result = CallModuleFunc($child,'_ParentLoad',$class);
+			$obj = utopia::GetInstance($child);
+			$result = $obj->_ParentLoad($class);
 			if ($result === FALSE) return FALSE;
 			if (is_numeric($result) && $result > 0) return $result -1;
 		}
@@ -432,7 +413,8 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function AddChild($childModule,$fieldLinks=NULL,$parentField=NULL,$text=NULL) {
 		//$childModule = (string)$childModule;
 		//echo "addchild $childModule<br/>";
-		CallModuleFunc($childModule,'AddParent',get_class($this),$fieldLinks,$parentField,$text);
+		$obj = utopia::GetInstance($childModule);
+		$obj->AddParent(get_class($this),$fieldLinks,$parentField,$text);
 	}
 
 	/**
@@ -582,7 +564,10 @@ abstract class uBasicModule implements iUtopiaModule {
 		$filters['uuid'] = $uuid;
 		if (isset($filters['uuid']) && $filters['uuid'] !== $uuid) {
 			$m = utopia::UUIDExists($filters['uuid']);
-			if ($m) return CallModuleFunc($m['module_name'],'GetURL',$filters);
+			if ($m) {
+				$obj = utopia::GetInstance($m['module_name']);
+				return $obj->GetURL($filters);
+			}
 		}
 
 		$url = DEFAULT_FILE;
@@ -710,22 +695,24 @@ abstract class uBasicModule implements iUtopiaModule {
 	//	$lm = utopia::GetVar('loadedModules',array());
 	//	foreach ($this->parents as $parentName => $linkArray) {
 //			$parentName = $linkArray['moduleName'];
-			if (flag_is_set(CallModuleFunc(get_class($this),'GetOptions'),NO_NAV)) return;
+			if (flag_is_set($this->GetOptions(),NO_NAV)) return;
 	//		if (array_search($this,$lm,true) === FALSE) continue;
 
-			if (($parentName != 'internalmodule_Admin' && flag_is_set(CallModuleFunc(GetCurrentModule(),'GetOptions'),IS_ADMIN)) && $parentName != GetCurrentModule()) return;
+			$cModuleObj = utopia::GetInstance(GetCurrentModule());
+			if (($parentName != 'internalmodule_Admin' && flag_is_set($obj->GetOptions(),IS_ADMIN)) && $parentName != GetCurrentModule()) return;
 			//echo get_class($this).' '.$parentName.'<br/>';
 
-			if (flag_is_set(CallModuleFunc($parentName,'GetOptions'),IS_ADMIN) && !flag_is_set(CallModuleFunc(GetCurrentModule(),'GetOptions'),IS_ADMIN)) return;
+			$parentObj = utopia::GetInstance($parentName);
+			if (flag_is_set($parentObj->GetOptions(),IS_ADMIN) && !flag_is_set($cModuleObj->GetOptions(),IS_ADMIN)) return;
 
-//			if (flag_is_set(CallModuleFunc(GetCurrentModule(),'GetOptions'),IS_ADMIN) /*&& flag_is_set($this->GetOptions(),IS_ADMIN)*/ && !flag_is_set(CallModuleFunc($parentName,'GetOptions'),IS_ADMIN)) continue;
+//			if (flag_is_set($cModuleObj->GetOptions(),IS_ADMIN) && !flag_is_set($parentObj->GetOptions(),IS_ADMIN)) continue;
 
 			$linkArray = $this->parents[$parentName];
 			foreach ($linkArray as $linkInfo) {
 				if ($linkInfo['parentField'] !== NULL) continue; // has a parentField?  if so, ignore
 				$btnText = !empty($linkInfo['text']) ? $linkInfo['text'] : $this->GetTitle();
 				if (!empty($linkInfo['fieldLinks']) && GetCurrentModule()) { // is linked to fields in the list
-					$cr = CallModuleFunc(GetCurrentModule(),'GetCurrentRecord');
+					$cr = $cModuleObj->GetCurrentRecord();
 					if (is_array($linkInfo['fieldLinks']) && is_array($cr)) { // this link uses filters
 						$filters = array();
 						/*foreach ($linkInfo['fieldLinks'] as $fromField => $toField) {
@@ -777,13 +764,11 @@ abstract class uDataModule extends uBasicModule {
 		if ($this->fieldsSetup == TRUE) return;
 		$this->fieldsSetup = TRUE;
 
-	//	$this->_SetupParents();
-
 		$this->SetupFields();
 		$this->SetupUnionFields();
 		if (is_array($this->UnionModules)) foreach ($this->UnionModules as $modulename) {
-			CallModuleFunc($modulename,'_SetupFields');
-			//CallModuleFunc($modulename,'SetupUnionFields'); // called from _SetupFields
+			$obj = utopia::GetInstance($modulename);
+			$obj->_SetupFields();
 		}
 	}
 
@@ -929,43 +914,11 @@ abstract class uDataModule extends uBasicModule {
 	public function IsNewRecord() {
 		if ($this->forceNewRec === TRUE) return true;
 		if (isset($_REQUEST[$this->GetModuleId().'_new'])) return true;
-		//		$dset = GetModuleVar(GetCurrentModule(),'dataset');
-		//		if ($dset == NULL) return true;
-		//		if (mysql_num_rows($dset) == 0) return true;
-		//		if (get_class($this) !== GetCurrentModule() && CallModuleFunc(GetCurrentModule(),'GetCurrentRecord') === NULL) return true;
-		return false;
-		if (get_class($this) !== GetCurrentModule()) return false;//CallModuleFunc(CetCurrentModule(),'IsNewRecord');
-
 		return false;
 	}
 
 	public function EnforceNewRec() {
 		return;
-		/*		if (mysql_num_rows($this->GetDataset())>0) return;
-
-		// error occured?
-		$err = mysql_error();
-		if (!empty($err)) {
-		ob_end_clean(); die($err);
-		}
-
-		$uid = $this->FindFilter($this->GetPrimaryKey(),ctEQ);
-		if ($uid !== NULL && !is_empty($this->GetFilterValue($uid))) { // attempt to filter to a specific record
-		header('Location: '.$this->GetURL()."&newrec=1"); die();
-		}
-		return;
-
-		// fallback to first parent with no fieldlinks.
-		foreach ($this->parents as $parentName => $linkArray) {
-		foreach ($linkArray as $linkInfo) {
-		if ($linkInfo['fieldLinks'] === NULL) {
-		header('Location: '.CallModuleFunc($parentName,'GetURL'));
-		exit();
-		}
-		}
-		}
-
-		ob_end_clean(); die('Contact the administrator. Incorrect attempt to get a new record.');*/
 	}
 
 //	public function _RunModule() {
@@ -1039,8 +992,10 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function GetPrimaryKey() {
-		if ($this->pk == NULL && $this->GetTabledef() != NULL)
-		$this->pk = CallModuleFunc($this->GetTabledef(),'GetPrimaryKey');
+		if ($this->pk == NULL && $this->GetTabledef() != NULL) {
+			$obj = utopia::GetInstance($this->GetTabledef());
+			$this->pk = $obj->GetPrimaryKey();
+		}
 		return $this->pk;
 	}
 
@@ -1065,14 +1020,11 @@ abstract class uDataModule extends uBasicModule {
 
 		$this->UnionModules[] = $modulename;
 		SetModuleVar($modulename,'UNION_MODULE',TRUE);
-		//		CallModuleFunc($modulename,'_SetupFields');
-		//		CallModuleFunc($modulename,'AddField','__module__',"'$modulename'",'');
-		//		$sts = GetModuleVar($modulename,'sqlTableSetup');
-		//		CallModuleFunc($modulename,'AddField','__module_pk__',CallModuleFunc($modulename,'GetPrimaryKey'),$sts['alias']);
 	}
 
 	public function AddUnionParent($parentModule) {
-		CallModuleFunc($parentModule,'AddUnionModule',get_class($this));
+		$obj = utopia::GetInstance($parentModule);
+		$obj->AddUnionModule(get_class($this));
 	}
 
 	public function SetupUnionFields() {
@@ -1090,10 +1042,10 @@ abstract class uDataModule extends uBasicModule {
 			$this->SetFieldProperty($name,'default_lookup',array('module'=>$moduleOrValue,'getField'=>$getField,'valField'=>$valField));
 			// create a callback, when valField is updated, to set value of $name to the new DefaultValue (IF that value is empty?)
 			if (!array_key_exists($valField,$this->fields) && get_class($this) != GetCurrentModule() && GetCurrentModule()) {
-				CallModuleFunc(GetCurrentModule(),'AddOnUpdateCallback',$valField,array($this,'RefreshDefaultValue'),$name,$onlyIfNull);
+				$obj = utopia::GetInstance(GetCurrentModule());
+				$obj->AddOnUpdateCallback($valField,array($this,'RefreshDefaultValue'),$name,$onlyIfNull);
 			} else
-			$this->AddOnUpdateCallback($valField,array($this,'RefreshDefaultValue'),$name,$onlyIfNull);
-			//			ErrorLog('added');
+				$this->AddOnUpdateCallback($valField,array($this,'RefreshDefaultValue'),$name,$onlyIfNull);
 		}
 	}
 
@@ -1122,7 +1074,8 @@ abstract class uDataModule extends uBasicModule {
 			// find the value of valField
 			$row = $this->GetCurrentRecord();
 			$lookupVal = $this->GetRealValue($dl['valField'],$row[$this->GetPrimaryKey()]);
-			$value = CallModuleFunc($dl['module'],'GetRealValue',$dl['getField'],$lookupVal);
+			$obj = utopia::GetInstance($dl['module']);
+			$value = $obj->GetRealValue($dl['getField'],$lookupVal);
 
 			return $value; //  process so only to return a string.... TO DO
 		}
@@ -1137,13 +1090,6 @@ abstract class uDataModule extends uBasicModule {
 		$value = $this->GetFilterValue($uid);
 		if (!empty($value)) return $value;
 
-		// check if linkFrom - if so, get the value of the linked field
-//		if (array_key_exists('linkFrom',$fltr) && !empty($fltr['linkFrom'])) {
-//			list($m,$f) = explode(':',$fltr['linkFrom']);
-//			$val = CallModuleFunc($m,'GetDefaultValue',$f);
-//			return $val;
-//		}
-		//echo "::: filter found with uid($uid) and value($value)";
 		return '';
 		// not processed
 		/*		foreach ($this->filters[FILTER_WHERE] as $filterset) {
@@ -1169,8 +1115,8 @@ abstract class uDataModule extends uBasicModule {
 
 		$vtable = $fieldData['vtable'];
 		foreach ($vtable['joins'] as $fromField => $toField) {
-			//			echo "$alias=$fromField:$toField//".CallModuleFunc($vtable['tModule'],'GetPrimaryKey')."<br/>";
-			if ($toField == CallModuleFunc($vtable['tModule'],'GetPrimaryKey')) return $fromField;
+			$obj = utopia::GetInstance($vtable['tModule']);
+			if ($toField == $obj->GetPrimaryKey()) return $fromField;
 		}
 	}
 
@@ -1240,11 +1186,13 @@ abstract class uDataModule extends uBasicModule {
 		if (!$this->sqlTableSetupFlat) $this->sqlTableSetupFlat = array();
 		if (array_key_exists($alias,$this->sqlTableSetupFlat)) { ErrorLog("Cannot create table with alias ($alias).  A table with this alias already exists."); return; }
 
+		$tableObj = utopia::GetInstance($tableModule);
+
 		$newTable = array();
 		$this->sqlTableSetupFlat[$alias] =& $newTable;
 		$newTable['alias']	= $alias;
 		$newTable['table']	= TABLE_PREFIX.$tableModule;
-		$newTable['pk']		= CallModuleFunc($tableModule,'GetPrimaryKey');
+		$newTable['pk']		= $tableObj->GetPrimaryKey();
 		$newTable['tModule']= $tableModule;
 		if ($parent==NULL) {
 			if ($this->sqlTableSetup != NULL) {
@@ -1261,10 +1209,11 @@ abstract class uDataModule extends uBasicModule {
 		// $fromField in $this->sqlTableSetupFlat[$parent]['tModule']
 		if (is_string($joins)) $joins = array($joins=>$joins);
 		if (is_array($joins)) foreach ($joins as $fromField => $toField) {
+			$tModObj = utopia::GetInstance($this->sqlTableSetupFlat[$parent]['tModule']);
 			if ($fromField[0] !== "'" && $fromField[0] !== '"' && stristr($fromField,'.') === FALSE &&
-			CallModuleFunc($this->sqlTableSetupFlat[$parent]['tModule'],'GetFieldProperty',$fromField,'pk') !== true &&
-			CallModuleFunc($this->sqlTableSetupFlat[$parent]['tModule'],'GetFieldProperty',$fromField,'unique') !== true &&
-			CallModuleFunc($this->sqlTableSetupFlat[$parent]['tModule'],'GetFieldProperty',$fromField,'index') !== true)
+				$tModObj->GetFieldProperty($fromField,'pk') !== true &&
+				$tModObj->GetFieldProperty($fromField,'unique') !== true &&
+				$tModObj->GetFieldProperty($fromField,'index') !== true)
 			ErrorLog("Field ($fromField) used as lookup but NOT an indexed field in table (".$this->sqlTableSetupFlat[$parent]['tModule'].").");
 		}
 		//$newTable['fromField'] = $fromField;
@@ -1326,7 +1275,8 @@ abstract class uDataModule extends uBasicModule {
 			$stringify = true;
 		} elseif (($values===true || is_string($values)) && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
-			$pk = CallModuleFunc($tbl['tModule'],'GetPrimaryKey');
+			$obj = utopia::GetInstance($tbl['tModule']);
+			$pk = $obj->GetPrimaryKey();
 			$table = $tbl['table'];
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
 			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) $arr = array_combine(array_keys($arr),array_keys($arr));
@@ -1417,22 +1367,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
-    //timer_start(get_class($this).':AF1:'.$aliasName);
-		//$tdfields = GetModuleVar($this->GetTabledef(),"fields");
-		//$this->fields[$fieldName] = $tdfields[$fieldName];
-		//		$aliasName = strtolower($aliasName);
-		//		if ($tableAlias !== NULL)
-		//			$fieldName = strtolower($fieldName);
-		//		$tableAlias = strtolower($tableAlias);
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
-//		$fieldName = trim($fieldName);
-		// field is mix?
-		//if (isset($this->fields[$aliasName])) { trigger_error("Field with alias ($aliasName) already exists in this module (".get_class($this).")."); return FALSE;}
-//		if ((!is_array($this->sqlTableSetupFlat) || !array_key_exists($tableAlias,$this->sqlTableSetupFlat)) && !empty($tableAlias)) { trigger_error("No table ($tableAlias) has been created in this module (".get_class($this)."). Field: $aliasName."); return FALSE;}
-    //timer_end(get_class($this).':AF1:'.$aliasName);
-
-    //timer_start(get_class($this).':AF2:'.$aliasName);    
-		//if (!array_key_exists($aliasName,$this->fields)) // always replace so we can re-order automatic fields (like file data)
 		
 		$this->fields[$aliasName] = array(
 		  'alias'       => $aliasName,
@@ -1447,13 +1382,7 @@ abstract class uDataModule extends uBasicModule {
       $this->AddPreProcessCallback($aliasName, $fieldName);
     }
     if ($tableAlias) $this->fields[$aliasName]['vtable'] = $this->sqlTableSetupFlat[$tableAlias];
-		//		if (preg_match_all('/{[^}]+}/',$fieldName,$matches) > 0)
-		//			$this->SetFieldProperty($aliasName,'pragma',$fieldName);
-		//		$tablename = $this->GetPrimaryTable();// GetModuleVar($tabledef,'tablename');
-		//		$this->SetFieldProperty($aliasName,'values',$values);
-    //timer_end(get_class($this).':AF2:'.$aliasName);
 
-    //timer_start(get_class($this).':AF3:'.$aliasName);
 	switch ($this->GetFieldType($aliasName)) {
 		case ftFILE:
 		case ftIMAGE:
@@ -1470,12 +1399,7 @@ abstract class uDataModule extends uBasicModule {
 			$this->AddPreProcessCallback($aliasName,array('utopia','convDateTime'));
 			break;
 	}
-    //timer_end(get_class($this).':AF3:'.$aliasName);
-		//		if ($inputtype == itDATE) {
-		//			$this->SetFieldProperty($aliasName,'dateformat','dd/MMM/yyyy');
-		//		}
 		// values here
-    //timer_start(get_class($this).':AF4:'.$aliasName);
 		if ($values === NULL) switch ($inputtype) {
 			case itCOMBO:
 			case itOPTION:
@@ -1486,29 +1410,12 @@ abstract class uDataModule extends uBasicModule {
 				break;
 		}
 		$this->fields[$aliasName]['values'] = $values;
-		//$this->SetValues($aliasName,$values);
-    //timer_end(get_class($this).':AF4:'.$aliasName);
-		//		} else {
-		//			switch ($inputtype) {
-		//				case itCOMBO:
-		//					$this->SetValues($aliasName); // no point in passing values, will always be null here
-		//					break;
-		//			}
-		//		}
-    //timer_start(get_class($this).':AF5:'.$aliasName);
+
 		if ($visiblename !== NULL) {
 			if (empty($this->layoutSections)) $this->NewSection();
 			$this->fields[$aliasName]['layoutsection'] = count($this->layoutSections)-1;
 		}
-    //timer_end(get_class($this).':AF5:'.$aliasName);
 		return TRUE;
-		//		$lookupData = CallModuleFunc($this->GetTabledef(),'GetLookupData',$fieldName);
-
-		//		if (!empty($lookupData)) {
-		//			$this->SetFieldProperty($fieldName,'lookup_data',$lookupData);
-		//			if ($values === NULL)
-		//				$this->SetFieldProperty($fieldName,'values',GetPossibleValues($lookupData['lookupTable'],$lookupData['lookupField'],$lookupData['returnField'],$lookupData['where']));
-		//		}
 	}
 
 	public function GetFields($visibleOnly=false,$layoutSection=NULL) {
@@ -1631,8 +1538,6 @@ abstract class uDataModule extends uBasicModule {
 
 	private $filterUID = 0;
 	public function GetNewUID() {
-		//		if (get_class($this) != GetCurrentModule()) return CallModuleFunc(GetCurrentModule(),'GetNewUID');
-
 		$this->filterUID = $this->filterUID +1;
 		return $this->GetModuleId().'_'.($this->filterUID - 1);
 	}
@@ -1642,17 +1547,7 @@ abstract class uDataModule extends uBasicModule {
 		//		if (!isset($value) || empty($value)) return;
 		$uid = $this->GetNewUID();
 		$value = $dvalue;
-		//		$this->filterUID++;
 
-		//		if (GetCurrentModule() !== get_class($this)) {
-		//			// search current record for this field.
-		//			$currentRecord = GetModuleVar(GetCurrentModule(),'currentRecord');
-		//			print_r($currentRecord);
-		//			if ($currentRecord !== NULL && array_key_exists($fieldName,$currentRecord))
-		//				$value = $currentRecord[$fieldName];
-		//						echo get_class($this)." $fieldName found value: $value::\n";
-		//		}
-		//		if ($value === NULL) $value = $this->GetFilterValue($uid); // enforce a filter  -- possibility of a "default filter"
 		if ($filterType == NULL) // by default, filters are HAVING unless otherwise specified
 		$filterset =& $this->filters[FILTER_HAVING];
 		else
@@ -1844,6 +1739,7 @@ abstract class uDataModule extends uBasicModule {
 		return $from;
 	}
 
+	public $rowcount = false;
 	public function GetSelectStatement() {//$filter = '',$sortColumn='') {
 		// init fields, get primary key, its required by all tables anyway so force it...
 		//grab the table alias and primary key from the alias's tabledef
@@ -1872,7 +1768,8 @@ abstract class uDataModule extends uBasicModule {
 		$from = $this->GetFromClause();
 
 		$distinct = flag_is_set($this->GetOptions(),DISTINCT_ROWS) ? ' DISTINCT' : '';
-		$qry = "SELECT $distinct ".join(",\n",$flds);
+		if ($this->rowcount) $flds[] = 'COUNT(*) as row_count';
+		$qry = "SELECT$distinct ".join(",\n",$flds);
 		if ($from) $qry .= " \nFROM ".$from;//$this->GetPrimaryTable().$joins;
 		return $qry;
 	}
@@ -1917,15 +1814,6 @@ abstract class uDataModule extends uBasicModule {
 		$filterData = $this->GetFilterInfo($uid);
 		//        ErrorLog(print_r($filterData,true));
 
-		// this block will search the "current module" for the value of the field on the current record.
-		/*		if (GetCurrentModule() !== get_class($this) && GetCurrentModule() !== '') {
-			// search current record for this field.
-			$currentRecord = CallModuleFunc(GetCurrentModule(),'GetCurrentRecord');
-			if ($currentRecord !== NULL && array_key_exists('fieldName',$filterData) && array_key_exists($filterData['fieldName'],$currentRecord))
-			return $currentRecord[$filterData['fieldName']];
-			}
-			*/
-
 		// ptime static filter value
 		// this line grabs STATIC filters (filters set by code), this enforced if the input type is null
 		$defaultValue = (is_array($filterData) && array_key_exists('value',$filterData)) ? $filterData['value'] : NULL;
@@ -1933,22 +1821,13 @@ abstract class uDataModule extends uBasicModule {
 		if (is_array($filterData) && $filterData['it'] == itNONE) {
 			// for union modules, we cannot get a value form currentmodule because it is itself, part of the query
 			if (GetCurrentModule() !== get_class($this) && (!isset($this->UNION_MODULE) || $this->UNION_MODULE !== TRUE)) {
-				//$row = ($this->activeParent !== NULL) ? GetModuleVar($this->activeParent,'currentRecord') : GetModuleVar(GetCurrentModule(),'currentRecord');
-				//			echo '///'.get_class($this).':'.$this->activeParent;
 				if (array_key_exists('linkFrom',$filterData)) {
 					list($linkParent,$linkFrom) = explode(':',$filterData['linkFrom']);
 					// linkparent is loaded?  if not then we dont really want to use it as a filter.....
-					if (CallModuleFunc($linkParent,'HasParentLoaded',get_class($this)) || $linkParent == GetCurrentModule()) {
-						$row = CallModuleFunc($linkParent,'GetCurrentRecord',$refresh);
-						if (!$row && !$refresh) $row = CallModuleFunc($linkParent,'GetCurrentRecord',true);
-						//print_r($row);
-						//echo "gcr($linkParent:$linkFrom)";
-						//$row = ($this->activeParent !== NULL) ? CallModuleFunc($this->activeParent,'GetCurrentRecord') : NULL;//CallModuleFunc(GetCurrentModule(),'GetCurrentRecord');
-						//$row = CallModuleFunc(GetCurrentModule(),'GetCurrentRecord')
-						//				if (strtolower(substr(trim($filterData['fieldName'],'('),0,6)) == 'select') {
-						//					$row = mysql_fetch_row(sql_query($filterData['fieldName']));
-						//					return $row[0];
-						//				} else
+					$linkParentObj = utopia::GetInstance($linkParent);
+					if ($linkParentObj->HasParentLoaded(get_class($this)) || $linkParent == GetCurrentModule()) {
+						$row = $linkParentObj->GetCurrentRecord($refresh);
+						if (!$row && !$refresh) $row = $linkParentObj->GetCurrentRecord(true);
 
 						if (is_array($row) && array_key_exists($linkFrom,$row)) {
 							return $row[$linkFrom];
@@ -1957,11 +1836,11 @@ abstract class uDataModule extends uBasicModule {
 							//						errorLog(print_r(useful_backtrace(1,5),true));
 							//					}
 						} else {// if the filter value of the parent is null (if we're updating for example), then we want to get the value of the filter
-							$fltrLookup = CallModuleFunc($linkParent,'FindFilter',$linkFrom,ctEQ);
+							$fltrLookup = $linkParentObj->FindFilter($linkFrom,ctEQ);
 							$val = NULL;
 							// stop lookup callbacks
 							if (is_array($fltrLookup) && array_key_exists('linkFrom',$fltrLookup) && stristr($fltrLookup['linkFrom'],get_class($this)) === FALSE )
-								$val = CallModuleFunc($linkParent, 'GetFilterValue',$fltrLookup['uid']);
+								$val = $linkParentObj->GetFilterValue($fltrLookup['uid']);
 							//ErrorLog($val);
 							if ($val!==NULL) return $val;
 							//if ($fltrLookup['value']) return $fltrLookup['value'];
@@ -1982,27 +1861,6 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		return urldecode($filters[$uid]);
-
-		/*return;
-
-		//if ($currentModuleOnly && GetCurrentModule() !== get_class($this)) return NULL;
-		//if not current module, get the value of this filter from the parent
-		if ($filterData['it'] == itNONE && GetCurrentModule() !== get_class($this) && ) {
-		//	print_r($filterData);
-		//			if ($filterData['it'] == itNONE) {
-		$row = CallModuleFunc(GetCurrentModule(),'GetCurrentRecord');
-		//		echo $row[$filterData['fieldName']];
-		if ($row !== NULL && array_key_exists($filterData['fieldName'],$row))
-		return $row[$filterData['fieldName']];
-		//			}
-		}
-
-		if (!$processRequest) return NULL;
-
-		if (!array_key_exists('filters',$_REQUEST)) return NULL;
-		if (!array_key_exists($uid,$_REQUEST['filters'])) return NULL;
-
-		return urldecode($_REQUEST['filters'][$uid]);*/
 	}
 
 	public function GetTableProperty($alias,$property) {
@@ -2014,7 +1872,8 @@ abstract class uDataModule extends uBasicModule {
 		//		$fieldName = $this->GetRootField($alias);
 		$fieldName = $this->fields[$alias]['field'];
 		//echo "finding prop $property for field $fieldName in $tabledef<br/>";
-		return CallModuleFunc($tabledef,"GetFieldProperty",$fieldName,$property);
+		$obj = utopia::GetInstance($tabledef);
+		return $obj->GetFieldProperty($fieldName,$property);
 	}
 
 	// filterSection = [where|having]
@@ -2125,12 +1984,7 @@ abstract class uDataModule extends uBasicModule {
 				if ($fData['type'] !== FILTER_WHERE) continue;
 				$fieldName = $fData['fieldName'];
 
-				//				if (!array_key_exists($fieldName,$this->fields) && $this->GetPrimaryKey() != $fieldName && strtolower(substr($fieldName,0,8)) !== '(select ') continue;
-				//				if (empty($fData['value'])) continue;
-				//				if ($fData['value'] == "%%" && $fData['ct'] == ctLIKE) continue;
 				// if the field doesnt exist in the primary table. -- should be ANY table used. and if more than one, should be specific.
-				//				ErrorLog($this->GetTabledef().' '.$fieldName);
-				//				if (!CallModuleFunc($this->GetTabledef(),'FieldExists',$fieldName)) continue;
 
 				if (($filterString = $this->GetFilterString($fData['uid'])) !== '')
 				$setParts[] = $filterString;
@@ -2229,7 +2083,9 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public $limit = NULL;
-  
+
+	private $queryChecksum = NULL;
+	private $explainQuery = false;
 	/**
 	 * Get a dataset based on setup.
 	 * @param (bool|null) NULL to return a fresh dataset, TRUE to refresh the internal dataset, FALSE to return the cached dataset.
@@ -2237,15 +2093,6 @@ abstract class uDataModule extends uBasicModule {
 	 */
 	public function &GetDataset($refresh = FALSE) {
 		$this->_SetupFields();
-
-		//echo get_class($this).".GetDataset()\n";
-		//if ($this->IsNewRecord()) return NULL;
-		if ($this->dataset !== NULL && $refresh === FALSE) { return $this->dataset; }
-
-		//echo ($this->dataset === NULL) ? 'ds is null, ' : '';
-		//echo ($refresh !== FALSE) ? 'refresh isnt false' : '';
-		//echo "\n";
-		//print_r(useful_backtrace(0,6));
 
 		// GET SELECT
 		$select = $this->GetSelectStatement();
@@ -2265,47 +2112,46 @@ abstract class uDataModule extends uBasicModule {
 		if (is_array($this->UnionModules)) {
 			//		$havingFilters = $this->GetHavingStatement(TRUE); $havingFilters = $havingFilters ? " HAVING $having" : ''; // uses HAVING modifier to account for aliases
 			foreach ($this->UnionModules as $moduleName) {
-				CallModuleFunc($moduleName,'_SetupFields');
-				$select2 = CallModuleFunc($moduleName, 'GetSelectStatement');
-				$where2 = CallModuleFunc($moduleName, 'GetWhereStatement'); $where2 = $where2 ? " WHERE $where2" : '';
-				$group2 = CallModuleFunc($moduleName, 'GetGrouping'); $group2 = $group2 ? " GROUP BY $group2" : '';
-				$having2 = CallModuleFunc($moduleName, 'GetHavingStatement');
+				$obj = utopia::GetInstance($moduleName);
+				$obj->_SetupFields();
+				$select2 = $obj->GetSelectStatement();
+				$where2 = $obj->GetWhereStatement(); $where2 = $where2 ? " WHERE $where2" : '';
+				$group2 = $obj->GetGrouping(); $group2 = $group2 ? " GROUP BY $group2" : '';
+				$having2 = $obj->GetHavingStatement();
 				$having2 = $having2 ? $having.' AND ('.$having2.')' : $having;
 				//				if (!empty($having2)) $having2 = $having.' AND ('.$having2.')';
 				//				else $having2 = $having;
-				$order2 = CallModuleFunc($moduleName, 'GetOrderBy'); $order2 = $order2 ? " ORDER BY $order2" : '';
+				$order2 = $obj->GetOrderBy(); $order2 = $order2 ? " ORDER BY $order2" : '';
 				$query .= "\nUNION\n($select2$where2$group2$having2$order2)";
 			}
 			$query .= " $order";
 		}
-		//	ob_end_clean();
-		//	print_r(useful_backtrace(0,4));
-		//print_r($this->filters);
 
 		$limitKey = '_p_'.$this->GetModuleId();
 		if (empty($this->limit) && isset($_GET[$limitKey])) $this->limit = $_GET[$limitKey];
 		if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
 
-		if (array_key_exists('__explain',$_REQUEST)) {
-			utopia::CancelTemplate();
-			$this->explain = GetRows(sql_query("EXPLAIN EXTENDED $query"));
-			print_r($this->explain);
-			die();
-		}
+		$checksum = sha1(print_r($query,true));
+		if ($this->queryChecksum === $checksum && $this->dataset !== NULL && $refresh === FALSE) return $this->dataset;
+		$this->queryChecksum = $checksum;
 
-		$dataset = sql_query($query);
-		if ($refresh === TRUE || $this->dataset === NULL) {
-			//			$this->internalRowNum = 0;
-			$this->dataset =& $dataset;
-			$this->EnforceNewRec();
-		}
-	//	if (SHOW_QUERY || array_key_exists('showQ',$_REQUEST)) {
-	//		echo "\n\nQUERY (".get_class($this).",".mysql_num_rows($dataset)."): <pre>$query</pre>";
-	//		print_r($this->filters);
-	//		print_r(useful_backtrace(1,6));
-	//	}
+		if ($this->explainQuery) print_r(GetRows(sql_query("EXPLAIN EXTENDED $query")));
 
-		return $dataset;
+		$this->dataset = sql_query($query);
+		$this->EnforceNewRec();
+
+		return $this->dataset;
+	}
+
+	public function GetRowCount() {
+		$this->rowcount = true;
+		$old_limit = $this->limit;
+		$this->limit = 1;
+		$result = $this->GetDataset(true);
+		$row = mysql_fetch_assoc($result);
+		$this->limit = $old_limit;
+		$this->rowcount = false;
+		return $row['row_count'];
 	}
 
 	private $lastRowNum = array();
@@ -2327,7 +2173,7 @@ abstract class uDataModule extends uBasicModule {
 
 		if (!is_resource($dataset)) return NULL;
 		if ($dataset === $this->dataset && $this->IsNewRecord()) return NULL;
-    $num_rows = mysql_num_rows($dataset);
+		$num_rows = mysql_num_rows($dataset);
 		//        if ($rowNum === NULL) {
 		//			$rowNum = $this->internalRowNum;
 		//			$this->internalRowNum++;
@@ -2354,28 +2200,15 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function GetCurrentRecord($refresh = FALSE) {
-		//if (GetCurrentModule() !== get_class($this) && (isset($this->UNION_MODULE) && $this->UNION_MODULE === TRUE) && GetCurrentModule())
-			//return CallModuleFunc(GetCurrentModule(),'GetCurrentRecord',$refresh);
-
-		//	if (isset($this->currentRecord) && $refresh === FALSE)
-		//		if (is_null($this->currentRecord) && !is_null($this->lastInsertId))
-		//			return $this->LookupRecord($this->lastInsertId);
 
 		if ($refresh === TRUE) {
 			if ($this->currentRecord !== NULL)
-			return $this->LookupRecord($this->currentRecord[$this->GetPrimaryKey()]);
+				return $this->LookupRecord($this->currentRecord[$this->GetPrimaryKey()]);
 			else
-			return $this->GetRecord($this->GetDataset(),0);
+				return $this->GetRecord($this->GetDataset(),0);
 		}
 
 		return $this->currentRecord;
-
-		//ErrorLog('refreshing current record');
-		//		return $this->GetRecord($this->GetDataset($refresh),max($this->internalRowNum-1,0));
-
-		//		if ($refresh == TRUE) return $this->LookupRecord(array($this->GetPrimaryKey()=>$this->currentRecord[$this->GetPrimaryKey()]));
-
-		//		return $this->currentRecord;
 	}
 
 	public function GetRows($filter=NULL,$clearFilters=false) {
@@ -2598,68 +2431,16 @@ abstract class uDataModule extends uBasicModule {
 		return '<span '.$spanAttr.'>'.$pre.utopia::DrawInput('_f_'.$filterInfo['uid'],$filterInfo['it'],$default,$vals,$attributes,false).'</span>';
 	}
 
-	//	public function __construct() { $this->SetupFields(); }
-
-	/*	public function ProcessUpdates($function,$decodedStr) {
-			if ($function == 'del') {
-			InterpretSqlDeleteString($decodedStr,$module,$table,$where);
-			return CallModuleFunc($module,'ProcessUpdates_'.$function,$table,$where);
-			} else {
-			InterpretSqlString($decodedStr,$module,$field,$pkVal);
-			return CallModuleFunc($module,'ProcessUpdates_'.$function,$field,$value,$pkVal);
-			}
-		}   */
-
 	public function ProcessUpdates($function,$sendingField,$fieldAlias,$value,&$pkVal = NULL) {
 		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { AjaxEcho('//Module Not Editable'); return; }
 		$this->_SetupFields();
-/*		$lm = utopia::GetVar('loadedModules');
-		$mainClass = get_class($this);// GetCurrentModule();
 
-		$arrBefore = array(); $arrAfter = array();
-
-		$arrBefore[$mainClass] = $this->LookupRecord($pkVal);
-		foreach ($lm as $module) {
-			if (!is_callable(array($module,'GetCurrentRecord'))) continue;
-			$arrBefore[$childInfo['moduleName']] = $module->GetCurrentRecord();
-		}
-*/
 		$func = 'ProcessUpdates_'.$function;
 		$this->$func($sendingField,$fieldAlias,$value,$pkVal);
     
-    // reset all fields with preprocess.
-    foreach ($this->fields as $alias => $field) {
-      if (isset($field['preprocess'])) $this->ResetField($alias,$pkVal);
-    }
-    
-		return;
-		//CallModuleFunc($mainClass,'ProcessUpdates_'.$function,$sendingField,$fieldAlias,$value,$pkVal);
-
-		$arrAfter[$mainClass] = $this->LookupRecord($pkVal);
-		foreach ($lm as $module) {
-			if (!is_callable(array($module,'GetCurrentRecord'))) continue;
-			$arrAfter[$childInfo['moduleName']] = $module->GetCurrentRecord();
-		}
-
-		$this->ResetField($fieldAlias,$pkVal);
-
-		$updatesOccurred = false;
-		$thisModule = get_class($this);
-		foreach ($arrAfter as $moduleName => $newRec) {
-			if ($newRec === NULL) continue; // new record doesnt exist, we need to do something
-			$oldRec = $arrBefore[$moduleName];
-			$modPkVal = $newRec[CallModuleFunc($moduleName,'GetPrimaryKey')];
-			foreach ($newRec as $fieldName => $value) {
-				// already reset this field
-				if ($fieldName == $fieldAlias && $moduleName == $thisModule) continue;
-				// skip if field hasn't changed
-				if ($value === $oldRec[$fieldName]) continue;
-
-				//$fieldData = GetModuleVar($moduleName,'fields'); $fieldData = $fieldData[$fieldName];
-
-				// reset field
-				CallModuleFunc($moduleName,'ResetField',$fieldName,$modPkVal);
-			}
+		// reset all fields with preprocess.
+		foreach ($this->fields as $alias => $field) {
+			if (isset($field['preprocess'])) $this->ResetField($alias,$pkVal);
 		}
 	}
 
@@ -2674,61 +2455,12 @@ abstract class uDataModule extends uBasicModule {
 
 	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
 		AjaxEcho('//'.get_class($this)."@ProcessUpdates_del($fieldAlias,$value,$pkVal)");
-		//if (!$pkVal) return;
 
 		$table = TABLE_PREFIX.$this->GetTabledef();
 		$where = $this->GetPrimaryKey()." = '$pkVal'";
 
 		sql_query("DELETE FROM $table WHERE $where");
 
-		return false;
-		return true;
-		echo "$table, $where<br/>";
-		//		list($field,$pk) = split('=',$where);
-		//		die("$table, $field, $pk");
-		// delete process, look thru all tables and find a cell which references this record
-		//loop classes
-		$inuse = array();
-		$classes = get_declared_classes();
-		foreach ($classes as $classname) {
-			// change to is_subclass_of datamodule
-			if (substr($classname,0,9) != 'module_') continue;
-
-			CallModuleFunc($classname,'_SetupFields');
-			$fields = GetModuleVar($classname,'fields');
-
-			// check each field for a lookup on this table
-			foreach ($fields as $fieldName => $fieldData) {
-				//				if (!isset($fieldData['lookup_data'])) continue;
-				//				if ($fieldData['lookup_data']['lookupTable'] != $table) continue;
-				if (!isset($fieldData['vtable'])) continue;
-				if ($fieldData['vtable']['table'] != $table) continue;
-				echo "$classname>$fieldName : ";
-				// ok, found a field using this table, lets check that field for any uses
-				// first replace the field in WHERE with this field name
-				$newWhere = str_replace($fieldData['vtable']['toField'],$fieldName,$where);
-				//				$tabledef = CallModuleFunc($classname,'GetTabledef');
-				$srchTable = $fieldData['vtable']['table'];//GetModuleVar($tabledef,'tablename');
-				//echo "SELECT * FROM $srchTable WHERE $newWhere";
-				$pk = CallModuleFunc($classname,'GetPrimaryKey');
-				echo "SELECT $pk FROM $srchTable WHERE $newWhere<br/>";
-				$result = sql_query("SELECT $pk FROM $srchTable WHERE $newWhere");
-				while (($row = GetRow($result)))
-				$inuse[] = "$srchTable: where $pk = {$row[$pk]}";
-			}
-		}
-		// loop fields
-		//@list(,$dataField,$lookupField,$lookupTable) = ParseFieldComments($row['Comment']);
-		//if ($lookupTable == $table) { // same table - search for entries which match
-		//	$qry = "SELECT * FROM $currentTable WHERE $currentField = $val";
-		//}
-		if (!empty($inuse)) {
-			ob_end_clean(); die(nl2br("Cannot delete. This record is in use by:\n".join("\n",$inuse)));
-			return FALSE;
-		}
-		//	echo "DELETE FROM $table WHERE $where";
-		//	return sql_query("DELETE FROM $table WHERE $where");
-		ob_end_clean(); die();
 		return false;
 	}
 
@@ -2829,7 +2561,6 @@ abstract class uDataModule extends uBasicModule {
 		// it may be necessary to go right back to the tier 1 parent for nested tables > 2 tiers
 		//		if (array_key_exists('joins',$vtable)) foreach ($vtable['joins'] as $fromField => $toField) {
 		// loop through each join, if the toField is the PK of vtable[tModule] then field = fromField
-		//			if ($toField == CallModuleFunc($vtable['tModule'],'GetPrimaryKey')) { $field = $fromField; break; }
 		//		}
 		//		$field		= array_key_exists('fromField',$vtable) && !empty($vtable['fromField']) ? $vtable['fromField'] : $this->fields[$fieldAlias]['field'];
 		//		$field		= $vtable['fromField'] ? $vtable['fromField'] : $this->fields[$fieldAlias]['field'];
@@ -2906,7 +2637,10 @@ abstract class uDataModule extends uBasicModule {
 			$this->OnNewRecord($pkVal);
 			$children = utopia::GetChildren(get_class($this));
 			//if (array_key_exists('children',$GLOBALS) && array_key_exists(get_class($this),$GLOBALS['children']))
-			foreach ($children as $child => $links) CallModuleFunc($child,'OnParentNewRecord',$pkVal);
+			foreach ($children as $child => $links) {
+				$obj = utopia::GetInstance($child);
+				if (method_exists($obj,'OnParentNewRecord')) $obj->OnParentNewRecord($pkVal);
+			}
 
 			//$ret = TRUE;
 		//	$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
@@ -2949,7 +2683,8 @@ abstract class uDataModule extends uBasicModule {
 
 	public function GetCell($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		if (is_array($row) && array_key_exists('__module__',$row) && $row['__module__'] != get_class($this)) {
-			return CallModuleFunc($row['__module__'],'GetCell',$fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
+			$obj = utopia::GetInstance($row['__module__']);
+			return $obj->GetCell($fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		}
 		if ($this->UNION_MODULE)
 			$pkField = '__module_pk__';
@@ -2962,7 +2697,8 @@ abstract class uDataModule extends uBasicModule {
 
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		if (is_array($row) && array_key_exists('__module__',$row) && $row['__module__'] != get_class($this)) {
-			return CallModuleFunc($row['__module__'],'GetCellData',$fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
+			$obj = utopia::GetInstance($row['__module__']);
+			return $obj->GetCellData($fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		}
 		$pkVal = NULL;
 		if (is_array($row)) $pkVal = isset($row['__module_pk__']) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
@@ -3009,8 +2745,6 @@ abstract class uDataModule extends uBasicModule {
 			return NULL;
 		}
 
-		//$targetUrl = CallModuleFunc($info['moduleName'],'GetURL');
-
 		if ($includeFilter) {
 			$targetFilter = $this->GetTargetFilters($field,$row);
 			//if (!$targetFilter) $targetFilter = $this->GetTargetFilter('*',$row);
@@ -3018,7 +2752,8 @@ abstract class uDataModule extends uBasicModule {
 		$targetFilter = NULL;
 		//print_r($targetFilter);
 		//print_r($this->filters);
-		return CallModuleFunc($info['moduleName'],'GetURL',$targetFilter);
+		$obj = utopia::GetInstance($info['moduleName']);
+		return $obj->GetURL($targetFilter);
 
 		//return (!$targetFilter) ? $targetUrl : "$targetUrl&amp;$targetFilter";
 	}
@@ -3028,7 +2763,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($row == NULL) return NULL;
 		$searchModule = is_array($row) && array_key_exists('__module__',$row) ? $row['__module__'] : get_class($this);
 
-    $children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : utopia::GetChildren($searchModule);
+		$children = isset(self::$targetChildren[$searchModule]) ? self::$targetChildren[$searchModule] : utopia::GetChildren($searchModule);
 
 		$info = NULL;
 		// get specific field
@@ -3047,20 +2782,6 @@ abstract class uDataModule extends uBasicModule {
 		// fieldLinks: array: parentField => childField
 		// need to replace the values
 		$targetModule = $info['moduleName'];
-		//CallModuleFunc($targetModule,'_SetupFields');
-/*		$targetModuleFields = GetModuleVar($targetModule,'fields');
-		// check $targetModule filters have a target field
-		$targetFilters = GetModuleVar($targetModule,'filters');
-		if (isset($targetFilters) && is_array($targetFilters)) foreach ($targetFilters as $setType) {
-			foreach ($setType as $set) {
-				foreach ($set as $fltr) {
-					if (strpos($fltr['fieldName'],' ') === FALSE && !array_key_exists($fltr['fieldName'],$targetModuleFields)) {
-						echo 'Field defined in filter ('.$fltr['fieldName'].') is not present in target module ('.$targetModule.') dataset.<br/>';
-					}
-				}
-			}
-		}
-*/
 		$newFilter = array();
 //		$additional = array();
 		//print_r($info['fieldLinks']);
@@ -3074,35 +2795,18 @@ abstract class uDataModule extends uBasicModule {
 				// if its a union AND the fromfield equals the modules primarykey then show the module_pk
 				// NO,  if its a union, loop thru that modules fields to find the number of the fromField. then get the value of the corresponding number in this union parent module
 			} elseif (array_key_exists('__module__',$row)) {
-				if (CallModuleFunc($row['__module__'],'AssertField',$linkInfo['fromField'],$targetModule)) {
-					$unionFields = GetModuleVar($row['__module__'],'fields');
-					$uFieldCount = 0;
-          $keys = array_keys($unionFields);
-					foreach ($keys as $uFieldAlias) {
-						if ($uFieldAlias == $linkInfo['fromField']) break;
-						$uFieldCount++;
-					}
-
-          $ourKeys = array_keys($this->fields);
-          $correspondingKey = $ourKeys[$uFieldCount];
-          $value = $row[$correspondingKey];
-/*					reset($this->fields);
-					for ($i = 0; $i < $uFieldCount; $i++) {
-						next($this->fields);
-					}
-					$value = $row[key($this->fields)];*/
-					//			} else {
-					//				ErrorLog("Cannot find field ({$linkInfo['fromField']}) linking from ($targetModule)");
-					//				continue;
-					//			} elseif ($this->AssertField($linkInfo['fromField'])) {
-					//				$value = $row[$linkInfo['fromField']];
+				$obj = utopia::GetInstance($row['__module__']);
+				$unionFields = $obj->fields;
+				$uFieldCount = 0;
+				$keys = array_keys($unionFields);
+				foreach ($keys as $uFieldAlias) {
+					if ($uFieldAlias == $linkInfo['fromField']) break;
+					$uFieldCount++;
 				}
 
-				/*				if ($linkInfo['fromField'] === CallModuleFunc($row['__module__'],'GetPrimaryKey'))
-					$value = $row['__module_pk__'];
-					else {
-					$value = $row[$linkInfo['fromField']];
-					} */
+				$ourKeys = array_keys($this->fields);
+				$correspondingKey = $ourKeys[$uFieldCount];
+				$value = $row[$correspondingKey];
 			} else {
 				//$value = $row[$linkInfo['fromField']]; // use actual value, getting the real value on every field causes a lot of lookups, the requested field must be the field that stores the actual value
 				/* */
@@ -3117,9 +2821,7 @@ abstract class uDataModule extends uBasicModule {
 			}
 			//echo $value."<br/>";
 			if (!empty($value))
-        $newFilter['_f_'.$linkInfo['toField']] = $value;
-			//elseif (flag_is_set(CallModuleFunc($targetModule,'GetOptions'),ALLOW_ADD))
-			//$additional['newrec'] = 1;
+				$newFilter['_f_'.$linkInfo['toField']] = $value;
 		}
     return $newFilter;
 		//print_r(array_merge($newFilter,$additional));
@@ -3209,14 +2911,15 @@ abstract class uListDataModule extends uDataModule {
 	}
 
 	public function CheckMaxRows($mod = 0) {
-		$ds = $this->GetDataset(true);
+		//$ds = $this->GetDataset(true);
 		AjaxEcho('// max recs: '.$this->GetMaxRows());
-		if (!$this->GetMaxRows() || mysql_num_rows($ds) + $mod < $this->GetMaxRows()) {
+		$rows = $this->GetRowCount();
+		if (!$this->GetMaxRows() || $rows + $mod < $this->GetMaxRows()) {
 			AjaxEcho('$(".newRow").show();');
 			return TRUE;
 		}
 		AjaxEcho('$(".newRow").hide();');
-		if (mysql_num_rows($ds) + $mod == $this->GetMaxRows()) return TRUE;
+		if ($rows + $mod == $this->GetMaxRows()) return TRUE;
 		return FALSE;
 	}
 
@@ -3237,6 +2940,7 @@ SCR_END
 		if (is_empty($this->GetTabledef()) && !$this->UnionModules) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
 		$dataset = $this->GetDataset(TRUE);
+		$num_rows = $this->GetRowCount();
 		if (mysql_error()) return;
 
 		$children = utopia::GetChildren(get_class($this));
@@ -3245,11 +2949,12 @@ SCR_END
 			foreach ($links as $link) {
 				//if (!$child) continue;
 				//ErrorLog(print_r($child,true));
+				$obj = utopia::GetInstance($link['moduleName']);
 				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
-						&& flag_is_set(CallModuleFunc($link['moduleName'],'GetOptions'),ALLOW_ADD)
+						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
 						&& empty($link['fieldLinks'])) {
-					$url = CallModuleFunc($link['moduleName'],'GetURL',array(CallModuleFunc($link['moduleName'],'GetModuleId').'_new'=>1));
+					$url = $obj->GetURL(array($obj->GetModuleId().'_new'=>1));
 					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
 			}
@@ -3360,8 +3065,8 @@ SCR_END
 			$c = ob_get_contents();
 			ob_end_clean();
 
-			$pager = mysql_num_rows($dataset) > 100 ? '<span class="pager" style="float:right;"></span>' : '';
-			$records = ($dataset == FALSE || mysql_num_rows($dataset) == 0) ? "There are no records to display." : 'Total Rows: '.mysql_num_rows($dataset).' (Max 150 shown)';
+			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
+			$records = ($dataset == FALSE || $num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows.' (Max 150 shown)';
 			echo '<tr><td colspan="'.$colcount.'">'.$pager.'<b>{list.'.get_class($this).'}'.$records.'</b></td></tr>';
 
 			echo $c;
@@ -3403,7 +3108,7 @@ SCR_END
 		//			$gUrl = " l_url='$gUrl'";
 
 		$body = "<tbody$gUrl>";
-		if ($dataset == FALSE || mysql_num_rows($dataset) == 0) {
+		if ($dataset == FALSE || $num_rows == 0) {
 		} else {
 			//			if ($result != FALSE && mysql_num_rows($result) > 200)
 			//				echo "<tr><td colspan=\"$colcount\">There are more than 200 rows. Please use the filters to narrow your results.</td></tr>";
@@ -3434,7 +3139,7 @@ SCR_END
 		timer_end('display rows');
 		$foot = '';
 		if (flag_is_set($this->GetOptions(),ALLOW_ADD)) {
-			$hideNew = ($this->GetMaxRows() && mysql_num_rows($dataset) >= $this->GetMaxRows()) ? ' style="display:none"' : '';
+			$hideNew = ($this->GetMaxRows() && $num_rows >= $this->GetMaxRows()) ? ' style="display:none"' : '';
 			$foot .= '<tr class="newRow"'.$hideNew.'>';
 			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) $foot .= "<td class=\"new-ident\"></td>";
 			foreach ($this->fields as $fieldName => $fieldData) {
@@ -3547,7 +3252,7 @@ abstract class uSingleDataModule extends uDataModule {
 
 		$row = NULL;
 		if (!$this->IsNewRecord()) { // records exist, lets get the first.
-      $dataset = $this->GetDataset(TRUE);
+			$dataset = $this->GetDataset(TRUE);
 			$row = $this->GetRecord($dataset,0);
 			if (!$row) {
 				echo "The record you requested is not available.";

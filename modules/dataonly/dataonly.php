@@ -18,11 +18,11 @@ class uDataOnly extends uBasicModule {
 //	public function ParentLoadPoint() { return 0; }
 	public function ParentLoad($parent) {
 		if (!is_subclass_of($parent,'uListDataModule')) return;
-
-		$url = CallModuleFunc($parent,'GetURL',array_merge($_GET,array('__ajax'=>'excel')));
+		$obj = utopia::GetInstance($parent);
+		$url = $obj->GetURL(array_merge($_GET,array('__ajax'=>'excel')));
 		utopia::LinkList_Add('list_functions:'.$parent,'Export to Excel',$url,10,NULL,array('class'=>'fdb-btn bluebg'));
 
-		$url = CallModuleFunc($parent,'GetURL',array_merge($_GET,array('__ajax'=>'print')));
+		$url = $obj->GetURL(array_merge($_GET,array('__ajax'=>'print')));
 		utopia::LinkList_Add('list_functions:'.$parent,'Print',$url,10,NULL,array('class'=>'fdb-btn bluebg','target'=>'_blank'));
 	}
 	
@@ -38,7 +38,8 @@ class uDataOnly extends uBasicModule {
 		utopia::Cache_Check($etag,'application/json','',NULL,$_GET['_expires']);
 		switch ($type) {
 			case 'json':
-				$data = json_encode(CallModuleFunc(GetCurrentModule(),'GetRawData'));
+				$obj = utopia::GetInstance(GetCurrentModule());
+				$data = json_encode($obj->GetRawData());
 				utopia::Cache_Output($data,$etag,'application/json','',NULL,$_GET['_expires']);
 //				die();
 			break;
@@ -51,57 +52,6 @@ class uDataOnly extends uBasicModule {
 	public function showPrint() {
 		utopia::UseTemplate(TEMPLATE_BLANK);
 		RunModule();
-		return;
-		$modules = array(GetCurrentModule());
-		if (is_array($GLOBALS['children']['/'])) foreach ($GLOBALS['children']['/'] as $info) {
-			array_push($modules,$info['moduleName']);
-		}
-		if (is_array($GLOBALS['children'][GetCurrentModule()])) foreach ($GLOBALS['children'][GetCurrentModule()] as $info) {
-			array_push($modules,$info['moduleName']);
-		}
-
-		foreach ($modules as $module) { // add in unions
-			$unions = GetModuleVar($module,'UnionModules');
-			if (is_array($unions)) foreach ($unions as $union)
-			$modules[] = $union;
-		}
-		//    echo GetCurrentModule();
-
-		foreach ($modules as $module) {
-			//			$filters = GetModuleVar($module,'filters');
-			//			if (is_array($filters)) foreach ($filters as $filterType => $filterTypeData)
-			//				if (is_array($filterTypeData)) foreach ($filterTypeData as $filterSetId => $filterSet)
-			//					if (is_array($filterSet)) foreach ($filterSet as $uid => $filterData)
-			// set to an invalid input type, this will allow the filter to pickup from the querystring, but will stop the filterbox from drawing.
-			//						if ($filterData['it'] !== itNONE) $filters[$filterType][$filterSetId][$uid]['it'] = '__';
-			CallModuleFunc($module,'HideFilters');
-			//			SetModuleVar($module,'filters',$filters);
-			CallModuleFunc($module,'_SetupFields');
-			$fields = GetModuleVar($module,'fields');
-			if (is_array($fields)) foreach ($fields as $alias => $fieldInfo)
-			if ($fieldInfo['inputtype'] !== itNONE) $fields[$alias]['inputtype'] = itNONE;
-			SetModuleVar($module,'fields',$fields);
-		}
-		//LoadChildren();
-
-		$filterOutput = '';
-		$filters = GetModuleVar(GetCurrentModule(),'filters');
-		if (is_array($filters)) foreach ($filters as $filterType => $filterTypeData)
-		if (is_array($filterTypeData)) foreach ($filterTypeData as $filterSetId => $filterSet)
-		if (is_array($filterSet)) foreach ($filterSet as $filterData) {
-			if ($filterData['visiblename'] === NULL) continue;
-			$filterValue = CallModuleFunc(GetCurrentModule(),'GetFilterValue',$filterData['uid']);
-			if (empty($filterValue)) continue;
-			$filterOutput .= "{$filterData['visiblename']} {$filterData['ct']} $filterValue<br>";
-		}
-		if (!empty($filterOutput)) echo "<p><b>Filters:</b><br>$filterOutput</p>";
-		//echo "moo";
-		//utopia::UseTemplate(TEMPLATE_PRINT_PATH);
-		RunModule();
-		//die();
-		//echo utopia::GetVar('content');
-		//CancelTemplate();
-		//include(TEMPLATE_PRINT_PATH);
 	}
 
 	public function excel() {
@@ -115,8 +65,10 @@ class uDataOnly extends uBasicModule {
 		header("Cache-Control: post-check=0, pre-check=0", true);
 		header("Pragma: no-cache",true);
 
-		$fields = GetModuleVar(GetCurrentModule(),'fields');
-		$layoutSections = GetModuleVar(GetCurrentModule(),'layoutSections');
+		$obj = utopia::GetInstance(GetCurrentModule());
+
+		$fields = $obj->fields;
+		$layoutSections = $obj->layoutSections;
 
 		$fullOut = '';
 		// section headers
@@ -146,18 +98,18 @@ class uDataOnly extends uBasicModule {
 		$fullOut .= '"'.join('","',$out)."\"\n";
 
 		// rows
-		$dataset = CallModuleFunc(GetCurrentModule(),'GetDataset');
-		$pk = CallModuleFunc(GetCurrentModule(),'GetPrimaryKey');
+		$dataset = $obj->GetDataset();
+		$pk = $obj->GetPrimaryKey();
 
 		$i = 0;
-		while (($row = CallModuleFunc(GetCurrentModule(),'GetRecord',$dataset,$i))) {
+		while (($row = $obj->GetRecord($dataset,$i))) {
 			$i++;
 			$out = array();
 			foreach ($fields as $fieldAlias => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				//				$out[] = $row[$fieldAlias];
 				//ErrorLog($fieldAlias);
-				$data = trim(CallModuleFunc(GetCurrentModule(),'PreProcess',$fieldAlias,$row[$fieldAlias],$row[$pk]));
+				$data = trim($obj->PreProcess($fieldAlias,$row[$fieldAlias],$row[$pk]));
 				if (empty($data)) $data = '';
 				$out[] = $data;
 			}

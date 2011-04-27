@@ -12,7 +12,7 @@ class fileManager extends uBasicModule {
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 	}
 	function show_fileman($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
-		list($path) = $this->Init();
+		list($path) = self::Init();
 		//if (!is_array($attributes)) $attributes = array();
 		//$attributes['onclick'] = 'alert("moo");return false;';
 		utopia::AppendVar('script_include', <<<FIN
@@ -37,7 +37,7 @@ FIN
 		utopia::CancelTemplate();
 		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');
 	}
-	function Init() {
+	static function Init() {
 		utopia::AddJSFile(jqFileManager::GetPathJS());
 		utopia::AddCSSFile(jqFileManager::GetPathCSS());
 		utopia::AppendVar('script_include', <<<FIN
@@ -48,7 +48,8 @@ FIN
 	}
 FIN
 );
-		return array($this->GetAjaxPath(),$this->GetAjaxUploadPath());
+		$obj = utopia::GetInstance(__CLASS__);
+		return array($obj->GetAjaxPath(),$obj->GetAjaxUploadPath());
 	}
 	function GetAjaxPath() {
 		return $this->GetURL(array('__ajax'=>'fileManagerAjax'));
@@ -59,7 +60,7 @@ FIN
 	function RunModule() {
 		$tabGroupName = utopia::Tab_InitGroup();
 		ob_start();
-		list($path,$pathUpload) = $this->Init();
+		list($path,$pathUpload) = self::Init();
 
 		echo '<div id="fileMan"></div>';
 		$includeOpts = '';

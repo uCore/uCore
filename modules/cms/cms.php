@@ -88,14 +88,16 @@ class uCMS_List extends uDataModule {
 		ob_start();
 
 		$m = utopia::ModuleExists('uCMS_Edit');
-		$newUrl = CallModuleFunc('uCMS_Edit','GetURL',array($m['module_id'].'_new'=>1));
+		$obj = utopia::GetInstance('uCMS_Edit');
+		$newUrl = $obj->GetURL(array($m['module_id'].'_new'=>1));
 		$relational = $this->GetNestedArray();
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
 		echo '<div style="font-size:0.8em;white-space:nowrap"><a class="btn" style="font-size:0.8em" href="'.$newUrl.'">New Page</a><a class="btn" style="font-size:0.8em" href="javascript:t()">Toggle Hidden</a>';
 
-		CallModuleFunc('modOpts','_SetupFields');
-		$row = CallModuleFunc('modOpts','LookupRecord','CMS::default_template');//$this->GetCell($fieldName,$row,$targetUrl)
-		echo '<br>Default Template: '.CallModuleFunc('modOpts','GetCell','value',$row,NULL);
+		$modOptsObj = utopia::GetInstance('modOpts');
+		$modOptsObj->_SetupFields();
+		$row = $modOptsObj->LookupRecord('CMS::default_template');//$this->GetCell($fieldName,$row,$targetUrl)
+		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row,NULL);
 
 		echo '<hr><div style="font-size:0.8em">Click a page below to preview it.</div>';
 		self::DrawChildren($relational);
@@ -158,18 +160,20 @@ FIN;
 		echo '<ul class="cmsTree">';
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? ' hiddenItem' : '';
-			$editLink = CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
-			$delLink = CallModuleFunc('uCMS_List','CreateSqlField','del',$child['cms_id'],'del');// CallModuleFunc('uCMS_Edit','GetURL',array('cms_id'=>$child['cms_id'])); //'?_action=edit&id='.$child['id'];
+			$editObj = utopia::GetInstance('uCMS_Edit');
+			$listObj = utopia::GetInstance('uCMS_List');
+			$viewObj = utopia::GetInstance('uCMS_View');
+
+			$editLink = $editObj->GetURL(array('cms_id'=>$child['cms_id']));
+			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
 			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
 
 			echo '<li id="'.$child['cms_id'].'" class="cmsItem'.$hide.'">';
-		//	echo '<div onclick="$(\'#previewFrame\').attr(\'src\',\''.CallModuleFunc('uCMS_View','GetURL',array('cms_id'=>$child['cms_id'])).'\')">';
 			echo $child['title'].$data;
 			echo '<div class="cmsItemActions">';
-			echo CallModuleFunc('uCMS_List','GetDeleteButton',$child['cms_id']);
+			echo $listObj->GetDeleteButton($child['cms_id']);
 			echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			echo '</div>';
-		//	echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
 			echo '</li>';
 		}
@@ -218,14 +222,10 @@ FIN;
 		if (!$_POST['data']) return;
 		foreach ($_POST['data'] as $cms_id => $val) {
 			list($newParent,$pos) = explode(':',$val);
-			$oldURL = CallModuleFunc('uCMS_View','GetURL',$cms_id);
+			$obj = utopia::GetInstance('uCMS_View');
+			$oldURL = $obj->GetURL($cms_id);
 			$this->UpdateFields(array('parent'=>$newParent,'position'=>$pos),$cms_id);
-			$newURL = CallModuleFunc('uCMS_View','GetURL',$cms_id);
-
-			//if (!$oldURL || $oldURL == '/') continue;
-			//$qry = 'UPDATE '.CallModuleFunc('uCMS_View','GetPrimaryTable').' SET `content` = REPLACE(`content`,\''.$oldURL.'\',\''.$newURL.'\')';
-			//sql_query($qry);
-			//print_r($rows);
+			$newURL = $obj->GetURL($cms_id);
 		}
 	}
 }
@@ -249,10 +249,9 @@ class uCMS_Edit extends uSingleDataModule {
 		$this->FieldStyles_Set('title',array('width'=>'100%'));
 		$this->AddField('description','description','cms','Meta Description',itTEXT);
 		$this->FieldStyles_Set('description',array('width'=>'100%'));
-    $this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Possible Data Blocks');
+		$this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Possible Data Blocks');
 		$this->AddField('content','content','cms','Page Content',itHTML);
 		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
-	//	$this->AddPreProcessCallback('content',array($this,'getWithTemplate'));
 		$this->AddFilter('cms_id',ctEQ);
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
@@ -261,16 +260,14 @@ class uCMS_Edit extends uSingleDataModule {
 	}
 
 	public function getPossibleBlocks($val,$pk,$original) {
-		$rows = CallModuleFunc('uDataBlocks_List','GetRows');
+		$obj = utopia::GetInstance('uDataBlocks_List');
+		$rows = $obj->GetRows();
 		foreach (uDataBlocks::$staticBlocks as $blockID => $callback) $rows[]['block_id'] = $blockID;
 		$ret = '<div>Click on a block to insert it.</div>';
 		foreach ($rows as $row) {
 			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$row['block_id']}</span>";
 		}   
 		return trim($ret);
-	}
-	public function getWithTemplate($val,$pk,$original) {
-		return file_get_contents('http://'.utopia::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$pk),FALSE);
 	}
 	public function SetupParents() {
 		//$this->AddParent('uCMS_List');
@@ -301,7 +298,8 @@ class uCMS_View extends uSingleDataModule {
 		return $page['updated'];
 	}
 	static function templateParser($id) {
-		$rec = CallModuleFunc('uCMS_View','GetRows',$id);
+		$obj = utopia::GetInstance('uCMS_View');
+		$rec = $obj->GetRows($id);
 		$rec = $rec[0];
 		return '<div class="mceEditable">'.$rec['content'].'</div>';
 	}
@@ -374,31 +372,23 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	static function GetHomepage() {
-		$row = CallModuleFunc('uCMS_View','LookupRecord',array('is_home'=>'1'));
-		if (!$row) $row = CallModuleFunc('uCMS_View','LookupRecord');
+		$obj = utopia::GetInstance('uCMS_View');
+		$row = $obj->LookupRecord(array('is_home'=>'1'));
+		if (!$row) $row = $obj->LookupRecord();
 		if ($row) return $row;
 		return FALSE;
 	}
 
 	static function findPage() {
 		$uri = $_SERVER['REQUEST_URI'];
-
-		// if file is directly requested then don't use findPage. Only for CMS pages.
-//		$test = realpath($_SERVER['DOCUMENT_ROOT']).$uri;
-//		if (file_exists($test) && is_file($test)) return FALSE;
-
 		$uri = preg_replace('/(\?.*)?/','',$uri);
 
-    if ($uri == '/') {
-      return self::GetHomepage();
-    }
-    
-//    preg_match('/([^\/]+)\.php$/Ui',$uri,$matches);
-    preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
+		if ($uri == '/') return self::GetHomepage();    
 
+		preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
 		if (array_key_exists(1,$matches)) {
-//		  header('fp: yes');
-			$row = CallModuleFunc('uCMS_View','LookupRecord',$matches[1]);
+			$obj = utopia::GetInstance('uCMS_View');
+			$row = $obj->LookupRecord($matches[1]);
 			if ($row) return $row;
 		}
 
@@ -431,7 +421,8 @@ class uCMS_View extends uSingleDataModule {
 	static function GetTemplate($id) {
 		$template = NULL;
 		while ($id != NULL) {
-			$rec = CallModuleFunc('uCMS_View','LookupRecord',$id);
+			$obj = utopia::GetInstance('uCMS_View');
+			$rec = $obj->LookupRecord($id);
 			if ($rec['template']) { $template = $rec['template']; break; }
 			$id = $rec['parent'];
 		}

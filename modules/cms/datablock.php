@@ -77,7 +77,8 @@ class uDataBlocks extends uSingleDataModule {
   public function getPossibleFields($originalVal,$pk,$processedVal) {
     $rec = $this->LookupRecord($pk);
     if (!$rec || !$rec['module']) return 'Please select a module.';
-    $fields = GetModuleVar($rec['module'],'fields');
+    $obj = utopia::GetInstance($rec['module']);
+    $fields = $obj->fields;
     $ret = '';
     foreach ($fields as $field) {
       $ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">{$field['alias']}</span>";
@@ -100,7 +101,8 @@ class uDataBlocks extends uSingleDataModule {
   static function DrawBlock($id) {
     if (isset(self::$staticBlocks[$id])) return call_user_func(self::$staticBlocks[$id]);
 
-    $rec = CallModuleFunc('uDataBlocks','LookupRecord',$id);
+    $obj = utopia::GetInstance('uDataBlocks');
+    $rec = $obj->LookupRecord($id);
     if (!$rec) return NULL;
 
     if ($rec['module']) {
@@ -149,9 +151,10 @@ class uDataBlocks extends uSingleDataModule {
           $field = $varsArr[$k];
           if (!isset($row[$field])) continue;
 		  $replace = $typeArr[$k] == 'u' ? UrlReadable($row[$field]) : $row[$field];
-		  if ($rec['editable'])
-		    $replace = CallModuleFunc($rec['module'],'GetCell',$field,$row);
-
+		  if ($rec['editable']) {
+		    $obj = utopia::GetInstance($rec['module']);
+		    $replace = $obj->GetCell($field,$row);
+		  }
 		  $c = str_replace($search,$replace,$c);
         }
         $content .= $c;

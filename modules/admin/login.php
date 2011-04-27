@@ -43,7 +43,8 @@ class adminLogout extends uBasicModule {
 	public function ParentLoad($parent) {}
         public function RunModule() {
 		unset($_SESSION['admin_auth']);
-		header('Location: '.CallModuleFunc('internalmodule_Admin','GetURL'));
+		$obj = utopia::GetInstance('internalmodule_Admin');
+		header('Location: '.$obj->GetURL());
 		die();
 	}
 }
@@ -85,7 +86,8 @@ class internalmodule_AdminLogin extends uDataModule {
 		}
 
 		if (self::IsLoggedIn() && ((GetCurrentModule() == get_class($this)) || (array_key_exists('adminredirect',$_REQUEST) && $_REQUEST['adminredirect'] == 1))) {
-			header('Location: '.CallModuleFunc('internalmodule_Admin','GetURL')); die();
+			$obj = utopia::GetInstance('internalmodule_Admin');
+			header('Location: '.$obj->GetURL()); die();
 		}
 	}
   
@@ -110,7 +112,8 @@ class internalmodule_AdminLogin extends uDataModule {
 	public function ParentLoadPoint() { return 0; }
 	public function ParentLoad($parent) {
 		// if auth not required, return
-		if (!flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return true;
+		$obj = utopia::GetInstance($parent);
+		if (!flag_is_set($obj->GetOptions(),IS_ADMIN)) return true;
 		if ($parent === get_class($this)) return true;
 
 		// if authed, dont show the login
@@ -130,13 +133,12 @@ class internalmodule_AdminLogin extends uDataModule {
 			' '.utopia::DrawInput('',itSUBMIT,'Log In').'</form>';
 		}
 
-		return '[ <a href="'.CallModuleFunc('internalmodule_Admin','GetURL').'">Admin Home</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=adminLogout\')">Logout</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=toggleT\')">Toggle Timers</a> ]'.// [ <a href="#" onclick="javascript:$(\'#errFrame\').toggle()">Show Errors</a> ]'.
+		$obj = utopia::GetInstance('internalmodule_Admin');
+		return '[ <a href="'.$obj->GetURL().'">Admin Home</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=adminLogout\')">Logout</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=toggleT\')">Toggle Timers</a> ]'.// [ <a href="#" onclick="javascript:$(\'#errFrame\').toggle()">Show Errors</a> ]'.
 				'<div id="errFrame" style="display:none; max-height:500px; overflow:scroll;">'.$errs.'</div>';
 	}
   
-  static function RequireLogin($accounts=NULL) {
-//    if ()
-  }
+	static function RequireLogin($accounts=NULL) { }
 
 	public function RunModule() {
 		//__admin_login_u

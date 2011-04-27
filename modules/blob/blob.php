@@ -6,7 +6,8 @@ class uBlob extends uBasicModule {
 	function GetUUID() { return 'blob'; }
 	function ParentLoad($parent) {}
 	function RunModule() {
-		$rec = CallModuleFunc($_GET['module'],'LookupRecord',mysql_real_escape_string($_GET['pk']));
+		$obj = utopia::GetInstance($_GET['module']);
+		$rec = $obj->LookupRecord(mysql_real_escape_string($_GET['pk']));
 
 		if (!$rec || !isset($rec[$_GET['field']])) utopia::PageNotFound();
                 utopia::CancelTemplate();

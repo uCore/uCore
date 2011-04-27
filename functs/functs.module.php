@@ -79,6 +79,7 @@ function LoadModulesDir($dir, $recursive = TRUE) {
 }
 
 function &CallModuleFunc($classname,$funcname) {
+	trigger_error("CallModuleFunc is deprecated.", E_USER_DEPRECATED);
 	static $null = NULL;
 
 	if (!$classname) { ErrorLog("Executing function ($funcname) in null class<br/>".print_r(useful_backtrace(),true)); return $null; }
@@ -130,6 +131,7 @@ function &CallModuleFuncByRef($classname,$funcname,&$one=null,&$two=null,&$three
 }
 
 function &GetModuleVar($classname,$varname) {
+	trigger_error("GetModuleVar is deprecated.", E_USER_DEPRECATED);
 	$null = NULL;
 	if (($instance = utopia::GetInstance($classname)) == NULL) return $null;
 	if (!property_exists($instance,$varname)) return $null;
@@ -254,34 +256,12 @@ function RunModule($module = NULL) {
 		utopia::PageNotFound();
 	}
 	utopia::SetVar('current_module',$module);
-	utopia::SetVar('title',CallModuleFunc($module,'GetTitle'));
+	$obj = utopia::GetInstance($module);
+	utopia::SetVar('title',$obj->GetTitle());
 	// run module
-	if (!is_empty($module)) CallModuleFunc($module,'_RunModule');
+	if (!is_empty($module)) $obj->_RunModule();
 
 	utopia::Finish();
-}
-
-function InstallAllModules() {
-  // TABLE CHANGE CHECKER
-  sql_query('CREATE TABLE IF NOT EXISTS __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40))');
-  sql_query('ALTER TABLE __table_checksum ENGINE='.MYSQL_ENGINE);
-//  $r = sql_query('SHOW TABLES LIKE \'__table_checksum\'');
-//  if (!mysql_num_rows($r)) {
-    // create internal table check
-//  }
-
-	$installed = array();
-	$classes = utopia::GetModulesOf('uTableDef');
-	timer_start('table installation');
-	foreach ($classes as $classname => $class) { // install tables
-		timer_start('table install ('.$classname.')');
-		CallModuleFunc($classname,'InstallTable');
-		$installed[] = $classname;
-		timer_end('table install ('.$classname.')');
-	}
-	timer_end('table installation');
-
-	return $installed;
 }
 
 function retTrue() { return true; }

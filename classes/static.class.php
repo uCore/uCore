@@ -47,12 +47,6 @@ class utopia {
 		else
 			$content = self::GetVar('title');
 
-//		if (!$content && $fallback)
-//			$content = CallModuleFunc(GetCurrentModule(),'GetTitle');
-//		else
-//			$content = '&lt;&lt; No Title &gt;&gt;';
-
-
 		if (empty($content) || $textOnly) return $content;
 		return '<title>'.$content.'</title>'."\n";
 	}
@@ -125,7 +119,8 @@ class utopia {
 				$class['uuid'] = $class['module_name'];
 
 				if ($ref->isSubclassOf('uBasicModule')) {
-        	                        $class['uuid'] = CallModuleFunc($class['module_name'],'GetUUID');
+					$obj = utopia::GetInstance($class['module_name']);
+        	                        $class['uuid'] = $obj->GetUUID();
 				}
 				$rows[$class['module_name']] = $class;
 			}
@@ -606,8 +601,6 @@ class utopia {
 		if (self::$adminTemplate) self::UseTemplate(TEMPLATE_ADMIN);
 		if (!self::UsingTemplate()) return;
 
-		$adminPanel = CallModuleFunc('internalmodule_AdminLogin', 'GetAdminPanel');
-
 		$templateDir = self::GetTemplateDir();
 		$templatePath = $templateDir.'template.php';
 		self::CancelTemplate(true);
@@ -637,19 +630,6 @@ class utopia {
 		if (self::VarExists('script_include'))
 			self::AppendVar('</head>','<script type="text/javascript">'.utopia::GetVar('script_include').'</script>'."\n");
 //		self::AppendVar('</head>','<base href="http://'.self::GetDomainName().self::GetRelativePath($templateDir).'/" />'."\n");
-
-/*		self::AppendVar('</body>','{UTOPIA.powered}{UTOPIA.admin_panel}');
-
-		$time_taken = timer_findtime('full process');
-		self::SetVar('admin_panel',
-				'<div id="uPanel"><div id="utopiaImg" onclick="$(\'#adminSlave\').toggle();"></div>'.
-				//'<div style="">'.
-				'<div id="adminSlave">'.
-				'<div id="adminClose" onclick="$(\'#adminSlave\').toggle()"></div>'.
-				'<div style="font-size:16px; margin-right:14px">Powered by <a target="_blank" href="http://www.utopiasystems.co.uk">Utopia</a>.</div>'.
-				'<div>[ '.$time_taken.'ms ] [ '.$GLOBALS['sql_query_count'].' queries ]</div>'.
-				$adminPanel.
-				'</div></div>');*/
 
 		while (self::MergeVars($template));
 

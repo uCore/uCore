@@ -9,7 +9,8 @@ class uSitemap {
 		self::DrawMenu(NULL,-1);
 	}
 	static function DrawMenu($parent=NULL,$level = 1) {
-		$arr = CallModuleFunc('uCMS_List','GetNestedArray');
+		$obj = utopia::GetInstance('uCMS_List');
+		$arr = $obj->GetNestedArray();
 		if ($parent) {
 			$newarr = self::findKey($arr,$parent);
 			$newarr = $newarr[$parent];
@@ -23,11 +24,12 @@ class uSitemap {
 		$level = $level -1;
 		array_sort_subkey($children,'position');
 		echo '<ul class="u-menu">';
+		$obj = utopia::GetInstance('uCMS_View');
 		foreach ($children as $child) {
 			if ($child['hide']) continue;
 			$menu_title = $child['nav_text'] ? $child['nav_text'] : $child['title'];
-			//$hide = $child['hide'] ? 'hiddenItem' : '';  //class="'.$hide.'" 
-			$url = CallModuleFunc('uCMS_View','GetURL',$child['cms_id']);
+			//$hide = $child['hide'] ? 'hiddenItem' : '';  //class="'.$hide.'"
+			$url = $obj->GetURL($child['cms_id']);
 			//$sel = (strpos($url,$_SERVER['REQUEST_URI']) !== FALSE) ? ' u-menu-active' : '';
 			//$sel = ($url == $_SERVER['REQUEST_URI']) ? ' u-menu-active' : ''; //handled by javascript
 			echo '<li id="'.$child['cms_id'].'" style="position:relative;cursor:pointer">';
@@ -62,12 +64,14 @@ class uSitemapXML extends uBasicModule {
 	public function ParentLoad($parent) { }
 	public function RunModule() {
 		utopia::CancelTemplate();
-		$arr = CallModuleFunc('uCMS_List','GetRows');
+		$obj = utopia::GetInstance('uCMS_List');
+		$viewObj = utopia::GetInstance('uCMS_View');
+		$arr = $obj->GetRows();
 
 		echo '<?xml version="1.0" encoding="UTF-8"?>';
 		echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 		foreach ($arr as $entry) {
-			$url = 'http://'.utopia::GetDomainName().CallModuleFunc('uCMS_View','GetURL',$entry['cms_id']);
+			$url = 'http://'.utopia::GetDomainName().$viewObj->GetURL($entry['cms_id']);
 			echo <<<FIN
 
 <url>

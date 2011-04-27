@@ -23,8 +23,6 @@ if ($valid) {
         die();
 }
 
-InstallAllModules();
-
 ini_set('default_charset',CHARSET_ENCODING);
 header('Content-type: text/html; charset='.CHARSET_ENCODING);
 
@@ -34,32 +32,35 @@ if(!ob_start("ob_gzhandler")) ob_start();
 
 if (!array_key_exists('_noTemplate',$_GET))	utopia::UseTemplate();
 
-$allmodules = utopia::GetModules(true,true);
-if ($allmodules === NULL || count($allmodules) === 0) {// || (internalmodule_AdminLogin::IsLoggedIn() && array_key_exists('__rebuild',$_REQUEST))) {
-	InstallAllModules();
-	header('Location: '.preg_replace('/__rebuild(=[^&]*)?/','',$_SERVER['REQUEST_URI'])); exit();
-}
+sql_query('CREATE TABLE IF NOT EXISTS __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40))');
+sql_query('ALTER TABLE __table_checksum ENGINE='.MYSQL_ENGINE);
 
+$allmodules = utopia::GetModules(true);
 timer_start('Module Initialise');
 foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to be setup fully
 	timer_start('Init: '.$row['module_name']);
-	CallModuleFunc($row['module_name'],'Initialise'); // setup Parents
+	$obj = utopia::GetInstance($row['module_name']);
+	if (method_exists($obj,'Initialise'))
+		$obj->Initialise(); // setup Parents
 	timer_end('Init: '.$row['module_name']);
 }
 timer_end('Module Initialise');
 
 
-timer_start('Setup Fields');
+//timer_start('Setup Fields');
 // setup fields on current module
-if (GetCurrentModule())
-	CallModuleFunc(GetCurrentModule(),'_SetupFields');
-timer_end('Setup Fields');
+//if (GetCurrentModule()) {
+//	$obj = utopia::GetInstance(GetCurrentModule());
+//	$obj->_SetupFields();
+//}
+//timer_end('Setup Fields');
 
 // process ajax function
 if (array_key_exists('__ajax',$_REQUEST)) {
 	utopia::CancelTemplate();
 	// TODO: ajax parentloading?  EG: login modules
-	$lc = CallModuleFunc(GetCurrentModule(),'LoadChildren'); // now part of runmodule and loadparents, call here to check for
+	$obj = utopia::GetInstance(GetCurrentModule());
+	$lc = $obj->LoadChildren(); // now part of runmodule and loadparents, call here to check for
 	if ($lc !== TRUE && $lc !== NULL) die();
 
 
@@ -69,8 +70,6 @@ if (array_key_exists('__ajax',$_REQUEST)) {
 	$requireAdmin = $GLOBALS['ajax'][$ajaxIdent]['req_admin'];
 	$callback	= $GLOBALS['ajax'][$ajaxIdent]['callback'];
 	$class		= $GLOBALS['ajax'][$ajaxIdent]['class'];
-
-	//CallModuleFunc($class,'_SetupFields');
 
 	if (is_bool($requireAdmin) && ($requireAdmin === TRUE && !internalmodule_AdminLogin::IsLoggedIn()))
 		die('// Not Authenticated');

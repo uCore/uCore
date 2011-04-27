@@ -22,7 +22,7 @@ class module_TinyMCE extends uBasicModule {
 			utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce.js');
 			$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/spellchecker/rpc.php';
 			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/preview/preview.php';
-			list($fileManagerPath) = CallModuleFunc('fileManager' ,'Init');
+			list($fileManagerPath) = fileManager::Init();
 			$relUploads = utopia::GetRelativePath(PATH_UPLOADS);
 
 			$options = array();

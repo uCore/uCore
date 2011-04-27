@@ -1,4 +1,24 @@
-<?php //session_start(); return;
+<?php
+
+class tabledef_Session extends uTableDef {
+	public function SetupFields() {
+		// add all the fields in here
+		// AddField($name, $type, $length, $collation='', $attributes='', $null='not null', $default='', $extra='', $comments='')
+		// SetPrimaryKey($name);
+
+		$this->AddField('ses_id','varchar',32);
+		$this->AddField('ses_time','timestamp',0);
+		$this->AddField('ses_start','timestamp',0);
+		$this->AddField('ses_value',ftTEXT);
+		$this->AddField('remote_ip','varchar',15);
+		$this->AddField('current_module','varchar','50');
+		$this->AddField('current_page',ftTEXT);
+		$this->SetPrimaryKey('ses_id',false);
+	}
+}
+
+//session_start();
+
 /* Create new object of class */
 //$ses_class = new SessionHandler();
 
@@ -47,7 +67,8 @@ function ses_write($ses_id, $data) {
 	$cp_up = ''; $title_up = ''; $title = ''; $current_page = '';
 	if (stristr($_SERVER['REQUEST_URI'],'__ajax=') === FALSE && GetCurrentModule() !== '') {
 		$current_page = $_SERVER['REQUEST_URI'];
-		$title = CallModuleFunc(GetCurrentModule(),'GetTitle');
+		$obj = utopia::GetInstance(GetCurrentModule());
+		$title = $obj->GetTitle();
 		$cp_up = ", current_page='$current_page'";
 		$title_up = ", current_module='$title'";
 	}
@@ -104,22 +125,4 @@ function ses_gc($maxlifetime = NULL) {
 	}
 }
 
-class tabledef_Session extends uTableDef {
-	public $tablename = "internal_sessions";
-
-	public function SetupFields() {
-		// add all the fields in here
-		// AddField($name, $type, $length, $collation='', $attributes='', $null='not null', $default='', $extra='', $comments='')
-		// SetPrimaryKey($name);
-
-		$this->AddField('ses_id','varchar',32);
-		$this->AddField('ses_time','timestamp',0);
-		$this->AddField('ses_start','timestamp',0);
-		$this->AddField('ses_value',ftTEXT);
-		$this->AddField('remote_ip','varchar',15);
-		$this->AddField('current_module','varchar','50');
-		$this->AddField('current_page',ftTEXT);
-		$this->SetPrimaryKey('ses_id',false);
-	}
-}
 ?>

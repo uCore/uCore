@@ -68,9 +68,9 @@ abstract class uTableDef implements iUtopiaModule {
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'unique') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
-			$this->fields[$name]['pk'] = true;
-			$this->fields[$name]['default'] = NULL;
-			if (strcasecmp($this->fields[$name]['type'],ftNUMBER) == 0 && $auto_increment) $this->fields[$name]['extra'] = 'auto_increment';
+		$this->fields[$name]['pk'] = true;
+		$this->fields[$name]['default'] = NULL;
+		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) $this->fields[$name]['extra'] = 'auto_increment';
 	}
 	public function SetUniqueField($name) {
 		//$name = strtolower($name);
@@ -121,11 +121,11 @@ abstract class uTableDef implements iUtopiaModule {
 		$field['attributes'] = $attributes;
 		$field['null'] = $null;
 
-		$zeroIfNull = array(ftNUMBER,ftBOOL,ftDECIMAL,ftPERCENT,ftCURRENCY,ftTIMESTAMP,ftTIME);
+		$zeroIfNull = array_flip(array(ftNUMBER,ftBOOL,ftDECIMAL,ftPERCENT,ftCURRENCY,ftTIMESTAMP,ftTIME));
 		$emptyIfNull = array();
-		if ($default === NULL && array_search($sqltype,$zeroIfNull))
+		if ($default === NULL && isset($zeroIfNull[$sqltype]))
 			$default = 0;
-		if ($default === NULL && array_search($sqltype,$emptyIfNull))
+		if ($default === NULL && in_array($sqltype,$emptyIfNull))
 			$default = '';
 
 		$field['default'] = $default;
@@ -141,12 +141,12 @@ abstract class uTableDef implements iUtopiaModule {
 	public function FieldExists($fieldName) {
 		//$fieldName = strtolower($fieldName);
 		$this->_SetupFields();
-		return !empty($this->fields[$fieldName]);
+		return isset($this->fields[$fieldName]);
 	}
 
 	public function SetFieldProperty($fieldName,$propertyName,$propertyValue) {
 		//$fieldName = strtolower($fieldName);
-		if (!array_key_exists($fieldName,$this->fields)) return;
+		if (!isset($this->fields[$fieldName])) return;
 		$this->fields[$fieldName][$propertyName] = $propertyValue;
 	}
 
@@ -154,8 +154,8 @@ abstract class uTableDef implements iUtopiaModule {
 		//$fieldName = strtolower($fieldName);
 		//$propertyName = strtolower($propertyName);
 		$this->_SetupFields();
-		if (!array_key_exists($fieldName,$this->fields)) return NULL;
-		if (!array_key_exists($propertyName,$this->fields[$fieldName])) return NULL;
+		if (!isset($this->fields[$fieldName])) return;
+		if (!isset($this->fields[$fieldName][$propertyName])) return;
 		return $this->fields[$fieldName][$propertyName];
 	}
 
@@ -171,13 +171,14 @@ abstract class uTableDef implements iUtopiaModule {
 	static $tableChecksum = NULL;
 	public function checksumValid($checksum,$refresh=false) {
 		if ($refresh || self::$tableChecksum === NULL) self::$tableChecksum = GetRows(sql_query('SELECT * FROM `__table_checksum`'));
+		$class = get_class($this);
 		foreach (self::$tableChecksum as $row) {
-			if ($row['name'] == TABLE_PREFIX.get_class($this)) return $row['checksum'] === $checksum;
+			if ($row['name'] == TABLE_PREFIX.$class) return $row['checksum'] === $checksum;
 		}
 		return FALSE;
 	}
 
-	public function InstallTable() {
+	public function Initialise() {
 		// create / update table
 		// is table already existing?
 		if ($this->isDisabled) return;
@@ -195,7 +196,7 @@ abstract class uTableDef implements iUtopiaModule {
 		$engine = MYSQL_ENGINE;
 		$checksum = sha1($engine.print_r($this->fields,true));
 		if ($this->checksumValid($checksum)) return;
-		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `name` = \''.$this->tablename.'\', `checksum` = \''.$checksum.'\'');
+		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `checksum` = \''.$checksum.'\'');
 
 		$unique = array();
 		$index = array();

@@ -42,15 +42,17 @@ class modOpts extends uListDataModule {
 		self::RefreshCache();
 	}
 	public static function AddOption($module,$ident,$name,$init='',$fieldType=itTEXT,$values=NULL) {
-		$rec = self::GetOption($module,$ident);// CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
+		$rec = self::GetOption($module,$ident);
 		if ($rec === NULL) {
-			CallModuleFunc('modOpts','UpdateFields',array('ident'=>$module.'::'.$ident,'name'=>$name,'value'=>$init));
+			$obj = utopia::GetInstance('modOpts');
+			$obj->UpdateFields(array('ident'=>$module.'::'.$ident,'name'=>$name,'value'=>$init));
 		}
 		self::$types[$module.'::'.$ident] = array($fieldType,$values);
 	}
 	public static $optCache = array();
 	public static function RefreshCache() {
-		foreach (CallModuleFunc('modOpts','GetRows') as $row) {
+		$obj = utopia::GetInstance('modOpts');
+		foreach ($obj->GetRows() as $row) {
 			self::$optCache[$row['ident']] = $row['value'];
 		}
 	}
@@ -59,8 +61,6 @@ class modOpts extends uListDataModule {
 		if (!array_key_exists($ident,self::$optCache)) self::RefreshCache();
 		if (!array_key_exists($ident,self::$optCache)) return NULL;
 		return self::$optCache[$ident];
-		//$rec = CallModuleFunc('modOpts','LookupRecord',array('module'=>$module,'ident'=>$ident));
-		//return $rec['value'];
 	}
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		$pk = $this->GetPrimaryKey();

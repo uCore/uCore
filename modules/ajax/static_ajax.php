@@ -66,7 +66,8 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public function getUpload() {
 		//$module = utopia::UUIDExists($_GET['uuid']);
 		//print_r($module);
-		$rec = CallModuleFunc(GetCurrentModule(),'LookupRecord',$_GET['p']);
+		$obj = utopia::GetInstance(GetCurrentModule());
+		$rec = $obj->LookupRecord($_GET['p']);
 		//print_r($rec);
 		if (!$rec) {
 			echo '<h1>404 File Not Found</h1>';
@@ -216,7 +217,8 @@ class internalmodule_StaticAjax extends uBasicModule {
 				$string = cbase64_decode($enc_name);
 
 				InterpretSqlString($string, $module, $field, $pkVal);
-				CallModuleFunc($module, 'ProcessUpdates',$fileInfo['function'],$enc_name,$field,$fileInfo,$pkVal);
+				$obj = utopia::GetInstance($module);
+				$obj->ProcessUpdates($fileInfo['function'],$enc_name,$field,$fileInfo,$pkVal);
 			}
 		}
 
@@ -229,7 +231,8 @@ class internalmodule_StaticAjax extends uBasicModule {
 					if (get_magic_quotes_gpc()) $value = stripslashes($value);
 
 					InterpretSqlString($string, $module, $field, $pkVal);
-					CallModuleFunc($module,'ProcessUpdates',$function,$enc_name,$field,$value,$pkVal);
+					$obj = utopia::GetInstance($module);
+					$obj->ProcessUpdates($function,$enc_name,$field,$value,$pkVal);
 				}
 			}
 		}
@@ -244,12 +247,14 @@ class internalmodule_StaticAjax extends uBasicModule {
 		//if (!$tmp) return;
 		if (strpos($tmp,':') !== FALSE) {
 			list($module,$field) = explode(':',$tmp);
-			CallModuleFunc($module,'_SetupFields');
-			$vals = CallModuleFunc($module,'GetValues',$field);
+			$obj = utopia::GetInstance($module);
+			$obj->_SetupFields();
+			$vals = $obj->GetValues($field);
 		} elseif (strpos($tmp,'|') !== FALSE) {
 			list($module,$field) = explode('|',$tmp);
-			CallModuleFunc($module,'_SetupFields');
-			$fltr = CallModuleFunc($module,'FindFilter',$field);
+			$obj = utopia::GetInstance($module);
+			$obj->_SetupFields();
+			$fltr = $obj->FindFilter($field);
 			$vals = $fltr['values'];
 		}
 		$out = '';

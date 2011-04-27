@@ -14,7 +14,8 @@ class module_Offline extends uBasicModule {
 	public function ParentLoad($parent) {
 		if (modOpts::GetOption('module_Offline','online')) return;
 		if (internalmodule_AdminLogin::IsLoggedIn()) return;
-		if (flag_is_set(CallModuleFunc($parent,'GetOptions'),IS_ADMIN)) return;
+		$obj = utopia::GetInstance($parent);
+		if (flag_is_set($obj->GetOptions(),IS_ADMIN)) return;
 
 		$this->_RunModule();
 		//utopia::SetVar('current_module',get_class($this));
