@@ -2432,7 +2432,6 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function ProcessUpdates($function,$sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { AjaxEcho('//Module Not Editable'); return; }
 		$this->_SetupFields();
 
 		$func = 'ProcessUpdates_'.$function;
@@ -2445,6 +2444,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function ProcessUpdates_add($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
+		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { AjaxEcho('//Module does not allow record editing'); return; }
 		$this->UpdateField($fieldAlias,$value,$pkVal);
 	}
 
@@ -2454,6 +2454,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
+		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { AjaxEcho('//Module does not allow record deletion'); return; }
 		AjaxEcho('//'.get_class($this)."@ProcessUpdates_del($fieldAlias,$value,$pkVal)");
 
 		$table = TABLE_PREFIX.$this->GetTabledef();
