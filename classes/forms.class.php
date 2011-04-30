@@ -181,51 +181,28 @@ abstract class uBasicModule implements iUtopiaModule {
 	public $parentLoaded = array();
 	// timeframe is either pre(0) or post(1) currentmodule_Load, should be checked against module "ParentLoadPreference", which defaults to Post
 	public function _ParentLoad($parent) {
-//echo 'attempt '.get_class($this).' for '.$parent.'<br/>';
 		if (!$this->CanParentLoad($parent)) return NULL;
 
-		//pre or post
-		//		ErrorLog(get_class($this).':'.$this->ParentLoadPoint().'='.$timeframe);
-		//		if () return NULL;
-		//		ErrorLog("loading ".get_class($this)." with ".($timeframe ? '1':'0'));
-		//if ($parent == '/' && !array_key_exists(GetCurrentModule(),$this->parents)) return TRUE;
-		//		ErrorLog("parentloading ".get_class($this)." with $parent");
-
 		if (!$this->HasParent($parent)) return NULL;
-		//ErrorLog(array_key_exists($parent,$this->parents) ? '1' : 0);
-//		if ($parent == get_class($this)) return NULL;
-//ErrorLog(get_class($this).': p2');
 		if ($this->HasParentLoaded($parent)) return NULL;
-//ErrorLog(get_class($this).': p3');
-//ErrorLog(GetCurrentModule().':'.$parent.'->'.get_class($this));
 
 		$lm = utopia::GetVar('loadedModules',array());
 		if (array_search($this,$lm,true) === FALSE) $lm[] = $this;
-//echo 'PL '.get_class($this).' for '.$parent.'<br/>';
 		$this->activeParent = $parent;
 		$this->parentLoaded[$parent] = 0;
 
-//		timer_start('LoadChildren 0 '.get_class($this)."->_ParentLoad($parent)",utopia::GetChildren(get_class($this)));
 		$lc = $this->LoadChildren();
-//		timer_end('LoadChildren 0 '.get_class($this)."->_ParentLoad($parent)");
 		//echo get_class($this).' '.$parent.' '.$lc.(is_numeric($lc) ? 'n':'');
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 
 		timer_start('ParentLoad: '.get_class($this).' for '.$parent);
-//mail('oridan82@gmail.com','aaa','parentload:'.get_class($this).' for '.$parent);
-//echo 'parentload:'.get_class($this).' for '.$parent."\n";
 		$result = $this->ParentLoad($parent);
-//echo 'end:'.get_class($this).' for '.$parent."\n";
-//mail('oridan82@gmail.com','aaa','end:'.get_class($this).' for '.$parent);
 		if ($result !== TRUE && $result !== NULL) return $result;
-		//$this->CreateParentNavButtons($parent);
 
 		timer_end('ParentLoad: '.get_class($this).' for '.$parent);
 		$this->parentLoaded[$parent] = 1;
 
-//		timer_start('LoadChildren 1 '.get_class($this)."->_ParentLoad($parent)",utopia::GetChildren(get_class($this)));
 		$lc = $this->LoadChildren();
-//		timer_end('LoadChildren 1 '.get_class($this)."->_ParentLoad($parent)");
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 
 		$this->activeParent = NULL;
@@ -234,17 +211,13 @@ abstract class uBasicModule implements iUtopiaModule {
 	}
 
 	public function LoadChildren() {
-	  $class=get_class($this);
+		$class=get_class($this);
 		$children = utopia::GetChildren($class);
-		//print_r($children);
-		//$keys = array_keys($children);
-		//echo 'loading children for '.get_class($this).': '.implode(', ',$keys).'<br/>';
 
-    $keys = array_keys($children);
-    $size = sizeof($keys);
-		//foreach ($children as $child => $links) {
+		$keys = array_keys($children);
+		$size = sizeof($keys);
+
 		for ($i = 0;$i<$size;$i++) {
-			//echo 'RUNNING: '.$child.' for '.get_class($this).'<br/>';
 			$child = $keys[$i];
 			$obj = utopia::GetInstance($child);
 			$result = $obj->_ParentLoad($class);
@@ -257,13 +230,9 @@ abstract class uBasicModule implements iUtopiaModule {
 	public $hasRun = false;
 	public function _RunModule() {
 		if (get_class($this) == GetCurrentModule()) {
-			//$qs = $_SERVER['QUERY_STRING'] ? '?'.$_SERVER['QUERY_STRING'] : '';
 			$url = $this->GetURL($_GET);
 			$checkurl = $_SERVER['REQUEST_URI'];
-			//$checkurl = str_replace('?'.$_SERVER['QUERY_STRING'],'',$_SERVER['REQUEST_URI']);
-		//	if (strpos($checkurl,'?') !== FALSE) $checkurl = substr($checkurl,0,strpos($checkurl,'?'));
-			if (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage)
-				|| $checkurl !== $url) {//stripos(urldecode($_SERVER['REQUEST_URI']),urldecode($url)) === FALSE) {
+			if (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) || $checkurl !== $url) {
 					$abs = '';
 					if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) {
 						$layer = 'http';
@@ -276,25 +245,17 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (flag_is_set($this->GetOptions(),IS_ADMIN)) utopia::$adminTemplate = true;
 
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
-		//		$this->SetupFields();
-		//		die('setup fields');
-//		ErrorLog('run 0');
-//		timer_start('LoadChildren 0 '.get_class($this).'->_RunModule');
+
 		$lc = $this->LoadChildren();
-//		timer_end('LoadChildren 0 '.get_class($this).'->_RunModule');
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
-		//if ($this->LoadChildren() === FALSE) return FALSE;
-//		ErrorLog('run 1');
+
 		timer_start('Run Module');
 		if ($this->RunModule() === FALSE) return false;
 		timer_end('Run Module');
 		$this->hasRun = true;
-//		echo 'run 2';
-//		timer_start('LoadChildren 1 '.get_class($this).'->_RunModule');
+
 		$lc = $this->LoadChildren();
-//		timer_end('LoadChildren 1 '.get_class($this).'->_RunModule');
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
-//		echo 'run 3';
 	}
 
 	public $parentsAreSetup = false;

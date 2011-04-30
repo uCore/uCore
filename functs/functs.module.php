@@ -85,7 +85,6 @@ function &CallModuleFunc($classname,$funcname) {
 	if (!$classname) { ErrorLog("Executing function ($funcname) in null class<br/>".print_r(useful_backtrace(),true)); return $null; }
 	//ErrorLog("Calling {$classname}->{$funcname}");
 
-//  $args = func_get_args();array_shift($args);array_shift($args);
 	// get args by reference.
 	$stack = debug_backtrace();
 	$args = array();
@@ -95,38 +94,12 @@ function &CallModuleFunc($classname,$funcname) {
 
 	if (!method_exists($classname,$funcname)) { return $null; }
 
-//static methods should be called directly, not using CallModuleFunc
-//	$method = new ReflectionMethod($classname,$funcname);
-//	if ($method->isStatic() || is_object($classname))
-//		$instance = $classname;
-//	else {
-//		$instance = utopia::GetInstance($classname);
-//	}
-  $instance = utopia::GetInstance($classname);
+	$instance = utopia::GetInstance($classname);
 
 	if ($instance == NULL) { ErrorLog("Error Calling {$classname}->{$funcname}"); return $null;}
 
 	$call = array($instance,$funcname);
 	$return = call_user_func_array($call,$args);
-	return $return;
-}
-
-function &CallModuleFuncByRef($classname,$funcname,&$one=null,&$two=null,&$three=null,&$four=null,&$five=null,&$six=null,&$seven=null,&$eight=null,&$nine=null,&$ten=null,&$eleven=null,&$twelve=null) {
-	$null = NULL;
-	if (!$classname) { ErrorLog("Executing function ($funcname) in null class<br/>".print_r(useful_backtrace(),true)); return $null; }
-
-	$instance =& utopia::GetInstance($classname);
-	if ($instance == NULL) { ErrorLog($funcname); return $null;}
-
-	if (!method_exists($instance,$funcname)) return $null;
-	//	if (!is_callable($call)) return $null;
-	//    $trace = debug_backtrace();
-	//    if ($trace[1]['function'] != 'LoadChildren')
-	//    	LoadChildren($classname); // allow for linked parents on uninitialised modules
-
-	$call = array($instance,$funcname);
-	$args = array(&$one,&$two,&$three,&$four,&$five,&$six,&$seven,&$eight,&$nine,&$ten,&$eleven,&$twelve);
-	$return = ref_call_user_func_array($call,$args);
 	return $return;
 }
 
@@ -185,61 +158,6 @@ function &recurseSqlSetupSearch(&$searchin,$searchfor) {
 	$false = FALSE;
 	return $false;
 }
-
-function _LoadChildren($withParent = NULL,$tiers=1) {
-	//	utopia::CancelTemplate();
-	//	ErrorLog("LoadChildren($withParent = NULL,$tiers=1)");
-	if (!array_key_exists('children',$GLOBALS)) return TRUE;
-	if (empty($withParent)/* || $withParent === '*'*/) $withParent = GetCurrentModule();
-	if ($withParent !== NULL && !array_key_exists($withParent,$GLOBALS['children']) && !array_key_exists('*',$GLOBALS['children'])) return TRUE;
-
-	//			echo '<br><br>'.$withParent.': ';
-	//	if (!array_key_exists('loadedChildren',$GLOBALS)) $GLOBALS['loadedChildren'] = array();
-
-	foreach ($GLOBALS['children'] as $parentModule => $parentArray) {
-		if ($parentModule !== $withParent && $parentModule !== '*' &&
-		!($withParent == GetCurrentModule() && $parentModule == '/')) continue;
-		//echo "$parentModule with parent $withParent... <br>";
-
-		//ErrorLog(GetCurrentModule()."::$withParent");
-		//if (array_key_exists($parentModule,$GLOBALS['loadedChildren'])) continue;
-		//$GLOBALS['loadedChildren'][$parentModule] = TRUE;
-		//ErrorLog("checking for $parentModule with $withParent....");
-
-		// make an array of next tier children to pass AFTER current module. (not during)
-		//$nextTier = array();
-		foreach ($parentArray as $parentID => $child) {
-			//echo ', '.$child['moduleName'];
-			//if ($child['moduleName'] == $withParent) continue;
-			//$persistent = flag_is_set(CallModuleFunc($child['moduleName'],'GetOptions'),PERSISTENT_PARENT);
-
-			//if ($tiers <= 0 && !$childPersistent) continue;
-			//if ($tiers <= 0) continue;
-
-			//if (!CallModuleFunc($child['moduleName'],'CanParentLoad',$withParent)) continue;
-
-			//ErrorLog($withParent.'->'.$child['moduleName'].' '.($persistent ? '1' : '0'));
-			//CallModuleFunc($child['moduleName'],'_SetupFields');
-			CallModuleFunc($child['moduleName'],'_ParentLoad',$withParent);
-			//if ( === FALSE) return FALSE;
-			//echo 'done<br>';
-			//if ($tiers > 0) $nextTier[] = $child['moduleName'];
-		}
-
-		//foreach ($nextTier as $child) {
-		//	if (LoadChildren($child,$tiers-1) === FALSE) return FALSE;
-		//}
-	}
-	return TRUE;
-}
-/*
- function GetModuleFromUUID($uuid) {
- return $GLOBALS['modules'][$uuid];
- }
-
- function GetUUIDFromModule($module) {
- return array_search($module,$GLOBALS['modules']);
- }*/
 
 function GetCurrentModule() {
 	if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');

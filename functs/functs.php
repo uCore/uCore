@@ -513,7 +513,7 @@ function useful_backtrace($start = 0,$count = 2) {
 	$found = array();
 	for ($i = 1+$start,$traceCount = count($backtrace); $i < $traceCount; $i++) {
 		if (count($found) >= $count) break;
-		if (!array_key_exists('function',$backtrace[$i]) || $backtrace[$i]['function'] == 'eval' || $backtrace[$i]['function'] == 'call_user_func' || $backtrace[$i]['function'] == 'call_user_func_array' || $backtrace[$i]['function'] == 'ref_call_user_func_array') continue;
+		if (!array_key_exists('function',$backtrace[$i]) || $backtrace[$i]['function'] == 'eval' || $backtrace[$i]['function'] == 'call_user_func' || $backtrace[$i]['function'] == 'call_user_func_array') continue;
 
 		$found[] = array('obj'=>!array_key_exists('object',$backtrace[$i]) ? '' : get_class($backtrace[$i]['object']), 'func'=>$backtrace[$i]['function'], 'args' => !array_key_exists('args',$backtrace[$i]) ? '' : $backtrace[$i]['args']);
 	}
