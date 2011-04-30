@@ -294,6 +294,7 @@ abstract class uBasicModule implements iUtopiaModule {
 			foreach ($children as $childName => $links) {
 				foreach ($links as $link) {
 					//if ($child['moduleName'] !== get_class($this)) continue;
+					if (!isset($link['parentField'])) continue;
 					if ($link['parentField'] == $parentField) {
 						//trigger_error('Cannot add parent ('.$parentModule.') of '.get_class($this).', parentField ('.$parentField.') has already been defined in '.$child['moduleName'].'.',E_USER_ERROR);
 						return;
