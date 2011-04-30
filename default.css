@@ -22,6 +22,12 @@ img { border: none }
 
 .ui-icon { display: inline-block !important; }
 
+.ui-helper-clearfix:after { }
+.ui-helper-clearfix {
+        overflow: hidden; /* or auto */
+        zoom: 1; /* required for ie hasLayout */
+}
+
 .shadeRow { background-color:#e0e0e0; }
 .new-ident { background-image:url(images/newrec-ident.gif); background-position:center; background-repeat:no-repeat; width:25px}
 
