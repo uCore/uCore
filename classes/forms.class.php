@@ -140,89 +140,22 @@ abstract class uBasicModule implements iUtopiaModule {
 		$this->isDisabled = $message;
 	}
 
-	public function CanParentLoad($parent) {
-		// skip parentload for all other than index.php UNLESS the module has PersistentParentLoad == true
-		//		if (basename($_SERVER['SCRIPT_FILENAME']) !== 'index.php') {
-		//			if (!flag_is_set($this->GetOptions(),PERSISTENT_PARENT)) return FALSE;
-		//			if (!isset($this->PersistentParentLoad)) return false;
-		//			if ($this->PersistentParentLoad !== TRUE) return false;
-		///		}
-
-		if ($this->isDisabled) return false;
-		//if (flag_is_set($this->GetOptions(),IS_ADMIN) && !internalmodule_AdminLogin::IsLoggedIn()) return false;
-		//if (!$this->HasParent($parent)) return false;
-
-		//if (flag_is_set($this->GetOptions(),PERSISTENT_PARENT)) return true;
-
-		// already loaded for this parent?
-		//if (array_key_exists($parent,$this->parentLoaded)) return false;
-
-		$parentObj = utopia::GetInstance($parent);
-
-		if ($parent == GetCurrentModule()) return $parentObj->hasRun == $this->ParentLoadPoint();
-
-		// parent is child itself, if we're not persistant, dont load
-		if (!flag_is_set($this->GetOptions(), PERSISTENT_PARENT)) return false;
-
-		// we are persistent, so check if our loadpoint matches the parents loaded state.
-		$activeParent = $parentObj->activeParent;
-		$ploaded = $parentObj->parentLoaded;
-
-		return (array_key_exists($activeParent,$ploaded) && $ploaded[$activeParent] === 1) == $this->ParentLoadPoint();
-	}
-
-	public function ParentLoadPoint() { return 1; }
-
-	public function HasParentLoaded($parent) {
-		return array_key_exists($parent,$this->parentLoaded);
-	}
-
-	public $activeParent = NULL;
-	public $parentLoaded = array();
-	// timeframe is either pre(0) or post(1) currentmodule_Load, should be checked against module "ParentLoadPreference", which defaults to Post
-	public function _ParentLoad($parent) {
-		if (!$this->CanParentLoad($parent)) return NULL;
-
-		if (!$this->HasParent($parent)) return NULL;
-		if ($this->HasParentLoaded($parent)) return NULL;
-
-		$lm = utopia::GetVar('loadedModules',array());
-		if (array_search($this,$lm,true) === FALSE) $lm[] = $this;
-		$this->activeParent = $parent;
-		$this->parentLoaded[$parent] = 0;
-
-		$lc = $this->LoadChildren();
-		//echo get_class($this).' '.$parent.' '.$lc.(is_numeric($lc) ? 'n':'');
-		if ($lc !== TRUE && $lc !== NULL) return $lc;
-
-		timer_start('ParentLoad: '.get_class($this).' for '.$parent);
-		$result = $this->ParentLoad($parent);
-		if ($result !== TRUE && $result !== NULL) return $result;
-
-		timer_end('ParentLoad: '.get_class($this).' for '.$parent);
-		$this->parentLoaded[$parent] = 1;
-
-		$lc = $this->LoadChildren();
-		if ($lc !== TRUE && $lc !== NULL) return $lc;
-
-		$this->activeParent = NULL;
-
-		return $result !== FALSE;
-	}
-
-	public function LoadChildren() {
-		$class=get_class($this);
+	public function LoadChildren($loadpoint) {
+		$class = get_class($this);
 		$children = utopia::GetChildren($class);
 
 		$keys = array_keys($children);
 		$size = sizeof($keys);
 
-		for ($i = 0;$i<$size;$i++) {
-			$child = $keys[$i];
-			$obj = utopia::GetInstance($child);
-			$result = $obj->_ParentLoad($class);
-			if ($result === FALSE) return FALSE;
-			if (is_numeric($result) && $result > 0) return $result -1;
+		foreach ($children as $child) {
+			foreach ($child as $info) {
+				if (!isset($info['callback'])) continue;
+				if ($info['loadpoint'] !== $loadpoint) continue;
+
+				$result = call_user_func($info['callback'],get_class($this));
+				if ($result === FALSE) return FALSE;
+				if (is_numeric($result) && $result > 0) return $result -1;
+			}
 		}
 		return true;
 	}
@@ -246,7 +179,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
-		$lc = $this->LoadChildren();
+		$lc = $this->LoadChildren(0);
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 
 		timer_start('Run Module');
@@ -254,7 +187,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		timer_end('Run Module');
 		$this->hasRun = true;
 
-		$lc = $this->LoadChildren();
+		$lc = $this->LoadChildren(1);
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 	}
 
@@ -274,6 +207,15 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function HasChild($childModule) {
 		$children = utopia::GetChildren(get_class($this));
 		return array_key_exists($childModule,$children);
+	}
+
+	public function AddParentCallback($parentModule,$callback,$loadpoint=0) {
+		$info = array('moduleName'=>get_class($this), 'callback' => $callback, 'loadpoint' => $loadpoint);
+		utopia::AddChild($parentModule,get_class($this),$info);
+	}
+	public function AddChildCallback($child,$callback,$loadpoint=0) {
+		$info = array('moduleName'=>get_class($this), 'callback' => $callback, 'loadpoint' => $loadpoint);
+		utopia::AddChild(get_class($this),$child,$info);
 	}
 
 	// parentModule =
@@ -632,7 +574,6 @@ abstract class uBasicModule implements iUtopiaModule {
 		return 0;
 	}
 	//	public function __construct() { $this->_SetupFields(); } //$this->SetupParents(); }
-	public abstract function ParentLoad($parent); // called when current_path = parent_path
 	public abstract function RunModule();  // called when current_path = parent_path/<module_name>/
 
 
@@ -672,7 +613,7 @@ abstract class uBasicModule implements iUtopiaModule {
 			foreach ($linkArray as $linkInfo) {
 				if ($linkInfo['parentField'] !== NULL) continue; // has a parentField?  if so, ignore
 				$btnText = !empty($linkInfo['text']) ? $linkInfo['text'] : $this->GetTitle();
-				if (!empty($linkInfo['fieldLinks']) && GetCurrentModule()) { // is linked to fields in the list
+				if (isset($linkInfo['fieldLinks']) && GetCurrentModule()) { // is linked to fields in the list
 					$cr = $cModuleObj->GetCurrentRecord();
 					if (is_array($linkInfo['fieldLinks']) && is_array($cr)) { // this link uses filters
 						$filters = array();
@@ -834,37 +775,10 @@ abstract class uDataModule extends uBasicModule {
 		return $return;*/
 	}
 
-	public function CanParentLoad($parent) {
-		if ($this->HasParent($parent)) $this->_SetupFields();
-		return parent::CanParentLoad($parent);
-	}
 	public function Initialise() {
 		if (!parent::Initialise()) return false;
 		$this->_SetupFields();
 		return true;
-	}
-	public function _ParentLoad($parent) {
-		$this->_SetupFields();
-		$par = parent::_ParentLoad($parent);
-
-		//		ErrorLog('data_PL:'.get_class($this).":$parent/$timeframe=".($par === TRUE ? 'true':'not true'));
-		//if ($par !== TRUE) return $par;
-		//		ErrorLog('creating nav');
-		//		if (!array_key_exists(GetCurrentModule(),$this->parents)) return;
-
-		// now check that all fields linking in exist.  WHERE fields.
-		/*	if (is_array($this->parents)) foreach ($this->parents as $parent) {
-			if (is_array($parent)) foreach ($parent as $info) {
-			if (is_array($info['fieldLinks'])) foreach ($info['fieldLinks'] as $linkInfo) {
-			if ((stripos($linkInfo['_toField'],'(select') === FALSE) && !array_key_exists($linkInfo['_toField'],$this->fields)) ErrorLog(get_class($this).' is trying to link to a field that doesnt exist ('.$linkInfo['_toField'].')'); //---- this must be moved to after filtering
-			}
-			}
-			} */
-		//errorlog( 'createbuttons '.get_class($this));
-		//if (!flag_is_set($this->GetOptions(),NO_NAV) && $parent == GetCurrentModule()) $this->CreateParentNavButtons();
-		//if ($par === TRUE) $this->CreateParentNavButtons($parent);
-
-		return $par;
 	}
 
 	public $forceNewRec = false;
@@ -1785,8 +1699,8 @@ abstract class uDataModule extends uBasicModule {
 				if (array_key_exists('linkFrom',$filterData)) {
 					list($linkParent,$linkFrom) = explode(':',$filterData['linkFrom']);
 					// linkparent is loaded?  if not then we dont really want to use it as a filter.....
-					$linkParentObj = utopia::GetInstance($linkParent);
-					if ($linkParentObj->HasParentLoaded(get_class($this)) || $linkParent == GetCurrentModule()) {
+					if ($linkParent == GetCurrentModule()) {
+						$linkParentObj = utopia::GetInstance($linkParent);
 						$row = $linkParentObj->GetCurrentRecord($refresh);
 						if (!$row && !$refresh) $row = $linkParentObj->GetCurrentRecord(true);
 
@@ -1808,7 +1722,6 @@ abstract class uDataModule extends uBasicModule {
 
 							//$uid = $uid['uid'];
 						}
-						// else ErrorLog(get_class($this).": Cant get value of parent field ($this->activeParent.{$filterData['linkFrom']})");
 					}
 				} //else
 				//						ErrorLog('Cant find linkFrom in GetFilterValue: '.print_r($filterData,true));
@@ -2698,6 +2611,7 @@ abstract class uDataModule extends uBasicModule {
 		// get specific field
 		foreach ($children as $links) {
 			foreach ($links as $link) {
+				if (!isset($link['parentField'])) continue;
 				if ($link['parentField'] == $field) { $info = $link; break; }
 			}
 		}
@@ -2731,6 +2645,7 @@ abstract class uDataModule extends uBasicModule {
 		// get specific field
 		foreach ($children as $links) {
 			foreach ($links as $link) {
+				if (!isset($link['parentField'])) continue;
 				if ($link['parentField'] == $field) { $info = $link; break; }
 			}
 		}
@@ -2915,7 +2830,7 @@ SCR_END
 				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
 						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
-						&& empty($link['fieldLinks'])) {
+						&& !isset($link['fieldLinks'])) {
 					$url = $obj->GetURL(array($obj->GetModuleId().'_new'=>1));
 					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}

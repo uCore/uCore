@@ -6,11 +6,11 @@ class modLinks extends uBasicModule {
 	public function GetOptions() { return IS_ADMIN | NO_NAV | ALWAYS_ACTIVE; }
 
 	public function SetupParents() {
-		$this->AddParent('/');
+		$this->AddParentCallback('/',array($this,'drawLinks'));
 	}
 
-	public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
+	//public function ParentLoadPoint() { return 0; }
+	public function drawLinks($parent) {
 		$arr = array();
 
 		$parentObj = utopia::GetInstance($parent);
@@ -19,7 +19,7 @@ class modLinks extends uBasicModule {
 		$children = utopia::GetChildren($parent);
 		foreach ($children as $links) {
 			foreach ($links as $child) {
-				if ($child['fieldLinks']) continue;
+				if (isset($child['fieldLinks'])) continue;
 
 				$obj = utopia::GetInstance($child['moduleName']);
 				if ($obj->isDisabled) continue;

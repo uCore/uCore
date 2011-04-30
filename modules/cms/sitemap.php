@@ -61,7 +61,6 @@ class uSitemapXML extends uBasicModule {
 	public function SetupParents() {
 		$this->SetRewrite(true);
 	}
-	public function ParentLoad($parent) { }
 	public function RunModule() {
 		utopia::CancelTemplate();
 		$obj = utopia::GetInstance('uCMS_List');

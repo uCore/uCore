@@ -10,7 +10,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 
 	public function SetupParents() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
-		//$this->AddParent('*');
 		// register ajax
 		$this->RegisterAjax('updateField',array($this,'UpdateField'));
 		$this->RegisterAjax('filterText',array($this,'FilterText'));
@@ -20,15 +19,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 		$this->RegisterAjax('getFile',array($this,'getFile'));
 		$this->RegisterAjax('getUpload',array($this,'getUpload'));
 		$this->RegisterAjax('getCompressed',array($this,'getCompressed'));
-	}
-
-//	public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
-		//if (!is_subclass_of($parent,'uListDataModule')) return true;
-
-		//$url = BuildQueryString($_SERVER['REQUEST_URI'],array('__ajax'=>'printable'));
-		//utopia::LinkList_Add('admin_buttons','Printable',$url,50);//,NULL,array('onclick'=>"window.location = qsUpdate(window.location.href,{__ajax:'printable'});"));
-		//,'class'=>'linklist-options'
 	}
 
 	public function RunModule() {

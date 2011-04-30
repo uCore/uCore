@@ -4,7 +4,6 @@ class uBlob extends uBasicModule {
 		$this->SetRewrite(array('{module}','{field}','{pk}','{filename}'));
 	}
 	function GetUUID() { return 'blob'; }
-	function ParentLoad($parent) {}
 	function RunModule() {
 		$obj = utopia::GetInstance($_GET['module']);
 		$rec = $obj->LookupRecord(mysql_real_escape_string($_GET['pk']));

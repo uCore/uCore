@@ -6,17 +6,17 @@ class uDataOnly extends uBasicModule {
 	public function GetOptions() { return DEFAULT_OPTIONS | NO_NAV | PERSISTENT_PARENT; }
 
 	public function SetupParents() {
-		//		$this->AddParent('module_AdvisorCommissionMortgageProc');
-		//		$this->AddParent('module_MortgageList');
-		//		$this->AddParent('module_LifeList');
-		//$this->AddParent('*');  // COMMENTED - modules should call AddChild to append this
 		$this->RegisterAjax('excel',array($this,'excel'));
 		$this->RegisterAjax('print',array($this,'showPrint'));
 		$this->RegisterAjax('raw',array($this,'rawOutput'));
 	}
 
-//	public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
+	public static function inject($module) {
+		$obj = utopia::GetInstance(__CLASS__);
+		$this->AddParentCallback($module,array($obj,'inject_run'));
+	}
+
+	public function inject_run($parent) {
 		if (!is_subclass_of($parent,'uListDataModule')) return;
 		$obj = utopia::GetInstance($parent);
 		$url = $obj->GetURL(array_merge($_GET,array('__ajax'=>'excel')));

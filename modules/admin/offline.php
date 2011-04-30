@@ -6,12 +6,10 @@ class module_Offline extends uBasicModule {
 	public function GetOptions() { return NO_NAV; }
 	public function SetupParents() {
 		modOpts::AddOption('module_Offline','online','Site Online',0,itYESNO);
-//		if (internalmodule_AdminLogin::IsLoggedIn()) return;
-		$this->AddParent('/');
+		$this->AddParentCallback('/',array($this,'siteOffline'));
 	}
 
-	public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
+	public function siteOffline($parent) {
 		if (modOpts::GetOption('module_Offline','online')) return;
 		if (internalmodule_AdminLogin::IsLoggedIn()) return;
 		$obj = utopia::GetInstance($parent);

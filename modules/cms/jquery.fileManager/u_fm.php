@@ -6,8 +6,7 @@ class fileManager extends uBasicModule {
 		return 'File Manager';
 	}
 	function SetupParents() {
-		//$this->AddParent('internalmodule_Admin');
-		$this->AddParent('uCMS_List');
+		$this->AddParentCallback('uCMS_List',array($this,'RunModule'));
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 	}
@@ -32,7 +31,6 @@ FIN
 		//return $out.$defaultValue.utopia::DrawInput($fieldName,itBUTTON,'Choose File',$possibleValues,$attributes,$noSubmit);
 	}
 	function GetOptions() {return IS_ADMIN;}
-	function ParentLoad($parent) { $this->RunModule(); }
 	function ajax() {
 		utopia::CancelTemplate();
 		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');

@@ -12,10 +12,6 @@ class internalmodule_Reconfigure extends uBasicModule {
 
 	public function GetSortOrder() { return -10; }
 
-	public function ParentLoad($parent) {
-		//utopia::LinkList_Add('child_buttons',$this->GetTitle(),$this->GetURL(),$this->GetSortOrder(),NULL,array('class'=>'fdb-btn'));
-	}
-
 	public function RunModule() {
 		//utopia::CancelTemplate();
 		uConfig::ShowConfig();
@@ -35,7 +31,6 @@ class internalmodule_Admin extends uBasicModule {
 	}
 	public function SetupParents() {
 		$this->AddParent('/');
-//		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->RegisterAjax('toggleQ',array($this,'toggleQ'));
 //		$this->RegisterAjax('optimizeTables',array($this,'optimizeTables'),false);
@@ -80,8 +75,6 @@ class internalmodule_Admin extends uBasicModule {
 			$_SESSION['admin_showQ'] = !$_SESSION['admin_showQ'];
 		die('window.location.reload();');
 	}
-
-	public function ParentLoad($parent) { }
 
 	static function compareVersions($ver1,$ver2) {
 		if ($ver1 == $ver2) return 0;

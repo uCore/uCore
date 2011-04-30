@@ -26,8 +26,6 @@ class uAdminUsersList extends uListDataModule {
 		$this->AddParent('internalmodule_Admin');
 	}
 
-	public function ParentLoad($parent) {}
-
 	public function RunModule() {
 		$this->ShowData();
 	}
@@ -40,7 +38,6 @@ class adminLogout extends uBasicModule {
         public function SetupParents() {
                 $this->AddParent('/');
         }
-	public function ParentLoad($parent) {}
         public function RunModule() {
 		unset($_SESSION['admin_auth']);
 		$obj = utopia::GetInstance('internalmodule_Admin');
@@ -61,7 +58,7 @@ class internalmodule_AdminLogin extends uDataModule {
 	}
 
 	public function SetupParents() {
-		$this->AddParent('/');
+		$this->AddParentCallback('/',array($this,'checkLogin'));
 
 		// admin account has not been set up, redirect to config.
 		if (!constant('admin_user')) {
@@ -110,7 +107,7 @@ class internalmodule_AdminLogin extends uDataModule {
 	}*/
 
 	public function ParentLoadPoint() { return 0; }
-	public function ParentLoad($parent) {
+	public function checkLogin($parent) {
 		// if auth not required, return
 		$obj = utopia::GetInstance($parent);
 		if (!flag_is_set($obj->GetOptions(),IS_ADMIN)) return true;

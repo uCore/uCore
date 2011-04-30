@@ -37,9 +37,6 @@ class uJavascript extends uBasicModule {
 		utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
 
-	public function ParentLoad($parent) {
-	}
-
 	public function RunModule() {
 	}
 

@@ -5,7 +5,6 @@ class uUploads extends uBasicModule {
 		$this->SetRewrite(TRUE);
 	}
 	function GetUUID() { return 'uploads'; }
-	function ParentLoad($parent) {}
 	function RunModule() {
 		$path = urldecode(PATH_UPLOADS.substr($_SERVER['REQUEST_URI'],10));
 		$path = parse_url($path,PHP_URL_PATH);

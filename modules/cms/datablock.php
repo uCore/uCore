@@ -26,16 +26,11 @@ class uDataBlocks_List extends uListDataModule {
     $this->CreateTable('blocks');
     $this->AddField('block_id','block_id','blocks','Block ID');
     $this->AddField('module','module','blocks','Table');
-//    $this->AddField('where','where','blocks','Where');
-//    $this->AddField('order','order','blocks','Order');
   }
   public function SetupParents() {
-//    $this->AddParent('internalmodule_Admin');
-	$this->AddParent('uCMS_List');
+	$this->AddParentCallback('uCMS_List',array($this,'ShowData'));
   }
 
-  public function ParentLoad($parent) { $this->ShowData(); }
-  
   public function RunModule() {
     $this->ShowData();
     // show conclicts between static block ids and custom ids
@@ -93,7 +88,6 @@ class uDataBlocks extends uSingleDataModule {
     $this->AddParent('uDataBlocks_List','block_id','*');
   }
 
-  public function ParentLoad($parent) { }
   public function RunModule() {
     $this->ShowData();
   }

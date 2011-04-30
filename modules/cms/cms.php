@@ -63,25 +63,9 @@ class uCMS_List extends uDataModule {
 		$this->AddParent('internalmodule_Admin');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 	}
-  public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-    parent::ProcessUpdates_del($sendingField,$fieldAlias,$value,$pkVal);
-    AjaxEcho('window.location.reload();');
-  }
-/*
-	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
-		if ($fieldAlias == 'is_homepage') {
-			$ds = $this->GetDataset();
-			$rows = GetRows($ds);
-			foreach ($rows as $row) {
-				if ($pkVal === $row['id']) continue;
-				parent::UpdateField($fieldAlias,'0',$row['id']);
-			}
-		}
-
-		parent::UpdateField($fieldAlias,$newValue,$pkVal);
-	}
-*/
-	public function ParentLoad($parent) {
+	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
+		parent::ProcessUpdates_del($sendingField,$fieldAlias,$value,$pkVal);
+		AjaxEcho('window.location.reload();');
 	}
 	public function RunModule() {
 		$tabGroupName = utopia::Tab_InitGroup();
@@ -270,11 +254,6 @@ class uCMS_Edit extends uSingleDataModule {
 		return trim($ret);
 	}
 	public function SetupParents() {
-		//$this->AddParent('uCMS_List');
-		//$this->AddParent('uCMS_List','cms_id','*');
-		//breadcrumb::AddModule('uCMS_List');
-	}
-	public function ParentLoad($parent) {
 	}
 	public function RunModule() {
 		$this->ShowData();
@@ -395,7 +374,6 @@ class uCMS_View extends uSingleDataModule {
 		return false;
 	}
 
-	public function ParentLoad($parent) { }
 	public function RunModule() {
 		// custom home breadcrumb
 		//breadcrumb::ShowHome(false);

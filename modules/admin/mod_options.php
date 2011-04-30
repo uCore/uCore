@@ -22,18 +22,13 @@ class modOpts extends uListDataModule {
 	public function GetTabledef() { return 'tabledef_ModOpts'; }
 	public function SetupFields() {
 		$this->CreateTable('opts');
-//		$this->AddField('module','module','opts','Home');
-//		$this->AddField('ident','ident','opts','id');
 		$this->AddField('name','name','opts','Name');
 		$this->AddField('value','value','opts','Value',itTEXT);
-    
-//    $this->AddUniqueField('ident');
 	}
 	public static $types = array();
 	public function SetupParents() {
 		$this->AddParent('internalmodule_Admin');
 	}
-	public function ParentLoad($parent) {}
 	public function RunModule() {
 		$this->ShowData();
 	}

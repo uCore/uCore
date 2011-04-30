@@ -9,10 +9,6 @@ class module_TinyMCE extends uBasicModule {
 	public function SetupParents() {
 		utopia::AddInputType(itRICHTEXT,array($this,'drti_func'));
 		utopia::AddInputType(itHTML,array($this,'drti_func'));
-		//$this->AddParent('/');
-	}
-
-	public function ParentLoad($parent) {
 	}
 
 	private static $hasDrawnJS = false;
