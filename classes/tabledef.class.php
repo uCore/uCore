@@ -49,6 +49,7 @@ function getSqlTypeFromFieldType($fieldType) {
 
 abstract class uTableDef implements iUtopiaModule {
 	public $fields = array();
+	public $engine = NULL;
 	public abstract function SetupFields();
 
 	private $isDisabled = false;
@@ -194,6 +195,7 @@ abstract class uTableDef implements iUtopiaModule {
 
 		// checksum
 		$engine = MYSQL_ENGINE;
+		if ($this->engine) $engine = $this->engine;
 		$checksum = sha1($engine.print_r($this->fields,true));
 		if ($this->checksumValid($checksum)) return;
 		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `checksum` = \''.$checksum.'\'');
