@@ -447,6 +447,7 @@ function ReloadWithItems(items, ignoreCurrent) {
     arr = window.location.search.substr(1).split('&');
     $(arr).each(function () {
       var arr = this.split('=');
+      if (empty(arr[1])) return;
       var name = arr[0];
       var val = decodeURIComponent(arr[1].replace(/\+/g,' '));
       if (empty(name)) return;
