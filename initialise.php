@@ -32,8 +32,15 @@ if(!ob_start("ob_gzhandler")) ob_start();
 
 if (!array_key_exists('_noTemplate',$_GET))	utopia::UseTemplate();
 
-sql_query('CREATE TABLE IF NOT EXISTS __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40))');
-sql_query('ALTER TABLE __table_checksum ENGINE='.MYSQL_ENGINE);
+$result = sql_query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
+if (!mysql_num_rows($result))
+        sql_query('CREATE TABLE __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40)) ENGINE='.MYSQL_ENGINE);
+else {
+        $r = mysql_fetch_assoc($result);
+        if ($r['Engine'] != MYSQL_ENGINE) sql_query('ALTER TABLE __table_checksum ENGINE='.MYSQL_ENGINE);
+}
+uTableDef::checksumValid(null,null); // cache table checksums
+uTableDef::TableExists(null); // cache table exists
 
 $allmodules = utopia::GetModules(true);
 timer_start('Module Initialise');

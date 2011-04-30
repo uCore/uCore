@@ -169,10 +169,9 @@ abstract class uTableDef implements iUtopiaModule {
 		return FALSE;
 	}
 
-	static $tableChecksum = NULL;
-	public function checksumValid($checksum,$refresh=false) {
+	public static $tableChecksum = NULL;
+	public static function checksumValid($class,$checksum,$refresh=false) {
 		if ($refresh || self::$tableChecksum === NULL) self::$tableChecksum = GetRows(sql_query('SELECT * FROM `__table_checksum`'));
-		$class = get_class($this);
 		foreach (self::$tableChecksum as $row) {
 			if ($row['name'] == TABLE_PREFIX.$class) return $row['checksum'] === $checksum;
 		}
@@ -197,7 +196,7 @@ abstract class uTableDef implements iUtopiaModule {
 		$engine = MYSQL_ENGINE;
 		if ($this->engine) $engine = $this->engine;
 		$checksum = sha1($engine.print_r($this->fields,true));
-		if ($this->checksumValid($checksum)) return;
+		if (self::checksumValid(get_class($this),$checksum)) return;
 		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `checksum` = \''.$checksum.'\'');
 
 		$unique = array();
