@@ -113,6 +113,7 @@ function &GetModuleVar($classname,$varname) {
 }
 
 function SetModuleVar($classname,$varname,$value) {
+	trigger_error("SetModuleVar is deprecated.", E_USER_DEPRECATED);
 	if (($instance = utopia::GetInstance($classname)) == NULL) return NULL;
 
 	$instance->$varname = $value;
