@@ -2442,6 +2442,7 @@ abstract class uDataModule extends uBasicModule {
 		//		$field		= $vtable['fromField'] ? $vtable['fromField'] : $this->fields[$fieldAlias]['field'];
 
 		if ((preg_match('/{[^}]+}/',$field) > 0) || IsSelectStatement($field) || is_array($field)) {
+			$this->ResetField($fieldAlias,$pkVal);
 			return FALSE; // this field is a pragma or select statement
 		}
 
