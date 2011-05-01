@@ -36,8 +36,7 @@ class uDataBlocks_List extends uListDataModule {
     // show conclicts between static block ids and custom ids
     $rows = $this->GetRows();
     foreach ($rows as $row) {
-      if (uDataBlocks::StaticBlockExists($row['block_id'])) echo "Conflict: DataBlock ({$row['block_id']}) already exists as a static DataBlock.  Please 
-rename it.";
+      if (uDataBlocks::StaticBlockExists($row['block_id'])) echo "Conflict: DataBlock ({$row['block_id']}) already exists as a static DataBlock.  Please rename it.";
     }
   }
 }
