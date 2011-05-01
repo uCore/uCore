@@ -124,8 +124,8 @@ class uDataBlocks extends uSingleDataModule {
 	$repeatable = $rec['content'];
 	
 	$html = str_get_html($repeatable);
-	$ele = ($e = $html->find('#_ri',0)) ? $e->innertext : NULL;
-	if (!$ele) $ele = ($e = $html->find('#_r',0)) ? $e->outertext : NULL;
+	$ele = ($e = $html->find('._ri',0)) ? $e->innertext : NULL;
+	if (!$ele) $ele = ($e = $html->find('._r',0)) ? $e->outertext : NULL;
 
 	if ($ele) {
 		// found a repeatable element
