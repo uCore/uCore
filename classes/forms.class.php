@@ -2441,6 +2441,9 @@ abstract class uDataModule extends uBasicModule {
 		//		$field		= array_key_exists('fromField',$vtable) && !empty($vtable['fromField']) ? $vtable['fromField'] : $this->fields[$fieldAlias]['field'];
 		//		$field		= $vtable['fromField'] ? $vtable['fromField'] : $this->fields[$fieldAlias]['field'];
 
+		if ((preg_match('/{[^}]+}/',$field) > 0) || IsSelectStatement($field)) {
+			return FALSE; // this field is a pragma or select statement
+		}
 
 		// check old value
 		/*-- dont bother - no need to send 2 queries when we only need to send one.
