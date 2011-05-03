@@ -895,7 +895,8 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		$this->UnionModules[] = $modulename;
-		SetModuleVar($modulename,'UNION_MODULE',TRUE);
+		$obj = utopia::GetInstance($modulename);
+		$obj->UNION_MODULE = TRUE;
 	}
 
 	public function AddUnionParent($parentModule) {
