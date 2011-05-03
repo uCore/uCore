@@ -1,19 +1,16 @@
 <?php
-error_reporting(E_ALL | E_STRICT);
-
-ini_set('display_errors',1);
-
-set_error_handler('myErrorHandler', E_ALL | E_STRICT);
+set_error_handler('myErrorHandler');
 set_exception_handler("exception_handler");
 register_shutdown_function('fatalErrorShutdownHandler');
 function myErrorHandler($code, $message, $file, $line) {
+	if (!($code & error_reporting())) return;
 	try {
-    $last_error = error_get_last();
-    if ($last_error['type'] === E_ERROR && class_exists('FlexDB')) utopia::CancelTemplate();
+		$last_error = error_get_last();
+		if ($last_error['type'] === E_ERROR && class_exists('utopia')) utopia::CancelTemplate();
 		throw new ErrorException($message, 0, $code, $file, $line);
-    } catch (Exception $e) {
-    	EchoException($e);
-    }
+	} catch (Exception $e) {
+		EchoException($e);
+	}
 }
 function exception_handler($e)
 {
