@@ -206,9 +206,9 @@ class utopia {
 			case itSUBMIT:
 			case itRESET:
 				if (isset($attributes['class']))
-				$attributes['class'] .= ' fdb-btn';
+				$attributes['class'] .= ' btn';
 				else
-				$attributes['class'] = 'fdb-btn';
+				$attributes['class'] = 'btn';
 				$attr = BuildAttrString($attributes);
 				$out .= "<input$attr type=\"$inputType\" value=\"$defaultValue\"/>";
 				break;
@@ -470,6 +470,7 @@ class utopia {
 	}
 	private static $tabs_drawing = array();
 	static function Tab_InitDraw($tabGroup) {
+		if (isset($_REQUEST['__ajax'])) return;
 		if (array_search($tabGroup,self::$tabs_drawing) !== FALSE) return;
 		self::$tabs_drawing[] = $tabGroup;
 		echo '{tab.'.$tabGroup.'}';

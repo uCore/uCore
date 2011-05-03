@@ -85,8 +85,8 @@ function ParseFieldComments($comments) {
 
 function CreateButton($btnText,$attrs = NULL) {
 	if (!is_array($attrs)) $attrs = array();
-	if (array_key_exists('class',$attrs)) $attrs['class'] .= ' fdb-btn';
-	else  $attrs['class'] = 'fdb-btn';
+	if (array_key_exists('class',$attrs)) $attrs['class'] .= ' btn';
+	else  $attrs['class'] = 'btn';
 	$attrStr = BuildAttrString($attrs);
 	return "<a $attrStr>$btnText</a>";
 	//return "<input type=\"button\" value=\"$btnText\"$attrStr />";

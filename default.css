@@ -67,57 +67,38 @@ img { border: none }
 
 .layoutDetailSection td.fld { white-space:nowrap; width:1px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
-.fdb-btn,a.fdb-btn:link,a.fdb-btn:visited {
-	background-color: #ccc;
-	padding: 2px 4px 2px 4px;
-	margin: 1px;
-	color: #000;
-	text-decoration: none;
-	background-image: url(images/shade.png);
-	background-position: bottom;
-	font-size: 1em;
-	border: 1px #555 solid;
-	display: inline-block;
-}
-
-.fdb-btn:hover,a.fdb-btn:hover {
-	background-color: #aaa;
-	cursor: pointer;
-	color: #fff;
-}
-
 .red {
 	color: #f00
 }
 
-.bluebg {
-	background-color: #00f !important;
-	color: #eee !important;
+.btn.bluebg span {
+	background-color: #00f;
+	color: #eee;
 }
 
-.bluebg:hover {
-	background-color: #66f !important;
-	color: #000 !important;
+.btn.bluebg:hover span {
+	background-color: #66f;
+	color: #000;
 }
 
-.greenbg {
-	background-color: #339900 !important;
-	color: #eee !important;
+.btn.greenbg span {
+	background-color: #339900;
+	color: #eee;
 }
 
-.greenbg:hover {
-	background-color: #228800 !important;
-	color: #000 !important;
+.btn.greenbg:hover span {
+	background-color: #228800;
+	color: #000;
 }
 
-.redbg {
-	background-color: #f00 !important;
-	color: #000 !important;
+.btn.redbg span {
+	background-color: #f00;
+	color: #000;
 }
 
-.redbg:hover {
-	background-color: #c00 !important;
-	color: #eee !important;
+.btn.redbg:hover span {
+	background-color: #c00;
+	color: #eee;
 }
 
 #adminSlave {z-index:100001; position:absolute; top:0; left:0; font-size:14px; white-space:nowrap; text-align:left;
