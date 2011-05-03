@@ -206,9 +206,9 @@ class utopia {
 			case itSUBMIT:
 			case itRESET:
 				if (isset($attributes['class']))
-				$attributes['class'] .= ' fdb-btn';
+				$attributes['class'] .= ' btn';
 				else
-				$attributes['class'] = 'fdb-btn';
+				$attributes['class'] = 'btn';
 				$attr = BuildAttrString($attributes);
 				$out .= "<input$attr type=\"$inputType\" value=\"$defaultValue\"/>";
 				break;

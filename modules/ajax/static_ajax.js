@@ -196,8 +196,8 @@ var InitJavascript = {
 	}
 }
 
-$('.fdb-uf').live('change',_fieldChange);
-$('input[type=button].fdb-uf').live('click',_fieldChange);
+$('.uf').live('change',_fieldChange);
+$('input[type=button].uf').live('click',_fieldChange);
 
 function InitDatePickers() {
 	$('.dPicker').each(function () {
@@ -574,7 +574,7 @@ function _uf(ele,hourglass) {
 				StoppedUpdating(ele);
 				$('.auto-complete-list').hide();
 				$(hourglass).remove();
-				$('.fdb-uf').change(_fieldChange);
+				$('.uf').change(_fieldChange);
 				InitJavascript.run();
  //               $('#statusOverlay').hide();
             }
@@ -628,7 +628,7 @@ function _uf(ele,hourglass) {
 			StoppedUpdating(ele);
 			$('.auto-complete-list').hide();
 			$(hourglass).remove();
-			$('.fdb-uf').change(_fieldChange);
+			$('.uf').change(_fieldChange);
 			InitJavascript.run();
 //			$('#statusOverlay').hide();
 		}
