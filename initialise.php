@@ -51,6 +51,7 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 		$obj->Initialise(); // setup Parents
 	timer_end('Init: '.$row['module_name']);
 }
+if (!file_exists(PATH_ABS_CORE.'.javascript.js')) uJavascript::BuildJavascript();
 timer_end('Module Initialise');
 
 
