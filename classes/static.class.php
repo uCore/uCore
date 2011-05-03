@@ -454,7 +454,7 @@ class utopia {
 		//print_r($tabGroupOrdered);
 
 		echo '<div class="tabGroup '.$extraClasses.'" id="'.$tabGroup.'">';
-		echo '<ul style="">';
+		echo '<ul>';
 		foreach ($tabGroupArray as $tabID =>$tabInfo) {
 			if ($tabInfo['isURL'])
 			echo '<li><a href="'.$tabInfo['content'].'"><span>'.$tabInfo['title'].'</span></a></li>';
