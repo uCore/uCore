@@ -6,8 +6,8 @@ class fancybox {
 
 		utopia::AddCSSFile($rs);
 		utopia::AddJSFile($rj);
-		if ($mousewheel) FlexDB::AddJSFile(FlexDB::GetRelativePath(dirname(__FILE__).'/jquery.mousewheel-3.0.2.pack.js'));
-		if ($easing) FlexDB::AddJSFile(lexDB::GetRelativePath(dirname(__FILE__).'/jquery.easing-1.3.pack.js'));
+		if ($mousewheel) utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.mousewheel-3.0.2.pack.js'));
+		if ($easing) utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.easing-1.3.pack.js'));
 	}
 }
 ?>

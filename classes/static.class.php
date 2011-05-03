@@ -517,8 +517,7 @@ class utopia {
 		if (!is_array($list)) return;
 
 		array_sort_subkey($list,'order');
-		//uasort($list,array('FlexDB','LinkList_Sort'));
-//print_r($list);
+
 		$return = "";
 		foreach ($list as $order => $info) {
 			$attrsList = "";
