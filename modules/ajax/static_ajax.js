@@ -28,8 +28,10 @@ $(document).ready(function(){
 
 	$(".tabGroup").tabs();
 	$(".tabGroup").bind("tabsshow", function(event, ui) { 
-	    window.location.hash = ui.tab.hash;
-	})
+		var scrollPos = $(window).scrollTop();
+		window.location.hash = ui.tab.hash;
+		$(window).scrollTop(scrollPos);
+	});
 //	$('#btnOptions').bind('click',function () { showOptions() });
   $('th.sortable').live('click',function (e) {
     var fieldname = $(this).attr('rel');
