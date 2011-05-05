@@ -13,6 +13,8 @@ class modLinks extends uBasicModule {
 	public function drawLinks($parent) {
 		$arr = array();
 
+		$current = GetCurrentModule();
+		$currentAdded = false;
 		$parentObj = utopia::GetInstance($parent);
 		$admin = flag_is_set($parentObj->GetOptions(),IS_ADMIN);
 		$isadmin = internalmodule_AdminLogin::IsLoggedIn();
@@ -35,8 +37,14 @@ class modLinks extends uBasicModule {
 				$url = $obj->GetURL();
 				$title = $obj->GetTitle();
 				if (!$url || !$title) continue;
+				if ($child['moduleName'] == $current) $currentAdded = true;
 				$arr[] = array($title,$url,$order,$child['moduleName']);
 			}
+		}
+
+		if (!$currentAdded) {
+			$obj = utopia::GetInstance(GetCurrentModule());
+			$arr[] = array($obj->GetTitle(),$obj->GetURL(),-100,GetCurrentModule());
 		}
 
 		array_sort_subkey($arr,2);
