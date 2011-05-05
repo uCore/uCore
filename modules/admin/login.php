@@ -58,7 +58,7 @@ class internalmodule_AdminLogin extends uDataModule {
 	}
 
 	public function SetupParents() {
-		$this->AddParentCallback('/',array($this,'checkLogin'));
+		$this->AddParentCallback('*',array($this,'checkLogin'));
 
 		// admin account has not been set up, redirect to config.
 		if (!constant('admin_user')) {

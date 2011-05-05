@@ -140,6 +140,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$this->isDisabled = $message;
 	}
 
+	private $loaded = array();
 	public function LoadChildren($loadpoint) {
 		$class = get_class($this);
 		$children = utopia::GetChildren($class);
@@ -152,9 +153,15 @@ abstract class uBasicModule implements iUtopiaModule {
 				if (!isset($info['callback'])) continue;
 				if ($info['loadpoint'] !== $loadpoint) continue;
 
-				$result = call_user_func($info['callback'],get_class($this));
+				if (!isset($this->loaded[$info['moduleName']])) {
+					$this->loaded[$info['moduleName']] = true;
+					$obj = utopia::GetInstance($info['moduleName']);
+					$result = $obj->LoadChildren(0);
+					if ($result === FALSE) continue;
+				}
+
+				$result = call_user_func($info['callback'],$class);
 				if ($result === FALSE) return FALSE;
-				if (is_numeric($result) && $result > 0) return $result -1;
 			}
 		}
 		return true;

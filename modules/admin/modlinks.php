@@ -3,7 +3,7 @@
 class modLinks extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Home'; }
-	public function GetOptions() { return IS_ADMIN | NO_NAV | ALWAYS_ACTIVE; }
+	public function GetOptions() { return NO_NAV | ALWAYS_ACTIVE; }
 
 	public function SetupParents() {
 		$this->AddParentCallback('/',array($this,'drawLinks'));
