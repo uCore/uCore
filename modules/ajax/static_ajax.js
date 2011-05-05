@@ -169,17 +169,24 @@ function RefreshTables() {
 }
 
 function UpdateSelectedLinks() {
-  $('a').each(function() {
-    if (!$(this).attr('href')) return;
-    var _href = $(this).attr('href');
-    if ((_href != window.location.pathname) && (_href == '/' || window.location.pathname.indexOf(_href.slice(0,-4)) != 0)) return;
-	var classname = (_href == window.location.pathname) ? 'active-link' : 'active-link-parent';
-    if ($(this).parent('li').length) {
-      $(this).parent('li').addClass(classname);
-    } else {
-      $(this).addClass(classname);
-    }
-  });
+	var uuid = getParameterByName('uuid');
+	$('a').each(function() {
+		if (!$(this).attr('href')) return;
+		var _href = $(this).attr('href');
+
+		if (uuid) {
+			var linkUUID = getParameterByName('uuid',_href);
+			var classname = (uuid == linkUUID) ? 'active-link' : '';
+		} else {
+			if ((_href != window.location.pathname) && (_href == '/' || window.location.pathname.indexOf(_href.slice(0,-4)) != 0)) return;
+			var classname = (_href == window.location.pathname) ? 'active-link' : 'active-link-parent';
+		}
+		if ($(this).parent('li').length) {
+			$(this).parent('li').addClass(classname);
+		} else {
+			$(this).addClass(classname);
+		}
+	});
 }
 
 function UIButtons() {
