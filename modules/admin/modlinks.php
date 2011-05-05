@@ -20,6 +20,7 @@ class modLinks extends uBasicModule {
 		foreach ($children as $links) {
 			foreach ($links as $child) {
 				if (isset($child['fieldLinks'])) continue;
+				if (isset($child['callback'])) continue;
 
 				$obj = utopia::GetInstance($child['moduleName']);
 				if ($obj->isDisabled) continue;
