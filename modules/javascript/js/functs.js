@@ -115,6 +115,13 @@ function qsUpdate(url,newVals,unset) {
 	return newUrl;
 }
 
+function getParameterByName(name,querystring) {
+	if (!querystring) querystring = window.location.search;
+	var match = RegExp('[?&]' + name + '=([^&#]*)')
+		.exec(querystring);
+	return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
 function ErrorLog(text) {
 	alert(text);
 	//$('#errors').append('<div>'+text+'</div>');
