@@ -545,15 +545,10 @@ function _uf(ele,hourglass) {
 	if (forcedValue != undefined || forcedValue != null) {
 		eleVal = forcedValue;
 	} else {
-		if (ele.tagName == 'INPUT' && ele.getAttribute('type').toLowerCase() == 'checkbox') {// if checkbox, ensure checked value = 1 and unchecked = 0
-			if ($(ele).attr('checked')) eleVal = '1'; else eleVal = '0';
-		//	eleVal = val;
-		} //else if ($(ele).attr('type') == 'button') { // manual serialise
-		//	eleVal = escape($(ele).val());
-		//}// else 
-		//	eleVal = $(ele).serialize();
-	    if (empty(eleVal))
-	    	eleVal = $(ele).val();
+		if (ele.tagName == 'INPUT' && $(ele).is(':checkbox')) {// if checkbox, ensure checked value = 1 and unchecked = 0
+			if ($(ele).is(':checked')) eleVal = '1'; else eleVal = '0';
+		} else if (empty(eleVal))
+			eleVal = $(ele).val();
 	}
 	
 	eleVal = encodeURIComponent(Base64.encode(eleVal));
