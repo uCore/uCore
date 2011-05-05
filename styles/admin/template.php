@@ -5,15 +5,14 @@
 </head>
 <body>
 <div id="wrap">
-	<div id="header">
-		<div id="nav">{UTOPIA.modlinks}</div>
-	</div>
+	<div id="header"><div id="innerheader">
+	</div></div>
 	<div id="contentWrap">
+		<div id="nav">{UTOPIA.modlinks}</div>
 		<div id="content">
 			{utopia.content}
 		</div>
 	</div>
-	<div id="footer"></div>
 </div>
 <script type="text/javascript">
   var _gaq = _gaq || [];
