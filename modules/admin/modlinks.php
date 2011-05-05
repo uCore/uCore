@@ -44,7 +44,7 @@ class modLinks extends uBasicModule {
 
 		if (!$currentAdded && $current != 'uCMS_View') {
 			$obj = utopia::GetInstance($current);
-			$arr[] = array($obj->GetTitle(),$obj->GetURL(),-100,$current);
+			$arr[] = array($obj->GetTitle(),$_SERVER['REQUEST_URI'],-100,$current);
 		}
 
 		array_sort_subkey($arr,2);
