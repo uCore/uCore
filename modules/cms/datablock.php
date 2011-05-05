@@ -62,7 +62,7 @@ class uDataBlocks extends uSingleDataModule {
     $this->AddField('order','order','blocks','Order',itTEXT);
     $this->AddField('limit','limit','blocks','Limit',itTEXT);
     $this->AddField('editable','editable','blocks','Editable',itCHECKBOX);
-    $this->AddField('content_info','"The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element an id of _r (id=\"_r\") or _ri to repeat contained elements only (innerHTML)."','','');
+    $this->AddField('content_info','"The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element a class of _r (class=\"_r\"), or _ri to repeat contained elements only (innerHTML)."','','');
     $this->AddField('fields',array($this,'getPossibleFields'),'blocks','Possible Fields');
     $this->AddField('content','content','blocks','Content',itHTML);
 	$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
