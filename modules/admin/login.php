@@ -68,6 +68,10 @@ class internalmodule_AdminLogin extends uDataModule {
 			die();
 		}
 
+		self::TryLogin();
+	}
+
+	public static function TryLogin() {
 		// login not attempted.
 		if (!array_key_exists('__admin_login_u',$_REQUEST)) return;
 
@@ -89,6 +93,7 @@ class internalmodule_AdminLogin extends uDataModule {
 	}
   
 	public static function IsLoggedIn($authType = NULL) {
+		self::TryLogin();
 		if (!isset($_SESSION['admin_auth'])) return false;
 		if ($authType === NULL) return true;
 
@@ -108,6 +113,8 @@ class internalmodule_AdminLogin extends uDataModule {
 
 	public function ParentLoadPoint() { return 0; }
 	public function checkLogin($parent) {
+		self::TryLogin();
+
 		// if auth not required, return
 		$obj = utopia::GetInstance($parent);
 		if (!flag_is_set($obj->GetOptions(),IS_ADMIN)) return true;
