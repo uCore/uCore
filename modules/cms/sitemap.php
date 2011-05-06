@@ -33,7 +33,7 @@ class uSitemap {
 			//$sel = (strpos($url,$_SERVER['REQUEST_URI']) !== FALSE) ? ' u-menu-active' : '';
 			//$sel = ($url == $_SERVER['REQUEST_URI']) ? ' u-menu-active' : ''; //handled by javascript
 			echo '<li id="'.$child['cms_id'].'" style="position:relative;cursor:pointer">';
-			echo '<a class="cmsEdit" href="'.$url.'">'.$menu_title.'</a>';
+			echo '<a class="cmsEdit" href="'.$url.'" title="'.$child['title'].'">'.$menu_title.'</a>';
 			if ($level !== 0) self::DrawChildren($child['children'],$child['cms_id'],$level);
 			echo '</li>';
 		}

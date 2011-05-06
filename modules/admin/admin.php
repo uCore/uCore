@@ -7,13 +7,12 @@ class internalmodule_Reconfigure extends uBasicModule {
 
 	public function SetupParents() {
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) $this->DisableModule('You must log in as the Site Administrator to use this module.');
-		$this->AddParent('internalmodule_Admin');
+		$this->AddParent('/');
 	}
 
-	public function GetSortOrder() { return -10; }
+	public function GetSortOrder() { return -9998; }
 
 	public function RunModule() {
-		//utopia::CancelTemplate();
 		uConfig::ShowConfig();
 	}
 }
