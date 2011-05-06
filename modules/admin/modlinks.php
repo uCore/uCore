@@ -52,6 +52,7 @@ class modLinks extends uBasicModule {
 		array_sort_subkey($arr,2);
 		$out = array();
 		foreach ($arr as $link) {
+			if (empty($link[1]) && empty($out)) continue;
 			$l = !empty($link[1]) ? '<a href="'.$link[1].'">'.$link[0].'</a>' : '&nbsp;';
 			$out[] = '<li>'.$l.'</li>';
 		}
