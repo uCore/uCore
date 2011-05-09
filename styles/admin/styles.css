@@ -21,7 +21,7 @@ a, a:link, a:visited { color: #333; text-decoration:none }
 #nav li a { text-decoration:none; font-size:1.2em; padding:5px 15px 7px 15px; line-height:1.6em }
 #nav li.active-link a, #nav li.active-link-parent a { color: #8CC63F; font-weight:bold }
 
-#contentWrap { position:relative; margin:10px; overflow:hidden; }
+#contentWrap { position:relative; margin:10px; }
 #content { margin-left:200px; border-left:1px solid #8CC63F; padding-left:15px }
 
 #footer { background:url(images/bottom-swoosh.gif) bottom center no-repeat; height:97px; }
