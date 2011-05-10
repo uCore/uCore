@@ -78,9 +78,10 @@ class internalmodule_AdminLogin extends uDataModule {
 		$un = $_REQUEST['__admin_login_u']; $pw = $_REQUEST['__admin_login_p'];
 		unset($_REQUEST['__admin_login_u']); unset($_REQUEST['__admin_login_p']);
 
+		$obj = utopia::GetInstance(__CLASS__);
 		if ( strcasecmp($un,constant('admin_user')) == 0 && $pw===constant('admin_pass') ) {
 			$_SESSION['admin_auth'] = ADMIN_USER;
-		} elseif ($this->LookupRecord(array('username'=>$un,'password'=>md5($pw)))) {
+		} elseif ($obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)))) {
 			$_SESSION['admin_auth'] = $un;
 		} else {
 			ErrorLog('Username and password do not match.');
