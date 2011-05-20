@@ -34,7 +34,7 @@ class uAdminUsersList extends uListDataModule {
 class adminLogout extends uBasicModule {
         public function GetTitle() { return 'Logout'; }
         public function GetOptions() { return IS_ADMIN; }
-	public function GetSortOrder() { return -9999;}
+	public function GetSortOrder() { return -9900;}
         public function SetupParents() {
                 $this->AddParent('/');
         }
