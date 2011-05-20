@@ -1,7 +1,5 @@
 <?php
 
-$time_taken = timer_end('full process');
-header('X-Runtime: '.$time_taken/1000);
 if (array_key_exists('admin_showT',$_SESSION) && $_SESSION['admin_showT'] === true) {// || array_key_exists('showT',$_REQUEST) && array_key_exists('timers',$GLOBALS)) {
 	echo '<pre><table>';
 	foreach ($GLOBALS['timers'] as $name => $info) {

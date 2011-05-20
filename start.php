@@ -1,4 +1,11 @@
 <?php
+function runtimeHeader($startTime) {
+       $endTime = microtime(true);
+       header('X-Runtime: '.($endTime-$startTime));
+}
+$startTime = microtime(true);
+register_shutdown_function('runtimeHeader',$startTime);
+
 session_start();
 
 include_once('error.php');
