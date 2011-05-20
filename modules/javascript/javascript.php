@@ -29,11 +29,22 @@ class uJavascript extends uBasicModule {
 
 	public function SetupParents() {
 		modOpts::AddOption('uJavascript','googleAPI','Google API Key');
-		$key = ($gAPI = modOpts::GetOption(get_class(),'googleAPI')) ? 'key='.$gAPI.'&' : '';
+		$key = ($gAPI = modOpts::GetOption('uJavascript','googleAPI')) ? 'key='.$gAPI.'&' : '';
+
+		// commented because if a user enters an incorrect version (too high for example) they can not change it back.
+//		modOpts::AddOption('uJavascript','jQuery','jQuery Version',1);
+//		$jq  = modOpts::GetOption('uJavascript','jQuery');
+
+//		modOpts::AddOption('uJavascript','jQueryUI','jQuery UI Version',1);
+//		$jqui = modOpts::GetOption('uJavascript','jQueryUI');
+
+		modOpts::AddOption('uJavascript','jQueryUI-Theme','jQuery UI Theme','ui-lightness');
+		$jquitheme = modOpts::GetOption('uJavascript','jQueryUI-Theme');
 
 		$s = (utopia::IsRequestSecure()) ? 's' : '';
-		utopia::AddJSFile('http'.$s.'://www.google.com/jsapi?'.$key.'autoload='.urlencode('{"modules":[{"name":"jquery","version":"1"},{"name":"jqueryui","version":"1"}]}'),true);
-		utopia::AddCSSFile('http'.$s.'://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/ui-lightness/jquery-ui.css');
+		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js',true);
+		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',true);
+		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css');
 		utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
 
