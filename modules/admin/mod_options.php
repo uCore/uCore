@@ -28,7 +28,7 @@ class modOpts extends uListDataModule {
 	}
 	public static $types = array();
 	public function SetupParents() {
-		$this->AddParent('internalmodule_Admin');
+		$this->AddParent('/');
 	}
 	public function RunModule() {
 		$this->ShowData();
