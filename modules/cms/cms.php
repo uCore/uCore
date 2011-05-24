@@ -30,6 +30,7 @@ class uCMS_List extends uDataModule {
 	public function GetTitle() { return 'Page Editor'; }
 	public function GetOptions() { return IS_ADMIN | ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
+	public function GetSortOrder() { return GetCurrentModule() == 'uCMS_Edit' ? -500 : parent::GetSortOrder(); }
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID');
@@ -61,6 +62,7 @@ class uCMS_List extends uDataModule {
 
 
 		$this->AddParent('internalmodule_Admin');
+		$this->AddParent('uCMS_Edit');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 	}
 	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
