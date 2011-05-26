@@ -185,6 +185,8 @@ abstract class uTableDef implements iUtopiaModule {
 		$this->_SetupFields();
 		if (empty($this->fields)) return;
 
+		$this->AddField('__metadata',ftLONGTEXT);
+
 		$oldTable = isset($this->tablename) ? $this->tablename : NULL;
 		$this->tablename = TABLE_PREFIX.get_class($this);
 

@@ -1249,6 +1249,37 @@ abstract class uDataModule extends uBasicModule {
 		unset($this->fields[$field]['style_fn']);
 	}
 
+	public function GetMetaValue($original,$pk,$value,$name) {
+		if ($pk === NULL) return NULL;
+		if (!$this->includeMeta) return NULL;
+		$row = $this->LookupRecord($pk);
+		$metadata = json_decode($row['__metadata'],true);
+		if (isset($metadata[$name])) return $metadata[$name];
+		return $row['__metadata'];
+	}
+	public function SetMetaValue($fieldAlias,$newValue,&$pkVal=NULL) {
+		if ($pkVal == NULL) {
+			$newValue = json_encode(array($fieldAlias=>$newValue));
+		} else {
+			$rec = $this->LookupRecord($pkVal);
+			$metadata = json_decode($rec['__metadata'],true);
+			$metadata[$fieldAlias] = $newValue;
+			$newValue = json_encode($metadata);
+		}
+		AjaxEcho('//'.$newValue);
+		return $this->UpdateField('__metadata',$newValue,$pkVal);
+	}
+
+	private $includeMeta = false;
+	public function AddMetaField($name,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {
+		if (!$this->includeMeta) {
+			$this->includeMeta = true;
+			$this->AddField('__metadata','__metadata');
+		}
+		$this->AddField($name,array($this,'GetMetaValue',$name),NULL,$visiblename,$inputtype,$values);
+		$this->SetFieldType($name,'metadata');
+	}
+
 	public function AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
@@ -2394,6 +2425,9 @@ abstract class uDataModule extends uBasicModule {
 		AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
+		if ($this->GetFieldType($fieldAlias) == 'metadata') {
+			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
+		}
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
 
 		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
