@@ -1341,10 +1341,14 @@ abstract class uDataModule extends uBasicModule {
 	 */
 	public function AddPreProcessCallback($alias,$callback) {
 		if (!$this->FieldExists($alias)) return FALSE;
-		$numargs = func_num_args();
-		$arr = array();
-		for ($i = 2; $i < $numargs; $i++)
-		$arr[] = func_get_arg($i);
+		if (count($callback) > 2) {
+			$arr = array_splice($callback,2);
+		} else {
+			$numargs = func_num_args();
+			$arr = array();
+			for ($i = 2; $i < $numargs; $i++)
+				$arr[] = func_get_arg($i);
+		}
 		$this->fields[$alias]['preprocess'][] = array($callback,$arr);
 	}
 
