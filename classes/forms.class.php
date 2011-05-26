@@ -810,7 +810,7 @@ abstract class uDataModule extends uBasicModule {
 //	}
 
 	public function GetEncodedFieldName($field,$pkValue=NULL) {
-	  $pk = $pkValue === NULL ? '' : "($pkValue)";
+		$pk = is_null($pkValue) ? '' : "($pkValue)";
 		return cbase64_encode(get_class($this).":$field$pk");
 	}
 
@@ -2730,7 +2730,7 @@ abstract class uDataModule extends uBasicModule {
 		// reset the field.
 
 		$enc_name = $this->GetEncodedFieldName($fieldAlias,$pkVal);
-		$newRec = ($pkVal) ? $this->LookupRecord($pkVal) : NULL;
+		$newRec = is_null($pkVal) ? NULL : $this->LookupRecord($pkVal);
 
 		$data = $this->GetCellData($fieldAlias,$newRec,$this->GetTargetURL($fieldAlias,$newRec));
 
@@ -2775,7 +2775,7 @@ abstract class uListDataModule extends uDataModule {
 	public function UpdateField($fieldAlias,$newValue,&$pkVal = NULL) {
 		$isNew = ($pkVal === NULL);
 
-		$this->ResetField($fieldAlias,NULL); // reset the "new record" field
+		if ($pkVal === NULL) $this->ResetField($fieldAlias,NULL); // reset the "new record" field
 
 		if ($isNew && !$this->CheckMaxRows(1)) return;
 

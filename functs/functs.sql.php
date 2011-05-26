@@ -208,14 +208,14 @@ function InterpretSqlString($sqlString, &$module, &$field, &$pkVal) {
 	//	die(print_r($matches,true));
 	$module = $matches[1];
 	$field = $matches[2];
-  //mail('oridan82@gmail.com','test',print_r($matches,true));
-	$pkVal = array_key_exists(3,$matches) ? trim($matches[3],'()') : NULL;
-  
-	//	list($table,$field) = split(':',$sqlString);
-	//	$where = trim(substr($table,strpos($table,'(')),'()');
-	//	$table = substr($table,0,strpos($table,'('));
 
-	//	list($pk,$where) = split('~',$where);
+	if (!isset($matches[3]) || $matches[3] === '')
+		$pkVal = NULL;
+	elseif ($matches[3] == '()') {
+		$pkVal = '';
+	} else
+		$pkVal = substr($matches[3],1,-1);
+
 	return true;
 }
 
