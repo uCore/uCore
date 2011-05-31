@@ -562,7 +562,7 @@ class utopia {
 	/* TEMPLATE */
 	public static $adminTemplate = false;
 	private static $usedTemplate = NULL;
-	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_end_clean(); if (!$justClean) self::$usedTemplate = NULL; }
+	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_clean(); if (!$justClean) self::$usedTemplate = NULL; }
 	public static function UseTemplate($template = TEMPLATE_DEFAULT) {
 		if ($template == TEMPLATE_DEFAULT) $template = modOpts::GetOption('CMS','default_template');
 		if (!$template) $template = TEMPLATE_BLANK;
@@ -623,6 +623,9 @@ class utopia {
 			self::AddCSSFile(PATH_REL_CORE.'default.css');
 			if (file_exists($templateDir.'styles.css'))
 				self::AddCSSFile($templateDir.'styles.css');
+		} else {
+			$template = ob_get_contents();
+			ob_end_clean();
 		}
 		self::PrependVar('<head>','<meta name="generator" content="uCore '.file_get_contents(PATH_ABS_CORE.'version.txt').' - Utopia Core PHP Framework"/>');
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());

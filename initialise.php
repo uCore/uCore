@@ -13,6 +13,8 @@ timer_start('Load Files');
 LoadFiles();
 timer_end('Load Files');
 
+ob_start('utopia::output_buffer');
+
 $configArr = (isset($_REQUEST['__config_submit'])) ? $_REQUEST : uConfig::ReadConfig();
 $valid = uConfig::ValidateConfig($configArr);
 if ($valid) {
