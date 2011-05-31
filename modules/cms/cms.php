@@ -260,8 +260,8 @@ class uCMS_Edit extends uSingleDataModule {
 		foreach (uDataBlocks::$staticBlocks as $blockID => $callback) $rows[]['block_id'] = $blockID;
 		$ret = '<div>Click on a block to insert it.</div>';
 		foreach ($rows as $row) {
-			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\">{$row['block_id']}</span>";
-		}   
+			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\" class=\"btn\">{$row['block_id']}</span>";
+		}
 		return trim($ret);
 	}
 	public function SetupParents() {
