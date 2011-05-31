@@ -143,12 +143,13 @@ FIN;
 	static function DrawChildren($children) {
 		if (!$children) return;
 		array_sort_subkey($children,'position');
+		$editObj = utopia::GetInstance('uCMS_Edit');
+		$listObj = utopia::GetInstance('uCMS_List');
+		$viewObj = utopia::GetInstance('uCMS_View');
+
 		echo '<ul class="cmsTree">';
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? ' hiddenItem' : '';
-			$editObj = utopia::GetInstance('uCMS_Edit');
-			$listObj = utopia::GetInstance('uCMS_List');
-			$viewObj = utopia::GetInstance('uCMS_View');
 
 			$editLink = $editObj->GetURL(array('cms_id'=>$child['cms_id']));
 			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
