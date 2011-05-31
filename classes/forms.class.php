@@ -182,7 +182,7 @@ abstract class uBasicModule implements iUtopiaModule {
 					header('Location: '.$abs.$url,true,301); die();
 			}
 		}
-		if (flag_is_set($this->GetOptions(),IS_ADMIN)) utopia::$adminTemplate = true;
+		if (flag_is_set($this->GetOptions(),IS_ADMIN)) utopia::UseTemplate(TEMPLATE_ADMIN);
 
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 

@@ -597,15 +597,14 @@ class utopia {
 		return $path.'/';
 	}
 	public static function OutputTemplate() {
-		self::SetVar('templatedir',utopia::GetTemplateDir(true));
-		if (self::$adminTemplate) self::UseTemplate(TEMPLATE_ADMIN);
-		if (!self::UsingTemplate()) return;
+		if (self::UsingTemplate()) {
+			self::SetVar('templatedir',utopia::GetTemplateDir(true));
 
-		$templateDir = self::GetTemplateDir();
-		$templatePath = $templateDir.'template.php';
-		self::CancelTemplate(true);
+			$templateDir = self::GetTemplateDir();
+			$templatePath = $templateDir.'template.php';
+			self::CancelTemplate(true);
 
-		$template = get_include_contents($templatePath);
+			$template = get_include_contents($templatePath);
 /*		switch ($templateDir) {
 			case TEMPLATE_ADMIN:
 				$template = get_include_contents(PATH_ABS_CORE.'styles/admin/template.php');
@@ -621,10 +620,10 @@ class utopia {
 		}*/
 		//utopia::CancelTemplate();
 
-		self::AddCSSFile(PATH_REL_CORE.'default.css');
-		if (file_exists($templateDir.'styles.css'))
-			self::AddCSSFile($templateDir.'styles.css');
-
+			self::AddCSSFile(PATH_REL_CORE.'default.css');
+			if (file_exists($templateDir.'styles.css'))
+				self::AddCSSFile($templateDir.'styles.css');
+		}
 		self::PrependVar('<head>','<meta name="generator" content="uCore '.file_get_contents(PATH_ABS_CORE.'version.txt').' - Utopia Core PHP Framework"/>');
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
 		if (self::VarExists('script_include'))
