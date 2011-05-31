@@ -85,13 +85,16 @@ class uCMS_List extends uDataModule {
 		$row = $modOptsObj->LookupRecord('CMS::default_template');//$this->GetCell($fieldName,$row,$targetUrl)
 		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row,NULL);
 
-		echo '<hr><div style="font-size:0.8em">Click a page below to preview it.</div>';
+		echo '<hr>';
 		self::DrawChildren($relational);
 		echo '</div></td>';
-		echo '<td style="width:100%;height:100%;vertical-align:top"><iframe style="width:100%;height:100%;min-height:600px" id="previewFrame"></iframe></td></tr></table>';
+		echo '<td style="width:100%;height:100%;vertical-align:top"><div style="width:100%;height:100%;min-height:600px;border-left:1px solid #333" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
 
 		treeSort::Init();
 		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
+		$editObj = utopia::GetInstance('uCMS_Edit');
+		$editLink = $editObj->GetURL();
+		$fid = $editObj->FindFilter('cms_id');
 		echo <<<FIN
 		<script>
 		var hidden=true;
@@ -133,6 +136,11 @@ class uCMS_List extends uDataModule {
 			RefreshIcons();
 			e.stopPropagation();
 		});
+		$('.cmsItem').click(function () {
+			$('#previewFrame').load('$editLink&inline=1&_f_{$fid['uid']}='+$(this).attr('id'), function() {
+				InitJavascript.run();
+			});
+		});
 		</script>
 FIN;
 		$c = ob_get_contents();
@@ -159,7 +167,7 @@ FIN;
 			echo $child['title'].$data;
 			echo '<div class="cmsItemActions">';
 			echo $listObj->GetDeleteButton($child['cms_id']);
-			echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
+			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
 			echo '</li>';
