@@ -24,7 +24,7 @@ class uJavascript extends uBasicModule {
 		self::$includeText .= "\n$text";
 	}
 	public static function AddText($text) {
-		utopia::AppendVar('script_include',$text);
+		utopia::AppendVar('script_include',"\n$text");
 	}
 
 	public function SetupParents() {
