@@ -38,7 +38,7 @@ FIN
 	static function Init() {
 		utopia::AddJSFile(jqFileManager::GetPathJS());
 		utopia::AddCSSFile(jqFileManager::GetPathCSS());
-		utopia::AppendVar('script_include', <<<FIN
+		uJavascript::AddText(<<<FIN
 	function dclick(event) {
 		var item = $(this).data('item');
 		if (item.type != 0) return;
