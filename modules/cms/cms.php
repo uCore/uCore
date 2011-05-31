@@ -259,6 +259,8 @@ class uCMS_Edit extends uSingleDataModule {
 	public function SetupParents() {
 	}
 	public function RunModule() {
+		if (isset($_REQUEST['inline']))
+			utopia::CancelTemplate();
 		$this->ShowData();
 	}
 	public static function StartNoProcess() {
