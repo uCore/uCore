@@ -154,7 +154,6 @@ $(document).ready(function(){
 	
 	InitJavascript.run();
 });
-$(window).load(function () { InitJavascript.run(); });
 
 function RefreshTableSorters() {
 	$('.datalist:has(SPAN.pager)').each(function () {
