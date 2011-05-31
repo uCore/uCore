@@ -9,6 +9,7 @@ class module_TinyMCE extends uBasicModule {
 	public function SetupParents() {
 		utopia::AddInputType(itRICHTEXT,array($this,'drti_func'));
 		utopia::AddInputType(itHTML,array($this,'drti_func'));
+		module_TinyMCE::InitScript();
 	}
 
 	private static $hasDrawnJS = false;
@@ -66,7 +67,7 @@ class module_TinyMCE extends uBasicModule {
 				$includeOpts = ','.$jsOptionVar;
 			}
 
-			utopia::AppendVar('script_include',<<< FIN
+			uJavascript::AddText(<<< FIN
 	function updateMCE(className,hourglass) {
 		var field = $("."+className);
 		var val = tinyMCE.get(field.attr('id')).getContent();
@@ -92,21 +93,17 @@ class module_TinyMCE extends uBasicModule {
 		mb.dialog('close');
 	}
 	function InitMCE() {
-		//$(document).ready(function() {
-			tinyMCE.init($richOpts);
-			tinyMCE.init($htmlOpts);
-		//});
+		tinyMCE.init($richOpts);
+		tinyMCE.init($htmlOpts);
 		//$(".mceRichText").live("change",function() { uf(this); });
 	}
-	InitMCE();
+	InitJavascript.add(InitMCE);
 FIN
 );
 		}
 	}
 
 	function drti_func($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
-		self::InitScript();
-
 		$className = 'mceEditorRich';
 		if ($inputType == itHTML) $className = 'mceEditorHTML';
 
@@ -118,8 +115,7 @@ FIN
 
 		$saveClass = 'mceSave'.rand(1,5000);
 		$attributes['class'] .= ' '.$saveClass;
-		$ajax = array_key_exists('__ajax',$_REQUEST) ? '<script>InitMCE();</script>' : '';
-		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).'<br><input type="button" value="Save" onclick="updateMCE(\''.$saveClass.'\',this)">'.$ajax;
+		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).'<br><input type="button" value="Save" onclick="updateMCE(\''.$saveClass.'\',this)">';
 	}
 	public function RunModule() {
 	}
