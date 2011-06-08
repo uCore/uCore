@@ -1087,8 +1087,10 @@ abstract class uDataModule extends uBasicModule {
 
 			$this->AddField($this->GetPrimaryKey(),$this->GetPrimaryKey(),$alias);
 			return;
-		} else
+		} else {
 			$newTable['parent'] = $parent;
+			$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
+		}
 
 		// $fromField in $this->sqlTableSetupFlat[$parent]['tModule']
 		if (is_string($joins)) $joins = array($joins=>$joins);
