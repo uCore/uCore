@@ -96,7 +96,7 @@ class internalmodule_Admin extends uBasicModule {
 	public function RunModule() {
 		echo '<h1>Welcome to Admin Home</h1>';
 
-		$gitTags = json_decode(file_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
+		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
 		$gitTags = array_keys($gitTags['tags']);
 		usort($gitTags,'internalmodule_Admin::compareVersions');
 		
