@@ -226,7 +226,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 				}
 			}
 		}
-		AjaxEcho("InitJavascript.run();\n");
 	}
 
 	public function getComboVals() {

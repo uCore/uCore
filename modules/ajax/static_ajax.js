@@ -195,6 +195,7 @@ function UIButtons() {
 var InitJavascript = {
 	_functs: [InitDatePickers, InitAutocomplete, RefreshTables, UpdateSelectedLinks, UIButtons],
 	add: function (f) {
+		if (this._functs.indexOf(f) != -1) return;
 		this._functs.push(f);
 	},
 	run: function () {
