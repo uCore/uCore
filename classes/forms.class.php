@@ -561,14 +561,16 @@ abstract class uBasicModule implements iUtopiaModule {
 		return $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$width,$height);
         }
 
-	public function DrawSqlImage($fieldAlias,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE,$linkAttr=NULL) {
-		if ($pkVal == NULL) return '';
+	public function DrawSqlImage($fieldAlias,$rec,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE,$linkAttr=NULL) {
+		if ($rec == NULL) return '';
 		$field = $this->GetFieldProperty($fieldAlias ,'field');
-		$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
-
+		$tableAlias = $this->GetFieldProperty($fieldAlias ,'tablename');
+		$setup = $this->GetFieldProperty($fieldAlias ,'vtable');
 		$table = $setup['table'];
-		$key = $setup['pk'];
-		//$pkVal = $this->GetRealValue($fieldAlias,$pkVal);
+
+		$key = $this->GetPrimaryKey($fieldAlias);
+		$pkVal = $table !== $this->GetPrimaryTable() ? $rec['_'.$tableAlias.'_pk'] : $rec[$key];
+
 		return $this->DrawImageFromTable($field,$table,$key,$pkVal,$width,$height,$attr,$link,NULL,NULL,$linkAttr);
 	}
 
@@ -2223,13 +2225,13 @@ abstract class uDataModule extends uBasicModule {
 //	private $navCreated = FALSE;
 
   // sends ARGS,originalValue,pkVal,processedVal
-	public function PreProcess($fieldName,$value,$pkVal=NULL,$forceType = NULL) {
+	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
+		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
 		$originalValue = $value;
 		$suf = ''; $pre = ''; $isNumeric=true;
 		if ($forceType === NULL) $forceType = $this->GetFieldType($fieldName);
 		switch ($forceType) {
 			case ftFILE:
-				$rec = $this->LookupRecord($pkVal);
 				$filename = '';
 				$link = $this->GetFileFromTable($fieldName,TABLE_PREFIX.$this->GetTabledef(),$this->GetPrimaryKey(),$pkVal);
 				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
@@ -2239,7 +2241,7 @@ abstract class uDataModule extends uBasicModule {
 			case ftIMAGE:
 				if (!$value) break;
 				$size = $this->GetFieldProperty($fieldName,'length');
-				$value = $this->DrawSqlImage($fieldName,$pkVal,$size,$size);
+				$value = $this->DrawSqlImage($fieldName,$rec,$size,$size);
 				break;
 			case ftCURRENCY:
 				$dp = $this->GetFieldProperty($fieldName,'length');
@@ -2640,7 +2642,7 @@ abstract class uDataModule extends uBasicModule {
 		if (is_array($row)) $pkVal = isset($row['__module_pk__']) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
-		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$pkVal);
+		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$row);
 
 		$fieldData = $this->fields[$fieldName];
 		//$url = htmlentities($url);
@@ -3062,8 +3064,8 @@ SCR_END
 						case ftPERCENT:
 							if (!array_key_exists($fieldName,$total)) $total[$fieldName] = 0;
 							if (!array_key_exists($fieldName,$totalShown)) $totalShown[$fieldName] = 0;
-							$pkVal = $row[$this->GetPrimaryKey()];
-							$preProcessValue = floatval(preg_replace('/[^0-9\.-]/','',$this->PreProcess($fieldName,$row[$fieldName],$pkVal)));
+							//$pkVal = $row[$this->GetPrimaryKey()];
+							$preProcessValue = floatval(preg_replace('/[^0-9\.-]/','',$this->PreProcess($fieldName,$row[$fieldName],$row)));
 							if ($i <= 150) $totalShown[$fieldName] += $preProcessValue;
 							$total[$fieldName] += $preProcessValue;
 							break;
@@ -3251,8 +3253,8 @@ abstract class uSingleDataModule extends uDataModule {
 
 			$fieldCount = count($fields);
 			foreach ($fields as $fieldName => $fieldData) {
-				$pkValue	= is_array($row) && array_key_exists($this->GetPrimaryKey(),$row) ? $row[$this->GetPrimaryKey()] : NULL;
-				$fieldValue	= $this->PreProcess($fieldName,is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '',$pkValue);
+				//$pkValue	= is_array($row) && array_key_exists($this->GetPrimaryKey(),$row) ? $row[$this->GetPrimaryKey()] : NULL;
+				$fieldValue	= $this->PreProcess($fieldName,is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '',$row);
 
 				$targetUrl = $this->GetTargetUrl($fieldName,$row);
 
