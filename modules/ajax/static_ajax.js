@@ -502,17 +502,19 @@ function uf(ele, forcedValue, hourglassEle) {
 	
 	if (!hourglassEle) hourglassEle = ele;
 	if (typeof(hourglassEle) == 'string') hourglassEle = document.getElementById(hourglassEle);
-	var hourglass = $('<img align="texttop" src="'+PATH_REL_CORE+'images/hourglass.png">');
-	var offset = $(hourglassEle).offset();
-	hourglass.css({
-		position:'absolute',
-		'z-index':5000,
-		top: offset.top,
-		left: offset.left + hourglassEle.offsetWidth
-	});
-	$('body').append(hourglass);
-	$('body').addClass('progressCursor');
-	if (!$(hourglassEle).is(':file')) $(hourglassEle).attr('disabled','disabled');
+	if (hourglassEle) {
+		var hourglass = $('<img align="texttop" src="'+PATH_REL_CORE+'images/hourglass.png">');
+		var offset = $(hourglassEle).offset();
+		hourglass.css({
+			position:'absolute',
+			'z-index':5000,
+			top: offset.top,
+			left: offset.left + hourglassEle.offsetWidth
+		});
+		$('body').append(hourglass);
+		$('body').addClass('progressCursor');
+		if (!$(hourglassEle).is(':file')) $(hourglassEle).attr('disabled','disabled');
+	}
 
 	// timeout for autocomplete
 	setTimeout(function(){_uf(ele, hourglass);},200);
