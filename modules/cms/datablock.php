@@ -134,29 +134,27 @@ class uDataBlocks extends uSingleDataModule {
 		$repeatable = $ele;
 	}
 	
-    if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$repeatable,$matches,PREG_PATTERN_ORDER)) {
-      $searchArr = $matches[0];
-      $typeArr = isset($matches[1]) ? $matches[1] : false;
-      $varsArr = isset($matches[2]) ? $matches[2] : false;
-      foreach ($rows as $row) {
-        $c = $repeatable;
-        foreach ($searchArr as $k => $search) {
-          $field = $varsArr[$k];
-          if (!isset($row[$field])) continue;
-		  $replace = $typeArr[$k] == 'u' ? UrlReadable($row[$field]) : $row[$field];
-		  if ($rec['editable']) {
-		    $obj = utopia::GetInstance($rec['module']);
-		    $replace = $obj->GetCell($field,$row);
-		  }
-		  $c = str_replace($search,$replace,$c);
-        }
-        $content .= $c;
-      }
-    }
+	if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$repeatable,$matches,PREG_PATTERN_ORDER)) {
+		$searchArr = $matches[0];
+		$typeArr = isset($matches[1]) ? $matches[1] : false;
+		$varsArr = isset($matches[2]) ? $matches[2] : false;
+		foreach ($rows as $row) {
+			$c = $repeatable;
+			foreach ($searchArr as $k => $search) {
+				$field = $varsArr[$k];
+				if (!isset($row[$field])) continue;
+				$replace = $typeArr[$k] == 'u' ? UrlReadable($row[$field]) : $row[$field];
+				$obj = utopia::GetInstance($rec['module']);
+				$replace = $obj->GetCell($field,$row,'',$rec['editable']?NULL:itNONE);
+				$c = str_replace($search,$replace,$c);
+			}
+			$content .= $c;
+		}
+	}
 	    
 	$ret = $append.$content.$prepend;
 	while (utopia::MergeVars($ret));	
-    return $ret;
+	return $ret;
   }
 
   public static $staticBlocks = array();
