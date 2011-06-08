@@ -552,8 +552,8 @@ function _uf(ele,hourglass) {
 		} else if (empty(eleVal))
 			eleVal = $(ele).val();
 	}
-	
-	eleVal = encodeURIComponent(Base64.encode(eleVal));
+
+	eleVal = encodeURIComponent(Base64.encode(eleVal.toString()));
 
 	eleData = "__ajax=updateField&"+escape(eleName)+"="+eleVal;
 	
