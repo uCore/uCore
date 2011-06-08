@@ -1,4 +1,5 @@
 <?php
+ob_start();
 function runtimeHeader($startTime) {
        $endTime = microtime(true);
        header('X-Runtime: '.($endTime-$startTime));
