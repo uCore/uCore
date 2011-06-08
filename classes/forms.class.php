@@ -190,7 +190,9 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 
 		timer_start('Run Module');
+		echo '<div class="'.get_class($this).'">';
 		if ($this->RunModule() === FALSE) return false;
+		echo '</div>';
 		timer_end('Run Module');
 		$this->hasRun = true;
 
@@ -2913,7 +2915,7 @@ SCR_END
 		$metadataTitle = ' {tabTitle:\''.$this->GetTitle().'\', tabPosition:\''.$this->GetSortOrder().'\'}';
 		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
-		echo "<table class=\"".get_class($this)." layoutListSection datalist\">";
+		echo "<table class=\"layoutListSection datalist\">";
 
 		/*		echo "<colgroup>";
 		 // need first 'empty' column for buttons?
@@ -3241,7 +3243,7 @@ abstract class uSingleDataModule extends uDataModule {
 			//            $globTargetFilter = $this->GetTargetFilter('*',$row);
 			// start table
 			//echo "<div id='$tabGroupName-".get_class($this)."_$sectionID' class=\"draggable$metadataTitle\">";
-			$out = "<table class=\"".get_class($this)." layoutDetailSection\">";
+			$out = "<table class=\"layoutDetailSection\">";
 			//if ($SN && count($this->layoutSections) == 1) $out .= "<tr><th colspan=\"2\">$SN</th></tr>"; // add a header to the table
 
 
