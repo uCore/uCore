@@ -185,6 +185,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 	}
 
 	public function UpdateField() {
+		ignore_user_abort(true);
 		$filter = '';
 		$pkVal = NULL;
 		$requireReload = false;
