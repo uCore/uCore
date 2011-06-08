@@ -2656,7 +2656,12 @@ abstract class uDataModule extends uBasicModule {
 			$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 		} else {
 			//possible problems where value contains html? (html will be displayed in full)
-			$ret = (!empty($url) && ($value != '' && $value[0] != '<')) ? "<a href=\"$url\">$value</a>" : $value;
+			if (empty($url) || ($value != '' && $value[0] == '<'))
+				$ret = $value;
+			else {
+				$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
+				$ret = "<a$class href=\"$url\">$value</a>";
+			}
 		}
 		return $ret;
 	}
