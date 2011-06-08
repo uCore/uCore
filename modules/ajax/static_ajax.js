@@ -565,7 +565,7 @@ function _uf(ele,hourglass) {
 	if ($(ele).attr('type') == 'file') {
 		$(ele).ajaxFileUpload({
 			type:'POST',
-			async: false,
+			async: true,
 			cache: false,
 			url:targetPage,
 			data:{'__ajax':'updateField'},
@@ -590,7 +590,7 @@ function _uf(ele,hourglass) {
 
 	$.ajax({
 		type: "POST",
-		async: false,
+		async: true,
 		cache: false,
 		url: targetPage,
 		data: eleData,
