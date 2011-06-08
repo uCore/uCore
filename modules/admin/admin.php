@@ -31,7 +31,6 @@ class internalmodule_Admin extends uBasicModule {
 	public function SetupParents() {
 		$this->AddParent('/');
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
-		$this->RegisterAjax('toggleQ',array($this,'toggleQ'));
 //		$this->RegisterAjax('optimizeTables',array($this,'optimizeTables'),false);
 	}
 	public function optimizeTables() {
@@ -64,14 +63,6 @@ class internalmodule_Admin extends uBasicModule {
 			$_SESSION['admin_showT'] = true;
 		else
 			$_SESSION['admin_showT'] = !$_SESSION['admin_showT'];
-		die('window.location.reload();');
-	}
-
-	public function toggleQ() {
-		if (!array_key_exists('admin_showQ',$_SESSION))
-			$_SESSION['admin_showQ'] = true;
-		else
-			$_SESSION['admin_showQ'] = !$_SESSION['admin_showQ'];
 		die('window.location.reload();');
 	}
 
