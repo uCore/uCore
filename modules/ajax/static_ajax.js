@@ -527,14 +527,7 @@ function _uf(ele,hourglass) {
 			break;
 		}
 	}
-    //if (isUpdating == true) { /*alert('Please wait a few moments for the previous operation to complete.');*/ $(ele).val(ele.defaultValue); return; }
-    //isUpdating = true;
-    
-/*    if (typeof(ele) == 'string') {
-    	//alert();
-    	ele = $('#'+ele);// document.getElementById(ele);
-	}*/
-	//oldVal = $(ele).val();
+
 	var eleData = '';
 	
 	var eleName = ele;
@@ -558,9 +551,6 @@ function _uf(ele,hourglass) {
 	eleData = "__ajax=updateField&"+escape(eleName)+"="+eleVal;
 	
 	targetPage = window.location.toString().replace(window.location.hash,'');
-	
-//	$('#statusOverlay').show();
-//	alert(targetPage);
 	
 	if ($(ele).attr('type') == 'file') {
 		$(ele).ajaxFileUpload({
