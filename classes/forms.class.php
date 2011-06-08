@@ -874,7 +874,11 @@ abstract class uDataModule extends uBasicModule {
 		return utopia::DrawInput($fieldName,$inputType,$defaultValue,$values,$attributes);
 	}
 
-	public function GetPrimaryKey() {
+	public function GetPrimaryKey($fieldAlias=NULL) {
+		if (!is_null($fieldAlias)) {
+			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
+			return $setup['pk'];
+		}
 		if ($this->pk == NULL && $this->GetTabledef() != NULL) {
 			$obj = utopia::GetInstance($this->GetTabledef());
 			$this->pk = $obj->GetPrimaryKey();
@@ -882,7 +886,11 @@ abstract class uDataModule extends uBasicModule {
 		return $this->pk;
 	}
 
-	public function GetPrimaryTable() {
+	public function GetPrimaryTable($fieldAlias=NULL) {
+		if (!is_null($fieldAlias)) {
+			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
+			return $setup['table'];
+		}
 		if ($this->pt == NULL)
 		$this->pt = TABLE_PREFIX.$this->GetTabledef();
 		return $this->pt;
