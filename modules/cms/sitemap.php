@@ -1,9 +1,8 @@
 <?php
 
-utopia::AddTemplateParser('top_menu','uSitemap::DrawMenu','',true);
-utopia::AddTemplateParser('top_menu','uSitemap::DrawMenu','.*',true);
-utopia::AddTemplateParser('nested_menu','uSitemap::DrawMenu','.*',true);
-utopia::AddTemplateParser('sitemap','uSitemap::DrawSitemap','',true);
+utopia::AddTemplateParser('menu1','uSitemap::DrawMenu','.*',true);
+utopia::AddTemplateParser('menu','uSitemap::DrawNestedMenu','.*',true);
+utopia::AddTemplateParser('sitemap','uSitemap::DrawNestedMenu','',true);
 class uSitemap {
 	static function DrawSitemap() {
 		self::DrawMenu(NULL,-1);
