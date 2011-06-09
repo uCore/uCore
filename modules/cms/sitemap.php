@@ -4,8 +4,8 @@ utopia::AddTemplateParser('menu1','uSitemap::DrawMenu','.*',true);
 utopia::AddTemplateParser('menu','uSitemap::DrawNestedMenu','.*',true);
 utopia::AddTemplateParser('sitemap','uSitemap::DrawNestedMenu','',true);
 class uSitemap {
-	static function DrawSitemap() {
-		self::DrawMenu(NULL,-1);
+	static function DrawNestedMenu($parent=NULL) {
+		self::DrawMenu($parent,-1);
 	}
 	static function DrawMenu($parent=NULL,$level = 1) {
 		$obj = utopia::GetInstance('uCMS_List');
