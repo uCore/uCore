@@ -137,7 +137,6 @@ class uCMS_List extends uDataModule {
 			e.stopPropagation();
 		});
 		$('.cmsItemText').click(function (e) {
-			if (e.srcElement != this) return;
 			$('#previewFrame').load('$editLink&inline=1&_f_{$fid['uid']}='+$(this).closest('.cmsItem').attr('id'), function() {
 				InitJavascript.run();
 			});
