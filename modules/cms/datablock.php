@@ -143,9 +143,14 @@ class uDataBlocks extends uSingleDataModule {
 			foreach ($searchArr as $k => $search) {
 				$field = $varsArr[$k];
 				if (!isset($row[$field])) continue;
-				$replace = $typeArr[$k] == 'u' ? UrlReadable($row[$field]) : $row[$field];
-				$obj = utopia::GetInstance($rec['module']);
-				$replace = $obj->GetCell($field,$row,'',$rec['editable']?NULL:itNONE);
+				switch ($typeArr[$k]) {
+					case 'u':
+						$replace = UrlReadable($row[$field]);
+						break;
+					default:
+						$obj = utopia::GetInstance($rec['module']);
+						$replace = $obj->PreProcess($field,$row[$field],$row);
+				}
 				$c = str_replace($search,$replace,$c);
 			}
 			$content .= $c;
