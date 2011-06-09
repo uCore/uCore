@@ -167,11 +167,11 @@ FIN;
 
 			echo '<li id="'.$child['cms_id'].'" class="cmsItem'.$hide.'">';
 			echo '<div class="cmsItemText">';
-			echo $child['title'].$data;
 			echo '<div class="cmsItemActions">';
+			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			echo $listObj->GetDeleteButton($child['cms_id']);
 			echo '</div>';
-			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
+			echo $child['title'].$data;
 			echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
 			echo '</li>';
