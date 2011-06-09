@@ -136,10 +136,12 @@ class uCMS_List extends uDataModule {
 			RefreshIcons();
 			e.stopPropagation();
 		});
-		$('.cmsItem').click(function () {
+		$('.cmsItem').click(function (e) {
+			if (e.srcElement != this) return;
 			$('#previewFrame').load('$editLink&inline=1&_f_{$fid['uid']}='+$(this).attr('id'), function() {
 				InitJavascript.run();
 			});
+			e.stopPropagation();
 		});
 		</script>
 FIN;
