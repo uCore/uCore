@@ -136,9 +136,9 @@ class uCMS_List extends uDataModule {
 			RefreshIcons();
 			e.stopPropagation();
 		});
-		$('.cmsItem').click(function (e) {
+		$('.cmsItemText').click(function (e) {
 			if (e.srcElement != this) return;
-			$('#previewFrame').load('$editLink&inline=1&_f_{$fid['uid']}='+$(this).attr('id'), function() {
+			$('#previewFrame').load('$editLink&inline=1&_f_{$fid['uid']}='+$(this).closest('.cmsItem').attr('id'), function() {
 				InitJavascript.run();
 			});
 			e.stopPropagation();
@@ -166,9 +166,11 @@ FIN;
 			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
 
 			echo '<li id="'.$child['cms_id'].'" class="cmsItem'.$hide.'">';
+			echo '<div class="cmsItemText">';
 			echo $child['title'].$data;
 			echo '<div class="cmsItemActions">';
 			echo $listObj->GetDeleteButton($child['cms_id']);
+			echo '</div>';
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
