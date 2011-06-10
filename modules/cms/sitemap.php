@@ -81,6 +81,7 @@ class uSitemapXML extends uBasicModule {
 FIN;
 		}
 		echo '</urlset>';
+		die();
 	}
 }
 
