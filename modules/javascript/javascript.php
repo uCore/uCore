@@ -10,9 +10,6 @@ uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
 utopia::AddJSFile(PATH_REL_CORE.'.javascript.js');
 
-$b = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
-if (strpos($b,'MSIE 6') !== FALSE || strpos($b,'MSIE 7') !== FALSE) utopia::AddJSFile(dirname(__FILE__).'/js/DD_belatedPNG-min.js');
-
 class uJavascript extends uBasicModule {
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
