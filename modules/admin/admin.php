@@ -122,7 +122,7 @@ class internalmodule_Admin extends uBasicModule {
 	SetEnv HTTP_MOD_REWRITE On
 
 	RewriteEngine on
-	RewriteRule ^(.*/)?\.svn/ - [F,L]
+	RewriteRule ^(.*/)?(\.svn)|(\.git) - [F,L]
 	ErrorDocument 403 "Access Forbidden"
 
 	RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
