@@ -1861,10 +1861,11 @@ FIN;
 	public function GetFilterString($uid,$fieldNameOverride=NULL,$fieldTypeOverride=NULL){//,$filterSection) {
 		//		echo get_class($this).".GetFilterString($uid)\n";
 		$filterData = $this->GetFilterInfo($uid);
-		$fieldName= $fieldNameOverride ? $fieldNameOverride : $filterData['fieldName'];
+		if (!is_array($filterData)) return '';
+		$fieldName = $fieldNameOverride ? $fieldNameOverride : $filterData['fieldName'];
 		$compareType=$filterData['ct'];
 		$inputType=$filterData['it'];
-		if ($compareType == ctCUSTOM) return '('.$filterData['fieldName'].')';
+		if ($compareType == ctCUSTOM) return $filterData['fieldName'];
 
 		$fieldToCompare = NULL;
 		if ($filterData['type'] == FILTER_WHERE) {
@@ -1920,13 +1921,13 @@ FIN;
 		$fieldToCompare = $fieldToCompare ? $fieldToCompare : $fieldName;
 		if ($compareType == ctIN) {
 			if (IsSelectStatement($fieldName))
-			return "($val $compareType $fieldName)";
+				return trim("$val $compareType $fieldName");
 			$vals = explode(',',$value);
 			$val = "('".join("','",$vals)."')";
-			return "($fieldToCompare $compareType $val)";
+			return trim("$fieldToCompare $compareType $val");
 		}
 
-		return "($fieldToCompare $compareType $val)";
+		return trim("$fieldToCompare $compareType $val");
 	}
 
   public $extraWhere = NULL;
@@ -1947,7 +1948,7 @@ FIN;
 				// if the field doesnt exist in the primary table. -- should be ANY table used. and if more than one, should be specific.
 
 				if (($filterString = $this->GetFilterString($fData['uid'])) !== '')
-				$setParts[] = $filterString;
+					$setParts[] = "($filterString)";
 			}
 			if (count($setParts) >0) $where[] = '('.join(' AND ',$setParts).')';
 		}
@@ -1996,26 +1997,25 @@ FIN;
 				//				if ($fData['value'] == "%%" && $fData['ct'] == ctLIKE) continue;
 
 				if (($filterString = $this->GetFilterString($fData['uid'])) !== '')
-				$setParts[] = $filterString;
+					$setParts[] = "($filterString)";
 			}
-
 			if (count($setParts) >0) $having[] = '('.join(' AND ',$setParts).')';
 		}
 		$ret = join(' OR ',$having);
-    
-    if (empty($this->extraHaving)) return $ret;
-    if ($ret) $ret = "($ret) AND ";
-	
-    if (is_array($this->extraHaving)) {
-      $extraWhere = array();
-      foreach ($this->extraHaving as $field => $value) {
-        $value = is_numeric($value) ? $value : "'$value'";
-        $extraWhere[] = "($field = $value)";
-      }
-      return "$ret (".implode(' AND ',$extraWhere).")";
-    } elseif (is_string($this->extraHaving)) {
-      return "$ret (".$this->extraHaving.")";
-    }
+
+		if (empty($this->extraHaving)) return $ret;
+		if ($ret) $ret = "($ret) AND ";
+
+		if (is_array($this->extraHaving)) {
+			$extraWhere = array();
+			foreach ($this->extraHaving as $field => $value) {
+				$value = is_numeric($value) ? $value : "'$value'";
+				$extraWhere[] = "($field = $value)";
+			}
+			if (count($extraWhere) > 0) return "$ret (".implode(' AND ',$extraWhere).")";
+		} elseif (is_string($this->extraHaving) && $this->extraHaving) {
+			return "$ret (".$this->extraHaving.")";
+		}
 
 		return $ret;
 	}
