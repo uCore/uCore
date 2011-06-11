@@ -299,18 +299,13 @@ class uCMS_View extends uSingleDataModule {
 		return '<div class="mceEditable">'.$rec['content'].'</div>';
 	}
 	public function GetURL($filters = NULL, $encodeAmp = false) {
-	  if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
-    if (!is_array($filters) && is_string($filters)) $filters = array('cms_id'=>$filters);
-    
-    $cPage = self::findPage();
-    
-		$rec = NULL;
-		if ($filters && (is_string($filters) || is_array($filters))) {
-      if ($cPage && !array_key_exists('cms_id',$filters)) $filters['cms_id'] = $cPage['cms_id'];
-			$rec = $this->LookupRecord($filters);
-    }
+		if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
+		if (!is_array($filters) && is_string($filters)) $filters = array('cms_id'=>$filters);
 
-		if (!$rec && $cPage) $rec = $cPage;
+		if (isset($filters['cms_id']))
+			$rec = $this->LookupRecord($filters);
+		else
+			$rec = self::findPage();
 
 		if (!$rec) return $_SERVER['REQUEST_URI'];
 
@@ -322,9 +317,10 @@ class uCMS_View extends uSingleDataModule {
 			$qs = http_build_query($filters); if ($qs) $qs = "?$qs";
 		}
 		$cms_id = $rec['cms_id'];
-    $ishome = $rec['is_home'];
+		$ishome = $rec['is_home'];
 
 		$path = array();
+
 		while ($rec['parent']) {
 			$path[] = $rec['parent'];
 			$rec = $this->LookupRecord($rec['parent']);
