@@ -18,6 +18,19 @@ class uBlob extends uBasicModule {
 		header('Content-Type:');
 		die($data);
 	}
+	function GetURL($module,$field,$pk,$filename=NULL) {
+		if ($filename === NULL) {
+			$obj = utopia::GetInstance($module);
+			$rec = $obj->LookupRecord($pk);
+			$filename = $rec[$field.'_filename'];
+		}
+		return parent::GetURL(array(
+			'module'=>$module,
+			'field'=>$field,
+			'pk'=>$pk,
+			'filename'=>$filename,
+		));
+	}
 }
 
 ?>
