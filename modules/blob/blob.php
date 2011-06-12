@@ -18,7 +18,7 @@ class uBlob extends uBasicModule {
 		header('Content-Type:');
 		die($data);
 	}
-	function GetURL($module,$field,$pk,$filename=NULL) {
+	function GetFileLink($module,$field,$pk,$filename=NULL) {
 		if ($filename === NULL) {
 			$obj = utopia::GetInstance($module);
 			$rec = $obj->LookupRecord($pk);
