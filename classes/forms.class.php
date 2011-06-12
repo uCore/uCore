@@ -1126,6 +1126,7 @@ FIN;
 			$this->sqlTableSetup = $newTable;
 
 			$this->AddField($this->GetPrimaryKey(),$this->GetPrimaryKey(),$alias);
+			$this->AddField('_module',"'".get_class($this)."'",$alias);
 			return;
 		} else {
 			$newTable['parent'] = $parent;
