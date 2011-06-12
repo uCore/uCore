@@ -2316,7 +2316,7 @@ FIN;
 				$num = $method->getNumberOfParameters();
 
 				if ($args == NULL) $args = array();
-				array_unshift($args,$originalValue,$pkVal,$value);
+				array_unshift($args,$originalValue,$pkVal,$value,$rec,$fieldName);
 				array_splice($args,$num); // strip out any extra args than the function can take (stops 'wrong param count' error)
 
 				$value = call_user_func_array($callback,$args);
