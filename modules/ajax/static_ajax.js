@@ -203,9 +203,6 @@ var InitJavascript = {
 		}
 	}
 }
-
-$('.uf').live('change',_fieldChange);
-$('input[type=button].uf').live('click',_fieldChange);
 $(function () {
 	InitJavascript.add(InitDatePickers);
 	InitJavascript.add(InitAutocomplete);
@@ -499,6 +496,8 @@ function StoppedUpdating(ele) {
 		if (isUpdating[e].element == ele) delete isUpdating[e];
 	}
 }
+$('.uf').live('change',_fieldChange);
+$('input[type=button].uf').live('click',_fieldChange);
 function _fieldChange(e) { uf(this); }
 function uf(ele, forcedValue, hourglassEle) {
 	for (e in isUpdating) {
