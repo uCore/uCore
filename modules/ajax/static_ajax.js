@@ -151,8 +151,6 @@ $(document).ready(function(){
 	$('img.calendar_trigger').bind('click', function (event) {event.stopPropagation(); return true;});
 
 	$("[name^=sql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
-	
-	InitJavascript.run();
 });
 
 function RefreshTableSorters() {
@@ -193,10 +191,11 @@ function UIButtons() {
 }
 
 var InitJavascript = {
-	_functs: [InitDatePickers, InitAutocomplete, RefreshTables, UpdateSelectedLinks, UIButtons],
+	_functs: [],
 	add: function (f) {
 		if ($.inArray(f,this._functs) > -1) return;
 		this._functs.push(f);
+		f();
 	},
 	run: function () {
 		for (f in this._functs) {
@@ -207,6 +206,13 @@ var InitJavascript = {
 
 $('.uf').live('change',_fieldChange);
 $('input[type=button].uf').live('click',_fieldChange);
+$(function () {
+	InitJavascript.add(InitDatePickers);
+	InitJavascript.add(InitAutocomplete);
+	InitJavascript.add(RefreshTables);
+	InitJavascript.add(UpdateSelectedLinks);
+	InitJavascript.add(UIButtons);
+});
 
 function InitDatePickers() {
 	$('.dPicker').each(function () {
