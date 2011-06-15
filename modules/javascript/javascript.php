@@ -8,7 +8,6 @@ uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
-utopia::AddJSFile(PATH_REL_CORE.'.javascript.js');
 
 class uJavascript extends uBasicModule {
 	private static $includeFiles = array();
@@ -23,8 +22,12 @@ class uJavascript extends uBasicModule {
 	public static function AddText($text) {
 		utopia::AppendVar('script_include',"\n$text");
 	}
+	public function GetUUID() { return 'javascript.js'; }
 
 	public function SetupParents() {
+		$this->SetRewrite(true);
+		utopia::AddJSFile($this->GetURL());
+
 		modOpts::AddOption('uJavascript','googleAPI','Google API Key');
 		$key = ($gAPI = modOpts::GetOption('uJavascript','googleAPI')) ? 'key='.$gAPI.'&' : '';
 
@@ -46,18 +49,6 @@ class uJavascript extends uBasicModule {
 	}
 
 	public function RunModule() {
-	}
-
-	static function BuildJavascript() {
-		$body = '';
-		array_push($GLOBALS['jsDefine'],'FORMAT_DATETIME','FORMAT_DATE','FORMAT_TIME','USE_TABS','PATH_REL_ROOT','PATH_REL_CORE');
-		if (array_key_exists('jsDefine',$GLOBALS))
-		foreach ($GLOBALS['jsDefine'] as $var) {
-			if (!defined($var)) continue;
-			$val = is_numeric(constant($var)) ? constant($var) : '\''.constant($var).'\'';
-			$body .= "var $var = $val;\n";
-		}
-/*
 		$lastTime = NULL;
 		foreach (self::$includeFiles as $filename) {
 			//does it exist?
@@ -67,21 +58,32 @@ class uJavascript extends uBasicModule {
 
 		$etag = sha1($lastTime.'-'.count(self::$includeFiles).'-'.strlen($body));
 		utopia::Cache_Check($etag,'text/javascript');
-*/
+
+		utopia::CancelTemplate();
+		$out = uJavascript::BuildJavascript(true);
+		utopia::Cache_Output($out,$etag,'text/javascript','javascript.js');
+	}
+
+	static function BuildJavascript($minify=true) {
+		$body = '';
+		array_push($GLOBALS['jsDefine'],'FORMAT_DATETIME','FORMAT_DATE','FORMAT_TIME','USE_TABS','PATH_REL_ROOT','PATH_REL_CORE');
+		if (array_key_exists('jsDefine',$GLOBALS))
+		foreach ($GLOBALS['jsDefine'] as $var) {
+			if (!defined($var)) continue;
+			$val = is_numeric(constant($var)) ? constant($var) : '\''.constant($var).'\'';
+			$body .= "var $var = $val;\n";
+		}
+
 		foreach (self::$includeFiles as $filename) {
-//			//does it exist?
 			if (!file_exists($filename)) continue;
-			$body .= file_get_contents($filename).';';
+			$body .= file_get_contents($filename).";\n\n";
 		}
     
-    $body .= self::$includeText;
-    
-		$body = JSMin::minify($body);
-		file_put_contents(PATH_ABS_CORE.'.javascript.js',$body);
-//		ob_end_clean();
-//		header('Content-Encoding: ',true);
-		
-//		utopia::Cache_Output($body,$etag,'text/javascript');
+		$body .= self::$includeText;
+
+		if ($minify) $body = JSMin::minify($body);
+
+		return $body;
 	}
 }
 
