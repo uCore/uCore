@@ -9,7 +9,6 @@ class tabledef_DataBlocks extends uTableDef {
     $this->AddField('filter',ftTEXT);
     $this->AddField('order',ftVARCHAR,30);
     $this->AddField('limit',ftVARCHAR,10);
-    $this->AddField('editable',ftBOOL);
     
     $this->AddField('display',ftTEXT);
     
@@ -61,7 +60,6 @@ class uDataBlocks extends uSingleDataModule {
     $this->AddField('filter','filter','blocks','Filter',itTEXT);
     $this->AddField('order','order','blocks','Order',itTEXT);
     $this->AddField('limit','limit','blocks','Limit',itTEXT);
-    $this->AddField('editable','editable','blocks','Editable',itCHECKBOX);
     $this->AddField('content_info','"The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element a class of _r (class=\"_r\"), or _ri to repeat contained elements only (innerHTML)."','','');
     $this->AddField('fields',array($this,'getPossibleFields'),'blocks','Possible Fields');
     $this->AddField('content','content','blocks','Content',itHTML);
@@ -143,13 +141,18 @@ class uDataBlocks extends uSingleDataModule {
 			foreach ($searchArr as $k => $search) {
 				$field = $varsArr[$k];
 				if (!isset($row[$field])) continue;
+				$obj = utopia::GetInstance($rec['module']);
 				switch ($typeArr[$k]) {
 					case 'u':
-						$replace = UrlReadable($row[$field]);
+						$replace = $obj->PreProcess($field,$row[$field],$row);
+						$replace = UrlReadable($replace);
+						break;
+					case 'd':
+						$replace = $obj->PreProcess($field,$row[$field],$row);
 						break;
 					default:
-						$obj = utopia::GetInstance($rec['module']);
-						$replace = $obj->PreProcess($field,$row[$field],$row);
+						$replace = $obj->GetCell($field,$row);
+						break;
 				}
 				$c = str_replace($search,$replace,$c);
 			}
