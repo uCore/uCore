@@ -3,6 +3,7 @@
 .cmsTree { list-style-type: none; margin:0; padding:0 }
 
 .cmsItem { margin-top:1px; padding-top:1px; padding-bottom:0; min-height:18px; padding-right:0; min-height:23px; line-height:23px; position:relative; cursor:pointer }
+.cmsItemText { overflow:hidden; }
 .cmsItemText:hover { background-color: #D5E2EA; }
 .cmsItemActions { float:right; padding-left:10px; position:relative; }
 .cmsItemActions a { background-color:white !important; }
