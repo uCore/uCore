@@ -30,8 +30,13 @@ class utopia {
 
 		$specific      = (isset(self::$children[$parent]))     ? self::$children[$parent] : array();
 		$currentModule = ($parent == GetCurrentModule() && isset(self::$children['/'])) ? self::$children['/'] : array();
-		$baseModule    = ($parent == 'uCMS_View' && (uCMS_View::findPage() == uCMS_View::GetHomepage()) && isset(self::$children[''])) ? self::$children[''] : array();
 		$catchAll      = (isset(self::$children['*'])) ? self::$children['*'] : array();
+		$baseModule = array();
+
+		if ($parent == 'uCMS_View') {
+			$currentPage   = uCMS_View::findPage();
+			if ($currentPage['is_home'] && isset(self::$children[''])) $baseModule = self::$children[''];
+		}
 
 		$arr = array_merge($specific,$currentModule,$baseModule,$catchAll);
  //   self::$gc_cache[$parent] = $arr;
