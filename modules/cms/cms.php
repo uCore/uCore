@@ -333,11 +333,8 @@ class uCMS_View extends uSingleDataModule {
 		return '/'.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
-		$rec = NULL;
-		$fltr = $this->FindFilter('cms_id');
-		if (!$fltr['value'] || $fltr['value'] == '{cms_id}') {
-			$rec = self::GetHomepage();
-		}
+		$rec = self::findPage();
+		if (!$rec) $rec = self::GetHomepage();
 		if (!$rec) $rec = $this->GetRecord($this->GetDataset(),0);
 		return $rec['title'];
 	}
