@@ -1,14 +1,5 @@
 <?php
 
-// dependancies
-// check dependancies exist - Move to install?
-
-uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
-uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
-uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
-uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
-uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
-
 class uJavascript extends uBasicModule {
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
@@ -27,6 +18,12 @@ class uJavascript extends uBasicModule {
 	public function SetupParents() {
 		$this->SetRewrite(true);
 		utopia::AddJSFile($this->GetURL());
+
+		uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
+		uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
+		uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
+		uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
+		uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
 
 		modOpts::AddOption('uJavascript','googleAPI','Google API Key');
 		$key = ($gAPI = modOpts::GetOption('uJavascript','googleAPI')) ? 'key='.$gAPI.'&' : '';
