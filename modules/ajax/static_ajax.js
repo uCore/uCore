@@ -543,10 +543,18 @@ function _uf(ele,hourglass) {
 	if (forcedValue != undefined || forcedValue != null) {
 		eleVal = forcedValue;
 	} else {
-		if (ele.tagName == 'INPUT' && $(ele).is(':checkbox')) {// if checkbox, ensure checked value = 1 and unchecked = 0
-			if ($(ele).is(':checked')) eleVal = $(ele).val(); else eleVal = '';
-		} else if (empty(eleVal))
-			eleVal = $(ele).val();
+		var eleVal = [];
+		$('[name*="'+eleName+'"]').each(function () {
+			if (this.tagName == 'INPUT' && $(this).is(':checkbox')) {
+				if ($(this).is(':checked')) eleVal.push($(this).val());// else eleVal.push('');
+			} else {
+				eleVal.push($(this).val());
+			}
+		});
+		switch (eleVal.length) {
+			case 0: eleVal = ''; break;
+			case 1: eleVal = eleVal[0]; break;
+		}
 	}
 
 	var eleData = {'__ajax':'updateField'}
