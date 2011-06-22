@@ -1,9 +1,9 @@
 <?php
 
-class internalmodule_Reconfigure extends uBasicModule {
+class internalmodule_Reconfigure extends uBasicModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Reconfigure Database'; }
-	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
+	public function GetOptions() { return ALWAYS_ACTIVE; }
 
 	public function SetupParents() {
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) $this->DisableModule('You must log in as the Site Administrator to use this module.');
@@ -18,10 +18,10 @@ class internalmodule_Reconfigure extends uBasicModule {
 }
 
 
-class internalmodule_Admin extends uBasicModule {
+class internalmodule_Admin extends uBasicModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Home'; }
-	public function GetOptions() { return IS_ADMIN | ALWAYS_ACTIVE; }
+	public function GetOptions() { return ALWAYS_ACTIVE; }
 
 	public function GetSortOrder() { return -10000; }
 	public function GetURL($filters = NULL, $encodeAmp = false) {

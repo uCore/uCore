@@ -16,7 +16,7 @@ class modLinks extends uBasicModule {
 		$current = GetCurrentModule();
 		$currentAdded = false;
 		$parentObj = utopia::GetInstance($parent);
-		$admin = flag_is_set($parentObj->GetOptions(),IS_ADMIN);
+		$admin = ($parentObj instanceof iAdminModule);
 		$isadmin = internalmodule_AdminLogin::IsLoggedIn();
 		$children = utopia::GetChildren($parent);
 		foreach ($children as $links) {
@@ -29,9 +29,9 @@ class modLinks extends uBasicModule {
 
 				$opts = $obj->GetOptions();
 				if (flag_is_set($opts,NO_NAV)) continue;
-				if (!$admin && flag_is_set($opts,IS_ADMIN)) continue;
-				if (!flag_is_set($opts,IS_ADMIN) && $admin) continue;
-				if (flag_is_set($opts,IS_ADMIN) && !$isadmin) continue;
+				if (!$admin && ($obj instanceof iAdminModule)) continue;
+				if (!($obj instanceof iAdminModule) && $admin) continue;
+				if (($obj instanceof iAdminModule) && !$isadmin) continue;
 
 				$order = $obj->GetSortOrder();
 				$url = $obj->GetURL();

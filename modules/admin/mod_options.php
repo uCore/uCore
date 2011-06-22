@@ -16,9 +16,9 @@ class tabledef_ModOpts extends uTableDef {
 		$this->SetPrimaryKey('ident');
 	}
 }
-class modOpts extends uListDataModule {
+class modOpts extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Module Options'; }
-	public function GetOptions() { return IS_ADMIN | ALLOW_FILTER | ALLOW_EDIT | ALLOW_DELETE; }
+	public function GetOptions() { return ALLOW_FILTER | ALLOW_EDIT | ALLOW_DELETE; }
 	public function GetTabledef() { return 'tabledef_ModOpts'; }
 	public function GetSortOrder() { return -9999.5; }
 	public function SetupFields() {

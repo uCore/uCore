@@ -11,9 +11,9 @@ class tabledef_AdminUsers extends uTableDef {
   }
 }
 
-class uAdminUsersList extends uListDataModule {
+class uAdminUsersList extends uListDataModule implements iAdminModule {
         public function GetTitle() { return 'Admin Accounts'; }
-        public function GetOptions() { return ALWAYS_ACTIVE | IS_ADMIN | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT; }
+        public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT; }
 
         public function GetTabledef() { return 'tabledef_AdminUsers'; }
         public function SetupFields() {
@@ -31,9 +31,8 @@ class uAdminUsersList extends uListDataModule {
 	}
 }
 
-class adminLogout extends uBasicModule {
+class adminLogout extends uBasicModule implements iAdminModule {
         public function GetTitle() { return 'Logout'; }
-        public function GetOptions() { return IS_ADMIN; }
 	public function GetSortOrder() { return -9900;}
         public function SetupParents() {
                 $this->AddParent('/');
@@ -46,10 +45,10 @@ class adminLogout extends uBasicModule {
 	}
 }
 
-class internalmodule_AdminLogin extends uDataModule {
+class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Login'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | IS_ADMIN | NO_NAV; }
+	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | NO_NAV; }
 
 	public function GetTabledef() { return 'tabledef_AdminUsers'; }
 	public function SetupFields() {
@@ -118,7 +117,7 @@ class internalmodule_AdminLogin extends uDataModule {
 
 		// if auth not required, return
 		$obj = utopia::GetInstance($parent);
-		if (!flag_is_set($obj->GetOptions(),IS_ADMIN)) return true;
+		if (!($obj instanceof iAdminModule)) return true;
 		if ($parent === get_class($this)) return true;
 
 		// if authed, dont show the login

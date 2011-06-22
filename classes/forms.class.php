@@ -78,7 +78,6 @@ define('NO_NAV',flag_gen());
 define('PERSISTENT_PARENT',flag_gen());
 define('SHOW_FUNCTIONS',flag_gen());
 define('SHOW_TOTALS',flag_gen());
-define('IS_ADMIN',flag_gen());
 define('LIST_HIDE_HEADER',flag_gen());
 
 define('DEFAULT_OPTIONS',ALLOW_FILTER);
@@ -182,7 +181,7 @@ abstract class uBasicModule implements iUtopiaModule {
 					header('Location: '.$abs.$url,true,301); die();
 			}
 		}
-		if (flag_is_set($this->GetOptions(),IS_ADMIN)) utopia::UseTemplate(TEMPLATE_ADMIN);
+		if ($this instanceof iAdminModule) utopia::UseTemplate(TEMPLATE_ADMIN);
 
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
@@ -348,7 +347,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$GLOBALS['ajax'][$ajaxIdent]['callback'] = $callback;
 		$GLOBALS['ajax'][$ajaxIdent]['class'] = get_class($this);
 		if ($requireAdmin === NULL)
-		$requireAdmin = flag_is_set($this->GetOptions(),IS_ADMIN);
+		$requireAdmin = $this instanceof iAdminModule;
 		$GLOBALS['ajax'][$ajaxIdent]['req_admin'] = $requireAdmin;
 		return true;
 	}
@@ -600,7 +599,7 @@ abstract class uBasicModule implements iUtopiaModule {
 //		$this->navCreated = true;
 		$sortOrder = $this->GetSortOrder();
 		$listDestination =  'child_buttons';
-		if (flag_is_set($this->GetOptions(),IS_ADMIN)) {
+		if ($this instanceof iAdminModule) {
 			if (get_class($this) == GetCurrentModule()) utopia::LinkList_Add($listDestination,'',NULL,-500);
 			$sortOrder = $sortOrder - 1000;
 		}
@@ -613,13 +612,11 @@ abstract class uBasicModule implements iUtopiaModule {
 	//		if (array_search($this,$lm,true) === FALSE) continue;
 
 			$cModuleObj = utopia::GetInstance(GetCurrentModule());
-			if (($parentName != 'internalmodule_Admin' && flag_is_set($obj->GetOptions(),IS_ADMIN)) && $parentName != GetCurrentModule()) return;
+			if (($parentName != 'internalmodule_Admin' && ($obj instanceof iAdminModule)) && $parentName != GetCurrentModule()) return;
 			//echo get_class($this).' '.$parentName.'<br/>';
 
 			$parentObj = utopia::GetInstance($parentName);
-			if (flag_is_set($parentObj->GetOptions(),IS_ADMIN) && !flag_is_set($cModuleObj->GetOptions(),IS_ADMIN)) return;
-
-//			if (flag_is_set($cModuleObj->GetOptions(),IS_ADMIN) && !flag_is_set($parentObj->GetOptions(),IS_ADMIN)) continue;
+			if (($parentObj instanceof iAdminModule) && !($cModuleObj instanceof iAdminModule)) return;
 
 			$linkArray = $this->parents[$parentName];
 			foreach ($linkArray as $linkInfo) {

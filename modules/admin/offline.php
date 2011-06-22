@@ -13,7 +13,7 @@ class module_Offline extends uBasicModule {
 		if (modOpts::GetOption('module_Offline','online')) return;
 		if (internalmodule_AdminLogin::IsLoggedIn()) return;
 		$obj = utopia::GetInstance($parent);
-		if (flag_is_set($obj->GetOptions(),IS_ADMIN)) return;
+		if ($obj instanceof iAdminModule) return;
 
 		$this->_RunModule();
 		//utopia::SetVar('current_module',get_class($this));

@@ -1,6 +1,6 @@
 <?php
 define('itFILEMANAGER' ,'fileman');
-class fileManager extends uBasicModule {
+class fileManager extends uBasicModule implements iAdminModule {
 	public function GetSortOrder() { return 10; }
 	function GetTitle() {
 		return 'File Manager';
@@ -30,7 +30,6 @@ FIN
 			'<input id="'.$fieldName.'" type="button" onclick="$(\'#fileMan\').fileManager({ajaxPath:\''.$path.'\',events:{dblclick:function(event) {filesel(\''.$fieldName.'\',$(this).data(\'item\'))} }}).dialog();" value="Choose File">';
 		//return $out.$defaultValue.utopia::DrawInput($fieldName,itBUTTON,'Choose File',$possibleValues,$attributes,$noSubmit);
 	}
-	function GetOptions() {return IS_ADMIN;}
 	function ajax() {
 		utopia::CancelTemplate();
 		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');

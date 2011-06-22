@@ -1,5 +1,6 @@
 <?php
 interface iUtopiaModule {}
+interface iAdminModule {}
 
 /*
  interface iOutput {
