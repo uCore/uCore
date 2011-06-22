@@ -2261,6 +2261,8 @@ FIN;
 	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
 		$originalValue = $value;
+		$value = json_decode($value);
+		if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
 		$suf = ''; $pre = ''; $isNumeric=true;
 		if ($forceType === NULL) $forceType = $this->GetFieldType($fieldName);
 		switch ($forceType) {
@@ -2548,7 +2550,10 @@ FIN;
 			} */
 
 		// preformat the value
-		$newValue = trim($newValue);
+		if (is_array($newValue))
+			$newValue = json_encode($newValue);
+		else
+			$newValue = trim($newValue);
 		$pfVal = $newValue;
 		if ($this->GetFieldType($fieldAlias) != ftRAW) $newValue = mysql_real_escape_string($newValue);
 		if ($newValue === '' || $newValue === NULL) $newValue = 'NULL';

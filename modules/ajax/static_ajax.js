@@ -533,8 +533,6 @@ function _uf(ele,hourglass) {
 		}
 	}
 
-	var eleData = '';
-	
 	var eleName = ele;
 	if (typeof(ele) != 'string') {
 		eleName = $(ele).attr('name');
@@ -551,10 +549,8 @@ function _uf(ele,hourglass) {
 			eleVal = $(ele).val();
 	}
 
-	eleVal = encodeURIComponent(Base64.encode(eleVal.toString()));
+	var eleData = {'__ajax':'updateField'}
 
-	eleData = "__ajax=updateField&"+escape(eleName)+"="+eleVal;
-	
 	targetPage = window.location.toString().replace(window.location.hash,'');
 	
 	if ($(ele).attr('type') == 'file') {
@@ -563,7 +559,7 @@ function _uf(ele,hourglass) {
 			async: true,
 			cache: false,
 			url:targetPage,
-			data:{'__ajax':'updateField'},
+			data:eleData,
 			dataType: "script",
 			success: function (msg) {
 				eval(msg);
@@ -582,6 +578,8 @@ function _uf(ele,hourglass) {
 		});
 		return;
 	}
+
+	eleData[eleName] = eleVal;
 
 	$.ajax({
 		type: "POST",

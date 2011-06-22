@@ -218,8 +218,13 @@ class utopia {
 				$out .= "<input$attr type=\"$inputType\" value=\"$defaultValue\"/>";
 				break;
 			case itCHECKBOX:
-				$checked = ($defaultValue == 1) ? ' checked="checked"': '';
-				$out .= "<input$attr type=\"checkbox\"$checked value=\"1\"/>";
+				if (is_array($possibleValues)) foreach ($possibleValues as $name => $val) {
+					$checked = ($val == $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
+					$out .= "<input$attr type=\"checkbox\"$checked value=\"$val\"/> $name<br>";
+				} else {
+					$checked = ($defaultValue == 1) ? ' checked="checked"': '';
+					$out .= "<input$attr type=\"checkbox\"$checked value=\"1\"/>";
+				}
 				break;
 			case itOPTION:
 				if (!is_array($possibleValues)) { ErrorLog('Option field specified but no possible values found'); return ''; }
@@ -227,7 +232,7 @@ class utopia {
 				$defaultExists = false;
 				foreach ($possibleValues as $name => $val) {
 					$count++; $attributes['id'] = "$fieldName-$count"; $attr = BuildAttrString($attributes);
-					$checked = ($val == $defaultValue) ? ' checked="true"' : '';
+					$checked = ($val == $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
 					if ($checked != '') $defaultExists = true;
 					$out .= "<input type=\"radio\" $attr value=\"$val\"$checked/>$name<br/>";
 				}
@@ -267,7 +272,7 @@ class utopia {
 					if ($val === '') continue;
 					$selected = '';
 					//if (is_numeric($val) && !is_numeric($defaultValue)) $defaultValue = (int)$defaultValue;
-					if ($val === $defaultValue || $name === $defaultValue) {
+					if ($val === $defaultValue || $name === $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) {
 						$defaultExists = true;
 						$selected = ' selected="selected"';
 					}
@@ -315,7 +320,7 @@ class utopia {
 				$out .= "<select size=5 $attr><option value=\"\"></option>";
 				foreach ($possibleValues as $name => $val) {
 					if (empty($val)) continue;
-					$selected = ($val == $defaultValue) ? ' selected="selected"' : '';
+					$selected = ($val == $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' selected="selected"' : '';
 					$out .= "<option value=\"$val\"$selected>$name</option>";
 				}
 				$out .= "</select>";
