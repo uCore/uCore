@@ -865,6 +865,8 @@ FIN;
 
 	public function DrawSqlInput($field,$defaultValue='',$pkValue=NULL,$attributes=NULL,$inputTypeOverride=NULL,$valuesOverride=NULL) {
 		if ($attributes==NULL) $attributes = array();
+		if (isset($this->fields[$field]['attr']))
+			$attributes = array_merge($this->fields[$field]['attr'],$attributes);
 		$inputType = $inputTypeOverride ? $inputTypeOverride : $this->fields[$field]['inputtype'];
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
 		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field);
