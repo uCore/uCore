@@ -544,7 +544,7 @@ function _uf(ele,hourglass) {
 		eleVal = forcedValue;
 	} else {
 		if (ele.tagName == 'INPUT' && $(ele).is(':checkbox')) {// if checkbox, ensure checked value = 1 and unchecked = 0
-			if ($(ele).is(':checked')) eleVal = '1'; else eleVal = '0';
+			if ($(ele).is(':checked')) eleVal = $(ele).val(); else eleVal = '';
 		} else if (empty(eleVal))
 			eleVal = $(ele).val();
 	}
