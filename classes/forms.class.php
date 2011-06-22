@@ -2578,7 +2578,10 @@ FIN;
 
 			sql_query($insertQry);
 
-			if (mysql_error()) { return FALSE; }
+			if (mysql_error()) {
+				$this->ResetField($fieldAlias,$pkVal);
+				return FALSE;
+			}
 
 			if (!$pkVal) {
 				if ($fieldAlias == $this->GetPrimaryKey())
@@ -2624,7 +2627,10 @@ FIN;
 			$updateQry = "UPDATE $table SET `$field` = $newValue WHERE `$tablePk` = '$pkVal'";
 			//echo "//$updateQry";
 			sql_query($updateQry);
-			if (mysql_error()) { return FALSE; }
+			if (mysql_error()) {
+				$this->ResetField($fieldAlias,$pkVal);
+				return FALSE;
+			}
 			if ($fieldAlias == $this->GetPrimaryKey()) {
 				$ret = $this->GetURL($pfVal);
 				$pkVal = $pfVal;
