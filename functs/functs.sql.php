@@ -132,7 +132,7 @@ function &sql_query($query) { $false = FALSE;
 	timer_start($tID);
 	$GLOBALS['sql_queries'][$GLOBALS['sql_query_count']] = $query;
 	$result = mysql_query($query);
-	$err = mysql_error();	if (!empty($err)) { DebugMail('SQL Error',$err."\n\n".$query); ErrorLog($err); }//ErrorLog("$err<br/>$query");
+	$err = mysql_error();	if (!empty($err)) { trigger_error($err."\n\n".$query); ErrorLog($err); }//ErrorLog("$err<br/>$query");
 	$timetaken = timer_end($tID);
 	/*	if (false && $timetaken > 50) {
 		//echo $query." slow: $timetaken<BR>";
