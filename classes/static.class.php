@@ -834,7 +834,6 @@ class utopia {
 		$etag .= GZIP_ENABLED ? '-gzip' : '';
 		$etag = '"'.$etag.'"';
 		header("ETag: $etag",true);
-		header('Vary: accept-encoding');
 		header("Expires: ".gmdate("D, d M Y H:i:s",time()+$age) . " GMT",true);
 		header("Cache-Control: public, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
 		header("Content-Disposition: ".$disposition.$fn,true);

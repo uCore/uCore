@@ -27,6 +27,7 @@ if ($valid) {
 
 ini_set('default_charset',CHARSET_ENCODING);
 header('Content-type: text/html; charset='.CHARSET_ENCODING);
+header('Vary: if-none-match, accept-encoding');
 
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
 
