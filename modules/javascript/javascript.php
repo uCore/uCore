@@ -46,14 +46,15 @@ class uJavascript extends uBasicModule {
 	}
 
 	public function RunModule() {
-		$lastTime = NULL;
+		$uStr = '';
 		foreach (self::$includeFiles as $filename) {
 			//does it exist?
 			if (!file_exists($filename)) continue;
-			if ($lastTime == NULL || filemtime($filename) > $lastTime) $lastTime = filemtime($filename);
+			clearstatcache(true,$filename);
+			$uStr .= filemtime($filename).'-'.filesize($filename);
 		}
 
-		$etag = sha1($lastTime.'-'.count(self::$includeFiles).'-'.strlen($body));
+		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()));
 		utopia::Cache_Check($etag,'text/javascript');
 
 		utopia::CancelTemplate();
@@ -61,7 +62,7 @@ class uJavascript extends uBasicModule {
 		utopia::Cache_Output($out,$etag,'text/javascript','javascript.js');
 	}
 
-	static function BuildJavascript($minify=true) {
+	static function GetJavascriptConstants() {
 		$body = '';
 		array_push($GLOBALS['jsDefine'],'FORMAT_DATETIME','FORMAT_DATE','FORMAT_TIME','USE_TABS','PATH_REL_ROOT','PATH_REL_CORE');
 		if (array_key_exists('jsDefine',$GLOBALS))
@@ -70,6 +71,11 @@ class uJavascript extends uBasicModule {
 			$val = is_numeric(constant($var)) ? constant($var) : '\''.constant($var).'\'';
 			$body .= "var $var = $val;\n";
 		}
+		return $body;
+	}
+
+	static function BuildJavascript($minify=true) {
+		$body = self::GetJavascriptConstants();
 
 		foreach (self::$includeFiles as $filename) {
 			if (!file_exists($filename)) continue;
