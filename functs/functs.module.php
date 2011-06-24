@@ -14,68 +14,17 @@ function LoadFiles() {
   foreach ($files as $file) include_once($file);
 }
 
-function hasNoScan($var) {
-	return preg_match('/.u_noscan$/i',$var) > 0;
-}
+function LoadModulesDir($indir, $recursive = TRUE) {
+	if (glob($indir.'.u_noscan')) return array();
+	$files = glob($indir.'*.php');
+	if (!$recursive || glob($indir.'.u_noscandeep')) return $files;
 
-function LoadModulesDir($dir, $recursive = TRUE) {
-        $Directory = new RecursiveDirectoryIterator($dir);
-        $Iterator = new RecursiveIteratorIterator($Directory);
-        $Regex = new RegexIterator($Iterator, '/(\.php|.u_noscan)$/i', RecursiveRegexIterator::GET_MATCH);
-	$files = array_keys(iterator_to_array($Regex));
-	$ns = array_filter($files,'hasNoScan');
-	foreach ($ns as $noScanPath) {
-		$c = substr($noScanPath,0,-9);
-		foreach ($files as $k => $path) {
-			if (strpos($path,$c) !== FALSE) unset($files[$k]);
-		}
+	$dir = glob($indir.'*', GLOB_ONLYDIR | GLOB_MARK);
+	foreach ($dir as $d) {
+		if ($d == '.' || $d == '..') continue;
+		$files = array_merge($files,LoadModulesDir($d));
 	}
 	return $files;
-
-
-	$files = array();
-	$dir = rtrim($dir,'/'); 
-//	if (preg_match('/\.svn$/i',$dir)) return $files;
-	if (file_exists($dir.'/.u_noscan')) return $files;
-	
-	if (!is_dir($dir)) return $files;
-
-	$dirs = array();
-	if ($dh = opendir($dir)) {
-		while (($file = readdir($dh)) !== false) {
-			if ($file == '.' || $file == '..' || $file == '.svn') continue;
-			if (is_dir($dir.'/'.$file)) { $dirs[] = $dir.'/'.$file; continue; }
-			//if (pathinfo($dir.'/'.$file, PATHINFO_EXTENSION) != 'php') continue;
-			if (substr($file, -3) != 'php') continue;
-			
-			//include_once($dir.'/'.$file);
-			$files[] = $dir.'/'.$file;
-		}
-		closedir($dh);
-	}
-
-	foreach ($dirs as $dir) {
-		$subFiles = LoadModulesDir($dir);
-		$files = array_merge($files,$subFiles);
-	}
-	return $files;
-	/*
-	$glob = glob($dir.'*.php');
-	if ($glob) foreach ($glob as $id => $filename) {
-		include_once($filename);
-		$files[] = $filename;
-	}
-
-	$glob = glob($dir.'*');
-	$dirs = array();
-	if ($recursive === TRUE && $glob) foreach ($glob as $dirname) {
-		if ($dirname == '.' || $dirname == '..') continue;
-		if (!is_dir($dirname)) continue;
-		$subFiles = LoadModulesDir($dirname.'/',$recursive);
-		$files = array_merge($files,$subFiles);
-	}
-
-	return $files;*/
 }
 
 function &CallModuleFunc($classname,$funcname) {
