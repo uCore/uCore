@@ -91,7 +91,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public function getFile() {
 		$last_load    =  isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime(trim($_SERVER['HTTP_IF_MODIFIED_SINCE'])) : false;
 		if ($last_load) {
-			header('Pragma: public');
 			header('HTTP/1.0 304 Not Modified', true, 304); die();
 		}
 

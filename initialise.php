@@ -30,7 +30,10 @@ header('Content-type: text/html; charset='.CHARSET_ENCODING);
 
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
 
-if(!ob_start("ob_gzhandler")) ob_start();
+define ('GZIP_ENABLED',substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') || substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate'));
+
+if (GZIP_ENABLED) ob_start("ob_gzhandler");
+else ob_start();
 
 if (!array_key_exists('_noTemplate',$_GET))	utopia::UseTemplate();
 

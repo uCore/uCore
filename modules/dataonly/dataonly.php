@@ -63,7 +63,6 @@ class uDataOnly extends uBasicModule {
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT",true);
 		header("Cache-Control: no-store, no-cache, must-revalidate",true);
 		header("Cache-Control: post-check=0, pre-check=0", true);
-		header("Pragma: no-cache",true);
 
 		$obj = utopia::GetInstance(GetCurrentModule());
 

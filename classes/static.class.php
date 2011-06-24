@@ -831,13 +831,16 @@ class utopia {
 
 	static function Cache_Check($etag, $contentType,$filename='',$modified=NULL,$age=2592000,$disposition='inline') {
 		header('Content-Type: '.$contentType,true);
-		header('Pragma: public',true);
-		header("Etag: $etag",true);
+		$etag .= GZIP_ENABLED ? '-gzip' : '';
+		$etag = '"'.$etag.'"';
+		header("ETag: $etag",true);
+		header('Vary: accept-encoding');
 		header("Expires: ".gmdate("D, d M Y H:i:s",time()+$age) . " GMT",true);
-		header("Cache-Control: public, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
+		header("Cache-Control: must-revalidate, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
 		header("Content-Disposition: ".$disposition.$fn,true);
 
 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
+			while (ob_end_clean());
 			header('HTTP/1.1 304 Not Modified', true, 304); die();
 		}
 
@@ -845,6 +848,7 @@ class utopia {
 		$lm = gmdate('r',$modified);
 		header("Last-Modified: ".$lm,true);
 		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $lm) {
+			while (ob_end_clean());
 			header('HTTP/1.1 304 Not Modified', true, 304); die();
 		}
 	}
