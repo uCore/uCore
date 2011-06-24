@@ -836,7 +836,7 @@ class utopia {
 		header("ETag: $etag",true);
 		header('Vary: accept-encoding');
 		header("Expires: ".gmdate("D, d M Y H:i:s",time()+$age) . " GMT",true);
-		header("Cache-Control: must-revalidate, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
+		header("Cache-Control: public, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
 		header("Content-Disposition: ".$disposition.$fn,true);
 
 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
