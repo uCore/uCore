@@ -26,11 +26,7 @@ function sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
 		echo "Cannot connect to SQL server.<br>";
 		return false;
 	}
-	//sql_query("SET GLOBAL THREAD_CACHE_SIZE = 10");
-	sql_query("SET CHARACTER SET utf8");
 	sql_query("SET NAMES utf8");
-	sql_query("SET SQL_MODE = ''");
-	//sql_query("SET max_allowed_packet = 3000000");
 //	}
 
 	return $sql_connection; // $GLOBALS['sql_connection'];
