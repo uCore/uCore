@@ -9,7 +9,7 @@
  */
 
 (function() {
-	var excludedEmbedAttrs = tinymce.makeMap('id,width,height,type'), Node = tinymce.html.Node,
+	var rootAttributes = tinymce.explode('id,name,width,height,style,align,class,hspace,vspace,bgcolor,type'), excludedAttrs = tinymce.makeMap(rootAttributes.join(',')), Node = tinymce.html.Node,
 		mediaTypes, scriptRegExp, JSON = tinymce.util.JSON, mimeTypes;
 
 	// Media types supported by this plugin
@@ -22,6 +22,7 @@
 		["RealMedia", "cfcdaa03-8be4-11cf-b84b-0020afbbccfa", "audio/x-pn-realaudio-plugin", "http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0"],
 		["Java", "8ad9c840-044e-11d1-b3e9-00805f499d93", "application/x-java-applet", "http://java.sun.com/products/plugin/autodl/jinstall-1_5_0-windows-i586.cab#Version=1,5,0,0"],
 		["Silverlight", "dfeaf541-f3e1-4c24-acac-99c30715084a", "application/x-silverlight-2"],
+		["Iframe"],
 		["Video"]
 	];
 
@@ -111,7 +112,7 @@
 				ed.schema.addValidElements('object[id|style|width|height|classid|codebase|*],param[name|value],embed[id|style|width|height|type|src|*],video[*],audio[*],source[*]');
 
 				// Convert video elements to image placeholder
-				ed.parser.addNodeFilter('object,embed,video,audio,script', function(nodes) {
+				ed.parser.addNodeFilter('object,embed,video,audio,script,iframe', function(nodes) {
 					var i = nodes.length;
 
 					while (i--)
@@ -129,10 +130,6 @@
 					}
 				});
 			});
-
-			// Load the media specific CSS file
-			if (ed.settings.content_css !== false)
-				ed.contentCSS.push(url + "/css/content.css");
 
 			ed.onInit.add(function() {
 				// Display "media" instead of "img" in element path
@@ -158,17 +155,20 @@
 
 				img = ed.selection.getNode();
 				if (isMediaImg(img)) {
-					data = JSON.parse(ed.dom.getAttrib(img, 'data-mce-json'));
+					data = ed.dom.getAttrib(img, 'data-mce-json');
+					if (data) {
+						data = JSON.parse(data);
 
-					// Add some extra properties to the data object
-					tinymce.each('id,width,height,class'.split(','), function(name) {
-						var value = ed.dom.getAttrib(img, name);
+						// Add some extra properties to the data object
+						tinymce.each(rootAttributes, function(name) {
+							var value = ed.dom.getAttrib(img, name);
 
-						if (value)
-							data[name] = value;
-					});
+							if (value)
+								data[name] = value;
+						});
 
-					data.type = self.getType(img.className).name.toLowerCase();
+						data.type = self.getType(img.className).name.toLowerCase();
+					}
 				}
 
 				if (!data) {
@@ -247,7 +247,8 @@
 			img = self.editor.dom.create('img', {
 				id : data.id,
 				style : data.style,
-				src : self.url + '/img/trans.gif',
+				align : data.align,
+				src : self.editor.theme.url + '/img/trans.gif',
 				'class' : 'mceItemMedia mceItem' + self.getType(data.type).name,
 				'data-mce-json' : JSON.serialize(data, "'")
 			});
@@ -262,7 +263,7 @@
 		 * Converts the JSON data object to a HTML string.
 		 */
 		dataToHtml : function(data, force_absolute) {
-			return this.editor.serializer.serialize(this.dataToImg(data, force_absolute), {force_absolute : force_absolute});
+			return this.editor.serializer.serialize(this.dataToImg(data, force_absolute), {forced_root_block : '', force_absolute : force_absolute});
 		},
 
 		/**
@@ -285,7 +286,7 @@
 				data.type = this.getType(img.attr('class')).name.toLowerCase();
 
 				// Add some extra properties to the data object
-				tinymce.each('id,width,height,class'.split(','), function(name) {
+				tinymce.each(rootAttributes, function(name) {
 					var value = img.attr(name);
 
 					if (value)
@@ -320,49 +321,56 @@
 		 * Converts a tinymce.html.Node image element to video/object/embed.
 		 */
 		imgToObject : function(node, args) {
-			var self = this, editor = self.editor, video, object, embed, name, value, data,
-				source, sources, params, param, typeItem, i, item, mp4Source,
+			var self = this, editor = self.editor, video, object, embed, iframe, name, value, data,
+				source, sources, params, param, typeItem, i, item, mp4Source, replacement,
 				posterSrc, style;
 
 			// Adds the flash player
 			function addPlayer(video_src, poster_src) {
-				var baseUri, flashVars, flashVarsOutput, params;
+				var baseUri, flashVars, flashVarsOutput, params, flashPlayer;
 
-				baseUri = editor.documentBaseURI;
-				data.params.src = editor.getParam('flash_video_player_url', self.convertUrl(self.url + '/img/moxieplayer.swf'));
+				flashPlayer = editor.getParam('flash_video_player_url', self.convertUrl(self.url + '/moxieplayer.swf'));
+				if (flashPlayer) {
+					baseUri = editor.documentBaseURI;
+					data.params.src = flashPlayer;
 
-				// Convert the movie url to absolute urls
-				if (editor.getParam('flash_video_player_absvideourl', true)) {
-					video_src = baseUri.toAbsolute(video_src || '', true);
-					poster_src = baseUri.toAbsolute(poster_src || '', true);
+					// Convert the movie url to absolute urls
+					if (editor.getParam('flash_video_player_absvideourl', true)) {
+						video_src = baseUri.toAbsolute(video_src || '', true);
+						poster_src = baseUri.toAbsolute(poster_src || '', true);
+					}
+
+					// Generate flash vars
+					flashVarsOutput = '';
+					flashVars = editor.getParam('flash_video_player_flashvars', {url : '$url', poster : '$poster'});
+					tinymce.each(flashVars, function(value, name) {
+						// Replace $url and $poster variables in flashvars value
+						value = value.replace(/\$url/, video_src || '');
+						value = value.replace(/\$poster/, poster_src || '');
+
+						if (value.length > 0)
+							flashVarsOutput += (flashVarsOutput ? '&' : '') + name + '=' + escape(value);
+					});
+
+					if (flashVarsOutput.length)
+						data.params.flashvars = flashVarsOutput;
+
+					params = editor.getParam('flash_video_player_params', {
+						allowfullscreen: true,
+						allowscriptaccess: true
+					});
+
+					tinymce.each(params, function(value, name) {
+						data.params[name] = "" + value;
+					});
 				}
-
-				// Generate flash vars
-				flashVarsOutput = '';
-				flashVars = editor.getParam('flash_video_player_flashvars', {url : '$url', poster : '$poster'});
-				tinymce.each(flashVars, function(value, name) {
-					// Replace $url and $poster variables in flashvars value
-					value = value.replace(/\$url/, video_src || '');
-					value = value.replace(/\$poster/, poster_src || '');
-
-					if (value.length > 0)
-						flashVarsOutput += (flashVarsOutput ? '&' : '') + name + '=' + escape(value);
-				});
-
-				if (flashVarsOutput.length)
-					data.params.flashvars = flashVarsOutput;
-
-				params = editor.getParam('flash_video_player_params', {
-					allowfullscreen: true,
-					allowscriptaccess: true
-				});
-
-				tinymce.each(params, function(value, name) {
-					data.params[name] = "" + value;
-				});
 			};
 
-			data = JSON.parse(node.attr('data-mce-json'));
+			data = node.attr('data-mce-json');
+			if (!data)
+				return;
+
+			data = JSON.parse(data);
 			typeItem = this.getType(node.attr('class'));
 
 			style = node.attr('data-mce-style')
@@ -371,6 +379,33 @@
 
 				if (style)
 					style = editor.dom.serializeStyle(editor.dom.parseStyle(style, 'img'));
+			}
+
+			// Handle iframe
+			if (typeItem.name === 'Iframe') {
+				replacement = new Node('iframe', 1);
+
+				tinymce.each(rootAttributes, function(name) {
+					var value = node.attr(name);
+
+					if (name == 'class' && value)
+						value = value.replace(/mceItem.+ ?/g, '');
+
+					if (value && value.length > 0)
+						replacement.attr(name, value);
+				});
+
+				for (name in data.params)
+					replacement.attr(name, data.params[name]);
+
+				replacement.attr({
+					style: style,
+					src: data.params.src
+				});
+
+				node.replace(replacement);
+
+				return;
 			}
 
 			// Handle scripts
@@ -445,8 +480,8 @@
 					style : style
 				});
 
-				tinymce.each(tinymce.explode('name,bgcolor,align,vspace,hspace'), function(name) {
-					if (data[name])
+				tinymce.each(rootAttributes, function(name) {
+					if (data[name] && name != 'type')
 						object.attr(name, data[name]);
 				});
 
@@ -489,8 +524,8 @@
 					for (name in data.params)
 						embed.attr(name, data.params[name]);
 
-					tinymce.each(tinymce.explode('name,bgcolor,align,vspace,hspace'), function(name) {
-						if (data[name])
+					tinymce.each(rootAttributes, function(name) {
+						if (data[name] && name != 'type')
 							embed.attr(name, data[name]);
 					});
 
@@ -536,7 +571,7 @@
 		 * {'params':{'flashvars':'something','quality':'high','src':'someurl'}, 'video':{'sources':[{src: 'someurl', type: 'video/mp4'}]}}
 		 */
 		objectToImg : function(node) {
-			var object, embed, video, img, name, id, width, height, style, i, html,
+			var object, embed, video, iframe, img, name, id, width, height, style, i, html,
 				param, params, source, sources, data, type, lookup = this.lookup,
 				matches, attrs, urlConverter = this.editor.settings.url_converter,
 				urlConverterScope = this.editor.settings.url_converter_scope;
@@ -575,7 +610,7 @@
 			// Setup new image object
 			img = new Node('img', 1);
 			img.attr({
-				src : this.url + '/img/trans.gif'
+				src : this.editor.theme.url + '/img/trans.gif'
 			});
 
 			// Video element
@@ -625,6 +660,12 @@
 			if (node.name === 'embed')
 				embed = node;
 
+			// Iframe element
+			if (node.name === 'iframe') {
+				iframe = node;
+				type = 'Iframe';
+			}
+
 			if (object) {
 				// Get width/height
 				width = width || object.attr('width');
@@ -638,7 +679,7 @@
 					param = params[i];
 					name = param.remove().attr('name');
 
-					if (!excludedEmbedAttrs[name])
+					if (!excludedAttrs[name])
 						data.params[name] = param.attr('value');
 				}
 
@@ -654,8 +695,26 @@
 
 				// Get all embed attributes
 				for (name in embed.attributes.map) {
-					if (!excludedEmbedAttrs[name] && !data.params[name])
+					if (!excludedAttrs[name] && !data.params[name])
 						data.params[name] = embed.attributes.map[name];
+				}
+			}
+
+			if (iframe) {
+				// Get width/height
+				width = iframe.attr('width');
+				height = iframe.attr('height');
+				style = style || iframe.attr('style');
+				id = iframe.attr('id');
+
+				tinymce.each(rootAttributes, function(name) {
+					img.attr(name, iframe.attr(name));
+				});
+
+				// Get all iframe attributes
+				for (name in iframe.attributes.map) {
+					if (!excludedAttrs[name] && !data.params[name])
+						data.params[name] = iframe.attributes.map[name];
 				}
 			}
 
