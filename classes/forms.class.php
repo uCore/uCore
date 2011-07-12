@@ -2917,7 +2917,7 @@ abstract class uListDataModule extends uDataModule {
 		AjaxEcho(<<<SCR_END
 ele = $('*[name*=$fieldName]');
 // hide row - seems to be within a datalist
-ele.parents('TR:eq(0)').hide();
+ele.parents('TR:eq(0)').remove();
 ele.parents("TABLE.datalist").trigger('applyWidgets');
 SCR_END
 		);
