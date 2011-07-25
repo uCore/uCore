@@ -36,8 +36,6 @@ define ('GZIP_ENABLED',substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') ||
 if (GZIP_ENABLED) ob_start("ob_gzhandler");
 else ob_start();
 
-if (!array_key_exists('_noTemplate',$_GET))	utopia::UseTemplate();
-
 $result = sql_query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
 if (!mysql_num_rows($result))
         sql_query('CREATE TABLE __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40)) ENGINE='.MYSQL_ENGINE);
@@ -60,7 +58,6 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 
 timer_end('Module Initialise');
 
-
 //timer_start('Setup Fields');
 // setup fields on current module
 //if (GetCurrentModule()) {
@@ -71,7 +68,7 @@ timer_end('Module Initialise');
 
 // process ajax function
 if (array_key_exists('__ajax',$_REQUEST)) {
-	utopia::CancelTemplate();
+	//utopia::CancelTemplate();
 	// TODO: ajax parentloading?  EG: login modules
 	$obj = utopia::GetInstance(GetCurrentModule());
 	$lc = $obj->LoadChildren(0); // now part of runmodule and loadparents, call here to check for
@@ -101,5 +98,7 @@ if (array_key_exists('__ajax',$_REQUEST)) {
 	utopia::Finish(); // commented why ?
 	die();
 }
+
+if (!array_key_exists('_noTemplate',$_GET)) utopia::UseTemplate();
 
 ?>
