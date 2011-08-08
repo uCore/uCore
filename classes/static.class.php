@@ -578,7 +578,6 @@ class utopia {
 		if (!$template) $template = TEMPLATE_BLANK;
 		$ret = true;
 		if ($template != TEMPLATE_BLANK && $template != TEMPLATE_ADMIN && !file_exists(PATH_ABS_TEMPLATES.$template.'/template.php')) {
-			echo 'Template not found: '.PATH_ABS_TEMPLATES.$template.'/template.php';
 			$template = TEMPLATE_BLANK;
 			$ret = false;
 		}
@@ -594,6 +593,7 @@ class utopia {
 		switch (self::$usedTemplate) {
 			case NULL:
 			case TEMPLATE_BLANK:
+				$templateDir = PATH_ABS_CORE.'styles/default/';
 				break;
 			case TEMPLATE_ADMIN:
 				$templateDir = PATH_ABS_CORE.'styles/admin/';
