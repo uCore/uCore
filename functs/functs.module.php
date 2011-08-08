@@ -15,6 +15,7 @@ function LoadFiles() {
 }
 
 function LoadModulesDir($indir, $recursive = TRUE) {
+	if (!is_dir($indir)) return array();
 	if (glob($indir.'.u_noscan')) return array();
 	$files = glob($indir.'*.php');
 	if (!$recursive || glob($indir.'.u_noscandeep')) return $files;

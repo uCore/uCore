@@ -1,14 +1,6 @@
 <?php
 timer_start('full process');
 
-// if uModules doesnt exist, create it
-if (!file_exists(PATH_ABS_MODULES)) mkdir(PATH_ABS_MODULES);
-
-// if uTemplates doesnt exist, create it and copy CORE/styles/default to it
-if (!file_exists(PATH_ABS_TEMPLATES)) {
-	rcopy(PATH_ABS_CORE.'styles'.DIRECTORY_SEPARATOR.'default',PATH_ABS_TEMPLATES.'default');
-}
-
 timer_start('Load Files');
 LoadFiles();
 timer_end('Load Files');
