@@ -9,14 +9,21 @@ class module_Offline extends uBasicModule {
 		$this->AddParentCallback('/',array($this,'siteOffline'));
 	}
 
+	private static $states = array();
+	public static function IgnoreClass($class,$state=true) {
+		self::$states[$class] = $state;
+	}
+
 	public function siteOffline($parent) {
+		if (isset(self::$states[$parent]) && self::$states[$parent]) return;
+
 		if (modOpts::GetOption('module_Offline','online')) return;
 		if (internalmodule_AdminLogin::IsLoggedIn()) return;
+
 		$obj = utopia::GetInstance($parent);
 		if ($obj instanceof iAdminModule) return;
 
 		$this->_RunModule();
-		//utopia::SetVar('current_module',get_class($this));
 		return FALSE;
 	}
 

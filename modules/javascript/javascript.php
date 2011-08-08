@@ -16,6 +16,7 @@ class uJavascript extends uBasicModule {
 	public function GetUUID() { return 'javascript.js'; }
 
 	public function SetupParents() {
+		module_Offline::IgnoreClass(__CLASS__);
 		$this->SetRewrite(true);
 		utopia::AddJSFile($this->GetURL());
 
