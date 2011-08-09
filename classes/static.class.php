@@ -635,7 +635,6 @@ class utopia {
 				self::AddCSSFile($templateDir.'styles.css');
 		} else {
 			$template = ob_get_contents();
-			ob_end_clean();
 		}
 		self::PrependVar('<head>','<meta name="generator" content="uCore '.file_get_contents(PATH_ABS_CORE.'version.txt').' - Utopia Core PHP Framework"/>');
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
