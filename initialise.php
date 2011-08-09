@@ -5,8 +5,6 @@ timer_start('Load Files');
 LoadFiles();
 timer_end('Load Files');
 
-ob_start('utopia::output_buffer');
-
 $configArr = (isset($_REQUEST['__config_submit'])) ? $_REQUEST : uConfig::ReadConfig();
 $valid = uConfig::ValidateConfig($configArr);
 if ($valid) {
@@ -27,6 +25,8 @@ define ('GZIP_ENABLED',substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') ||
 
 if (GZIP_ENABLED) ob_start("ob_gzhandler");
 else ob_start();
+
+ob_start('utopia::output_buffer');
 
 $result = sql_query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
 if (!mysql_num_rows($result))
