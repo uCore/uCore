@@ -189,10 +189,14 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 
 		timer_start('Run Module');
-		echo '<div class="'.get_class($this).'">';
-		if ($this->RunModule() === FALSE) return false;
-		echo '</div>';
+		ob_start();
+		$result = $this->RunModule();
+		$c = ob_get_contents();
+		ob_end_clean();
 		timer_end('Run Module');
+		if (utopia::UsingTemplate()) $c = '<div class="'.get_class($this).'">'.$c.'</div>';
+		echo $c;
+		if ($result === FALSE) return false;
 		$this->hasRun = true;
 
 		$lc = $this->LoadChildren(1);
