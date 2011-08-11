@@ -107,13 +107,15 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public function getImage() {
 		$qry = "SELECT ".mysql_real_escape_string($_GET['f'])." as img FROM ".mysql_real_escape_string($_GET['t'])." WHERE ".mysql_real_escape_string($_GET['k'])." = ".mysql_real_escape_string($_GET['p']);
 		$data = '';
+		ob_start();
 		$result = sql_query($qry);
+		ob_end_clean();
 		if ($result !== FALSE && mysql_num_rows($result) > 0)
 			$data = mysql_result($result,0,'img');
-		else
-			die('Image Not Found');//$data = file_get_contents(PATH_ABS_ROOT.'no-img.png');
-
-		utopia::CancelTemplate();
+		else {
+			utopia::UseTemplate();
+			utopia::PageNotFound();
+		}
 
 		$etag = sha1($_SERVER['REQUEST_URI'].'-'.strlen($data));
 		utopia::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
