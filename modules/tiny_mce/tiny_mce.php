@@ -115,7 +115,8 @@ FIN
 
 		$saveClass = 'mceSave'.rand(1,5000);
 		$attributes['class'] .= ' '.$saveClass;
-		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).'<br><input type="button" value="Save" onclick="updateMCE(\''.$saveClass.'\',this)">';
+
+		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).'<div style="background-color:#ccc; border:1px solid #666"><input class="btn" type="button" value="Save" onclick="updateMCE(\''.$saveClass.'\',this)"></div>';
 	}
 	public function RunModule() {
 	}
