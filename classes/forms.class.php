@@ -1266,6 +1266,7 @@ FIN;
 	}
 
 	public function FieldStyles_Get($field,$value=NULL) {
+		if (!isset($this->fields[$field])) return null;
 		$inputType = $this->fields[$field]['inputtype'];
 		$defaultStyles = array_key_exists($inputType,$this->defaultStyles) ? $this->defaultStyles[$inputType] : array();
 		$specificStyles = $this->GetFieldProperty($field,'style'); if (!$specificStyles) $specificStyles = array();
