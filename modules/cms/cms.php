@@ -16,6 +16,9 @@ class tabledef_CMS extends uTableDef {
     $this->AddField('title',ftVARCHAR,66);  // google only shows 66 chars in title
     $this->AddField('description',ftVARCHAR,150); // google only shows 150 chars in description
     $this->AddField('content',ftTEXT);
+    $this->AddField('content_time',ftTIMESTAMP);
+    $this->AddField('content_published',ftTEXT);
+    $this->AddField('content_published_time',ftTIMESTAMP);
 
     $this->AddField('updated',ftTIMESTAMP);
     $this->SetFieldProperty('updated','extra','ON UPDATE CURRENT_TIMESTAMP');
@@ -248,12 +251,60 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('description','description','cms','Meta Description',itTEXT);
 		$this->FieldStyles_Set('description',array('width'=>'100%'));
 		$this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Possible Data Blocks');
+
 		$this->AddField('content','content','cms','Page Content',itHTML);
 		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
+		$this->AddField('content_published','content_published','cms');
+
+		$this->AddField('content_time','content_time','cms','Last Saved');
+		$this->AddField('content_published_time','content_published_time','cms','Last Published');
+		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
 		$this->AddFilter('cms_id',ctEQ);
 	}
+	public function publishLinks($field,$pkVal,$v) {
+		$rec = $this->LookupRecord($pkVal);
+		if ($rec['content'] === $rec['content_published'])
+			return utopia::DrawInput('published',itBUTTON,'Published',null,array('disabled'=>'disabled'));
+
+		// preview, publish, revert (red)
+		$obj = utopia::GetInstance('uCMS_View');
+		$preview = CreateNavButton('Preview',$obj->GetURL(array('cms_id'=>$pkVal,'preview'=>1)),array('target'=>'_blank','title'=>'Preview this page'));
+		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish'),itBUTTON);
+		$revert = $this->DrawSqlInput('revert','Revert',$pkVal,array('title'=>'Reset to published version','class'=>'page-revert'),itBUTTON);
+
+		$script = <<<EOF
+<script type="text/javascript">
+$('.page-publish').click(function() {
+	return confirm('Any changes you have made will become visible to the public.  Do you wish to continue?');
+});
+$('.page-revert').click(function() {
+	return confirm('Reverting this page will reset all of your changes to the last published version.  Do you wish to continue?');
+});
+</script>
+EOF;
+
+		return $preview.$publish.$revert.$script;
+	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		if ($fieldAlias == 'revert') {
+			$rec = $this->LookupRecord($pkVal);
+			$this->UpdateField('content',$rec['content_published'],$pkVal);
+			return;
+		}
+		if ($fieldAlias == 'publish') {
+			$rec = $this->LookupRecord($pkVal);
+			$this->UpdateField('content_published',$rec['content'],$pkVal);
+			return;
+		}
 		if ($fieldAlias == 'cms_id') $newValue = UrlReadable($newValue);
+		if ($fieldAlias == 'content') {
+			$this->SetFieldType('content_time',ftRAW);
+			$this->UpdateField('content_time','NOW()',$pkVal);
+		}
+		if ($fieldAlias == 'content_published') {
+			$this->SetFieldType('content_published_time',ftRAW);
+			$this->UpdateField('content_published_time','NOW()',$pkVal);
+		}
 		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
 
@@ -296,7 +347,12 @@ class uCMS_View extends uSingleDataModule {
 		$obj = utopia::GetInstance('uCMS_View');
 		$rec = $obj->GetRows($id);
 		$rec = $rec[0];
-		return '<div class="mceEditable">'.$rec['content'].'</div>';
+		$content = $rec['content_published'];
+		if (isset($_GET['preview']) && internalmodule_AdminLogin::IsLoggedIn())
+			$content = $rec['content'];
+		if ($rec['content_time'] == 0)
+			$content = $rec['content'];
+		return '<div class="mceEditable">'.$content.'</div>';
 	}
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 		if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
@@ -349,6 +405,8 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('description','description','cms','description');
 		$this->AddField('content','content','cms','content');
+		$this->AddField('content_time','content_time','cms');
+		$this->AddField('content_published','content_published','cms','content');
 		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
