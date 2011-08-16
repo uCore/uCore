@@ -654,18 +654,17 @@ class utopia {
 
 	static function MergeVars(&$string) {
 		$start = $string;
-		// TODO: Dont match inside fields!
 		foreach (self::$templateParsers as $ident => $arr) {
 			if (preg_match_all('/{'.$ident.'}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
 				$searchArr = $matches[0];
 				$varsArr = isset($matches[1]) ? $matches[1] : false;
-	//	if (preg_match_all('/{UTOPIA\.([^}]+)}/i',$string,$matches,PREG_SET_ORDER)) {
 				foreach ($searchArr as $k => $search) {
-          if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
+					if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
 					$searchLen = strlen($search);
 					$offset = 0;
 					while (($pos = strpos($string, $search, $offset)) !== FALSE) {
 						$test = substr($string, 0, $pos); // only test on string up to match.
+						// TODO:(done) Dont match inside fields!
 						$noprocessPos = strrpos($test, '<!-- NoProcess -->');
 						if ($noprocessPos !== FALSE) { // noprocess is found.
 							// end noprocess found?
