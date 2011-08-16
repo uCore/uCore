@@ -119,8 +119,6 @@ class uDataBlocks extends uSingleDataModule implements iAdminModule {
     
     $content = $append = $prepend = '';
     	
-	$repeatable = $rec['content'];
-	
 	$html = str_get_html($rec['content']);
 	$ele = $html->find('._ri',0)->innertext;
 	if (!$ele) $ele = $html->find('._r',0)->outertext;
