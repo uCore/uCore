@@ -1296,11 +1296,10 @@ FIN;
 		unset($this->fields[$field]['style_fn']);
 	}
 
-	public function GetMetaValue($original,$pk,$value,$name) {
+	public function GetMetaValue($original,$pk,$value,$rec,$name) {
 		if ($pk === NULL) return NULL;
 		if (!$this->includeMeta) return NULL;
-		$row = $this->LookupRecord($pk);
-		$metadata = json_decode($row['__metadata'],true);
+		$metadata = json_decode($rec['__metadata'],true);
 		if (isset($metadata[$name])) return $metadata[$name];
 		return $row['__metadata'];
 	}
@@ -2263,8 +2262,10 @@ FIN;
 	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
 		$originalValue = $value;
-		$value = json_decode($value);
-		if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
+		if ($this->GetFieldType($fieldName) == 'metadata') {
+			$value = json_decode($value);
+			if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
+		}
 		$suf = ''; $pre = ''; $isNumeric=true;
 		if ($forceType === NULL) $forceType = $this->GetFieldType($fieldName);
 		switch ($forceType) {
