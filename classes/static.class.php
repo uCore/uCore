@@ -772,6 +772,7 @@ class utopia {
 	}
 
 	static function AjaxUpdateElement($eleName,$html) {
+		if (is_object($html)) return;
     	$enc = base64_encode($html);
     	AjaxEcho('$("#'.$eleName.'").html(Base64.decode("'.$enc.'"))');
 	}
