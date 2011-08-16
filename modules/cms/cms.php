@@ -261,8 +261,8 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
 		$this->AddFilter('cms_id',ctEQ);
 	}
-	public function publishLinks($field,$pkVal,$v) {
-		$rec = $this->LookupRecord($pkVal);
+	
+	public function publishLinks($field,$pkVal,$v,$rec) {
 		if ($rec['content'] === $rec['content_published'])
 			return utopia::DrawInput('published',itBUTTON,'Published',null,array('disabled'=>'disabled'));
 
