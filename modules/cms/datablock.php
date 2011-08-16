@@ -121,14 +121,15 @@ class uDataBlocks extends uSingleDataModule implements iAdminModule {
     	
 	$repeatable = $rec['content'];
 	
-	$html = str_get_html($repeatable);
-	$ele = ($e = $html->find('._ri',0)) ? $e->innertext : NULL;
-	if (!$ele) $ele = ($e = $html->find('._r',0)) ? $e->outertext : NULL;
-
+	$html = str_get_html($rec['content']);
+	$ele = $html->find('._ri',0)->innertext;
+	if (!$ele) $ele = $html->find('._r',0)->outertext;
+	
+	$repeatable = $html;
 	if ($ele) {
 		// found a repeatable element
 		// split content at this element. prepare for append and prepend.
-		list($append,$prepend) = explode($ele,$repeatable);
+		list($append,$prepend) = explode($ele,$html);
 		$repeatable = $ele;
 	}
 	
