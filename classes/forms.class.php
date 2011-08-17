@@ -2200,33 +2200,9 @@ FIN;
 	}
 
 	public function LookupRecord($filter=NULL,$clearFilters=false) {
-		//		ErrorLog(get_class($this)."@lookup ".print_r($arr,true));
-		//echo '//'.get_class($this)."@lookup ".print_r($arr,true);
-		//echo "LRs={$this->internalRowNum}   ";
 		$rows = $this->GetRows($filter,$clearFilters);
 		if (is_array($rows)) return reset($rows);
 		return NULL;
-		//return $instance->GetRecord($dataset,0);
-		/*
-		 if (!is_array($filter)) return NULL;
-		 //        $rn = $this->internalRowNum;
-		 $dataset = $this->GetDataset(NULL);
-		 //		mysql_data_seek($dataset,0);
-		 $return = NULL;
-		 while (($row = mysql_fetch_assoc($dataset))) {
-		 //			ErrorLog(print_r($row,true));
-		 //			print_r($row);
-			$match = 0;
-			foreach ($filter as $lookupField => $matchValue) {
-			if (array_key_exists($lookupField,$row) && $row[$lookupField] == $matchValue)
-			$match++;
-			}
-			if ($match == count($filter)) { $return = $row; break; }
-			}
-			//        $this->internalRowNum = $rn;
-			//        mysql_data_seek($dataset,$rn);
-			//echo "LRe={$this->internalRowNum}<br/>";
-			return $return;*/
 	}
 
 	public function GetRowWhere($pkValue = NULL) {
