@@ -2196,7 +2196,16 @@ FIN;
 			}
 		}
 		$dataset = $instance->GetDataset(NULL);
-		return GetRows($dataset);
+
+		$rows = array();
+
+		$i = 0;
+		while (($row = $this->GetRecord($dataset,$i))) {
+			$rows[] = $row;
+			$i++;
+		}
+
+		return $rows;
 	}
 
 	public function LookupRecord($filter=NULL,$clearFilters=false) {
