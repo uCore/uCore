@@ -1323,7 +1323,7 @@ FIN;
 			$this->AddField('__metadata','__metadata');
 		}
 		$this->AddField($name,array($this,'GetMetaValue',$name),NULL,$visiblename,$inputtype,$values);
-		$this->SetFieldType($name,'metadata');
+		$this->fields[$name]['ismetadata'] = true;
 	}
 
 	public function AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
@@ -2247,7 +2247,7 @@ FIN;
 	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
 		$originalValue = $value;
-		if ($this->GetFieldType($fieldName) == 'metadata') {
+		if ($this->fields[$fieldName]['ismetadata']) {
 			$value = json_decode($value);
 			if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
 		}
@@ -2460,9 +2460,6 @@ FIN;
 		AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
-		if ($this->GetFieldType($fieldAlias) == 'metadata') {
-			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
-		}
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
 
 		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
@@ -2544,8 +2541,7 @@ FIN;
 			$newValue = trim($newValue);
 		$pfVal = $newValue;
 		if ($this->GetFieldType($fieldAlias) != ftRAW) $newValue = mysql_real_escape_string($newValue);
-		if ($newValue === '' || $newValue === NULL) $newValue = 'NULL';
-		else switch ($this->GetFieldType($fieldAlias)) {      //"STR_TO_DATE('$newValue','".FORMAT_DATE."')"; break;
+		if ($newValue) switch ($this->GetFieldType($fieldAlias)) {      //"STR_TO_DATE('$newValue','".FORMAT_DATE."')"; break;
 			case ftRAW: break;
 			case ftDATE:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('".fixdateformat($newValue)."','".FORMAT_DATE."'))"; break;
 			case ftTIME:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('$newValue','".FORMAT_TIME."'))"; break;
@@ -2554,11 +2550,22 @@ FIN;
 			case ftCURRENCY:	// currency
 			case ftPERCENT:		// percent
 			case ftFLOAT:		// float
-			case ftDECIMAL:		$newValue = "'".floatval(preg_replace('/[^0-9\.-]/','',$newValue))."'"; break;
+			case ftDECIMAL:		$newValue = floatval(preg_replace('/[^0-9\.-]/','',$newValue)); break;
 			case ftBOOL:		// bool
-			case ftNUMBER:		$newValue = "'".($newValue==='' ? '' : intval(preg_replace('/[^0-9\.-]/','',$newValue)))."'"; break;
-			default:
+			case ftNUMBER:		$newValue = ($newValue==='' ? '' : intval(preg_replace('/[^0-9\.-]/','',$newValue))); break;
+		}
+
+		if ($this->fields[$fieldAlias]['ismetadata']) {
+			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
+		}
+
+		if ($newValue === '' || $newValue === NULL)
+			$newValue = 'NULL';
+		else {
+			$dontQuoteTypes = array(ftRAW,ftDATE,ftTIME,ftDATETIME,ftTIMESTAMP,ftCURRENCY,ftPERCENT,ftFLOAT,ftDECIMAL,ftBOOL,ftNUMBER);
+			if (!in_array($this->GetFieldType($fieldAlias),$dontQuoteTypes)) {
 				$newValue = "'$newValue'";
+			}
 		}
 
 		// lets update the field
