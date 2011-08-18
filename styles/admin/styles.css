@@ -27,3 +27,15 @@ a, a:link, a:visited { color: #333; text-decoration:none }
 #content { margin-left:200px; border-left:1px solid #8CC63F; padding-left:15px }
 
 #footer { background:url(images/bottom-swoosh.gif) bottom center no-repeat; height:97px; }
+
+
+.uWidgetPlaceholder {
+	background-color:#ccc;
+	border: 1px solid #999;
+	border-radius: 10px;
+	padding: 5px;
+}
+
+.uWidgetPlaceholder div.uWidgetHeader {
+	margin:0; padding:0; border-bottom: solid 1px #999; font-size:1.2em; font-weight:bold;
+}

@@ -250,9 +250,10 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->FieldStyles_Set('title',array('width'=>'100%'));
 		$this->AddField('description','description','cms','Meta Description',itTEXT);
 		$this->FieldStyles_Set('description',array('width'=>'100%'));
-		$this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Possible Data Blocks');
+		$this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Add Widget');
 
 		$this->AddField('content','content','cms','Page Content',itHTML);
+		$this->AddPreProcessCallback('content',array($this,'processWidget'));
 		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
 		$this->AddField('content_published','content_published','cms');
 
@@ -285,6 +286,51 @@ EOF;
 
 		return $preview.$publish.$revert.$script;
 	}
+	
+	public function processWidget($field,$pkVal,$value) {
+			// replace pragma with uWidgetDiv
+//			$value = preg_replace('/\{widget\.(.+)\}/Ui','<div class="uWidgetPlaceholder mceNonEditable" title="$0"><h1>$1</h1> options here (including delete) <input type="button" onclick="window.top.location = \'$0\'" value="EDIT"></div>',$value);
+
+			if (preg_match_all('/\{widget.(.+)\}/Ui', $value, $matches, PREG_SET_ORDER)) {
+				foreach ($matches as $match) {
+					$value = str_replace($match[0],$this->getWidgetPlaceholder($match[1]),$value);
+				}
+			}
+			return $value;
+	}
+	public function getWidgetPlaceholder() {
+		if (func_num_args() > 0) {
+			$id = func_get_arg(0);
+		} else {
+			$id = $_GET['id'];
+		}
+
+		$obj = utopia::GetInstance('uWidgets');
+		$url = $obj->GetURL($id);
+
+		$rep = uWidgets::DrawWidget($id);
+		$ele = str_get_html($rep);
+
+		$editBtn = '';
+		$delBtn = '<input type="button" value="Remove" onclick="var a = this.parentNode; while (a.className.indexOf(\'uWidgetPlaceholder\')==-1) { a = a.parentNode } a.parentNode.removeChild(a);">';
+		$addition = '';
+		if (!$ele->root->children) {
+			$ele = str_get_html('<span>'.$id.'</span>');
+			$addition = $delBtn;
+		} else {
+			$editBtn = '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
+			$addition = '<div class="uWidgetHeader">'.$delBtn.$editBtn.$id.'</div>';
+		}
+
+		$ele = $ele->root->children[0];
+		$ele->class .= ' uWidgetPlaceholder mceNonEditable';
+		$ele->title = $id;
+		$ele->innertext = $addition.$ele->innertext;
+
+		if (func_num_args() > 0) return $ele;
+		die($ele);
+	}
+	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		if ($fieldAlias == 'revert') {
 			$rec = $this->LookupRecord($pkVal);
@@ -298,6 +344,16 @@ EOF;
 		}
 		if ($fieldAlias == 'cms_id') $newValue = UrlReadable($newValue);
 		if ($fieldAlias == 'content') {
+			// replace uWidgetDiv with pragma
+			$html = str_get_html(stripslashes($newValue));
+			if ($html) {
+				foreach ($html->find('.uWidgetPlaceholder') as $ele) {
+					if ($ele->plaintext == '') $ele->class = null;
+					else $ele->outertext = '{widget.'.$ele->title.'}';
+				}
+				$newValue = addslashes($html);
+			}
+
 			$this->SetFieldType('content_time',ftRAW);
 			$this->UpdateField('content_time','NOW()',$pkVal);
 		}
@@ -307,18 +363,19 @@ EOF;
 		}
 		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
-
 	public function getPossibleBlocks($val,$pk,$original) {
-		$obj = utopia::GetInstance('uDataBlocks_List');
+		$obj = utopia::GetInstance('uWidgets_List');
 		$rows = $obj->GetRows();
-		foreach (uDataBlocks::$staticBlocks as $blockID => $callback) $rows[]['block_id'] = $blockID;
-		$ret = '<div>Click on a block to insert it.</div>';
+		foreach (uWidgets::$staticWidgets as $widgetID => $callback) $rows[]['block_id'] = $widgetID;
+		$ret = '<div>Click on a widget to insert it.</div>';
+		$ret .= '<script>function GetPlaceholder(id) {$.get(\'?__ajax=getWidgetPlaceholder&id=\'+id,function (data){tinyMCE.execCommand(\'mceInsertContent\',false,data)})}</script>';
 		foreach ($rows as $row) {
-			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{block.'+$(this).text()+'}');\" style=\"margin:0 5px\" class=\"btn\">{$row['block_id']}</span>";
+			$ret .= "<span onclick=\"GetPlaceholder($(this).text());\" style=\"margin:0 5px\" class=\"btn\">{$row['block_id']}</span>";
 		}
 		return trim($ret);
 	}
 	public function SetupParents() {
+		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 	}
 	public function RunModule() {
 		if (isset($_REQUEST['inline']))
@@ -352,7 +409,7 @@ class uCMS_View extends uSingleDataModule {
 			$content = $rec['content'];
 		if ($rec['content_time'] == 0)
 			$content = $rec['content'];
-		return '<div class="mceEditable">'.$content.'</div>';
+		return '<div class="cms-'.$id.'">'.$content.'</div>';
 	}
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 		if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
@@ -414,7 +471,7 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	public function SetupParents() {
-		uDataBlocks::AddStaticBlock('page_updated','uCMS_View::last_updated');
+		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
 	}
 
 	static function GetHomepage() {
