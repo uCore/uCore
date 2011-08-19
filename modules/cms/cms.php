@@ -44,6 +44,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('title','title','cms','Page Title');
 		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('hide','hide','cms','Parent');
+		$this->AddField('published','(IF({content} = {content_published},1,0))','cms');
 	}
 	public function SetupParents() {
 		$templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
@@ -163,6 +164,9 @@ FIN;
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? ' hiddenItem' : '';
 
+			$info = '';
+			if (!$child['published'])
+				$info = '<span class="ui-icon ui-icon-info" title="Unpublished"></span>';
 			$editLink = $editObj->GetURL(array('cms_id'=>$child['cms_id']));
 			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
 			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
@@ -173,7 +177,7 @@ FIN;
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			echo $listObj->GetDeleteButton($child['cms_id']);
 			echo '</div>';
-			echo $child['title'].$data;
+			echo $info.$child['title'].$data;
 			echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
 			echo '</li>';
