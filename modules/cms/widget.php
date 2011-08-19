@@ -88,7 +88,25 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 		$this->AddField('block_type','block_type','blocks','Type');
 	}
 	public function SetupParents() {
+		$this->RegisterAjax('getWidgets',array($this,'getWidgets'));
 		$this->AddParentCallback('uCMS_List',array($this,'ShowData'));
+	}
+	public function getWidgets() {
+		// static
+		$rows = array();
+		foreach(uWidgets::$staticWidgets as $name => $widget) {
+			$rows[] = array('block_id'=>$name,'block_type'=>'Fixed Widgets');
+		}
+		// widgets
+		$widgets = $this->GetRows();
+		array_sort_subkey($widgets,'block_type');
+		$rows = array_merge($rows,$widgets);
+
+		$obj = utopia::GetInstance('uWidgets');
+		$newUrl = $obj->GetURL(array($obj->GetModuleId().'_new'=>1));
+
+		$rows = array($newUrl, $rows);
+		echo json_encode($rows);
 	}
 
 	public function RunModule() {
@@ -285,14 +303,15 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		$this->AddMetaField('height','Height',itTEXT);
 	}
 	public function SetupParents() {
+		uJavascript::IncludeFile(dirname(__FILE__).'/widget.js');
 		$this->AddParent('uWidgets_List');
 		$this->AddParent('uWidgets_List','block_id','*');
 	}
+
 	public function InitInstance($type) {
 		if (class_exists($type)) $type::Initialise($this);
 		$this->AddField('preview',array($this,'getPreview'),'blocks','Preview');
 	}
-
 	public function UpdateField($field,$newValue,$pkVal=null) {
 		$rec = $this->LookupRecord($pkVal);
 		$this->InitInstance($rec['block_type']);

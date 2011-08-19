@@ -371,12 +371,7 @@ EOF;
 		$obj = utopia::GetInstance('uWidgets_List');
 		$rows = $obj->GetRows();
 		foreach (uWidgets::$staticWidgets as $widgetID => $callback) $rows[]['block_id'] = $widgetID;
-		$ret = '<div>Click on a widget to insert it.</div>';
-		$ret .= '<script>function GetPlaceholder(id) {$.get(\'?__ajax=getWidgetPlaceholder&id=\'+id,function (data){tinyMCE.execCommand(\'mceInsertContent\',false,data)})}</script>';
-		foreach ($rows as $row) {
-			$ret .= "<span onclick=\"GetPlaceholder($(this).text());\" style=\"margin:0 5px\" class=\"btn\">{$row['block_id']}</span>";
-		}
-		return trim($ret);
+		return '<span class="btn" onclick="ChooseWidget()">Insert Widget</span>';
 	}
 	public function SetupParents() {
 		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
