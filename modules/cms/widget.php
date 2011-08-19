@@ -25,8 +25,8 @@ class uCustomWidgetConverter extends uDataModule {
 	public function SetupFields() {
 		$this->CreateTable('blocks');
 		$this->AddField('block_id','block_id','blocks','Block ID',itTEXT);
-		$this->AddField('block_type','block_type','blocks','Type',itCOMBO,$installed);
-		$this->AddMetaField('module','Data Source',itCOMBO);
+		$this->AddField('block_type','block_type','blocks','Type',itTEXT);
+		$this->AddMetaField('module','Data Source',itTEXT);
 		$this->AddMetaField('filter','Filter',itTEXT);
 		$this->AddMetaField('order','Order',itTEXT);
 		$this->AddMetaField('limit','Limit',itTEXT);
