@@ -112,7 +112,7 @@ function fdb_sql_fetch_assoc($result) {
 	return $ret;
 }
 
-function &sql_query($query) { $false = FALSE;
+function &sql_query($query, $quiet = FALSE) { $false = FALSE;
 	//	$GLOBALS['db_handle'] = new PDO('mysql:host=localhost;dbname=test', $user, $pass);
 	//new PDO(DB_TYPE.':'.DB_DSN, DB_USERNAME, DB_PASSWORD) //
 	//return;
@@ -128,7 +128,9 @@ function &sql_query($query) { $false = FALSE;
 	timer_start($tID);
 	$GLOBALS['sql_queries'][$GLOBALS['sql_query_count']] = $query;
 	$result = mysql_query($query);
-	$err = mysql_error();	if (!empty($err)) { trigger_error($err."\n\n".$query); ErrorLog($err); }//ErrorLog("$err<br/>$query");
+	if (!$quiet && !$result) {
+		$err = mysql_error();	if (!empty($err)) { trigger_error($err."\n\n".$query); ErrorLog($err); }//ErrorLog("$err<br/>$query");
+	}
 	$timetaken = timer_end($tID);
 	/*	if (false && $timetaken > 50) {
 		//echo $query." slow: $timetaken<BR>";
