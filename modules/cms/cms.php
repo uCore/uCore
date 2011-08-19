@@ -107,10 +107,10 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			hidden = !hidden;
 		}
 		function RefreshIcons() {
-//			$('.ui-treesort-item > .ui-icon').attr('class','');
+			$('.ui-treesort-item:not(.ui-treesort-folder) > .cmsParentToggle').remove();
 			$('.ui-treesort-folder').each(function () {
-				var icon = $('.ui-icon',this);
-				if (!icon.length) icon = $('<span class="ui-icon" style="position:absolute;left:-16px;top:0;bottom:0;width:16px"></span>');
+				var icon = $('.cmsParentToggle',this);
+				if (!icon.length) icon = $('<span class="cmsParentToggle ui-widget ui-icon" style="width:16px; float:left"></span>');
 				if ($('ul:visible',this).length)
 					icon.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
 				else
@@ -134,7 +134,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		}
 		$('#tree ul').not($('#tree ul:first')).hide();
 		$('#tree').treeSort({init:RefreshIcons,change:dropped});
-		$('.ui-icon-triangle-1-e, .ui-icon-triangle-1-s').live('click',function (e) {
+		$('.cmsParentToggle').live('click',function (e) {
 			$(this).parent('li').children('ul').toggle();
 			RefreshIcons();
 			e.stopPropagation();
