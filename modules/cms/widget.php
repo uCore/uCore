@@ -336,7 +336,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 			if (!$rec) return '';
 		}
 		$content = '';
-		if ($rec['block_type']) $content = $rec['block_type']::DrawData($rec);
+		if ($rec['block_type'] && class_exists($rec['block_type'])) $content = $rec['block_type']::DrawData($rec);
 
 		$meta = json_decode($rec['__metadata'],true);
 		$w = $meta['width']; if ($w == intval($w) && $w > 0) $w = $w.'px';
