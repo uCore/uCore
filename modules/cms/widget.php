@@ -42,6 +42,7 @@ class uCustomWidgetConverter extends uDataModule {
 		$this->AddFilter('o_module',ctNOTEQ,itNONE,'');
 	}
 	public function RunModule() {
+		// update old Datablocks to uCustomWidgets
 		$rows = $this->GetRows();
 		foreach ($rows as $row) {
 			if (!$row['o_module']) continue;
@@ -59,6 +60,19 @@ class uCustomWidgetConverter extends uDataModule {
 				'o_limit'=>NULL,
 				'o_content'=>NULL,
 			),$row['block_id']);
+		}
+
+		// update cms pages
+		$obj = utopia::GetInstance('uCMS_Edit');
+		$filter = "content LIKE '%{block.%' OR content_published LIKE '%{block.%'";
+		$rows = $obj->GetRows(array($filter),true);
+		$pk = $obj->GetPrimaryKey();
+		foreach ($rows as $row) {
+			$newVal = preg_replace('/{block\.(.+)}/Ui','{widget.$1}',$row['content']);
+			if ($newVal != $row['content']) $obj->UpdateField('content',$newVal,$row[$pk]);
+
+			$newVal = preg_replace('/{block\.(.+)}/Ui','{widget.$1}',$row['content_published']);
+			if ($newVal != $row['content_published']) $obj->UpdateField('content_published',$newVal,$row[$pk]);
 		}
 	}
 }
