@@ -115,15 +115,16 @@ class uTwitterWidget implements iWidget {
 	}
 	static function DrawData($data) {
 		$meta = json_decode($data['__metadata'],true);
+		$blockId = $data['block_id'];
 		$id = $meta['twitter_id'];
 		$width = $meta['width'] ? $meta['width'] : 250;
 		$height = $meta['height'] ? $meta['height'] : 350;
 		return <<<FIN
-<script src="http://widgets.twimg.com/j/2/widget.js"></script>
-<div id="twitter_$id"></div>
-<script>
+<div id="twitter_$blockId"></div>
+<script type="text/javascript">
+$.getScript('http://widgets.twimg.com/j/2/widget.js',function () {
 new TWTR.Widget({
-  id: 'twitter_$id',
+  id: 'twitter_$blockId',
   version: 2,
   type: 'profile',
   rpp: 4,
@@ -151,6 +152,7 @@ new TWTR.Widget({
     behavior: 'all'
   }
 }).render().setUser('$id').start();
+});
 </script>
 FIN;
 	}
