@@ -92,7 +92,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		echo '<hr>';
 		self::DrawChildren($relational);
 		echo '</div></td>';
-		echo '<td style="width:100%;height:100%;vertical-align:top"><div style="width:100%;height:100%;min-height:600px;border-left:1px solid #333" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
+		echo '<td style="width:100%;vertical-align:top; border-left:1px solid #333"><div style="width:100%" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
 
 		treeSort::Init();
 		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
