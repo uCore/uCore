@@ -66,6 +66,7 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function SetPrimaryKey($name, $auto_increment = true) {
+		if (!isset($this->fields[$name])) return;
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'unique') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
@@ -74,12 +75,14 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) $this->fields[$name]['extra'] = 'auto_increment';
 	}
 	public function SetUniqueField($name) {
+		if (!isset($this->fields[$name])) return;
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
 			$this->fields[$name]['unique'] = true;
 	}
 	public function SetIndexField($name) {
+		if (!isset($this->fields[$name])) return;
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'unique') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign index flag to $name, already an indexed field.'); return; }
@@ -184,146 +187,176 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($this->isDisabled) return;
 		$this->_SetupFields();
 		if (empty($this->fields)) return;
+		if (!$this->engine) $this->engine = MYSQL_ENGINE;
 
 		$this->AddField('__metadata',ftLONGTEXT);
 
 		$oldTable = isset($this->tablename) ? $this->tablename : NULL;
 		$this->tablename = TABLE_PREFIX.get_class($this);
 
-		// rename old table name to class name
-		if (self::TableExists($oldTable) && !self::TableExists($this->tablename))
-			sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename);
-
 		// checksum
-		$engine = MYSQL_ENGINE;
-		if ($this->engine) $engine = $this->engine;
-		$checksum = sha1($engine.print_r($this->fields,true));
-		if (self::checksumValid(get_class($this),$checksum)) return;
-		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `checksum` = \''.$checksum.'\'');
+		$tableExists = self::TableExists($this->tablename);
+		if (!$tableExists) {
+			$tableExists = (sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename,true)) ? true : false;
+			$renamed = true;
+		}
 
+		if (!$tableExists) { // create table
+			$this->CreateTable();
+		} else {
+			// checksum
+			$checksum = sha1($oldTable.$this->tablename.$this->engine.print_r($this->fields,true));
+			if (!$renamed && self::checksumValid(get_class($this),$checksum)) return;
+
+			$fullColumns = sql_query('SHOW FULL COLUMNS FROM `'.$this->tablename.'`',true);
+			$fullColumns = GetRows($fullColumns);
+
+/*			$fieldCheck = true;
+			// check fields
+			foreach ($this->fields as $fieldName => $info) {
+				$found = false;
+				foreach ($fullColumns as $row) {
+					if ($fieldName == $row['Field']) { $found = true; break; }
+				}
+				if (!$found) { $fieldCheck = false; break; }
+			}*/
+
+			// update table
+			$this->RefreshTable($fullColumns);
+		}
+
+		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `checksum` = \''.$checksum.'\'');
+	}
+
+	function RefreshTable($rows) {
 		$unique = array();
 		$index = array();
-		if (self::TableExists($this->tablename)) {
-			// loop fields
-			$pk = NULL;
-			$currentPK = NULL;
+		// loop fields
+		$pk = NULL;
+		$currentPK = NULL;
 
-			$alterArray = array();
-			$otherArray = array();
-			$alterArray[] = "CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION;
+		$alterArray = array();
+		$otherArray = array();
+		$alterArray[] = "CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION;
 
-			// lets keep the sql querys to a minimum, get all the rows first, and process them locally.
-			$rows = GetRows(sql_query("SHOW FULL FIELDS FROM `$this->tablename`"));
-/*			foreach ($rows as $data) {
-				if (!array_key_exists($data['Field'],$this->fields)) {
-					$alterArray[] = "DROP `{$data['Field']}`";
-				}
-			}*/
-			//print_r($this->fields);
-			foreach ($this->fields as $fieldName => $fieldData) {
-				// build field
-				if (array_key_exists('pk',$fieldData) && $fieldData['pk'] === true) if ($pk === NULL) $pk = $fieldName; else { $pk = FALSE; break; /* multiple pri key - break */ };
-				$type = getSqlTypeFromFieldType($fieldData['type']);
-				$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
-				if ($fieldData['type'] == ftTIMESTAMP) {
-					if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
-					else $default = " DEFAULT 0";
-				} else
-				$default = $fieldData['default'] === NULL ? '' : " DEFAULT '{$fieldData['default']}'";
-				$comments = $fieldData['comments'] === NULL ? '' : " COMMENT '{$fieldData['comments']}'";
-				$collate = $fieldData['collation'] === NULL ? '' : " COLLATE '{$fieldData['collation']}'";
+		// lets keep the sql querys to a minimum, get all the rows first, and process them locally.
 
-				$len = '';
-				if ($fieldData['type'] == ftTEXT || $fieldData['type'] == ftVARCHAR) $len = "({$fieldData['length']})";
-				if (array_key_exists('unique',$fieldData) && $fieldData['unique'] === TRUE) $unique[] = "`$fieldName`$len";
-				if (array_key_exists('index',$fieldData) && $fieldData['index'] === TRUE) $index[] = "`$fieldName`$len";
+/*		foreach ($rows as $data) {
+			if (!array_key_exists($data['Field'],$this->fields)) {
+				$alterArray[] = "DROP `{$data['Field']}`";
+			}
+		}*/
+		//print_r($this->fields);
+		$keys = array_keys($this->fields);
+		$count = -1;
+		foreach ($this->fields as $fieldName => $fieldData) {
+			$count++;
+			// build field
+			if (array_key_exists('pk',$fieldData) && $fieldData['pk'] === true) if ($pk === NULL) $pk = $fieldName; else { $pk = FALSE; break; /* multiple pri key - break */ };
+			$type = getSqlTypeFromFieldType($fieldData['type']);
+			$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
+			if ($fieldData['type'] == ftTIMESTAMP) {
+				if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
+				else $default = " DEFAULT 0";
+			} else
+			$default = $fieldData['default'] === NULL ? '' : "DEFAULT '{$fieldData['default']}'";
+			$comments = $fieldData['comments'] === NULL ? '' : "COMMENT '{$fieldData['comments']}'";
+			$collate = $fieldData['collation'] === NULL ? '' : "COLLATE '{$fieldData['collation']}'";
 
-				$row = NULL;
-				for ($i = 0,$rowCount = count($rows); $i < $rowCount; $i++) // find if field is already in the table
-				if (strtolower($rows[$i]['Field']) === strtolower($fieldName)) { $row = $rows[$i]; break; }
+			$len = '';
+			if ($fieldData['type'] == ftTEXT || $fieldData['type'] == ftVARCHAR) $len = "({$fieldData['length']})";
+			if (array_key_exists('unique',$fieldData) && $fieldData['unique'] === TRUE) $unique[] = "`$fieldName`$len";
+			if (array_key_exists('index',$fieldData) && $fieldData['index'] === TRUE) $index[] = "`$fieldName`$len";
 
-				if ($row !== NULL) {
-					// field exists, "modify" it
-					if (strtolower($row['Key']) == 'pri') $currentPK = $row['Field'];
+			$row = NULL;
+			for ($i = 0,$rowCount = count($rows); $i < $rowCount; $i++) // find if field is already in the table
+			if (strtolower($rows[$i]['Field']) === strtolower($fieldName)) { $row = $rows[$i]; break; }
 
-					$alterArray[] = "\nMODIFY `$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']}$default {$fieldData['extra']}$comments$collate";
-				} else {
-					// field doesnt exist, either hasnt been renamed, or hasnt been created yet. -- NO RENAME YET
-					$alterArray[] = "\nADD `$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']}$default {$fieldData['extra']}$comments$collate";
-				}
+			
+			$position = $count==0 ? "FIRST" : 'AFTER `'.$keys[$count-1].'`';
 
-				//				sql_query($qry);
-				// timestamps do not set their value correctly for previously created records if the default value is current_timestamp, we must set it now, to the default value
-				if ((strtolower($fieldData['type']) == 'timestamp') && (strtolower($fieldData['default']) == 'current_timestamp')) {
-					if ($fieldData['null'] == 'null')
-					$otherArray[] = "\nUPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` IS NULL";
-					else
-					$otherArray[] = "\nUPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` = 0";
-					//					sql_query($qry,true);
-				}
+			if ($row !== NULL) {
+				// field exists, "modify" it
+				if (strtolower($row['Key']) == 'pri') $currentPK = $row['Field'];
+
+				$alterArray[] = "\nMODIFY `$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']} $default {$fieldData['extra']} $comments $collate $position";
+			} else {
+				// field doesnt exist, either hasnt been renamed, or hasnt been created yet. -- NO RENAME YET
+				$alterArray[] = "\nADD `$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']} $default {$fieldData['extra']} $comments $collate $position";
 			}
 
-			// drop all indexes
-			$indexResult = sql_query("SHOW INDEX FROM `$this->tablename`");
-			while ($indexRow = GetRow($indexResult)) {
-				if ($indexRow['Key_name'] === 'PRIMARY') continue;
-				array_unshift($alterArray,"\nDROP INDEX `".$indexRow['Key_name']."`");
+			//				sql_query($qry);
+			// timestamps do not set their value correctly for previously created records if the default value is current_timestamp, we must set it now, to the default value
+			if ((strtolower($fieldData['type']) == 'timestamp') && (strtolower($fieldData['default']) == 'current_timestamp')) {
+				if ($fieldData['null'] == 'null')
+				$otherArray[] = "\nUPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` IS NULL";
+				else
+				$otherArray[] = "\nUPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` = 0";
+				//					sql_query($qry,true);
 			}
+		}
 
-			// reset pk
-			//if ($pk === NULL)		ErrorLog('Must specify a PRIMARY KEY ('.get_class($this).')');
-			if ($pk === FALSE)	ErrorLog('Cannot assign multiple PRIMARY KEYS ('.get_class($this).')');
-			elseif ($pk !== NULL && $pk !== $currentPK) {
-				$dropold = $currentPK === NULL ? '' : ' DROP PRIMARY KEY,';
-				$alterArray[] = "$dropold ADD PRIMARY KEY ($pk)";
-			}
+		// drop all indexes
+		$indexResult = sql_query("SHOW INDEX FROM `$this->tablename`");
+		while ($indexRow = GetRow($indexResult)) {
+			if ($indexRow['Key_name'] === 'PRIMARY') continue;
+			array_unshift($alterArray,"\nDROP INDEX `".$indexRow['Key_name']."`");
+		}
 
-			foreach ($index as $val) {
-				$alterArray[] = "\nADD INDEX ($val)";
-			}
+		// reset pk
+		//if ($pk === NULL)		ErrorLog('Must specify a PRIMARY KEY ('.get_class($this).')');
+		if ($pk === FALSE)	ErrorLog('Cannot assign multiple PRIMARY KEYS ('.get_class($this).')');
+		elseif ($pk !== NULL && $pk !== $currentPK) {
+			$dropold = $currentPK === NULL ? '' : ' DROP PRIMARY KEY,';
+			$alterArray[] = "$dropold ADD PRIMARY KEY ($pk)";
+		}
 
-			foreach ($unique as $val) {
-				$alterArray[] = "\nADD UNIQUE ($val)";
-			}
+		foreach ($index as $val) {
+			$alterArray[] = "\nADD INDEX ($val)";
+		}
 
-			sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE=$engine");
-			array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
-			//echo "ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";";
-			//sql_query("ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
-			foreach ($otherArray as $qry) {
-				//echo $qry;
-				sql_query($qry);
-				$err = mysql_error();
-				if (!empty($err)) die($qry."\n".$err);
-			}
-		} else {
-			// create table
-			$pk = NULL;
-			$flds = array();
-			$qry = "CREATE TABLE `$this->tablename` (";
-			foreach ($this->fields as $fieldName => $fieldData) {
-				// check pk
-				if (array_key_exists('pk',$fieldData) && $fieldData['pk'] === true) if ($pk === NULL) $pk = $fieldName; else { $pk = FALSE; break; };
-				// build field
-				$type = getSqlTypeFromFieldType($fieldData['type']);
-				$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
-				if ($fieldData['type'] == ftTIMESTAMP) {
-					if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
-					else $default = " DEFAULT 0";
-				} else
-				$default = $fieldData['default'] === NULL ? '' : " DEFAULT '{$fieldData['default']}'";
-				$comments = $fieldData['comments'] === NULL ? '' : " COMMENT '{$fieldData['comments']}'";
-				$collate = $fieldData['collation'] === NULL ? '' : " COLLATE '{$fieldData['collation']}'";
-				$flds[] = "`$fieldName` $type$length {$fieldData['null']}$default {$fieldData['extra']}$comments$collate";
-			}
-			if ($pk === NULL)		ErrorLog('Must specify a PRIMARY KEY ('.get_class($this).')');
-			elseif ($pk === FALSE)	ErrorLog('Cannot assign multiple PRIMARY KEYS ('.get_class($this).')');
-			else {
-				$flds[] = "PRIMARY KEY (`$pk`)";
-				$qry .= join(",\n",$flds)."\n) CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION.";";
-				//				echo "$qry\n";
-				sql_query($qry,true);
-			}
+		foreach ($unique as $val) {
+			$alterArray[] = "\nADD UNIQUE ($val)";
+		}
+
+		sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
+		array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
+		//echo "ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";";
+		//sql_query("ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
+		foreach ($otherArray as $qry) {
+			//echo $qry;
+			sql_query($qry);
+			$err = mysql_error();
+			if (!empty($err)) die($qry."\n".$err);
+		}
+	}
+	private function CreateTable() {
+		// create table
+		$pk = NULL;
+		$flds = array();
+		$qry = "CREATE TABLE `$this->tablename` (";
+		foreach ($this->fields as $fieldName => $fieldData) {
+			// check pk
+			if (array_key_exists('pk',$fieldData) && $fieldData['pk'] === true) if ($pk === NULL) $pk = $fieldName; else { $pk = FALSE; break; };
+			// build field
+			$type = getSqlTypeFromFieldType($fieldData['type']);
+			$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
+			if ($fieldData['type'] == ftTIMESTAMP) {
+				if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
+				else $default = " DEFAULT 0";
+			} else
+			$default = $fieldData['default'] === NULL ? '' : " DEFAULT '{$fieldData['default']}'";
+			$comments = $fieldData['comments'] === NULL ? '' : " COMMENT '{$fieldData['comments']}'";
+			$collate = $fieldData['collation'] === NULL ? '' : " COLLATE '{$fieldData['collation']}'";
+			$flds[] = "`$fieldName` $type$length {$fieldData['null']}$default {$fieldData['extra']}$comments$collate";
+		}
+		if ($pk === NULL)		ErrorLog('Must specify a PRIMARY KEY ('.get_class($this).')');
+		elseif ($pk === FALSE)	ErrorLog('Cannot assign multiple PRIMARY KEYS ('.get_class($this).')');
+		else {
+			$flds[] = "PRIMARY KEY (`$pk`)";
+			$qry .= join(",\n",$flds)."\n) CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION.";";
+			//				echo "$qry\n";
+			sql_query($qry,true);
 		}
 	}
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
