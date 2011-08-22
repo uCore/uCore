@@ -53,6 +53,7 @@ class uLocale implements ArrayAccess {
 	}
 	private $localisations = array();
 	public function offsetGet($key){
+		$key = strtolower($key);
 		if (!array_key_exists($key,$this->localisations)) {
 			$locale = self::FindLocale($key);
 			if ($locale == $this->locale) return $key;
@@ -63,6 +64,8 @@ class uLocale implements ArrayAccess {
 		return $this->localisations[$key];
 	}
 	public function offsetSet($key,$val) {
+		if ($val === TRUE) $val = $key;
+		$key = strtolower($key);
 		$this->localisations[$key] = $val;
 	}
 	public function offsetExists($key) {
