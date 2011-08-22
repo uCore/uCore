@@ -59,6 +59,7 @@ class uLocale implements ArrayAccess {
 			$L = self::GetLocale($locale);
 			return $L[$key];
 		}
+		if ($this->localisations[$key] === true) return $key;
 		return $this->localisations[$key];
 	}
 	public function offsetSet($key,$val) {
