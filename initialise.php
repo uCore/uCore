@@ -63,9 +63,12 @@ timer_end('Module Initialise');
 if (array_key_exists('__ajax',$_REQUEST)) {
 	//utopia::CancelTemplate();
 	// TODO: ajax parentloading?  EG: login modules
-	$obj = utopia::GetInstance(GetCurrentModule());
-	$lc = $obj->LoadChildren(0); // now part of runmodule and loadparents, call here to check for
-	if ($lc !== TRUE && $lc !== NULL) die();
+	$cm = GetCurrentModule();
+	if ($cm) {
+		$obj = utopia::GetInstance($cm);
+		$lc = $obj->LoadChildren(0); // now part of runmodule and loadparents, call here to check for
+		if ($lc !== TRUE && $lc !== NULL) die();
+	}
 
 
 	$ajaxIdent	= $_REQUEST['__ajax'];
