@@ -823,7 +823,7 @@ class utopia {
 
 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
 			header('HTTP/1.1 304 Not Modified', true, 304);
-			while (ob_end_clean());
+			while (ob_get_level()) ob_end_clean();
 			die();
 		}
 
@@ -832,7 +832,7 @@ class utopia {
 		header("Last-Modified: ".$lm,true);
 		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $lm) {
 			header('HTTP/1.1 304 Not Modified', true, 304);
-			while (ob_end_clean());
+			while (ob_get_level()) ob_end_clean();
 			die();
 		}
 	}
