@@ -230,9 +230,12 @@ class uCustomWidget implements iWidget {
 		$content = $append = $prepend = '';
     	
 		$html = str_get_html($meta['content']);
+		$ele = '';
 		if ($html) {
-			$ele = $html->find('._ri',0)->innertext;
-			if (!$ele) $ele = $html->find('._r',0)->outertext;
+			$ele = $html->find('._ri',0);
+			if ($ele) $ele = $ele->innertext;
+			else $ele = $html->find('._r',0);
+			if ($ele) $ele = $ele->outertext;
 		} else $html = $meta['content'];
 
 		$repeatable = $html;
@@ -275,8 +278,8 @@ class uCustomWidget implements iWidget {
 		while (utopia::MergeVars($ret));
 
 		// add container
-		$w = $meta['width']; if ($w == intval($w)) $w = $w.'px';
-		$h = $meta['height']; if ($h == intval($h)) $h = $h.'px';
+		$w = isset($meta['width'])?$meta['width'] : ''; if ($w == intval($w)) $w = $w.'px';
+		$h = isset($meta['height'])?$meta['height'] : ''; if ($h == intval($h)) $h = $h.'px';
 		$ret = '<div style="width:'.$w.';height:'.$h.';">'.$ret.'</div>';
 		return $ret;
 	}
@@ -339,8 +342,8 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		if ($rec['block_type'] && class_exists($rec['block_type'])) $content = $rec['block_type']::DrawData($rec);
 
 		$meta = json_decode($rec['__metadata'],true);
-		$w = $meta['width']; if ($w == intval($w) && $w > 0) $w = $w.'px';
-		$h = $meta['height']; if ($h == intval($h) && $h > 0) $h = $h.'px';
+		$w = isset($meta['width'])?$meta['width'] : ''; if ($w == intval($w)) $w = $w.'px';
+		$h = isset($meta['height'])?$meta['height'] : ''; if ($h == intval($h)) $h = $h.'px';
 
 		$w = $w ? 'width:'.$w.';' : '';
 		$h = $h ? 'height:'.$h : '';

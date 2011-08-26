@@ -2247,7 +2247,7 @@ FIN;
 	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
 		$originalValue = $value;
-		if ($this->fields[$fieldName]['ismetadata']) {
+		if (isset($this->fields[$fieldName]['ismetadata'])) {
 			$value = json_decode($value);
 			if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
 		}
