@@ -21,7 +21,7 @@ header('Vary: if-none-match, accept-encoding');
 
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
 
-define ('GZIP_ENABLED',substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') || substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate'));
+define ('GZIP_ENABLED',substr_count(isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '', 'gzip') || substr_count($_SERVER['HTTP_ACCEPT_ENCODING'], 'deflate'));
 
 if (GZIP_ENABLED) ob_start("ob_gzhandler");
 else ob_start();
