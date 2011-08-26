@@ -86,7 +86,7 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 			ErrorLog('Username and password do not match.');
 		}
 
-		if (self::IsLoggedIn() && ((GetCurrentModule() == get_class($this)) || (array_key_exists('adminredirect',$_REQUEST) && $_REQUEST['adminredirect'] == 1))) {
+		if (self::IsLoggedIn() && ((GetCurrentModule() == __CLASS__) || (array_key_exists('adminredirect',$_REQUEST) && $_REQUEST['adminredirect'] == 1))) {
 			$obj = utopia::GetInstance('internalmodule_Admin');
 			header('Location: '.$obj->GetURL()); die();
 		}
