@@ -196,6 +196,7 @@ abstract class uTableDef implements iUtopiaModule {
 
 		// checksum
 		$tableExists = self::TableExists($this->tablename);
+		$renamed = false;
 		if (!$tableExists) {
 			$tableExists = (sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename,true)) ? true : false;
 			$renamed = true;
