@@ -18,9 +18,10 @@ function LoadModulesDir($indir, $recursive = TRUE) {
 	if (!is_dir($indir)) return array();
 	if (glob($indir.'.u_noscan')) return array();
 	$files = glob($indir.'*.php');
+	if (!is_array($files)) $files = array();
 	if (!$recursive || glob($indir.'.u_noscandeep')) return $files;
 
-	$dir = glob($indir.'*', GLOB_ONLYDIR | GLOB_MARK);
+	$dir = glob($indir.'*', GLOB_MARK);
 	foreach ($dir as $d) {
 		if ($d == '.' || $d == '..') continue;
 		$files = array_merge($files,LoadModulesDir($d));
