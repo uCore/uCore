@@ -822,16 +822,18 @@ class utopia {
 		header("Content-Disposition: ".$disposition.$fn,true);
 
 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
+			header('HTTP/1.1 304 Not Modified', true, 304);
 			while (ob_end_clean());
-			header('HTTP/1.1 304 Not Modified', true, 304); die();
+			die();
 		}
 
 		if (!$modified) $modified = 0;
 		$lm = gmdate('r',$modified);
 		header("Last-Modified: ".$lm,true);
 		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $lm) {
+			header('HTTP/1.1 304 Not Modified', true, 304);
 			while (ob_end_clean());
-			header('HTTP/1.1 304 Not Modified', true, 304); die();
+			die();
 		}
 	}
 
