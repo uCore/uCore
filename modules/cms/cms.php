@@ -100,7 +100,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$editLink = $editObj->GetURL();
 		$fid = $editObj->FindFilter('cms_id');
 		echo <<<FIN
-		<script>
+		<script type="text/javascript">
 		var hidden=true;
 		function t() {
 			if (hidden) $('.hiddenItem').not('#ui-treesort-placeholder').show();
