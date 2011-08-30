@@ -1,5 +1,8 @@
 <?php
-ob_start();
+$enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
+define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
+if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
+
 function runtimeHeader($startTime) {
        $endTime = microtime(true);
        header('X-Runtime: '.($endTime-$startTime));

@@ -21,12 +21,6 @@ header('Vary: if-none-match, accept-encoding');
 
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
 
-$enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
-define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
-
-if (GZIP_ENABLED) ob_start("ob_gzhandler");
-else ob_start();
-
 ob_start('utopia::output_buffer');
 
 $result = sql_query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
