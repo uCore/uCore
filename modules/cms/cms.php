@@ -173,7 +173,7 @@ FIN;
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			echo $listObj->GetDeleteButton($child['cms_id']);
 			echo '</div>';
-			echo $info.$child['title'].$data;
+			echo $child['title'].$info.$data;
 			echo '</div>';
 			self::DrawChildren($child['children'],$child['cms_id']);
 			echo '</li>';
