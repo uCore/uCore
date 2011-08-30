@@ -84,12 +84,16 @@ class utopia {
 	}
 
 	static $initCSShead = false;
-	static function AddCSSFile($path) {
+	static function AddCSSFile($path,$start=false) {
 		if (!self::$initCSShead) utopia::PrependVar('</head>',"{UTOPIA.cssHead}\n");
 		self::$initCSShead = true;
 
 		if (file_exists($path)) $path = self::GetRelativePath($path);
-		utopia::AppendVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
+
+		if ($start)
+			utopia::PrependVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
+		else
+			utopia::AppendVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
 	}
 	static $initJShead = false;
 	static function AddJSFile($path,$start=false) {
