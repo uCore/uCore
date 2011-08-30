@@ -27,7 +27,7 @@ class uConfig {
 	static $configVars = array();
 	static function AddConfigVar($name,$readable,$default=NULL,$type=CFG_TYPE_TEXT) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
-		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type,'required'=>$required);
+		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type);
 	}
 	static $oConfig = '';
 	static function ReadConfig() {
