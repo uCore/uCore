@@ -1,46 +1,5 @@
 <?php
 
-class uStylesheet extends uBasicModule {
-	public function GetUUID() { return 'styles.css'; }
-	private static $includeFiles = array();
-	public static function IncludeFile($path) {
-		// if running ALERT: CANNOT BE CALLED AT RUN TIME
-		if (!file_exists($path)) {
-			if (!file_exists(PATH_ABS_ROOT.$path)) return;
-			$path = PATH_ABS_ROOT.$path;
-		}
-		self::$includeFiles[] = $path;
-	}
-	public function SetupParents() {
-		module_Offline::IgnoreClass(__CLASS__);
-		$this->SetRewrite(true);
-		utopia::AddCSSFile($this->GetURL(),true);
-
-		modOpts::AddOption('uJavascript','jQueryUI-Theme','jQuery UI Theme','ui-lightness');
-		$jquitheme = modOpts::GetOption('uJavascript','jQueryUI-Theme');
-		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',true);
-
-		uStylesheet::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
-		uStylesheet::IncludeFile(PATH_REL_CORE.'default.css');
-	}
-	public function RunModule() {
-		$uStr = ''; $out = '';
-		self::$includeFiles = array_unique(self::$includeFiles);
-		foreach (self::$includeFiles as $filename) {
-			//does it exist?
-			clearstatcache(true,$filename);
-			$uStr .= filemtime($filename).'-'.filesize($filename);
-			$out .= file_get_contents($filename);
-		}
-
-		$etag = sha1($uStr.'-'.count(self::$includeFiles));
-		utopia::Cache_Check($etag,'text/css');
-
-		utopia::CancelTemplate();
-		utopia::Cache_Output($out,$etag,'text/css','styles.css');
-	}
-}
-
 class uJavascript extends uBasicModule {
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
@@ -83,6 +42,14 @@ class uJavascript extends uBasicModule {
 
 //		modOpts::AddOption('uJavascript','jQueryUI','jQuery UI Version',1);
 //		$jqui = modOpts::GetOption('uJavascript','jQueryUI');
+
+		utopia::AddCSSFile($this->GetURL(),true);
+		utopia::AddCSSFile(PATH_REL_CORE.'default.css');
+
+		modOpts::AddOption('uJavascript','jQueryUI-Theme','jQuery UI Theme','ui-lightness');
+		$jquitheme = modOpts::GetOption('uJavascript','jQueryUI-Theme');
+		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',true);
+		utopia::AddCSSFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
 
 	public function RunModule() {
