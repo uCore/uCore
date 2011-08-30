@@ -234,8 +234,11 @@ class uCustomWidget implements iWidget {
 		if ($html) {
 			$ele = $html->find('._ri',0);
 			if ($ele) $ele = $ele->innertext;
-			else $ele = $html->find('._r',0);
-			if ($ele) $ele = $ele->outertext;
+			else {
+				$ele = $html->find('._r',0);
+				if ($ele) $ele = $ele->outertext;
+				else $ele = '';
+			}
 		} else $html = $meta['content'];
 
 		$repeatable = $html;
