@@ -14,12 +14,11 @@ class uStylesheet extends uBasicModule {
 	public function SetupParents() {
 		module_Offline::IgnoreClass(__CLASS__);
 		$this->SetRewrite(true);
+		utopia::AddCSSFile($this->GetURL(),true);
 
 		modOpts::AddOption('uJavascript','jQueryUI-Theme','jQuery UI Theme','ui-lightness');
 		$jquitheme = modOpts::GetOption('uJavascript','jQueryUI-Theme');
-		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css');
-
-		utopia::AddCSSFile($this->GetURL());
+		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',true);
 
 		uStylesheet::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
@@ -63,10 +62,10 @@ class uJavascript extends uBasicModule {
 	public function SetupParents() {
 		module_Offline::IgnoreClass(__CLASS__);
 		$this->SetRewrite(true);
-		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js');
-		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js');
+		utopia::AddJSFile($this->GetURL(),true);
 
-		utopia::AddJSFile($this->GetURL());
+		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js',true);
+		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',true);
 
 		uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
 		uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
