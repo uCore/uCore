@@ -13,6 +13,7 @@ class internalmodule_Reconfigure extends uBasicModule implements iAdminModule {
 	public function GetSortOrder() { return -9998; }
 
 	public function RunModule() {
+		while (ob_get_level()>2) ob_end_flush();
 		uConfig::ShowConfig();
 	}
 }
