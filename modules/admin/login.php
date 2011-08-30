@@ -70,7 +70,7 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 		self::TryLogin();
 	}
 
-	public static function TryLogin() {
+	public static function TryLogin($adminOnly=false) {
 		// login not attempted.
 		if (!array_key_exists('__admin_login_u',$_REQUEST)) return;
 
@@ -80,7 +80,7 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 		$obj = utopia::GetInstance(__CLASS__);
 		if ( strcasecmp($un,constant('admin_user')) == 0 && $pw===constant('admin_pass') ) {
 			$_SESSION['admin_auth'] = ADMIN_USER;
-		} elseif ($obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)))) {
+		} elseif (!$adminOnly && $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)))) {
 			$_SESSION['admin_auth'] = $un;
 		} else {
 			ErrorLog('Username and password do not match.');

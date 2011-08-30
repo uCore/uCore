@@ -121,7 +121,7 @@ class uConfig {
 		// does login exist?
 		if (defined('admin_user') && defined('admin_pass')) {
 			// not authed?
-			internalmodule_AdminLogin::TryLogin();
+			internalmodule_AdminLogin::TryLogin(true);
 			if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER) && !isset($_SESSION['config_edit_authed'])) {
 				$obj = utopia::GetInstance('internalmodule_AdminLogin');
 				$obj->_RunModule();
