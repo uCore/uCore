@@ -4,6 +4,10 @@ class uJavascript extends uBasicModule {
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
+		if (!file_exists($path)) {
+			if (!file_exists(PATH_ABS_ROOT.$path)) return;
+			$path = PATH_ABS_ROOT.$path;
+		}
 		self::$includeFiles[] = $path;
 	}
 	private static $includeText = '';
@@ -48,6 +52,7 @@ class uJavascript extends uBasicModule {
 
 	public function RunModule() {
 		$uStr = '';
+		self::$includeFiles = array_unique(self::$includeFiles);
 		foreach (self::$includeFiles as $filename) {
 			//does it exist?
 			if (!file_exists($filename)) continue;
