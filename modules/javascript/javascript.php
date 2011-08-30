@@ -21,6 +21,7 @@ class uStylesheet extends uBasicModule {
 		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',true);
 
 		uStylesheet::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
+		uStylesheet::IncludeFile(PATH_REL_CORE.'default.css');
 	}
 	public function RunModule() {
 		$uStr = ''; $out = '';

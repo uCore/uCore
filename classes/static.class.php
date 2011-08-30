@@ -616,7 +616,6 @@ class utopia {
 
 			$template = get_include_contents($templatePath);
 
-			self::AddCSSFile(PATH_REL_CORE.'default.css');
 			if (file_exists($templateDir.'styles.css'))
 				self::AddCSSFile($templateDir.'styles.css');
 		} else {
