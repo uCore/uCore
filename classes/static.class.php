@@ -174,6 +174,7 @@ class utopia {
 
 	static function Finish() {
 //		self::Tab_FinaliseDrawing();
+		while (ob_get_level()>2) ob_end_flush();
 		include(PATH_ABS_CORE.'finalise.php');
 
 //		$c = ob_get_contents();

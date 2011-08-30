@@ -21,18 +21,22 @@ uConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.c
 uConfig::AddConfigVar('admin_user','Admin Username');
 uConfig::AddConfigVar('admin_pass','Admin Password',NULL,CFG_TYPE_PASSWORD);
 
+uConfig::ReadConfig();
+
 class uConfig {
 	static $configVars = array();
 	static function AddConfigVar($name,$readable,$default=NULL,$type=CFG_TYPE_TEXT) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
-		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type);
+		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type,'required'=>$required);
 	}
+	static $oConfig = '';
 	static function ReadConfig() {
 		$arr = array();
+		// read config
 		if (file_exists(PATH_ABS_CONFIG)) {
-			// read config
 			$conf = file_get_contents(PATH_ABS_CONFIG);
 			$lines = explode(PHP_EOL,$conf);
+			if (!$lines) return $arr;
 			array_shift($lines);
 			foreach ($lines as $line) {
 				if (!$line) continue;
@@ -40,24 +44,26 @@ class uConfig {
 				$arr[trim($ident)] = trim($val);
 			}
 		}
-		return $arr;
+		self::$oConfig = $arr;
 	}
-	static function SaveConfig($arr) {
-		//    if (!array_key_exists('config_submit',$_REQUEST)) return;
-		// we have config info
-		//   if (file_exists($config_path)) return;
-		// no config exists, save now
+	static function SaveConfig() {
 		$text = "<?php die('Direct access to this file is prohibited.'); ?>".PHP_EOL;
-		foreach ($arr as $key => $val) {
-			if (!$key) continue;
-			//        if (strtolower($key) == 'config_submit' || strtolower($key) == 'phpsessid') continue;
+		foreach (self::$configVars as $key => $info) {
+			if (!defined($key)) continue;
+			$val = constant($key);
 			$text .= "$key=$val".PHP_EOL;
 		}
 		file_put_contents(PATH_ABS_CONFIG,trim($text,PHP_EOL));
+		unset($_SESSION['config_edit_authed']);
 	}
 	static $isDefined = FALSE;
 	static function DefineConfig($arr) {
-		foreach ($arr as $key => $val) define($key,$val);
+		if (!$arr) $arr = self::$oConfig;
+		foreach (self::$configVars as $key => $info) {
+			if (!isset($arr[$key])) continue;
+			define($key,$arr[$key]);
+		}
+//		foreach ($arr as $key => $val) define($key,$val);
 
 		//--  Charset
 		define('CHARSET_ENCODING'        , 'utf-8');
@@ -68,53 +74,61 @@ class uConfig {
 
 		self::$isDefined = TRUE;
 	}
-	static function ValidateConfig(&$arr) {
-		$oConfig = uConfig::ReadConfig();
+	static function ValidateConfig() {
+		$showConfig = false;
+		foreach (self::$configVars as $key => &$info) {
+			if (!defined($key)) {
+				$showConfig = true;
+//				continue;// self::ShowConfig();
+			}
+			$val = defined($key) ? constant($key) : null;
+			if ($info['type']==CFG_TYPE_PASSWORD && empty($val)) {
+				$showConfig = true;
+				$info['notice'] = "Must not be empty.";
+			}
+			
+			if ($info['type']==CFG_TYPE_PATH && !is_dir(PATH_ABS_ROOT.$val)) {
+				$showConfig = true;
+				$info['notice'] = "Must be a valid directory.";
+			}
+		}
+
+		if ($showConfig) self::ShowConfig();
+
+		$srv = SQL_SERVER.(SQL_PORT !== '' ? ':'.SQL_PORT : '');
+
+		if (mysql_connect($srv,SQL_USERNAME,SQL_PASSWORD) === FALSE)
+			self::$configVars['SQL_SERVER']['notice'] = mysql_error();
+		elseif (mysql_select_db(SQL_DBNAME) === FALSE)
+			self::$configVars['SQL_SERVER']['SQL_DBNAME'] = "Unable to set the default schema. ".mysql_error();
+
 		$changed = false;
 		foreach (self::$configVars as $key => $info) {
-			if ($info['type']==CFG_TYPE_PASSWORD && (!isset($arr[$key]) || empty($arr[$key])) && !empty($oConfig[$key])) {
-				$arr[$key] = $oConfig[$key];
-			}
+			if (isset($info['notice'])) self::ShowConfig();
+			if (self::$oConfig[$key] !== constant($key)) $changed = true;
 		}
-
-		$validFields = array_keys(self::$configVars);
-		foreach ($arr as $key => $val) {
-			if (($pos = array_search($key,$validFields)) === FALSE) {
-				$changed = true;
-				unset($arr[$key]);
-				continue;
-			}
-			unset($validFields[$pos]);
-
-			if (self::$configVars[$key]['type'] == CFG_TYPE_PATH) {
-				if (!is_dir(PATH_ABS_ROOT.$val))
-					$failure .= self::$configVars[$key]['name']." must be a valid directory.\n";
-				else
-					$arr[$key] = rtrim($arr[$key],'/').'/';
-			}
-		}
-		$failure = '';
-		if (count($validFields) > 0) $failure .= "Some fields are missing:\n".join("\n",$validFields)."\n\n";
-
-    if (array_key_exists('SQL_SERVER',$arr) && $arr['SQL_SERVER'] && array_key_exists('SQL_USERNAME',$arr) && $arr['SQL_USERNAME'] && array_key_exists('SQL_PASSWORD',$arr) && $arr['SQL_PASSWORD'] && array_key_exists('SQL_DBNAME',$arr) && $arr['SQL_DBNAME']) {
-  		$srv = $arr['SQL_SERVER'].(isset($arr['SQL_PORT']) && $arr['SQL_PORT'] !== '' ? ':'.$arr['SQL_PORT'] : '');
-
-  		if (mysql_connect($srv,$arr['SQL_USERNAME'],$arr['SQL_PASSWORD']) === FALSE)
-  			$failure .= "Unable to connect to server. ".mysql_error()."\n";
-  		elseif (mysql_select_db($arr['SQL_DBNAME']) === FALSE)
-  			$failure .= "Unable to set the default schema. ".mysql_error()."\n";
-    } else {
-      $failure .= "Missing SQL server information.\n";
-    }
-		if ($failure == '') {
-			if (!$changed) return true;
-			return 2;
-		}
-		echo nl2br($failure);
-		return false;
+		
+		if ($changed) {
+			self::SaveConfig();
+		}		
+		
+		return true;
 	}
-	static function ShowConfig($configArr = NULL) {
-		if (!$configArr) $configArr = uConfig::ReadConfig();
+	static function ShowConfig() {
+		utopia::UseTemplate(TEMPLATE_ADMIN);
+		echo '<h1>uCore Configuration</h1>';
+
+		// does login exist?
+		if (defined('admin_user') && defined('admin_pass')) {
+			// not authed?
+			internalmodule_AdminLogin::TryLogin();
+			if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER) && !isset($_SESSION['config_edit_authed'])) {
+				$obj = utopia::GetInstance('internalmodule_AdminLogin');
+				$obj->_RunModule();
+				utopia::Finish();
+			}
+		}
+	
 		echo <<<FIN
 <form method="post">
 <table>
@@ -124,8 +138,12 @@ class uConfig {
 	</colgroup>
 FIN;
 		foreach (self::$configVars as $key => $info) {
-			$val = isset($configArr[$key]) && $configArr[$key] ? $configArr[$key] : $info['default'];
-			echo "<tr><td>{$info['name']}:</td>";
+			$val = defined($key) ? constant($key) : $info['default'];
+			if (isset($info['notice'])) {
+				echo '<tr><td style="color:red">'.$info['name'].':<br><span style="font-size:0.8em">'.$info['notice'].'</span></td>';
+			} else {
+				echo '<tr><td>'.$info['name'].':</td>';
+			}
 			if (is_array($info['type'])) {
 				$assoc = is_assoc($info['type']);
 				echo '<td><select name="'.$key.'">';
@@ -145,6 +163,7 @@ FIN;
 			echo '</tr>';
 		}
 		echo '</table><input name="__config_submit" type="submit" value="Save"></form>';
+		utopia::Finish();
 	}
 }
 ?>

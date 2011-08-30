@@ -5,23 +5,17 @@ timer_start('Load Files');
 LoadFiles();
 timer_end('Load Files');
 
-$configArr = (isset($_REQUEST['__config_submit'])) ? $_REQUEST : uConfig::ReadConfig();
-$valid = uConfig::ValidateConfig($configArr);
-if ($valid) {
-        if ($valid === 2 || isset($_REQUEST['__config_submit'])) uConfig::SaveConfig($configArr);
-        uConfig::DefineConfig($configArr);
-} else {
-        uConfig::ShowConfig($configArr);
-        die();
-}
+ob_start('utopia::output_buffer');
+
+$configArr = (isset($_REQUEST['__config_submit'])) ? $_REQUEST : null;
+uConfig::DefineConfig($configArr);
+uConfig::ValidateConfig();
 
 ini_set('default_charset',CHARSET_ENCODING);
 header('Content-type: text/html; charset='.CHARSET_ENCODING);
 header('Vary: if-none-match, accept-encoding');
 
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
-
-ob_start('utopia::output_buffer');
 
 $result = sql_query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
 if (!mysql_num_rows($result))
