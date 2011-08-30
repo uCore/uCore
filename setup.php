@@ -61,7 +61,11 @@ class uConfig {
 		if (!$arr) $arr = self::$oConfig;
 		foreach (self::$configVars as $key => $info) {
 			if (!isset($arr[$key])) continue;
-			define($key,$arr[$key]);
+			$val = $arr[$key];
+			if (!$val && $info['type'] == CFG_TYPE_PASSWORD && isset(self::$oConfig[$key])) {
+				$val = self::$oConfig[$key];
+			}
+			define($key,$val);
 		}
 //		foreach ($arr as $key => $val) define($key,$val);
 
