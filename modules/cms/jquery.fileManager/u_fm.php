@@ -9,6 +9,9 @@ class fileManager extends uBasicModule implements iAdminModule {
 		$this->AddParentCallback('uCMS_List',array($this,'RunModule'));
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
+
+		uJavascript::IncludeFile(jqFileManager::GetPathJS());
+		uStylesheet::IncludeFile(jqFileManager::GetPathCSS());
 	}
 	function show_fileman($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
 		list($path) = self::Init();
@@ -35,8 +38,6 @@ FIN
 		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');
 	}
 	static function Init() {
-		utopia::AddJSFile(jqFileManager::GetPathJS());
-		utopia::AddCSSFile(jqFileManager::GetPathCSS());
 		uJavascript::AddText(<<<FIN
 	function dclick(event) {
 		var item = $(this).data('item');
