@@ -2474,65 +2474,25 @@ FIN;
 		}
 		$originalValue = $newValue;
 
-		//$isNumericKeys = TRUE;
-		//if (is_array($values)) foreach (array_values($values) as $val) {
-//			if (!is_numeric($val)) { $isNumericKeys = FALSE; break; }
-		//}
-		// if its a pragma, get root field.  else get normal field and pk
 		$field = $this->fields[$fieldAlias]['field'];
 		$table		= $tbl['table'];
 		$tablePk	= $tbl['pk'];
 
-		//if ((preg_match_all('/{[^}]+}/',$field,$matches) > 0) || (is_array($values) && !is_assoc($values))) {
-			// parent table
-			//$tbl = $this->sqlTableSetupFlat[$tableAlias];
-
-			if (array_key_exists('parent',$tbl)) {
-				foreach ($tbl['joins'] as $fromField=>$toField)
-				if ($toField == $tbl['pk']) {
-					$field = $fromField;
-					break;
-				}
-				$tbl = $this->sqlTableSetupFlat[$tbl['parent']];
-				$table		= $tbl['table'];
-				$tablePk	= $tbl['pk'];
+		if (array_key_exists('parent',$tbl)) {
+			foreach ($tbl['joins'] as $fromField=>$toField)
+			if ($toField == $tbl['pk']) {
+				$field = $fromField;
+				break;
 			}
-			//			print_r($tbl);
-			//			if ($field == NULL) ErrorLog('somethings wrong');
-			// loop thru joins, find PK as the toJoin fromJoin is then field
-		//} else {
-			//		print_r($vtable);
-			//		echo "// $fieldAlias direct table \n";
-			//$field		= $this->fields[$fieldAlias]['field'];
-		//}
-
-/*		if (is_array($values)) {
-			foreach ($values as $key => $val) {
-				if ($val == $originalValue) {$originalValue = $key; break;}
-			}
+			$tbl = $this->sqlTableSetupFlat[$tbl['parent']];
+			$table		= $tbl['table'];
+			$tablePk	= $tbl['pk'];
 		}
-*/
-		// it may be necessary to go right back to the tier 1 parent for nested tables > 2 tiers
-		//		if (array_key_exists('joins',$vtable)) foreach ($vtable['joins'] as $fromField => $toField) {
-		// loop through each join, if the toField is the PK of vtable[tModule] then field = fromField
-		//		}
-		//		$field		= array_key_exists('fromField',$vtable) && !empty($vtable['fromField']) ? $vtable['fromField'] : $this->fields[$fieldAlias]['field'];
-		//		$field		= $vtable['fromField'] ? $vtable['fromField'] : $this->fields[$fieldAlias]['field'];
 
 		if ((preg_match('/{[^}]+}/',$field) > 0) || IsSelectStatement($field) || is_array($field)) {
 			$this->ResetField($fieldAlias,$pkVal);
 			return FALSE; // this field is a pragma or select statement
 		}
-
-		// check old value
-		/*-- dont bother - no need to send 2 queries when we only need to send one.
-		 if ($pkVal !== NULL) {
-		 //		echo "SELECT $field FROM $table WHERE `$tablePk` = '$pkVal'";
-			$row = GetRow(sql_query("SELECT $field FROM $table WHERE `$tablePk` = '$pkVal'"));
-			//		echo "{$row[$field]} == $newValue";
-			if ($row === FALSE || $row[$field] == $newValue)
-			return FALSE; // statement has failed or field doesnt need updating
-			} */
 
 		// preformat the value
 		if (is_array($newValue))
