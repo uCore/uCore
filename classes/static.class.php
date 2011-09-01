@@ -611,7 +611,7 @@ class utopia {
 
 			$templateDir = self::GetTemplateDir();
 
-			if (utopia::IsMobile()) {
+			if (utopia::IsMobile() && file_exists($templateDir.'mobile.php')) {
 				$templatePath = $templateDir.'mobile.php';
 				if (file_exists($templateDir.'mobile.css')) self::AddCSSFile($templateDir.'mobile.css');
 			} else {
