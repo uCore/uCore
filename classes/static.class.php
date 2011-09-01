@@ -173,6 +173,7 @@ class utopia {
 	}
 
 	static function Finish() {
+		while (ob_get_level() > 2) ob_end_flush();
 		include(PATH_ABS_CORE.'finalise.php');
 	}
 
