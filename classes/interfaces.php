@@ -17,4 +17,3 @@ interface iAdminModule {}
  //	function GetCellData();
  }
  */
-?>

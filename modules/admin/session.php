@@ -124,5 +124,3 @@ function ses_gc($maxlifetime = NULL) {
 		return TRUE;
 	}
 }
-
-?>

@@ -67,4 +67,3 @@ class modOpts extends uListDataModule implements iAdminModule {
 		return parent::GetCellData($fieldName, $row, $url, $inputTypeOverride, $valuesOverride);
 	}
 }
-?>

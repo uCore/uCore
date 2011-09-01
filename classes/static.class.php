@@ -914,5 +914,3 @@ class utopia {
 		return strftime(FORMAT_DATETIME,$t);
 	}
 }
-
-?>

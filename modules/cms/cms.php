@@ -527,4 +527,3 @@ class uCMS_View extends uSingleDataModule {
 		return $template;
 	}
 }
-?>

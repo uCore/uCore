@@ -36,5 +36,3 @@ class uBreadcrumb {
 		return '<div class="breadcrumb">'.implode(' &gt; ',array_reverse($build)).'</div>';
 	}
 }
-
-?>

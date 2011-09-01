@@ -31,5 +31,3 @@ class module_Offline extends uBasicModule {
 		echo '<h1>Site is offline for maintenance.</h1>';
 	}
 }
-
-?>

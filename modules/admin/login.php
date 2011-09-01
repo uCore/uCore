@@ -156,4 +156,3 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 		echo '</table></form><script type="text/javascript">$(document).ready(function (){$(\'#lu\').focus()})</script>';
 	}
 }
-?>

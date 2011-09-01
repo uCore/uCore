@@ -75,5 +75,3 @@ class uLocale implements ArrayAccess {
 		unset($this->localisations[$key]);
 	}
 }
-
-?>

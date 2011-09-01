@@ -10,4 +10,3 @@ class fancybox {
 		if ($easing) utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/jquery.easing-1.3.pack.js'));
 	}
 }
-?>

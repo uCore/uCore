@@ -232,4 +232,3 @@ class jqFileManager {
 		die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
 	}
 }
-?>

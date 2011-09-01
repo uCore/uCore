@@ -170,4 +170,3 @@ FIN;
 		if (isset($_GET['optimise'])) $this->optimizeTables();
 	}
 }
-?>

@@ -63,4 +63,3 @@ class modLinks extends uBasicModule {
 		utopia::PageNotFound();
 	}
 }
-?>

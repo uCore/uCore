@@ -44,5 +44,3 @@ foreach (glob(PATH_ABS_CORE.'functs/*.php') as $fn) include($fn);
 
 require_once(PATH_ABS_CORE.'setup.php');
 require_once(PATH_ABS_CORE.'initialise.php'); // init
-
-?>

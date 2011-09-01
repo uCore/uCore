@@ -84,5 +84,3 @@ if (array_key_exists('__ajax',$_REQUEST)) {
 }
 
 if (!array_key_exists('_noTemplate',$_GET)) utopia::UseTemplate();
-
-?>

@@ -55,5 +55,3 @@ class uUploads extends uBasicModule {
 		utopia::Cache_Output($output,$etag,$cType,$fileName);
 	}
 }
-
-?>

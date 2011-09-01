@@ -24,5 +24,3 @@ class jQuery_lightswitch extends uBasicModule{
 		return utopia::DrawInput($fieldName,itCHECKBOX,$defaultValue,$possibleValues,$attributes,$noSubmit);
 	}
 }
-
-?>

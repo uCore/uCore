@@ -3286,5 +3286,3 @@ abstract class uSingleDataModule extends uDataModule {
 			utopia::Tab_InitDraw($tabGroupName);
 	}
 }
-
-?>

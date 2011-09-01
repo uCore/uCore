@@ -279,5 +279,3 @@ class internalmodule_StaticAjax extends uBasicModule {
 		echo json_encode($found);
 	}
 }
-
-?>

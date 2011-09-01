@@ -743,4 +743,3 @@ class ParseMaster {
 		return preg_replace($this->ESCAPE, '', $string);
 	}
 }
-?>

@@ -367,5 +367,3 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		return isset(self::$staticWidgets[$id]);
 	}
 }
-
-?>

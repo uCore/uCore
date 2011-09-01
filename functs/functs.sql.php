@@ -242,4 +242,3 @@ function GetPossibleValues($table,$pkName,$field,$where = '') {
 	}
 	return $lv;
 }
-?>

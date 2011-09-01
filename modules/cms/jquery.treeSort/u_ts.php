@@ -6,4 +6,3 @@ class treeSort extends uBasicModule {
 	}
 	public function RunModule() {}
 }
-?>

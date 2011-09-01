@@ -119,4 +119,3 @@ class uDataOnly extends uBasicModule {
 		echo mb_convert_encoding($fullOut,'UTF-16','UTF-8');
 	}
 }
-?>

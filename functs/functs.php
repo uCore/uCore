@@ -602,4 +602,3 @@ function rcopy($source,$dest,$mode=0755) {
 function is_assoc($array) {
     return (is_array($array) && count(array_diff_key($array, array_keys(array_keys($array)))) !== 0);
 }
-?>

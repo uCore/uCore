@@ -173,4 +173,3 @@ function &ref_call_user_func_array($callable, $args)
 
 	return $result;
 }
-?>

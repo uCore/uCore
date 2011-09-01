@@ -53,4 +53,3 @@ function DebugMail($subject,$message) {
   $message = "$url$ref$ip$ua\n$message";
   mail(ERROR_EMAIL,$subject,$message);
 }
-?>

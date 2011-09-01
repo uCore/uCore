@@ -97,5 +97,3 @@ class uJavascript extends uBasicModule {
 		return $body;
 	}
 }
-
-?>
