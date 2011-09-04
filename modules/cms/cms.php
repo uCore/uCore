@@ -44,7 +44,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('title','title','cms','Page Title');
 		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('hide','hide','cms','Parent');
-		$this->AddField('published','(IF(STRCMP({content},{content_published}),1,0))','cms');
+		$this->AddField('published','(IF(STRCMP({content},{content_published})=0,1,0))','cms');
 	}
 	public function SetupParents() {
 		$templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
