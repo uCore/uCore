@@ -278,8 +278,6 @@ abstract class uTableDef implements iUtopiaModule {
 
 			if ($row !== NULL) {
 				// field exists, "modify" it
-				if (strtolower($row['Key']) == 'pri') $currentPK = $row['Field'];
-
 				$alterArray[] = "\nMODIFY `$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']} $default {$fieldData['extra']} $comments $collate $position";
 			} else {
 				// field doesnt exist, either hasnt been renamed, or hasnt been created yet. -- NO RENAME YET
@@ -295,6 +293,12 @@ abstract class uTableDef implements iUtopiaModule {
 				$otherArray[] = "\nUPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` = 0";
 				//					sql_query($qry,true);
 			}
+		}
+
+		foreach ($rows as $row) {
+			if (strpos($row['Extra'],'auto_increment') !== FALSE && (!isset($this->fields[$row['Field']]) || strpos($this->fields[$row['Field']]['extra'],'auto_increment') === FALSE))
+				array_unshift($alterArray, 'MODIFY `'.$row['Field'].'` '.$row['Type']);
+			if ($row['Key'] === 'PRI') $currentPK = $row['Field'];
 		}
 
 		// drop all indexes
