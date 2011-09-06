@@ -80,20 +80,19 @@ class uConfig {
 	}
 	static function ValidateConfig() {
 		$showConfig = false;
-		foreach (self::$configVars as $key => &$info) {
+		foreach (self::$configVars as $key => $info) {
 			if (!defined($key)) {
 				$showConfig = true;
-//				continue;// self::ShowConfig();
 			}
 			$val = defined($key) ? constant($key) : null;
 			if ($info['type']==CFG_TYPE_PASSWORD && empty($val)) {
 				$showConfig = true;
-				$info['notice'] = "Must not be empty.";
+				self::$configVars[$key]['notice'] = "Must not be empty.";
 			}
 			
 			if ($info['type']==CFG_TYPE_PATH && !is_dir(PATH_ABS_ROOT.$val)) {
 				$showConfig = true;
-				$info['notice'] = "Must be a valid directory.";
+				self::$configVars[$key]['notice'] = "Must be a valid directory.";
 			}
 		}
 
