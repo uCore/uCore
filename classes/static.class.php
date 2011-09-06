@@ -273,8 +273,7 @@ class utopia {
 				if (is_array($possibleValues)) foreach ($possibleValues as $name => $val) {
 					if ($val === '') continue;
 					$selected = '';
-					//if (is_numeric($val) && !is_numeric($defaultValue)) $defaultValue = (int)$defaultValue;
-					if ($val === $defaultValue || $name === $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) {
+					if ($val == $defaultValue || $name == $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) {
 						$defaultExists = true;
 						$selected = ' selected="selected"';
 					}
