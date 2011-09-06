@@ -11,7 +11,11 @@ define('itSUBMIT'	,'submit');
 define('itRESET'	,'reset');
 define('itCHECKBOX'	,'checkbox');
 define('itOPTION'	,'option');
+
+define('itMD5'		,'password');
 define('itPASSWORD'	,'password');
+define('itPLAINPASSWORD','plain_password');
+
 define('itTEXT'		,'text');
 define('itTEXTAREA'	,'textarea');
 define('itSUGGEST'	,'suggest');
@@ -875,6 +879,7 @@ FIN;
 		$prefix = NULL;
 
 		switch ($inputType) {
+			case itMD5:
 			case itPASSWORD:	$prefix = 'md5';
 			case itTEXT:
 			case itSUGGEST:

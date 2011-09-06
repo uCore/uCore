@@ -241,7 +241,9 @@ class utopia {
 				if (!$defaultExists && ($defaultValue != ''))
 				$out .= "<input type=\"radio\" $attr value=\"$val\" checked=\"true\">$defaultValue";
 				break;
+			case itMD5:
 			case itPASSWORD:
+			case itPLAINPASSWORD:
 				//				settype($possibleValues,'integer');
 				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " maxlength=\"$possibleValues\" size=\"".floor($possibleValues*0.75)."\"" : "";
 				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " size=\"".floor($possibleValues*0.75)."\"" : "";
