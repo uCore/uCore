@@ -9,8 +9,8 @@ class tabledef_ModOpts extends uTableDef {
 		// SetPrimaryKey($name);
 
 //		$this->AddField('id',ftNUMBER);
-//		$this->AddField('module','varchar',50);
 		$this->AddField('ident','varchar',50);
+		$this->AddField('module','varchar',50);
 		$this->AddField('name','varchar',100);
 		$this->AddField('value','varchar',200);
 		$this->SetPrimaryKey('ident');
@@ -23,8 +23,11 @@ class modOpts extends uListDataModule implements iAdminModule {
 	public function GetSortOrder() { return -9999.5; }
 	public function SetupFields() {
 		$this->CreateTable('opts');
+		$this->AddField('module','module','opts');
 		$this->AddField('name','name','opts','Name');
 		$this->AddField('value','value','opts','Value',itTEXT);
+
+		$this->AddGrouping('ident');
 	}
 	public static $types = array();
 	public function SetupParents() {
@@ -41,7 +44,7 @@ class modOpts extends uListDataModule implements iAdminModule {
 		$rec = self::GetOption($module,$ident);
 		if ($rec === NULL) {
 			$obj = utopia::GetInstance('modOpts');
-			$obj->UpdateFields(array('ident'=>$module.'::'.$ident,'name'=>$name,'value'=>$init));
+			$obj->UpdateFields(array('ident'=>$module.'::'.$ident,'module'=>$module,'name'=>$name,'value'=>$init));
 		}
 		self::$types[$module.'::'.$ident] = array($fieldType,$values);
 	}
@@ -49,6 +52,10 @@ class modOpts extends uListDataModule implements iAdminModule {
 	public static function RefreshCache() {
 		$obj = utopia::GetInstance('modOpts');
 		foreach ($obj->GetRows() as $row) {
+			if (!$row['module']) {
+				$module = substr($row['ident'],0,strpos($row['ident'],'::'));
+				$obj->UpdateField('module',$module,$row['ident']);
+			}
 			self::$optCache[$row['ident']] = $row['value'];
 		}
 	}
