@@ -2590,7 +2590,7 @@ FIN;
 				$this->ResetField($fieldAlias,$pkVal);
 				return FALSE;
 			}
-			if ($fieldAlias == $this->GetPrimaryKey()) {
+			if ($field == $this->GetPrimaryKey($fieldAlias)) {
 				$ret = $this->GetURL($pfVal);
 				$pkVal = $pfVal;
 			}
