@@ -1182,27 +1182,28 @@ FIN;
 	public function FindValues($aliasName,$values,$stringify = FALSE) {
 		$arr = NULL;
 		$sort = true;
+		// if string field, strigify
+		if (strpos($this->GetFieldType($aliasName), 'text') !== FALSE || strpos($this->GetFieldType($aliasName), 'char') !== FALSE) $stringify = true;
+		
 		if (is_array($values)) {
 			if (!is_assoc($values)) { // assume we want the key = val
 				$values = array_flip($values);
-				$stringify = true;
 				$sort = false;
-				//				$newVals = array();
-				//				foreach ($values as $key => $val) {
-				//					$newVals[$val] = $val;
-				//unset($values[$key]);
-				//				}
-				//				$values = $newVals;
 			}
 			$arr = $values;
 		} elseif (IsSelectStatement($values)) {
 			$arr = array();
 			$result = sql_query($values);
 			while ($result != false && (($row = mysql_fetch_row($result)) !== FALSE)) {
-				if (is_string($row[0])) $arr[] = $row[0];
+				$r = array();
+				if (isset($row[1])) {
+					// key value pair
+					$r[$row[1]] = $row[0];
+				} else {
+					$r[$row[0]] = $row[0];
+				}
+				$arr = $r;
 			}
-			$arr = array_flip($arr);
-			$stringify = true;
 		} elseif (($values===true || is_string($values)) && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$obj = utopia::GetInstance($tbl['tModule']);
@@ -1212,7 +1213,7 @@ FIN;
 			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) $arr = array_combine(array_keys($arr),array_keys($arr));
 		}
 
-		if (is_array($arr) && $stringify)
+		if ($stringify && is_array($arr) && !is_assoc($arr))
 		foreach ($arr as $key=>$val) {
 			$arr[$key]=$key;
 		}
