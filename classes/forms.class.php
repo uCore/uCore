@@ -3200,7 +3200,7 @@ abstract class uSingleDataModule extends uDataModule {
 			$dataset = $this->GetDataset(TRUE);
 			$row = $this->GetRecord($dataset,0);
 			if (!$row) {
-				echo "The record you requested is not available.";
+				//echo "The record you requested is not available.";
 				return;
 			}
 			// TODO: pagination for single record display
