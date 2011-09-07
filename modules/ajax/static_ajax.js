@@ -571,18 +571,13 @@ function _uf(ele,hourglass) {
 			dataType: "script",
 			success: function (msg) {
 				eval(msg);
+				InitJavascript.run();
 				$(hourglass).remove();
-				//$(ele).after(' DONE');
-                //alert('test');
-			},
-            complete: function(){
+
 				StoppedUpdating(ele);
 				$('.auto-complete-list').hide();
-				$(hourglass).remove();
-				$('.uf').change(_fieldChange);
-				InitJavascript.run();
- //               $('#statusOverlay').hide();
-            }
+//				$('.uf').change(_fieldChange);
+			}
 		});
 		return;
 	}
@@ -597,33 +592,8 @@ function _uf(ele,hourglass) {
 		data: eleData,
 		dataType: "script",
 		success: function(msg){   
-			//$(ele).after(' DONE');
-//			alert(msg);
-	//		eval(msg);
-/*			if (msg.substr(0,8) == '<script>') {
-//				eval(msg);
-				return true;
-			}
-
-			if (msg.substr(0,6) == 'reload') {
-				pk = msg.split(':');
-				if (pk[1] !== undefined){
-					z = pk[1].split("=");
-					val = new Object();
-					val[z[0]] = z[1];
-					url = qsUpdate(window.location.href,val,Array('newrec'));
-				} else
-					url = window.location;
-				if (window.location.href == url)
-					window.location.reload(true);
-				else
-					window.location.replace(url);
-			} else if (msg == 'success') {
-				$(ele).css('background',null);
-			} else if (msg != '') {
-				ErrorLog(msg);
-				$(ele).css('background','red');
-			}*/
+			InitJavascript.run();
+			$(hourglass).remove();
 		},
 		error: function(obj,type,e){      
 			if (empty(e)) return;
@@ -631,13 +601,10 @@ function _uf(ele,hourglass) {
 			ErrorLog(type+': '+e.message);
 		},
 		complete: function(){
-			//$(ele).after(' DONE');
 			StoppedUpdating(ele);
 			$('.auto-complete-list').hide();
 			$(hourglass).remove();
-			$('.uf').change(_fieldChange);
-			InitJavascript.run();
-//			$('#statusOverlay').hide();
+//			$('.uf').change(_fieldChange);
 		}
 	});
 }
