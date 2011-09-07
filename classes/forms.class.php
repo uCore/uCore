@@ -2547,14 +2547,12 @@ FIN;
 				return FALSE;
 			}
 
-			if (!$pkVal) {
-				if ($fieldAlias == $this->GetPrimaryKey())
-					$pkVal = $pfVal;
-				else
-					$pkVal = mysql_insert_id();
-				
-				if ($this->IsNewRecord()) $ret = $this->GetURL($pkVal);
-			}
+			// new record - reload the page to the new pk
+			if ($field == $this->GetPrimaryKey($fieldAlias))
+				$pkVal = $pfVal;
+			else
+				$pkVal = mysql_insert_id();
+			$ret = $this->GetURL($pkVal);
 
 			// update default values
 			if (!$this->noDefaults) {
@@ -2570,23 +2568,14 @@ FIN;
 				}
 				$this->noDefaults = false;
 			}
-			//echo("alert('$pkVal');");die();
-			//			$this->currentRecord = $this->LookupRecord(array($this->GetPrimaryKey()=>$pkVal));//GetRow(sql_query("SELECT * FROM $table WHERE `$tablePk` = '{$pkVal}'"));
 
 			// new record has been created.  pass the info on to child modules, incase they need to act on it.
 			$this->OnNewRecord($pkVal);
 			$children = utopia::GetChildren(get_class($this));
-			//if (array_key_exists('children',$GLOBALS) && array_key_exists(get_class($this),$GLOBALS['children']))
 			foreach ($children as $child => $links) {
 				$obj = utopia::GetInstance($child);
 				if (method_exists($obj,'OnParentNewRecord')) $obj->OnParentNewRecord($pkVal);
 			}
-
-			//$ret = TRUE;
-		//	$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
-		//	if (get_class($this) == GetCurrentModule() && $fltr['uid'] !== NULL) {
-		//		$ret = $this->GetUrl($pkVal);
-		//	}
 		} else { // update existing record
 			$updateQry = "UPDATE $table SET `$field` = $newValue WHERE `$tablePk` = '$pkVal'";
 			//echo "//$updateQry";
