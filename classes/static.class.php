@@ -425,7 +425,6 @@ class utopia {
 		//echo $tabTitle
 		if (isset(self::$tabGroups[$tabGroup]['tab'.$tabID])) { ErrorLog("TabID ($tabID) already exists in Group ($tabGroup)"); return; }
 		self::$tabGroups[$tabGroup]['tab'.$tabID] = array('id'=>$tabGroup.'-'.$tabID,'title'=>$tabTitle,'content'=>$tabContent,'isURL'=>$isURL,'order'=>$order);
-
 	}
 	static function Tab_GetCount($tabGroup=NULL) {
 		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();

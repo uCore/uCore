@@ -3144,7 +3144,8 @@ SCR_END
 		$cont = ob_get_contents();
 		ob_end_clean();
 
-		utopia::Tab_Add($this->GetTitle(),$cont,$tabGroupName,false,$this->GetSortOrder());
+		$soMod = get_class($this) == GetCurrentModule() ? -10 : 0;
+		utopia::Tab_Add($this->GetTitle(),$cont,$tabGroupName,false,$this->GetSortOrder()+$soMod);
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 
@@ -3237,6 +3238,7 @@ abstract class uSingleDataModule extends uDataModule {
 		//		}
 
 		$order = $this->GetSortOrder();
+		if (get_class($this) == GetCurrentModule()) $order -= 10;
 		$extraCount = 1;
 //		if (!flag_is_set($this->GetOptions(), NO_TABS))
 		$tabGroupName = utopia::Tab_InitGroup();
