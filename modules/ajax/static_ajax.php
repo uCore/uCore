@@ -101,7 +101,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 		$type = mysql_result($result,0,'filetype');
 		$name = mysql_result($result,0,'filename');
 
-		echo CachedOutput($data, sha1($data), $type, $name, NULL, 86400, $_GET['a']);
+		echo utopia::Cache_Output($data, sha1($data), $type, $name, NULL, 86400, $_GET['a']);
 	}
 
 	public function getImage() {
