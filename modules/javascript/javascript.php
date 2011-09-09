@@ -43,7 +43,6 @@ class uJavascript extends uBasicModule {
 //		modOpts::AddOption('uJavascript','jQueryUI','jQuery UI Version',1);
 //		$jqui = modOpts::GetOption('uJavascript','jQueryUI');
 
-		utopia::AddCSSFile($this->GetURL(),true);
 		utopia::AddCSSFile(PATH_REL_CORE.'default.css');
 
 		modOpts::AddOption('uJavascript','jQueryUI-Theme','jQuery UI Theme','ui-lightness');
