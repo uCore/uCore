@@ -11,6 +11,8 @@ utopia::AddTemplateParser('post','utopia::parsePost');
 utopia::AddTemplateParser('request','utopia::parseRequest');
 utopia::AddTemplateParser('session','utopia::parseSession');
 utopia::AddTemplateParser('const','utopia::parseConst');
+utopia::AddTemplateParser('cssHead','utopia::GetCSSHead','');
+utopia::AddTemplateParser('jsHead','utopia::GetJSHead','');
 
 utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
@@ -84,28 +86,47 @@ class utopia {
 	}
 
 	static $initCSShead = false;
+	static $cssFiles = array();
 	static function AddCSSFile($path,$start=false) {
-		if (!self::$initCSShead) utopia::PrependVar('</head>',"{UTOPIA.cssHead}\n");
+		if (!self::$initCSShead) utopia::PrependVar('</head>',"{cssHead}\n");
 		self::$initCSShead = true;
 
 		if (file_exists($path)) $path = self::GetRelativePath($path);
 
+		if (array_search($path,self::$cssFiles) !== FALSE) return;
+
 		if ($start)
-			utopia::PrependVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
+			array_unshift(self::$cssFiles,$path);
 		else
-			utopia::AppendVar('cssHead',"<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n");
+			self::$cssFiles[] = $path;
 	}
+	static function GetCSSHead() {
+		$ret = '';
+		foreach (self::$cssFiles as $path)
+			$ret .= "<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n";
+		return $ret;
+	}
+
 	static $initJShead = false;
+	static $jsFiles = array();
 	static function AddJSFile($path,$start=false) {
-		if (!self::$initJShead) utopia::AppendVar('</head>',"{UTOPIA.jsHead}\n");
+		if (!self::$initJShead) utopia::AppendVar('</head>',"{jsHead}\n");
 		self::$initJShead = true;
 
 		if (file_exists($path)) $path = self::GetRelativePath($path);
 
+		if (array_search($path,self::$jsFiles) !== FALSE) return;
+
 		if ($start)
-			utopia::PrependVar('jsHead',"<script type=\"text/javascript\" src=\"$path\"></script>\n");
+			array_unshift(self::$jsFiles,$path);
 		else
-			utopia::AppendVar('jsHead',"<script type=\"text/javascript\" src=\"$path\"></script>\n");
+			self::$jsFiles[] = $path;
+	}
+	static function GetJSHead() {
+		$ret = '';
+		foreach (self::$jsFiles as $path)
+			$ret .= "<script type=\"text/javascript\" src=\"$path\"></script>\n";
+		return $ret;
 	}
 
 	private static $allmodules = NULL;
