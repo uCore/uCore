@@ -12,7 +12,7 @@ register_shutdown_function('runtimeHeader',$startTime);
 
 session_start();
 
-include_once('error.php');
+include('error.php');
 
 date_default_timezone_set('GMT');
 
@@ -40,7 +40,10 @@ define('PATH_ABS_TEMPLATES',fix_path(PATH_ABS_ROOT.'uTemplates').'/');
 
 
 // glob and load all functs files
+foreach (glob(PATH_ABS_CORE.'interfaces/*.php') as $fn) include($fn);
+
+// glob and load all functs files
 foreach (glob(PATH_ABS_CORE.'functs/*.php') as $fn) include($fn);
 
-require_once(PATH_ABS_CORE.'setup.php');
-require_once(PATH_ABS_CORE.'initialise.php'); // init
+require(PATH_ABS_CORE.'setup.php');
+require(PATH_ABS_CORE.'initialise.php'); // init

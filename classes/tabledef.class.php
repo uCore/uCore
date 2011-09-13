@@ -1,5 +1,4 @@
 <?php
-include_once('interfaces.php');
 
 // text
 define('ftNONE'				,'');

@@ -1,5 +1,4 @@
 <?php
-include_once('interfaces.php');
 
 //-- debugging
 //define('SHOW_QUERY'		,false);
