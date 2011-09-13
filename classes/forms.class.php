@@ -2520,7 +2520,7 @@ FIN;
 			case ftNUMBER:		$newValue = ($newValue==='' ? '' : intval(preg_replace('/[^0-9\.-]/','',$newValue))); break;
 		}
 
-		if ($this->fields[$fieldAlias]['ismetadata']) {
+		if (isset($this->fields[$fieldAlias]['ismetadata']) && $this->fields[$fieldAlias]['ismetadata']) {
 			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
 		}
 
