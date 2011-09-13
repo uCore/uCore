@@ -306,6 +306,7 @@ function DONT_USE_uuid()
 }
 
 function timer_start($timerName,$info='') {
+	if (!isset($_SESSION['admin_showT'])) return;
 	$timer = &$GLOBALS['timers'][$timerName];
 
 	if (!is_string($info)) $info = print_r($info,true);
@@ -318,6 +319,7 @@ function timer_start($timerName,$info='') {
 //	$GLOBALS['timer_parent'] = $timerName;
 }
 function timer_end($timerName) {
+	if (!isset($_SESSION['admin_showT'])) return;
 	$timer = &$GLOBALS['timers'][$timerName];
 	if (!isset($timer['start_time'])) { /*echo "Timer ($timerName) not started.";*/ return; }
 
@@ -332,6 +334,7 @@ function timer_end($timerName) {
 	//	if (isset($timer['parent'])) $GLOBALS['timer_parent'] = $timer['parent'];
 }
 function timer_findtime($timerName,$end=FALSE) {
+	if (!isset($_SESSION['admin_showT'])) return;
 	$timer = &$GLOBALS['timers'][$timerName];
 	if (isset($timer['time_taken']))
 		return $timer['time_taken'];

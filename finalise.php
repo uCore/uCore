@@ -1,6 +1,6 @@
 <?php
 
-if (array_key_exists('admin_showT',$_SESSION) && $_SESSION['admin_showT'] === true) {// || array_key_exists('showT',$_REQUEST) && array_key_exists('timers',$GLOBALS)) {
+if (isset($GLOBALS['timers']) && isset($_SESSION['admin_showT']) && $_SESSION['admin_showT'] === true) {
 	echo '<pre><table>';
 	foreach ($GLOBALS['timers'] as $name => $info) {
 		if (!is_array($info)) continue;
