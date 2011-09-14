@@ -94,7 +94,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row,NULL);
 
 		echo '<hr>';
-		self::DrawChildren($relational);
+		echo '<div id="uCMS_List">'.self::GetChildren($relational).'</div>';
 		echo '</div></td>';
 		echo '<td style="width:100%;vertical-align:top; border-left:1px solid #333"><div style="width:100%" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
 
@@ -135,19 +135,22 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			});
 			return data;
 		}
-		$('#tree ul').not($('#tree ul:first')).hide();
-		$('#tree').treeSort({init:RefreshIcons,change:dropped});
+		function InitialiseTree() {
+			$('#tree ul').not($('#tree ul:first')).hide();
+			$('#tree').treeSort({init:RefreshIcons,change:dropped});
+		}
 		$('.cmsParentToggle').live('click',function (e) {
 			$(this).parent('li').children('ul').toggle();
 			RefreshIcons();
 			e.stopPropagation();
 		});
-		$('.cmsItemText').click(function (e) {
+		$('.cmsItemText').live('click',function (e) {
 			$('#previewFrame').load('$editLink&inline=1&_f_{$fid['uid']}='+$(this).closest('.cmsItem').attr('id'), function() {
 				InitJavascript.run();
 			});
 			e.stopPropagation();
 		});
+		InitialiseTree();
 		</script>
 FIN;
 		$c = ob_get_contents();
@@ -155,34 +158,46 @@ FIN;
 		utopia::Tab_Add('Page Editor',$c,$tabGroupName,false);
 		utopia::Tab_InitDraw($tabGroupName);
 	}
-	static function DrawChildren($children) {
-		if (!$children) return;
+	public static function RefreshList() {
+		$obj = utopia::GetInstance(__CLASS__);
+		$relational = $obj->GetNestedArray();
+		$r = $obj->GetChildren($relational);
+		// javascript: find open folders (visible ui-treesort-folder with visible ul)
+		AjaxEcho('var openfolders = $(\'.ui-treesort-folder:has(ul:visible)\');');
+		utopia::AjaxUpdateElement('uCMS_List',$r);
+		AjaxEcho('InitialiseTree();');
+		AjaxEcho('$(openfolders).each(function() {$(\'#\'+$(this).attr(\'id\')).children(\'ul\').show();});');
+		AjaxEcho('RefreshIcons();');
+	}
+	static function GetChildren($children) {
+		if (!$children) return '';
 		array_sort_subkey($children,'position');
 		$editObj = utopia::GetInstance('uCMS_Edit');
 		$listObj = utopia::GetInstance('uCMS_List');
 		$viewObj = utopia::GetInstance('uCMS_View');
 
-		echo '<ul class="cmsTree">';
+		$ret = '<ul class="cmsTree">';
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? ' hiddenItem' : '';
 
 			$info = (!$child['is_published']) ? '<span class="ui-icon ui-icon-info" title="Unpublished"></span>' : '';
 			$editLink = $editObj->GetURL(array('cms_id'=>$child['cms_id']));
 			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
-			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
+			//$info .= $child['dataModule'] ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
 
-			echo '<li id="'.$child['cms_id'].'" class="cmsItem'.$hide.'">';
-			echo '<div class="cmsItemText">';
-			echo '<div class="cmsItemActions">';
+			$ret .= '<li id="'.$child['cms_id'].'" class="cmsItem'.$hide.'">';
+			$ret .= '<div class="cmsItemText">';
+			$ret .= '<div class="cmsItemActions">';
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
-			echo $listObj->GetDeleteButton($child['cms_id']);
-			echo '</div>';
-			echo $child['title'].$info.$data;
-			echo '</div>';
-			self::DrawChildren($child['children'],$child['cms_id']);
-			echo '</li>';
+			$ret .= $listObj->GetDeleteButton($child['cms_id']);
+			$ret .= '</div>';
+			$ret .= $child['title'].$info;
+			$ret .= '</div>';
+			$ret .= self::GetChildren($child['children'],$child['cms_id']);
+			$ret .= '</li>';
 		}
-		echo '</ul>';
+		$ret .= '</ul>';
+		return $ret;
 	}
 
 	public function GetNestedArray($parent='') {
@@ -372,7 +387,12 @@ EOF;
 			$this->UpdateField('content_published_time','NOW()',$pkVal);
 			$this->UpdateField('is_published',1,$pkVal);
 		}
-		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
+		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
+
+		// update cms list to reflect published status
+		uCMS_List::RefreshList();
+
+		return $ret;
 	}
 	public function getPossibleBlocks($val,$pk,$original) {
 		$obj = utopia::GetInstance('uWidgets_List');
