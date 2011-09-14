@@ -26,7 +26,7 @@ function sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
 		echo "Cannot connect to SQL server.<br>";
 		return false;
 	}
-	sql_query("SET NAMES utf8");
+	mysql_set_charset('utf8');
 //	}
 
 	return $sql_connection; // $GLOBALS['sql_connection'];
