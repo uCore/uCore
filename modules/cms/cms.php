@@ -19,6 +19,7 @@ class tabledef_CMS extends uTableDef {
     $this->AddField('content_time',ftTIMESTAMP);
     $this->AddField('content_published',ftTEXT);
     $this->AddField('content_published_time',ftTIMESTAMP);
+    $this->AddField('is_published',ftBOOL);
 
     $this->AddField('updated',ftTIMESTAMP);
     $this->SetFieldProperty('updated','extra','ON UPDATE CURRENT_TIMESTAMP');
@@ -44,7 +45,9 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('title','title','cms','Page Title');
 		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('hide','hide','cms','Parent');
-		$this->AddField('published','(IF(STRCMP({content},{content_published})=0,1,0))','cms');
+		$this->AddField('content','content','cms');
+		$this->AddField('content_published','content_published','cms');
+		$this->AddField('is_published','is_published','cms');
 	}
 	public function SetupParents() {
 		$templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
@@ -162,7 +165,7 @@ FIN;
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? ' hiddenItem' : '';
 
-			$info = (!$child['published']) ? '<span class="ui-icon ui-icon-info" title="Unpublished"></span>' : '';
+			$info = (!$child['is_published']) ? '<span class="ui-icon ui-icon-info" title="Unpublished"></span>' : '';
 			$editLink = $editObj->GetURL(array('cms_id'=>$child['cms_id']));
 			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
 			$data = '';//($child['dataModule']) ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
@@ -259,12 +262,15 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 
 		$this->AddField('content_time','content_time','cms','Last Saved');
 		$this->AddField('content_published_time','content_published_time','cms','Last Published');
+
+		$this->AddField('is_published','is_published','cms');
+
 		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
 		$this->AddFilter('cms_id',ctEQ);
 	}
 	
 	public function publishLinks($field,$pkVal,$v,$rec) {
-		if ($rec['content'] === $rec['content_published'])
+		if ($rec['is_published'])
 			return utopia::DrawInput('published',itBUTTON,'Published',null,array('disabled'=>'disabled'));
 
 		// preview, publish, revert (red)
@@ -335,6 +341,7 @@ EOF;
 		if ($fieldAlias == 'revert') {
 			$rec = $this->LookupRecord($pkVal);
 			$this->UpdateField('content',$rec['content_published'],$pkVal);
+			$this->UpdateField('is_published',1,$pkVal);
 			return;
 		}
 		if ($fieldAlias == 'publish') {
@@ -356,10 +363,13 @@ EOF;
 
 			$this->SetFieldType('content_time',ftRAW);
 			$this->UpdateField('content_time','NOW()',$pkVal);
+
+			$this->UpdateField('is_published',0,$pkVal);
 		}
 		if ($fieldAlias == 'content_published') {
 			$this->SetFieldType('content_published_time',ftRAW);
 			$this->UpdateField('content_published_time','NOW()',$pkVal);
+			$this->UpdateField('is_published',1,$pkVal);
 		}
 		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
@@ -459,6 +469,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('content','content','cms','content');
 		$this->AddField('content_time','content_time','cms');
 		$this->AddField('content_published','content_published','cms','content');
+		$this->AddField('is_published','is_published','cms','published');
 		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
