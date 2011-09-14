@@ -46,6 +46,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('hide','hide','cms','Parent');
 		$this->AddField('content','content','cms');
+		$this->AddField('content_time','content_time','cms');
 		$this->AddField('content_published','content_published','cms');
 		$this->AddField('is_published','is_published','cms');
 	}
