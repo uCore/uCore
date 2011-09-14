@@ -27,6 +27,7 @@ class uSitemap {
 		foreach ($children as $child) {
 			if ($child['hide']) continue;
 			if ($child['content_time'] !== '0000-00-00 00:00:00' && !$child['is_published']) continue;
+			if (!$child['is_published'] && !$child['content']) continue;
 			$menu_title = $child['nav_text'] ? $child['nav_text'] : $child['title'];
 			//$hide = $child['hide'] ? 'hiddenItem' : '';  //class="'.$hide.'"
 			$url = $obj->GetURL($child['cms_id']);
