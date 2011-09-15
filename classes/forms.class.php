@@ -302,7 +302,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		}*/
 
 		//if (!array_key_exists('children',$GLOBALS)) $GLOBALS['children'] = array();
-		$children = utopia::GetChildren($parentModule);
+/*		$children = utopia::GetChildren($parentModule);
 		// check parent field hasnt already been selected
 		if ($parentField !== NULL && $parentField !== '*') {
 			//if (array_key_exists($parentModule,$children))
@@ -317,7 +317,7 @@ abstract class uBasicModule implements iUtopiaModule {
 				}
 			}
 		}
-
+*/
 
 		if (!is_null($fieldLinks) && !is_array($fieldLinks)) // must be null or array
 			trigger_error('Cannot add parent ('.$parentModule.') of '.get_class($this).', fieldLinks parameter is an invalid type.',E_USER_ERROR);
