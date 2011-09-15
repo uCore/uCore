@@ -11,4 +11,6 @@ if (isset($GLOBALS['timers']) && isset($_SESSION['admin_showT']) && $_SESSION['a
 }
 
 utopia::OutputTemplate();
+
+mysql_close();
 die();
