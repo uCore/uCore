@@ -64,6 +64,8 @@ class uSitemapXML extends uBasicModule {
 	}
 	public function RunModule() {
 		utopia::CancelTemplate();
+		header('Content-Type: application/xml',true);
+
 		$obj = utopia::GetInstance('uCMS_List');
 		$viewObj = utopia::GetInstance('uCMS_View');
 		$arr = $obj->GetRows();
