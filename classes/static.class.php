@@ -184,8 +184,7 @@ class utopia {
 
 	static $instances = array();
 	static function &GetInstance($class,$defaultInstance = true) {
-		$null = null;
-		if (!class_exists($class)) { ErrorLog("Class ($class) doesnt exist"); return $null; }
+		if (!$defaultInstance) return new $class;
 
 		if (!isset(self::$instances[$class]))
 			self::$instances[$class] = new $class;

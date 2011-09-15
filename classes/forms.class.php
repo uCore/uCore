@@ -1378,7 +1378,7 @@ FIN;
 		$this->fields[$aliasName]['values'] = $values;
 
 		if ($visiblename !== NULL) {
-			if (empty($this->layoutSections)) $this->NewSection();
+			if (!$this->layoutSections) $this->NewSection();
 			$this->fields[$aliasName]['layoutsection'] = count($this->layoutSections)-1;
 		}
 		return TRUE;

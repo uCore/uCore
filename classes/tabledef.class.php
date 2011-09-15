@@ -154,9 +154,6 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function GetFieldProperty($fieldName,$propertyName) {
-		//$fieldName = strtolower($fieldName);
-		//$propertyName = strtolower($propertyName);
-		$this->_SetupFields();
 		if (!isset($this->fields[$fieldName])) return;
 		if (!isset($this->fields[$fieldName][$propertyName])) return;
 		return $this->fields[$fieldName][$propertyName];
