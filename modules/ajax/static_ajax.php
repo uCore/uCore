@@ -112,7 +112,8 @@ class internalmodule_StaticAjax extends uBasicModule {
 		ob_end_clean();
 		if ($result !== FALSE && mysql_num_rows($result) > 0)
 			$data = mysql_result($result,0,'img');
-		else {
+
+		if (!$data) {
 			utopia::UseTemplate();
 			utopia::PageNotFound();
 		}
