@@ -665,7 +665,7 @@ class utopia {
 		while (self::MergeVars($template));
 
 		// Make all resources secure
-		if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+		if (self::IsRequestSecure()) {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
 

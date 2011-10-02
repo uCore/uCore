@@ -174,14 +174,14 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (get_class($this) == GetCurrentModule()) {
 			$url = $this->GetURL($_GET);
 			$checkurl = $_SERVER['REQUEST_URI'];
-			if (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) || $checkurl !== $url) {
-					$abs = '';
-					if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) {
-						$layer = 'http';
-						if ($this->isSecurePage) $layer .= 's';
-						$abs = $layer.'://'.utopia::GetDomainName();
-					}
-					header('Location: '.$abs.$url,true,301); die();
+			if (($this->isSecurePage && !utopia::IsRequestSecure()) || $checkurl !== $url) {
+				$abs = '';
+				if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) {
+					$layer = 'http';
+					if ($this->isSecurePage) $layer .= 's';
+					$abs = $layer.'://'.utopia::GetDomainName();
+				}
+				header('Location: '.$abs.$url,true,301); die();
 			}
 		}
 		if ($this instanceof iAdminModule) utopia::UseTemplate(TEMPLATE_ADMIN);
