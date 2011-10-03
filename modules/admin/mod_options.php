@@ -41,15 +41,15 @@ class modOpts extends uListDataModule implements iAdminModule {
 		self::RefreshCache();
 	}
 	public static function AddOption($module,$ident,$name,$init='',$fieldType=itTEXT,$values=NULL) {
-		$rec = self::GetOption($module,$ident);
-		if ($rec === NULL) {
+		if (!self::OptionExists($module,$ident)) {
 			$obj = utopia::GetInstance('modOpts');
 			$obj->UpdateFields(array('ident'=>$module.'::'.$ident,'module'=>$module,'name'=>$name,'value'=>$init));
 		}
 		self::$types[$module.'::'.$ident] = array($fieldType,$values);
 	}
-	public static $optCache = array();
+	public static $optCache = NULL;
 	public static function RefreshCache() {
+		self::$optCache = array();
 		$obj = utopia::GetInstance('modOpts');
 		foreach ($obj->GetRows() as $row) {
 			if (!$row['module']) {
@@ -59,10 +59,14 @@ class modOpts extends uListDataModule implements iAdminModule {
 			self::$optCache[$row['ident']] = $row['value'];
 		}
 	}
-	public static function GetOption($module,$ident) {
+	public static function OptionExists($module,$ident) {
+		if (self::$optCache === NULL) self::RefreshCache();
 		$ident = $module.'::'.$ident;
-		if (!array_key_exists($ident,self::$optCache)) self::RefreshCache();
-		if (!array_key_exists($ident,self::$optCache)) return NULL;
+		return array_key_exists($ident,self::$optCache);
+	}
+	public static function GetOption($module,$ident) {
+		if (!self::OptionExists($module,$ident)) return NULL;
+		$ident = $module.'::'.$ident;
 		return self::$optCache[$ident];
 	}
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
