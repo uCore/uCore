@@ -25,7 +25,7 @@ class module_TinyMCE extends uBasicModule {
 			$options = array();
 			$options['mode'] = "specific_textareas";
 			$options['relative_urls'] = false;
-			$options['remove_script_host'] = true;
+			$options['remove_script_host'] = false;
 			$options['cleanup_on_startup'] = true;
 			$options['cleanup'] = true;
 			$options['theme'] = "advanced";
