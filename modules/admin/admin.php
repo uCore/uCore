@@ -87,15 +87,19 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 	public function RunModule() {
 		echo '<h1>Welcome to Admin Home</h1>';
 
-		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
-		$gitTags = array_keys($gitTags['tags']);
-		usort($gitTags,'internalmodule_Admin::compareVersions');
-		
-		$latestVer = end($gitTags);
 		$myVer = file_get_contents(PATH_ABS_CORE.'version.txt');
+		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
+		if ($gitTags) {
+			$gitTags = array_keys($gitTags['tags']);
+			$latestVer = end($gitTags);
+			usort($gitTags,'internalmodule_Admin::compareVersions');
+			if (self::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
+			else echo 'You are using the latest version of uCore.';
+		} else {
+			$latestVer = 'Cannot get latest version information';
+		}
+		
 		echo '<table><tr><td>Current Version:</td><td>'.$myVer.'</td></tr><tr><td>Latest Version:</td><td>'.$latestVer.'</td></tr></table>';
-		if (self::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
-		else echo 'You are using the latest version of uCore.';
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 		//GetFiles(true);
