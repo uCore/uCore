@@ -310,7 +310,6 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 	}
 	public function SetupParents() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/widget.js');
-		$this->AddParent('uWidgets_List');
 		$this->AddParent('uWidgets_List','block_id','*');
 	}
 

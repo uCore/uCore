@@ -2895,8 +2895,7 @@ SCR_END
 				$obj = utopia::GetInstance($link['moduleName']);
 				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
 						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
-						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
-						&& !isset($link['fieldLinks'])) {
+						&& is_subclass_of($link['moduleName'],'uSingleDataModule')) {
 					$url = $obj->GetURL(array($obj->GetModuleId().'_new'=>1));
 					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
