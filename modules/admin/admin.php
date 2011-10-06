@@ -91,8 +91,8 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
 		if ($gitTags) {
 			$gitTags = array_keys($gitTags['tags']);
-			$latestVer = end($gitTags);
 			usort($gitTags,'internalmodule_Admin::compareVersions');
+			$latestVer = end($gitTags);
 			if (self::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
 			else echo 'You are using the latest version of uCore.';
 		} else {
