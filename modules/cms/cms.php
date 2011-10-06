@@ -374,6 +374,7 @@ EOF;
 					if ($ele->plaintext == '') $ele->class = null;
 					else $ele->outertext = '{widget.'.$ele->title.'}';
 				}
+				$newValue = $html;
 			}
 
 			$this->SetFieldType('content_time',ftRAW);
