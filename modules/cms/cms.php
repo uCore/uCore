@@ -374,7 +374,6 @@ EOF;
 					if ($ele->plaintext == '') $ele->class = null;
 					else $ele->outertext = '{widget.'.$ele->title.'}';
 				}
-				$newValue = addslashes($html);
 			}
 
 			$this->SetFieldType('content_time',ftRAW);
@@ -387,6 +386,7 @@ EOF;
 			$this->UpdateField('content_published_time','NOW()',$pkVal);
 			$this->UpdateField('is_published',1,$pkVal);
 		}
+
 		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
 
 		// update cms list to reflect published status
