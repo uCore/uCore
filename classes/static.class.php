@@ -182,6 +182,56 @@ class utopia {
 		return $inputs;
 	}
 
+	static function GetRewriteSections() {
+		$REQUESTED_URL = array_key_exists('HTTP_X_REWRITE_URL',$_SERVER) ? $_SERVER['HTTP_X_REWRITE_URL'] : $_SERVER['REQUEST_URI'];
+		$REQUESTED_URL = preg_replace('/\?.*/i','',$REQUESTED_URL);
+
+		if (strpos($REQUESTED_URL, PATH_REL_ROOT.'u/')===FALSE) return FALSE;
+		$path = urldecode(str_replace(PATH_REL_ROOT.'u/','',$REQUESTED_URL));
+		$return = array();
+
+		return explode('/',$path);
+	}
+
+	static function GetCurrentModule() {
+		// cm variable
+		if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
+
+		// GET uuid
+		if (isset($_GET['uuid'])) {
+			$m = utopia::UUIDExists($_GET['uuid']);
+			if ($m) return $m['module_name'];
+		}
+
+		// rewritten url?   /u/MOD/
+		$sections = self::GetRewriteSections();
+		if ($sections && $sections[0]) {
+			return $sections[0];
+		}
+
+		// admin root?
+		if ($_SERVER['SCRIPT_NAME'] == PATH_REL_CORE.'index.php') return 'internalmodule_Admin';
+
+		// CMS
+		return 'uCMS_View';
+	}
+
+	static function Launcher($module = NULL) {
+		if ($module == NULL) $module = self::GetCurrentModule();
+
+		if (!utopia::ModuleExists($module)) {
+			utopia::PageNotFound();
+		}
+
+		utopia::SetVar('current_module',$module);
+		$obj = utopia::GetInstance($module);
+		utopia::SetVar('title',$obj->GetTitle());
+		// run module
+		$obj->_RunModule();
+
+		utopia::Finish();
+	}
+
 	static $instances = array();
 	static function &GetInstance($class,$defaultInstance = true) {
 		if (!$defaultInstance) return new $class;

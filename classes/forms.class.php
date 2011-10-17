@@ -407,14 +407,9 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($this->rewriteMapping === NULL) return FALSE;
 		if (get_class($this) !== GetCurrentModule()) return FALSE;
 
-		$REQUESTED_URL = array_key_exists('HTTP_X_REWRITE_URL',$_SERVER) ? $_SERVER['HTTP_X_REWRITE_URL'] : $_SERVER['REQUEST_URI'];
-		$REQUESTED_URL = preg_replace('/\?.*/i','',$REQUESTED_URL);
+		$sections = utopia::GetRewriteSections();
+		if (!$sections) return FALSE;
 
-		if (strpos($REQUESTED_URL, PATH_REL_ROOT.'u/')===FALSE) return FALSE;
-		$path = urldecode(str_replace(PATH_REL_ROOT.'u/','',$REQUESTED_URL));
-		$return = array();
-
-		$sections = explode('/',$path);
 		foreach ($sections as $key => $value) {
 			$replace = array();
 			if (!array_key_exists($key,$this->rewriteMapping)) continue;
