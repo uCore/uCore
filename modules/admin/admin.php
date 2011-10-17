@@ -136,6 +136,9 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 	RewriteCond %{REQUEST_FILENAME} !-d     
 	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
 </IfModule>
+<IfModule !mod_rewrite.c>
+	ErrorDocument 404 {$rc}/index.php
+</IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
 		$htaccess = '';
