@@ -39,19 +39,11 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 
 timer_end('Module Initialise');
 
-//timer_start('Setup Fields');
-// setup fields on current module
-//if (GetCurrentModule()) {
-//	$obj = utopia::GetInstance(GetCurrentModule());
-//	$obj->_SetupFields();
-//}
-//timer_end('Setup Fields');
-
 // process ajax function
 if (array_key_exists('__ajax',$_REQUEST)) {
 	//utopia::CancelTemplate();
 	// TODO: ajax parentloading?  EG: login modules
-	$cm = GetCurrentModule();
+	$cm = utopia::GetCurrentModule();
 	if ($cm) {
 		$obj = utopia::GetInstance($cm);
 		$lc = $obj->LoadChildren(0); // now part of runmodule and loadparents, call here to check for

@@ -13,7 +13,7 @@ class modLinks extends uBasicModule {
 	public function drawLinks($parent) {
 		$arr = array();
 
-		$current = GetCurrentModule();
+		$current = utopia::GetCurrentModule();
 		$currentAdded = false;
 		$parentObj = utopia::GetInstance($parent);
 		$admin = ($parentObj instanceof iAdminModule);

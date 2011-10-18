@@ -171,7 +171,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 	public $hasRun = false;
 	public function _RunModule() {
-		if (get_class($this) == GetCurrentModule()) {
+		if (get_class($this) == utopia::GetCurrentModule()) {
 			$url = $this->GetURL($_GET);
 			$checkurl = $_SERVER['REQUEST_URI'];
 			if (($this->isSecurePage && !utopia::IsRequestSecure()) || $checkurl !== $url) {
@@ -286,8 +286,8 @@ abstract class uBasicModule implements iUtopiaModule {
 				//					$fieldLinks[$val] = $val;
 			}	}//	}
 
-	/*	if (GetCurrentModule() == get_class($this)) {
-			if ($parentModule === '/') $pm = GetCurrentModule();
+	/*	if (utopia::GetCurrentModule() == get_class($this)) {
+			if ($parentModule === '/') $pm = utopia::GetCurrentModule();
 			else $pm = $parentModule;
 			$filters = NULL;
 			if ($fieldLinks && !$parentField) {
@@ -298,7 +298,7 @@ abstract class uBasicModule implements iUtopiaModule {
 						$filters[$link['fromField']] = $_GET['_f_'.$link['toField']];
 				}
 			}
-			breadcrumb::AddModule($pm,$filters,0,GetCurrentModule());
+			breadcrumb::AddModule($pm,$filters,0,utopia::GetCurrentModule());
 		}*/
 
 		//if (!array_key_exists('children',$GLOBALS)) $GLOBALS['children'] = array();
@@ -404,7 +404,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 	public function ParseRewrite($caseSensative = false) {
 		if ($this->rewriteMapping === NULL) return FALSE;
-		if (get_class($this) !== GetCurrentModule()) return FALSE;
+		if (get_class($this) !== utopia::GetCurrentModule()) return FALSE;
 
 		$sections = utopia::GetRewriteSections();
 		if (!$sections) return FALSE;
@@ -464,7 +464,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$newPath = PATH_REL_ROOT.'u/'.join('/',$mapped);
 		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-                if ($this->rewritePersistPath && GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
+                if ($this->rewritePersistPath && utopia::GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
 
 		// DONE: ensure all rewrite segments are accounted for (all '/' are present)
 		return $newPath;
@@ -582,7 +582,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 	public function GetSortOrder() {
 		//if (is_object($module)) $module = get_class($module);
-//		if (get_class($this) == GetCurrentModule()) return 1;
+//		if (get_class($this) == utopia::GetCurrentModule()) return 1;
 		return 0;
 	}
 	//	public function __construct() { $this->_SetupFields(); } //$this->SetupParents(); }
@@ -594,14 +594,14 @@ abstract class uBasicModule implements iUtopiaModule {
 		//ErrorLog(get_class($this).' making buttons on '.$parentName);
 		if ($this->isDisabled) return;
 		if (!is_array($this->parents)) return;
-		if ($parentName !== GetCurrentModule()) return;
+		if ($parentName !== utopia::GetCurrentModule()) return;
 		if (!array_key_exists($parentName,$this->parents)) return;
 
 //		$this->navCreated = true;
 		$sortOrder = $this->GetSortOrder();
 		$listDestination =  'child_buttons';
 		if ($this instanceof iAdminModule) {
-			if (get_class($this) == GetCurrentModule()) utopia::LinkList_Add($listDestination,'',NULL,-500);
+			if (get_class($this) == utopia::GetCurrentModule()) utopia::LinkList_Add($listDestination,'',NULL,-500);
 			$sortOrder = $sortOrder - 1000;
 		}
 
@@ -612,8 +612,8 @@ abstract class uBasicModule implements iUtopiaModule {
 			if (flag_is_set($this->GetOptions(),NO_NAV)) return;
 	//		if (array_search($this,$lm,true) === FALSE) continue;
 
-			$cModuleObj = utopia::GetInstance(GetCurrentModule());
-			if (($parentName != 'internalmodule_Admin' && ($obj instanceof iAdminModule)) && $parentName != GetCurrentModule()) return;
+			$cModuleObj = utopia::GetInstance(utopia::GetCurrentModule());
+			if (($parentName != 'internalmodule_Admin' && ($obj instanceof iAdminModule)) && $parentName != utopia::GetCurrentModule()) return;
 			//echo get_class($this).' '.$parentName.'<br/>';
 
 			$parentObj = utopia::GetInstance($parentName);
@@ -623,7 +623,7 @@ abstract class uBasicModule implements iUtopiaModule {
 			foreach ($linkArray as $linkInfo) {
 				if ($linkInfo['parentField'] !== NULL) continue; // has a parentField?  if so, ignore
 				$btnText = !empty($linkInfo['text']) ? $linkInfo['text'] : $this->GetTitle();
-				if (isset($linkInfo['fieldLinks']) && GetCurrentModule()) { // is linked to fields in the list
+				if (isset($linkInfo['fieldLinks']) && utopia::GetCurrentModule()) { // is linked to fields in the list
 					$cr = $cModuleObj->GetCurrentRecord();
 					if (is_array($linkInfo['fieldLinks']) && is_array($cr)) { // this link uses filters
 						$filters = array();
@@ -966,8 +966,8 @@ FIN;
 		} else {
 			$this->SetFieldProperty($name,'default_lookup',array('module'=>$moduleOrValue,'getField'=>$getField,'valField'=>$valField));
 			// create a callback, when valField is updated, to set value of $name to the new DefaultValue (IF that value is empty?)
-			if (!array_key_exists($valField,$this->fields) && get_class($this) != GetCurrentModule() && GetCurrentModule()) {
-				$obj = utopia::GetInstance(GetCurrentModule());
+			if (!array_key_exists($valField,$this->fields) && get_class($this) != utopia::GetCurrentModule() && utopia::GetCurrentModule()) {
+				$obj = utopia::GetInstance(utopia::GetCurrentModule());
 				$obj->AddOnUpdateCallback($valField,array($this,'RefreshDefaultValue'),$name,$onlyIfNull);
 			} else
 				$this->AddOnUpdateCallback($valField,array($this,'RefreshDefaultValue'),$name,$onlyIfNull);
@@ -1784,11 +1784,11 @@ FIN;
 
 		if (is_array($filterData) && $filterData['it'] == itNONE) {
 			// for union modules, we cannot get a value form currentmodule because it is itself, part of the query
-			if (GetCurrentModule() !== get_class($this) && (!isset($this->UNION_MODULE) || $this->UNION_MODULE !== TRUE)) {
+			if (utopia::GetCurrentModule() !== get_class($this) && (!isset($this->UNION_MODULE) || $this->UNION_MODULE !== TRUE)) {
 				if (array_key_exists('linkFrom',$filterData)) {
 					list($linkParent,$linkFrom) = explode(':',$filterData['linkFrom']);
 					// linkparent is loaded?  if not then we dont really want to use it as a filter.....
-					if ($linkParent == GetCurrentModule()) {
+					if ($linkParent == utopia::GetCurrentModule()) {
 						$linkParentObj = utopia::GetInstance($linkParent);
 						$row = $linkParentObj->GetCurrentRecord($refresh);
 						if (!$row && !$refresh) $row = $linkParentObj->GetCurrentRecord(true);
@@ -3126,7 +3126,7 @@ SCR_END
 		$cont = ob_get_contents();
 		ob_end_clean();
 
-		$soMod = get_class($this) == GetCurrentModule() ? -10 : 0;
+		$soMod = get_class($this) == utopia::GetCurrentModule() ? -10 : 0;
 		utopia::Tab_Add($this->GetTitle(),$cont,$tabGroupName,false,$this->GetSortOrder()+$soMod);
 		utopia::Tab_InitDraw($tabGroupName);
 	}
@@ -3159,10 +3159,10 @@ abstract class uSingleDataModule extends uDataModule {
 	/*
 	 public function CreateParentNavButtons() {
 		foreach ($this->parents as $parentName => $linkArray){
-		if ($parentName !== GetCurrentModule()) continue;
+		if ($parentName !== utopia::GetCurrentModule()) continue;
 		foreach ($linkArray as $linkInfo) {
 		if ($linkInfo['parentField'] !== NULL) continue; // is linked to fields in the list, skip it
-		if (flag_is_set($this->GetOptions(),ALLOW_ADD)) { // create an addition button  --  && GetCurrentModule() == get_class($this)
+		if (flag_is_set($this->GetOptions(),ALLOW_ADD)) { // create an addition button  --  && utopia::GetCurrentModule() == get_class($this)
 		$filters = array('newrec'=>1); // set this filter so that the primary key is negative, this will force no policy to be found, and show a new form
 		utopia::AppendVar('footer_left',CreateNavButton('New Record',BuildQueryString($this->GetURL(),$filters),NULL,array('class'=>'btn greenbg')));
 		}
@@ -3220,7 +3220,7 @@ abstract class uSingleDataModule extends uDataModule {
 		//		}
 
 		$order = $this->GetSortOrder();
-		if (get_class($this) == GetCurrentModule()) $order -= 10;
+		if (get_class($this) == utopia::GetCurrentModule()) $order -= 10;
 		$extraCount = 1;
 //		if (!flag_is_set($this->GetOptions(), NO_TABS))
 		$tabGroupName = utopia::Tab_InitGroup();

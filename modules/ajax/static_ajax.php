@@ -56,7 +56,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public function getUpload() {
 		//$module = utopia::UUIDExists($_GET['uuid']);
 		//print_r($module);
-		$obj = utopia::GetInstance(GetCurrentModule());
+		$obj = utopia::GetInstance(utopia::GetCurrentModule());
 		$rec = $obj->LookupRecord($_GET['p']);
 		//print_r($rec);
 		if (!$rec) {

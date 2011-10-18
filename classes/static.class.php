@@ -31,7 +31,7 @@ class utopia {
 //	  if (isset(self::$gc_cache[$parent]) && self::$gc_cache[$parent]) return self::$gc_cache[$parent];
 
 		$specific      = (isset(self::$children[$parent]))     ? self::$children[$parent] : array();
-		$currentModule = ($parent == GetCurrentModule() && isset(self::$children['/'])) ? self::$children['/'] : array();
+		$currentModule = ($parent == utopia::GetCurrentModule() && isset(self::$children['/'])) ? self::$children['/'] : array();
 		$catchAll      = (isset(self::$children['*'])) ? self::$children['*'] : array();
 		$baseModule = array();
 
@@ -482,7 +482,7 @@ class utopia {
 	private static $tabGroups = array();
 	private static $tabOrderCount = 1;
 	static function Tab_InitGroup($tabGroup=NULL) {
-		if (!$tabGroup) $tabGroup = GetCurrentModule().'-tabs';
+		if (!$tabGroup) $tabGroup = utopia::GetCurrentModule().'-tabs';
 		if (isset(self::$tabGroups[$tabGroup])) return $tabGroup;
 		//			echo '<div class="tabGroup" id="'.$tabGroup.'"><ul></ul></div>';
 		self::$tabGroups[$tabGroup] = array();

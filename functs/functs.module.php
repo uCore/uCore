@@ -112,15 +112,12 @@ function &recurseSqlSetupSearch(&$searchin,$searchfor) {
 }
 
 function GetCurrentModule() {
-	if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
-	if (!isset($_GET['uuid'])) return 'uCMS_View';
-
-	$m = utopia::UUIDExists($_GET['uuid']);
-	return $m['module_name'];
+	trigger_error("GetCurrentModule is deprecated.  Use utopia::GetCurrentModule().", E_USER_DEPRECATED);
+	return utopia::GetCurrentModule();
 }
 
 function RunModule($module = NULL) {
-	if ($module == NULL) $module = GetCurrentModule();
+	if ($module == NULL) $module = utopia::GetCurrentModule();
 
 	if (!utopia::ModuleExists($module)) {
 		utopia::PageNotFound();
