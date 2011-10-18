@@ -1,6 +1,4 @@
 <?php
-header("HTTP/1.0 200 OK",true,200);
-header("Status: 200 OK",true,200);
 if (isset($_SERVER['REDIRECT_QUERY_STRING'])) parse_str($_SERVER['REDIRECT_QUERY_STRING'], $_GET);
 $enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
 define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
