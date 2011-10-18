@@ -107,7 +107,10 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 		$rc = PATH_REL_CORE;
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
-		$content = <<<FIN
+		$apacheContent = <<<FIN
+DirectoryIndex {$rc}index.php
+ErrorDocument 404 {$rc}index.php
+
 <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
 	<IfModule mod_deflate.c>
 		SetOutputFilter DEFLATE
@@ -117,46 +120,48 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 		Header set Expires "Thu, 15 Jan 2015 20:00:00 GMT"
 	</IfModule>
 </FilesMatch>
-
-<IfModule mod_rewrite.c>
-	# Tell PHP that the mod_rewrite module is ENABLED.
-	SetEnv HTTP_MOD_REWRITE On
-
-	RewriteEngine on
-	RewriteRule ^(.*/)?(\.svn)|(\.git) - [F,L]
-	ErrorDocument 403 "Access Forbidden"
-
-	RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
-
-	RewriteCond %{REQUEST_URI} ^$ [OR]
-	RewriteCond %{REQUEST_URI} ^/$
-	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
-
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d     
-	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
-</IfModule>
-<IfModule !mod_rewrite.c>
-	ErrorDocument 404 {$rc}/index.php
-</IfModule>
 FIN;
-		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
+		$iisContent = <<<FIN
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<system.webServer>
+		<directoryBrowse enabled="false" />
+		<httpErrors>
+			<remove statusCode="404" />
+			<error statusCode="404" path="{$rc}index.php" responseMode="ExecuteURL" />
+		</httpErrors>
+		<defaultDocument>
+			<files>
+				<remove value="index.php" />
+				<remove value="{$rc}index.php" />
+				<add value="{$rc}index.php" />
+			</files>
+		</defaultDocument>
+	</system.webServer>
+</configuration>
+FIN;
+
+		$apacheSearch = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$apacheContent.PHP_EOL.$ucEnd;
 		$htaccess = '';
 		if (file_exists(PATH_ABS_ROOT.'.htaccess')) $htaccess = file_get_contents(PATH_ABS_ROOT.'.htaccess');
-		if (strpos($htaccess,$search) === FALSE) {
+		if (strpos($htaccess,$apacheSearch) === FALSE) {
 			// first remove existing (outdated)
 			$s = strpos($htaccess,$ucStart);
 			$e = strrpos($htaccess,$ucEnd); // PHP5
-			//$e = strpos(strrev($htaccess),strrev($ucEnd)); // PHP4
 			if ($s !== FALSE && $e !== FALSE) {
-				$e += strlen($ucEnd); // PHP5
-				//$e = strlen($htaccess) - $e; // PHP4
+				$e += strlen($ucEnd);
 				$htaccess = substr_replace($htaccess,'',$s,$e);
 			}
 
-			$htaccess = trim($htaccess).$search;
+			$htaccess = trim($htaccess).$apacheSearch;
 			file_put_contents(PATH_ABS_ROOT.'.htaccess',$htaccess);
-			echo 'Updated .htaccess';
+			echo '<p>Updated .htaccess</p>';
+		}
+		$webconfig = '';
+		if (file_exists(PATH_ABS_ROOT.'web.config')) $webconfig = file_get_contents(PATH_ABS_ROOT.'web.config');
+		if (strpos($webconfig,$iisContent) === FALSE) {
+			file_put_contents(PATH_ABS_ROOT.'web.config',$iisContent);
+			echo '<p>Updated web.config</p>';
 		}
 		echo "<h3>Variables</h3><pre>";
 		echo 'PATH_ABS_ROOT: '.PATH_ABS_ROOT.'<br>';

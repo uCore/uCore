@@ -1,12 +1,1 @@
 Options -Indexes
-
-<IfModule mod_rewrite.c>
-	# Tell PHP that the mod_rewrite module is ENABLED.
-	SetEnv HTTP_MOD_REWRITE On
-
-	RewriteEngine on
-	RewriteRule \.svn|\.git - [F,L]
-	ErrorDocument 403 "Access Forbidden"
-
-	RewriteRule ^$ index.php
-</IfModule>

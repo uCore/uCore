@@ -386,7 +386,6 @@ abstract class uBasicModule implements iUtopiaModule {
 	 * @param bool $URLReadable specifies that all segments of the url should be stripped of non-alphanumeric characters.
 	 */
 	public function SetRewrite($mapping,$URLReadable = false) {
-		if (getenv('HTTP_MOD_REWRITE')!='On') return false;
 		if ($mapping === NULL) {
 			$this->rewriteMapping = NULL; return;
 		}
