@@ -205,8 +205,9 @@ class utopia {
 
 		// rewritten url?   /u/MOD/
 		$sections = self::GetRewriteSections();
-		if ($sections && $sections[0]) {
-			return $sections[0];
+		if ($sections && isset($sections[0])) {
+			$m = utopia::UUIDExists($sections[0]);
+			if ($m) return $m['module_name'];
 		}
 
 		// admin root?
