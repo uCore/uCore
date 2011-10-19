@@ -31,7 +31,8 @@ function fatalErrorShutdownHandler()
 function EchoException($e) {
 	$fullError = sprintf("<b>ERROR</b> [%s] %s<br />\n  Error on line %s in file %s<br />\n%s",$e->getCode(),$e->getMessage(),$e->getLine(),$e->getFile(),nl2br($e->getTraceAsString()));
 	DebugMail('Server Error: '.$e->getCode(),$fullError);
-	if (!AjaxEcho('alert("An error occurred. The site administrator has been notified.")'))	echo $fullError;
+	if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) $fullError = 'An error occurred. The site administrator has been notified.';
+	if (!AjaxEcho('alert("'.$fullError.'")')) echo $fullError;
 }
 function DebugMail($subject,$message) {
     if (!defined('ERROR_EMAIL')) return;
