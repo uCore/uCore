@@ -159,6 +159,7 @@ FIN;
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 	public static function RefreshList() {
+		if (utopia::GetCurrentModule() !== __CLASS__) return;
 		$obj = utopia::GetInstance(__CLASS__);
 		$relational = $obj->GetNestedArray();
 		$r = $obj->GetChildren($relational);
