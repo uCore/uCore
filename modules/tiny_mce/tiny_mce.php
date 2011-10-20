@@ -67,7 +67,7 @@ class module_TinyMCE extends uBasicModule {
 				$includeOpts = ','.$jsOptionVar;
 			}
 
-			uJavascript::AddText(<<< FIN
+			uJavascript::IncludeText(<<< FIN
 	function updateMCE(className,hourglass) {
 		var field = $("."+className);
 		var val = tinyMCE.get(field.attr('id')).getContent();
