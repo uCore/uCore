@@ -24,8 +24,8 @@ class uSearch extends uBasicModule {
 			$obj = utopia::GetInstance($module);
 			$data = $obj->LookupRecord($pkVal);
 			$url = $obj->GetURL($pkVal);
-			$title = strip_tags($data[$info[1]]);
-			$desc = strip_tags($data[$info[2]]);
+			$title = word_trim(html2txt($data[$info[1]]),10,true);
+			$desc = word_trim(html2txt($data[$info[2]]),50,true);
 			echo '<div class="searchResult"><a href="'.$url.'">'.$title.'</a><div>'.$desc.'</div></div>';
 		}
 	}
