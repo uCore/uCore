@@ -48,8 +48,8 @@ class uSearch extends uBasicModule {
 					$scores[] = array($score,$module,$row[$pk],$info);
 				}
 			}
-			array_sort_subkey($scores,0,'>');
 		}
+		array_sort_subkey($scores,0,'>');
 		return $scores;
 	}
 
