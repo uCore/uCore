@@ -38,8 +38,8 @@ FIN
 		utopia::AddJSFile(jqFileManager::GetPathJS());
 		utopia::AddCSSFile(jqFileManager::GetPathCSS());
 
-		uJavascript::AddText(<<<FIN
-	function dclick(event) {
+		uJavascript::IncludeText(<<<FIN
+	function FileManagerItemClick(event) {
 		var item = $(this).data('item');
 		if (item.type != 0) return;
 		window.open(item.fullPath);
@@ -67,7 +67,7 @@ FIN
 			uPlupload::Init($jsOptionVar,$pathUpload);
 			$includeOpts = ','.$jsOptionVar;
 		}
-		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:dclick}}$includeOpts);});");
+		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:FileManagerItemClick}}$includeOpts);});");
 
 		$out = ob_get_contents();
 		ob_end_clean();
