@@ -61,7 +61,7 @@ class uJavascript extends uBasicModule {
 			$uStr .= filemtime($filename).'-'.filesize($filename);
 		}
 
-		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()));
+		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()).self::$includeText);
 		utopia::Cache_Check($etag,'text/javascript');
 
 		utopia::CancelTemplate();
