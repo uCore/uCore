@@ -110,3 +110,6 @@ img { border: none }
 #utopiaImg:hover {background-image:url("images/utopia-systems-hover.png"); cursor:pointer}
 #adminSlave a, #adminSlave a:link, #adminSlave a:visited { color:#996; }
 #adminSlave a:hover { color:#774; }
+
+.uSearch .searchResult a { padding-bottom: 5px; font-size:1.1em }
+.uSearch .searchResult { margin-bottom: 30px; }
