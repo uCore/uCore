@@ -916,7 +916,7 @@ class utopia {
 	static function Cache_Output($data,$etag,$contentType,$filename='',$modified=NULL,$age=2592000,$disposition='inline') {
 		self::Cache_Check($etag,$contentType,$filename,$modified,$age,$disposition);
 	//	header('Content-Length: ' . strlen($data),true);
-	//	while (ob_get_level()) ob_end_clean();
+		while (ob_get_level() >1) ob_end_clean(); // end all buffers apart from gzip
 		die($data);
 	}
 
