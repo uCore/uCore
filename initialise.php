@@ -5,7 +5,7 @@ timer_start('Load Files');
 LoadFiles();
 timer_end('Load Files');
 
-ob_start('utopia::output_buffer');
+ob_start('utopia::output_buffer',2);
 
 $configArr = (isset($_REQUEST['__config_submit'])) ? $_REQUEST : null;
 uConfig::DefineConfig($configArr);

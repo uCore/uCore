@@ -830,7 +830,7 @@ class utopia {
 
 	/*  MISC  */
 	static function output_buffer($text) {
-		if (!utopia::UsingTemplate()) return $text;
+		if (!utopia::UsingTemplate()) return FALSE;
 		utopia::AppendVar('content',$text);
 		return '';
 	}
