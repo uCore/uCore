@@ -224,11 +224,11 @@ abstract class uBasicModule implements iUtopiaModule {
 		return array_key_exists($childModule,$children);
 	}
 
-	public function AddParentCallback($parentModule,$callback,$loadpoint=0) {
+	public function AddParentCallback($parentModule,$callback,$loadpoint=1) {
 		$info = array('moduleName'=>get_class($this), 'callback' => $callback, 'loadpoint' => $loadpoint);
 		utopia::AddChild($parentModule,get_class($this),$info);
 	}
-	public function AddChildCallback($child,$callback,$loadpoint=0) {
+	public function AddChildCallback($child,$callback,$loadpoint=1) {
 		$info = array('moduleName'=>get_class($this), 'callback' => $callback, 'loadpoint' => $loadpoint);
 		utopia::AddChild(get_class($this),$child,$info);
 	}
