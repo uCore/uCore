@@ -678,6 +678,7 @@ class utopia {
 		return $path.'/';
 	}
 	public static function OutputTemplate() {
+		ob_end_clean();
 		if (self::UsingTemplate()) {
 			self::SetVar('templatedir',utopia::GetTemplateDir(true));
 
@@ -693,9 +694,8 @@ class utopia {
 
 			$template = get_include_contents($templatePath);
 		} else {
-			$template = ob_get_contents();
+			$template = '{utopia.content}';
 		}
-		ob_end_clean();
 
 		self::PrependVar('<head>','<meta name="generator" content="uCore '.file_get_contents(PATH_ABS_CORE.'version.txt').' - Utopia Core PHP Framework"/>');
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
@@ -830,7 +830,6 @@ class utopia {
 
 	/*  MISC  */
 	static function output_buffer($text) {
-		if (!utopia::UsingTemplate()) return FALSE;
 		utopia::AppendVar('content',$text);
 		return '';
 	}
