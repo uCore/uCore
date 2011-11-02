@@ -106,6 +106,7 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 		$newUrl = $obj->GetURL(array($obj->GetModuleId().'_new'=>1));
 
 		$rows = array($newUrl, $rows);
+		header('Content-Type: application/json');
 		echo json_encode($rows);
 	}
 
