@@ -338,7 +338,7 @@ EOF;
 		$delBtn = '<input type="button" value="Remove" onclick="var a = this.parentNode; while (a.className.indexOf(\'uWidgetPlaceholder\')==-1) { a = a.parentNode } a.parentNode.removeChild(a);">';
 		$addition = '';
 		if (!$ele->root->children) {
-			$ele = str_get_html('<span>'.$id.'</span>');
+			$ele = str_get_html('<span>'.$ele.'</span>');
 			$addition = $delBtn;
 		} else {
 			$editBtn = '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
@@ -351,7 +351,7 @@ EOF;
 		$ele->innertext = $addition.$ele->innertext;
 
 		if (func_num_args() > 0) return $ele;
-		die($ele);
+		echo $ele;
 	}
 	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
