@@ -245,7 +245,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		$classes = get_declared_classes();
 		foreach ($classes as $classname) { // install tables
 			$reflectionA = new ReflectionClass($classname);
-			if ($reflectionA->implementsInterface('iWidget')) $installed[] = $classname;
+			if ($reflectionA->implementsInterface('iWidget')) $installed[$classname] = $classname;
 		}
 		$this->AddField('block_type','block_type','blocks','Type',itCOMBO,$installed);
 
