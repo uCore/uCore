@@ -6,7 +6,7 @@ class module_Offline extends uBasicModule {
 	public function GetOptions() { return NO_NAV; }
 	public function SetupParents() {
 		modOpts::AddOption('module_Offline','online','Site Online',0,itYESNO);
-		$this->AddParentCallback('/',array($this,'siteOffline'));
+		$this->AddParentCallback('/',array($this,'siteOffline'),0);
 	}
 
 	private static $states = array();
