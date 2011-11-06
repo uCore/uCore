@@ -126,7 +126,7 @@ class uCustomWidget implements iWidget {
 		$classes = get_declared_classes();
 		foreach ($classes as $classname){ // install tables
 			if ($classname == 'uDataModule' || $classname == 'uListDataModule' || $classname == 'uSingleDataModule' || !is_subclass_of($classname,'uDataModule')) continue;
-			$installed[] = $classname;
+			$installed[$classname] = $classname;
 		}
 		$sender->AddMetaField('module','Data Source',itCOMBO,$installed);
 		$sender->AddMetaField('filter','Filter',itTEXT);
@@ -224,10 +224,6 @@ class uCustomWidget implements iWidget {
 		$ret = $append.$content.$prepend;
 		while (utopia::MergeVars($ret));
 
-		// add container
-		$w = isset($meta['width'])?$meta['width'] : ''; if ($w == intval($w)) $w = $w.'px';
-		$h = isset($meta['height'])?$meta['height'] : ''; if ($h == intval($h)) $h = $h.'px';
-		$ret = '<div style="width:'.$w.';height:'.$h.';">'.$ret.'</div>';
 		return $ret;
 	}
 }
@@ -288,14 +284,14 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		if ($rec['block_type'] && class_exists($rec['block_type'])) $content = $rec['block_type']::DrawData($rec);
 
 		$meta = json_decode($rec['__metadata'],true);
-		$w = isset($meta['width'])?$meta['width'] : ''; if ($w == intval($w)) $w = $w.'px';
-		$h = isset($meta['height'])?$meta['height'] : ''; if ($h == intval($h)) $h = $h.'px';
 
-		$w = $w ? 'width:'.$w.';' : '';
-		$h = $h ? 'height:'.$h : '';
-		$rep = '<div style="'.$w.$h.'">'.$content.'</div>';
+		// add container
+		$w = isset($meta['width']) ? $meta['width'] : '';	if (is_numeric($w)) $w = $w.'px';	if ($w) $w = 'width:'.$w.';';
+		$h = isset($meta['height'])?$meta['height'] : '';	if (is_numeric($h)) $h = $h.'px';	if ($h) $h = 'height:'.$h.';';
+		$style = ($w || $h) ? ' style="'.$w.$h.'"' : '';
+		$ret = '<div'.$style.'>'.$content.'</div>';
 
-		return $rep;
+		return $ret;
 	}
 
 	static function getPreview($originalVal,$pk,$processedVal,$rec) {
