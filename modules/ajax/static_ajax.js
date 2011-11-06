@@ -590,21 +590,18 @@ function _uf(ele,hourglass) {
 		cache: false,
 		url: targetPage,
 		data: eleData,
-		dataType: "script",
-		success: function(msg){   
-			InitJavascript.run();
-			$(hourglass).remove();
-		},
-		error: function(obj,type,e){      
-			if (empty(e)) return;
-			$(ele).css('background','red');
-			ErrorLog(type+': '+e.message);
-		},
-		complete: function(){
-			StoppedUpdating(ele);
-			$('.auto-complete-list').hide();
-			$(hourglass).remove();
-//			$('.uf').change(_fieldChange);
-		}
+		dataType: "script"
+	}).done(function(msg){   
+		$(hourglass).remove();
+		InitJavascript.run();
+	}).fail(function(obj,type,e){      
+		$(hourglass).remove();
+		if (empty(e)) return;
+		$(ele).css('background','red');
+		ErrorLog(type+': '+e.message);
+	}).always(function(){
+		$(hourglass).remove();
+		StoppedUpdating(ele);
+		$('.auto-complete-list').hide();
 	});
 }
