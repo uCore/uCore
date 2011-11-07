@@ -902,7 +902,6 @@ class utopia {
 
 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {
 			header('HTTP/1.1 304 Not Modified', true, 304);
-			while (ob_get_level()) ob_end_clean();
 			die();
 		}
 
@@ -911,7 +910,6 @@ class utopia {
 		header("Last-Modified: ".$lm,true);
 		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $_SERVER['HTTP_IF_MODIFIED_SINCE'] == $lm) {
 			header('HTTP/1.1 304 Not Modified', true, 304);
-			while (ob_get_level()) ob_end_clean();
 			die();
 		}
 	}
@@ -919,7 +917,6 @@ class utopia {
 	static function Cache_Output($data,$etag,$contentType,$filename='',$modified=NULL,$age=2592000,$disposition='inline') {
 		self::Cache_Check($etag,$contentType,$filename,$modified,$age,$disposition);
 	//	header('Content-Length: ' . strlen($data),true);
-		while (ob_get_level() >1) ob_end_clean(); // end all buffers apart from gzip
 		die($data);
 	}
 
