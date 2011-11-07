@@ -647,6 +647,24 @@ class utopia {
 	}
 
 	/* TEMPLATE */
+	public static function GetTemplates($includeDefault=false,$includeCore=true) {
+		$userTemplates = glob(PATH_ABS_TEMPLATES.'*'); // find all user templates
+		$adminTemplates = glob(PATH_ABS_CORE.'styles/*'); // find all admin templates
+		$nTemplates = array();
+		if ($includeDefault) $nTemplates['Default Template'] = TEMPLATE_DEFAULT;
+
+		if (is_array($adminTemplates)) foreach ($adminTemplates as $k => $v) {
+			if ($v == '.' || $v == '..' || !is_dir($v)) continue;
+			$v = str_replace(PATH_ABS_ROOT,'',$v);
+			$nTemplates[$v] = $v;
+		}
+		if (is_array($userTemplates)) foreach ($userTemplates as $k => $v) {
+			if ($v == '.' || $v == '..' || !is_dir($v)) continue;
+			$v = str_replace(PATH_ABS_ROOT,'',$v);
+			$nTemplates[$v] = $v;
+		}
+		return $nTemplates;
+	}
 	public static $adminTemplate = false;
 	private static $usedTemplate = NULL;
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_clean(); if (!$justClean) self::$usedTemplate = NULL; }
