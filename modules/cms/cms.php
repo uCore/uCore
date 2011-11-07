@@ -52,9 +52,9 @@ class uCMS_List extends uDataModule implements iAdminModule {
 	}
 	public function SetupParents() {
 		$nTemplates = utopia::GetTemplates(false,true);
-		modOpts::AddOption('CMS','default_template','Default Template',PATH_ABS_CORE.'styles/default',itCOMBO,$nTemplates);
+		modOpts::AddOption('CMS','default_template','Default Template',PATH_REL_CORE.'styles/default',itCOMBO,$nTemplates);
 		$o = modOpts::GetOption('CMS','default_template');
-		if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('CMS','default_template',PATH_ABS_CORE.'styles/default');
+		if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('CMS','default_template',PATH_REL_CORE.'styles/default');
 
 		$this->AddParent('internalmodule_Admin');
 		$this->AddParent('uCMS_Edit');
@@ -551,7 +551,7 @@ class uCMS_View extends uSingleDataModule {
 		$templates = utopia::GetTemplates();
 		if (array_search($template,$templates) === FALSE && file_exists(PATH_ABS_TEMPLATES.$template) && $id) {
 			$obj = utopia::GetInstance('uCMS_View');
-			$obj->UpdateField('template',PATH_ABS_TEMPLATES.$template,$id);
+			$obj->UpdateField('template',PATH_REL_TEMPLATES.$template,$id);
 		}
 
 		return $template;
