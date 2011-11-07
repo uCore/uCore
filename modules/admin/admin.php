@@ -102,7 +102,6 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 		echo '<table><tr><td>Current Version:</td><td>'.$myVer.'</td></tr><tr><td>Latest Version:</td><td>'.$latestVer.'</td></tr></table>';
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
-		//GetFiles(true);
 
 		$rc = PATH_REL_CORE;
 		$ucStart = '## uCore ##';

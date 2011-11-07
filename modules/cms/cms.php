@@ -51,23 +51,10 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('is_published','is_published','cms');
 	}
 	public function SetupParents() {
-		$templates = glob(PATH_ABS_TEMPLATES.'*'); // find all templates
-		$nTemplates = array('Default Template'=>TEMPLATE_DEFAULT,'No Template'=>TEMPLATE_BLANK);
-		if (is_array($templates)) foreach ($templates as $k => $v) {
-		        if ($v == '.' || $v == '..' || !is_dir($v)) {
-		                unset($templates[$k]);
-		                continue;
-		        }
-		        $nTemplates[basename($v)] = basename($v);
-		        //unset($templates[$k]);
-		        //$templates[$k] = basename($v);
-		}
-		//$templates = is_array($templates) ? array_values($templates) : array();
-		utopia::SetVar('TEMPLATE_LIST',$nTemplates);
-		unset($nTemplates['Default Template']);
-		$nTemplates['No Template'] = '';
-		modOpts::AddOption('CMS','default_template','Default Template','',itCOMBO,$nTemplates);
-
+		$nTemplates = utopia::GetTemplates(false,true);
+		modOpts::AddOption('CMS','default_template','Default Template',PATH_ABS_CORE.'styles/default',itCOMBO,$nTemplates);
+		$o = modOpts::GetOption('CMS','default_template');
+		if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('CMS','default_template',PATH_ABS_CORE.'styles/default');
 
 		$this->AddParent('internalmodule_Admin');
 		$this->AddParent('uCMS_Edit');
@@ -260,7 +247,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}.php">'.PATH_REL_ROOT.'{cms_id}.php</a>','cms','View Page');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
 		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
-		$templates = utopia::GetVar('TEMPLATE_LIST');
+		$templates = utopia::GetTemplates(true);
 		$templates['Default Template'] = '';
 		$this->AddField('template','template','cms','Template',itCOMBO,$templates);
 //		$this->AddField('position','position','cms','Navigation Position',itTEXT);
@@ -559,6 +546,14 @@ class uCMS_View extends uSingleDataModule {
 			$id = $rec['parent'];
 		}
 		if (!$template) $template = modOpts::GetOption('CMS','default_template');
+
+		// check if template exists, if not, check if template exists in templates folder, if it does then update the field with the full path and return it
+		$templates = utopia::GetTemplates();
+		if (array_search($template,$templates) === FALSE && file_exists(PATH_ABS_TEMPLATES.$template) && $id) {
+			$obj = utopia::GetInstance('uCMS_View');
+			$obj->UpdateField('template',PATH_ABS_TEMPLATES.$template,$id);
+		}
+
 		return $template;
 	}
 }

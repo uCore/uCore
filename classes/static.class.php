@@ -1,6 +1,6 @@
 <?php
 define('TEMPLATE_BLANK','__blank__');
-define('TEMPLATE_ADMIN','__admin__');
+//define('TEMPLATE_ADMIN','__admin__');
 define('TEMPLATE_DEFAULT','__default__');
 
 utopia::AddTemplateParser('utopia','utopia::parseVars');
@@ -672,7 +672,8 @@ class utopia {
 		if ($template == TEMPLATE_DEFAULT) $template = modOpts::GetOption('CMS','default_template');
 		if (!$template) $template = TEMPLATE_BLANK;
 		$ret = true;
-		if ($template != TEMPLATE_BLANK && $template != TEMPLATE_ADMIN && !file_exists(PATH_ABS_TEMPLATES.$template.'/template.php')) {
+
+		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template.'/template.php')) {
 			$template = TEMPLATE_BLANK;
 			$ret = false;
 		}
@@ -687,11 +688,8 @@ class utopia {
 			case TEMPLATE_BLANK:
 				$templateDir = PATH_ABS_CORE.'styles/default/';
 				break;
-			case TEMPLATE_ADMIN:
-				$templateDir = PATH_ABS_CORE.'styles/admin/';
-				break;
 			default:
-				$templateDir = PATH_ABS_TEMPLATES.self::$usedTemplate.'/';
+				$templateDir = PATH_ABS_ROOT.self::$usedTemplate.'/';
 				break;
 		}
 		$path = realpath($templateDir);

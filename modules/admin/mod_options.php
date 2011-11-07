@@ -69,6 +69,11 @@ class modOpts extends uListDataModule implements iAdminModule {
 		$ident = $module.'::'.$ident;
 		return self::$optCache[$ident];
 	}
+	public static function SetOption($module,$ident,$value) {
+		$ident = $module.'::'.$ident;
+		$obj = utopia::GetInstance(__CLASS__);
+		$obj->UpdateField('value',$value,$ident);
+	}
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		$pk = $this->GetPrimaryKey();
 		if ($fieldName == 'value' && isset(self::$types[$row[$pk]])) {

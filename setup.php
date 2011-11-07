@@ -3,15 +3,15 @@
 define('CFG_TYPE_TEXT',flag_gen('configType'));
 define('CFG_TYPE_PATH',flag_gen('configType'));
 define('CFG_TYPE_PASSWORD',flag_gen('configType'));
+define('CFG_TYPE_CALLBACK',flag_gen('configType'));
 
-//uConfig::AddConfigVar('MODULES_PATH','Module Path',NULL,CFG_TYPE_PATH);
 uConfig::AddConfigVar('ERROR_EMAIL','Debug Email Address');
 uConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
 uConfig::AddConfigVar('SQL_SERVER','Database Server Address');
 uConfig::AddConfigVar('SQL_PORT','Database Port');
 uConfig::AddConfigVar('SQL_DBNAME','Database Name');
 uConfig::AddConfigVar('SQL_USERNAME','Database Username');
-uConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,CFG_TYPE_PASSWORD);
+uConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,NULL,CFG_TYPE_PASSWORD);
 
 uConfig::AddConfigVar('DEFAULT_CURRENCY','Default Currency');
 
@@ -19,15 +19,17 @@ uConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://dev.mysql.c
 uConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Time Format</a>','%H:%i:%s');
 
 uConfig::AddConfigVar('admin_user','Admin Username');
-uConfig::AddConfigVar('admin_pass','Admin Password',NULL,CFG_TYPE_PASSWORD);
+uConfig::AddConfigVar('admin_pass','Admin Password',NULL,NULL,CFG_TYPE_PASSWORD);
+
+uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'styles/uCore',array('utopia::GetTemplates',array(false)),CFG_TYPE_CALLBACK|CFG_TYPE_PATH);
 
 uConfig::ReadConfig();
 
 class uConfig {
 	static $configVars = array();
-	static function AddConfigVar($name,$readable,$default=NULL,$type=CFG_TYPE_TEXT) {
+	static function AddConfigVar($name,$readable,$default=NULL,$values=NULL,$type=CFG_TYPE_TEXT) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
-		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'type'=>$type);
+		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'values'=>$values,'type'=>$type);
 	}
 	static $oConfig = '';
 	static function ReadConfig() {
@@ -85,12 +87,12 @@ class uConfig {
 				$showConfig = true;
 			}
 			$val = defined($key) ? constant($key) : null;
-			if ($info['type']==CFG_TYPE_PASSWORD && empty($val)) {
+			if (($info['type'] & CFG_TYPE_PASSWORD) && empty($val)) {
 				$showConfig = true;
 				self::$configVars[$key]['notice'] = "Must not be empty.";
 			}
 			
-			if ($info['type']==CFG_TYPE_PATH && !is_dir(PATH_ABS_ROOT.$val)) {
+			if (($info['type'] & CFG_TYPE_PATH) && !is_dir(PATH_ABS_ROOT.$val)) {
 				$showConfig = true;
 				self::$configVars[$key]['notice'] = "Must be a valid directory.";
 			}
@@ -147,20 +149,29 @@ FIN;
 			} else {
 				echo '<tr><td>'.$info['name'].':</td>';
 			}
-			if (is_array($info['type'])) {
-				$assoc = is_assoc($info['type']);
-				echo '<td><select name="'.$key.'">';
-				foreach ($info['type'] as $k => $v) {
+			if (($info['type'] & CFG_TYPE_CALLBACK) && is_callable($info['values'][0])) {
+				$info['values'] = call_user_func_array($info['values'][0],$info['values'][1]);
+			}
+			if (is_array($info['values'])) {
+				$assoc = is_assoc($info['values']);
+				echo '<td>';
+				if ($info['type'] & CFG_TYPE_PATH) echo PATH_REL_ROOT;
+				echo '<select name="'.$key.'">';
+				foreach ($info['values'] as $k => $v) {
+					if ($info['type'] & CFG_TYPE_PATH) $v = str_replace(PATH_ABS_ROOT,'',$v);
 					$selected = (($assoc ? $k : $v) == $val) ? ' selected="selected"' : '';
 					$selVal = $assoc ? ' value="'.$k.'"' : '';
 					echo '<option'.$selected.$selVal.'>'.$v.'</option>';
 				}
 				echo '</select></td>';
 			} else {
-				$type = $info['type']==CFG_TYPE_PASSWORD ? 'password' : 'text';
-				$dVal = $info['type']==CFG_TYPE_PASSWORD ? '' : $val;
+				$type = $info['type'] & CFG_TYPE_PASSWORD ? 'password' : 'text';
+				$dVal = $info['type'] & CFG_TYPE_PASSWORD ? '' : $val;
 				echo '<td>';
-				if ($info['type'] == CFG_TYPE_PATH) echo PATH_REL_ROOT;
+				if ($info['type'] & CFG_TYPE_PATH) {
+					echo PATH_REL_ROOT;
+					$dVal = str_replace(PATH_ABS_ROOT,'',$dVal);
+				}
 				echo '<input name="'.$key.'" type="'.$type.'" size="40" value="'.$dVal.'"></td>';
 			}
 			echo '</tr>';
@@ -169,4 +180,3 @@ FIN;
 		utopia::Finish();
 	}
 }
-?>
