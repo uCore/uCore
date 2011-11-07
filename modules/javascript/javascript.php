@@ -52,6 +52,8 @@ class uJavascript extends uBasicModule {
 	}
 
 	public function RunModule() {
+		utopia::CancelTemplate();
+
 		$uStr = '';
 		self::$includeFiles = array_unique(self::$includeFiles);
 		foreach (self::$includeFiles as $filename) {
@@ -64,7 +66,6 @@ class uJavascript extends uBasicModule {
 		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()).self::$includeText);
 		utopia::Cache_Check($etag,'text/javascript');
 
-		utopia::CancelTemplate();
 		$out = uJavascript::BuildJavascript(true);
 		utopia::Cache_Output($out,$etag,'text/javascript','javascript.js');
 	}
