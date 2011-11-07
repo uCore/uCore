@@ -551,7 +551,7 @@ class uCMS_View extends uSingleDataModule {
 		$templates = utopia::GetTemplates();
 		if (array_search($template,$templates) === FALSE && file_exists(PATH_ABS_TEMPLATES.$template) && $id) {
 			$obj = utopia::GetInstance('uCMS_View');
-			$obj->UpdateField('template',PATH_REL_TEMPLATES.$template,$id);
+			$obj->UpdateField('template',utopia::GetRelativePath(PATH_ABS_TEMPLATES.$template),$id);
 		}
 
 		return $template;
