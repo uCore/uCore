@@ -5,10 +5,9 @@ function sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
 	//    $port = is_empty(constant('SQL_PORT')) ? '' : ';port='.SQL_PORT;
 	//   $GLOBALS['dbh'] = new PDO(DB_TYPE.':dbname='.SQL_DBNAME.';host='.SQL_SERVER.$port,SQL_USERNAME,SQL_PASSWORD);
 	//    return $GLOBALS['dbh'];
-	static $sql_connection = false;
-  if ($sql_connection) return $sql_connection;
+	$sql_connection = utopia::GetVar('sql_connection');
+	if ($sql_connection) return $sql_connection;
 
-//	if (!array_key_exists('sql_connection',$GLOBALS) || !$GLOBALS['sql_connection']) {
 	if (!$port) $port = is_empty(constant('SQL_PORT')) ? '' : ':'.SQL_PORT;
 	if (!$srv) $srv = SQL_SERVER.$port; else $srv = $srv.$port;
 	if (!$usr) $usr = SQL_USERNAME;
@@ -27,7 +26,6 @@ function sql_connect($srv=NULL,$port=NULL,$usr=NULL,$pass=NULL) {
 		return false;
 	}
 	mysql_set_charset('utf8');
-//	}
 
 	return $sql_connection; // $GLOBALS['sql_connection'];
 }
