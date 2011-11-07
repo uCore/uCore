@@ -21,7 +21,7 @@ uConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.c
 uConfig::AddConfigVar('admin_user','Admin Username');
 uConfig::AddConfigVar('admin_pass','Admin Password',NULL,NULL,CFG_TYPE_PASSWORD);
 
-uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'styles/uCore',array('utopia::GetTemplates',array(false)),CFG_TYPE_CALLBACK|CFG_TYPE_PATH);
+uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'styles/admin',array('utopia::GetTemplates',array(false)),CFG_TYPE_CALLBACK|CFG_TYPE_PATH);
 
 uConfig::ReadConfig();
 
@@ -62,7 +62,10 @@ class uConfig {
 	static function DefineConfig($arr) {
 		if (!$arr) $arr = self::$oConfig;
 		foreach (self::$configVars as $key => $info) {
-			if (!isset($arr[$key])) continue;
+			if (!isset($arr[$key])) {
+				if (!$info['default']) continue;
+				$arr[$key] = $info['default'];
+			}
 			$val = $arr[$key];
 			if (!$val && $info['type'] == CFG_TYPE_PASSWORD && isset(self::$oConfig[$key])) {
 				$val = self::$oConfig[$key];
