@@ -13,8 +13,6 @@ class modLinks extends uBasicModule {
 	public function drawLinks($parent) {
 		$arr = array();
 
-		$current = utopia::GetCurrentModule();
-		$currentAdded = false;
 		$parentObj = utopia::GetInstance($parent);
 		$admin = ($parentObj instanceof iAdminModule);
 		$isadmin = internalmodule_AdminLogin::IsLoggedIn();
@@ -37,14 +35,8 @@ class modLinks extends uBasicModule {
 				$url = $obj->GetURL();
 				$title = $obj->GetTitle();
 				if (!$url || !$title) continue;
-				if ($child['moduleName'] == $current) $currentAdded = true;
 				$arr[] = array($title,$url,$order,$child['moduleName']);
 			}
-		}
-
-		if (!$currentAdded && $current != 'uCMS_View') {
-			$obj = utopia::GetInstance($current);
-			$arr[] = array($obj->GetTitle(),$_SERVER['REQUEST_URI'],-100,$current);
 		}
 
 		array_sort_subkey($arr,2); // sort first, to find the highest order value
