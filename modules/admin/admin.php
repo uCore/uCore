@@ -17,7 +17,7 @@ class internalmodule_Reconfigure extends uBasicModule implements iAdminModule {
 	}
 }
 
-
+define('ADMIN_HOME', 'internalmodule_Admin');
 class internalmodule_Admin extends uBasicModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Home'; }

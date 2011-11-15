@@ -211,7 +211,7 @@ class utopia {
 		}
 
 		// admin root?
-		if (strpos($_SERVER['REQUEST_URI'],PATH_REL_CORE) === 0) return 'internalmodule_Admin';
+		if (strpos($_SERVER['REQUEST_URI'],PATH_REL_CORE) === 0) return ADMIN_HOME;
 
 		// CMS
 		return 'uCMS_View';
