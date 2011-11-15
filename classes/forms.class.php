@@ -2962,7 +2962,7 @@ SCR_END
 
 			// start of FIELD headers
 			echo '<tr>';
-			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo '<th>&nbsp;</th>'; $colcount++; }
+			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo '<td></td>'; $colcount++; }
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$colcount++;
