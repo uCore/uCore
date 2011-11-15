@@ -6,6 +6,7 @@ body { text-align:left !important; text-align:center; margin:0; font-family: Ari
 #wrap { width:100%; margin:0 auto; text-align:left; background:white; }
 
 a, a:link, a:visited { color: #333; text-decoration:none }
+a:hover { color: #8CC63F }
 
 #header { background: url(images/header-grad-bg.gif) top center repeat-x #F0F0F0; }
 #innerheader { min-height:98px; height: auto !important; height: 98px; position:relative;
