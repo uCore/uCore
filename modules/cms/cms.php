@@ -34,7 +34,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 	public function GetTitle() { return 'Page Editor'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
-	public function GetSortOrder() { return utopia::GetCurrentModule() == 'uCMS_Edit' ? -500 : parent::GetSortOrder(); }
+	public function GetSortOrder() { return -8900; }
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID');
