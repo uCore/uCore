@@ -47,15 +47,26 @@ class modLinks extends uBasicModule {
 			$arr[] = array($obj->GetTitle(),$_SERVER['REQUEST_URI'],-100,$current);
 		}
 
-		$arr[] = array('','',-9000);
+		array_sort_subkey($arr,2); // sort first, to find the highest order value
+		$highest = end($arr); $highest = $highest[2];
 
-		array_sort_subkey($arr,2);
+		$i = -10000;
+		while ($i < $highest) {
+			$arr[] = array('','',$i-0.5);
+			$i = $i + 1000;
+		}
+
+		array_sort_subkey($arr,2); // sort again to insert spacings at each 1000 interval
+
 		$out = array();
+		$lastWasBlank = true;
 		foreach ($arr as $link) {
-			if (empty($link[1]) && empty($out)) continue;
+			if (empty($link[1]) && $lastWasBlank) continue;
 			$l = !empty($link[1]) ? '<a href="'.$link[1].'">'.$link[0].'</a>' : '&nbsp;';
 			$out[] = '<li>'.$l.'</li>';
+			$lastWasBlank = empty($link[1]);
 		}
+		if ($lastWasBlank) array_pop($out);
 		if ($arr) utopia::SetVar('modlinks','<ul id="modlinks">'.implode('',$out).'</ul>');
 	}
 
