@@ -831,6 +831,7 @@ class utopia {
 		utopia::SetTitle('404 Not Found');
 		echo '<h1>404 Not Found</h1>';
 		echo '<p>The page you requested could not be found. Return to the <a href="/">homepage</a>.</p>';
+		utopia::AppendVar('<head>','<meta name="robots" content="noindex" />');
 		utopia::Finish(); die();
 	}
 
