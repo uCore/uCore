@@ -3,31 +3,6 @@
 //-- debugging
 //define('SHOW_QUERY'		,false);
 
-//--  InputType
-define('itNONE'		,'');
-define('itBUTTON'	,'button');
-define('itSUBMIT'	,'submit');
-define('itRESET'	,'reset');
-define('itCHECKBOX'	,'checkbox');
-define('itOPTION'	,'option');
-
-define('itMD5'		,'password');
-define('itPASSWORD'	,'password');
-define('itPLAINPASSWORD','plain_password');
-
-define('itTEXT'		,'text');
-define('itTEXTAREA'	,'textarea');
-define('itSUGGEST'	,'suggest');
-define('itSUGGESTAREA'	,'suggestarea');
-define('itCOMBO'	,'combo');
-define('itLISTBOX'	,'listbox');
-define('itFILE'		,'file');
-define('itDATE'		,'date');
-define('itTIME'		,'time');
-define('itDATETIME'	,'datetime');
-define('itSCAN'		,'scan');
-define('itCUSTOM'	,'~~custom~~');
-
 //--  FilterCompareType
 define('ctCUSTOM'   ,'{custom}');
 define('ctANY'		,'');
