@@ -36,6 +36,7 @@ class module_TinyMCE extends uBasicModule {
 			$options['theme_advanced_toolbar_align'] = "left";
 			$options['forced_root_block'] = false;
 			$options['content_css'] = '{utopia.templatedir}styles.css,'.PATH_REL_CORE.'default.css';
+			$options['setup'] = 'tinyMceSetup';
 
 			$richOpts = $options;
 			$htmlOpts = $options;
@@ -68,10 +69,16 @@ class module_TinyMCE extends uBasicModule {
 			}
 
 			uJavascript::AddText(<<< FIN
-	function updateMCE(className,hourglass) {
-		var field = $("."+className);
-		var val = tinyMCE.get(field.attr('id')).getContent();
-		uf(field,val,hourglass);
+	function tinyMceSetup(ed) {
+		ed.onInit.add(function(ed, evt) {
+			tinymce.dom.Event.add(ed.getWin(), 'blur', function(e) {
+				// hide toolbar
+				$('.mceExternalToolbar').hide();
+				// update field if different
+				if ($(ed.getElement()).val() != ed.getContent())
+					uf(ed.getElement(),ed.getContent(),ed.getContainer());
+			});
+		});
 	}
 	var mb = null;
 	function openMediaBrowser(field_name, url, type, win) {
@@ -116,7 +123,7 @@ FIN
 		$saveClass = 'mceSave'.rand(1,5000);
 		$attributes['class'] .= ' '.$saveClass;
 
-		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).'<div style="background-color:#ccc; border:1px solid #666"><input class="btn" type="button" value="Save" onclick="updateMCE(\''.$saveClass.'\',this)"></div>';
+		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit);
 	}
 	public function RunModule() {
 	}
