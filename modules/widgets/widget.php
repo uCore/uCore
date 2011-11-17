@@ -78,9 +78,9 @@ class uCustomWidgetConverter extends uDataModule {
 }
 
 class uWidgets_List extends uListDataModule implements iAdminModule {
-	public function GetTitle() { return 'Widgets'; }
+	public function GetTitle() { return 'Widget Editor'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER; }
-	public function GetSortOrder() { return 1; }
+	public function GetSortOrder() { return -8800; }
 	public function GetTabledef() { return 'tabledef_Widgets'; }
 	public function SetupFields() {
 		$this->CreateTable('blocks');
@@ -89,7 +89,8 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 	}
 	public function SetupParents() {
 		$this->RegisterAjax('getWidgets',array($this,'getWidgets'));
-		$this->AddParentCallback('uCMS_List',array($this,'ShowData'));
+		//$this->AddParentCallback('uCMS_List',array($this,'ShowData'));
+		$this->AddParent('/');
 	}
 	public function getWidgets() {
 		// static

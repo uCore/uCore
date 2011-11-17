@@ -1,12 +1,10 @@
 <?php
 define('itFILEMANAGER' ,'fileman');
 class fileManager extends uBasicModule implements iAdminModule {
-	public function GetSortOrder() { return 10; }
-	function GetTitle() {
-		return 'File Manager';
-	}
+	public function GetSortOrder() { return -8700; }
+	function GetTitle() { return 'Media Manager'; }
 	function SetupParents() {
-		$this->AddParentCallback('uCMS_List',array($this,'RunModule'));
+		$this->AddParent('/');
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 	}

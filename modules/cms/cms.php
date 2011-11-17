@@ -56,7 +56,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$o = modOpts::GetOption('CMS','default_template');
 		if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('CMS','default_template',PATH_REL_CORE.'styles/default');
 
-		$this->AddParent('internalmodule_Admin');
+		$this->AddParent('/');
 		$this->AddParent('uCMS_Edit');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 	}
