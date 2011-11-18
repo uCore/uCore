@@ -174,7 +174,7 @@ class uCustomWidget implements iWidget {
 
 		$content = $append = $prepend = '';
     	
-		$html = str_get_html($meta['content']);
+		$html = str_get_html($meta['content'],true,true,DEFAULT_TARGET_CHARSET,false);
 		$ele = '';
 		if ($html) {
 			$ele = $html->find('._ri',0);
