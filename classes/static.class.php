@@ -462,7 +462,7 @@ class utopia {
 		if (!self::VarExists($varname))
 			self::$globalVariables[$varname] = $initialise;
 
-		if (!$raw && is_callable(self::$globalVariables[$varname])) {
+		if (!$raw && is_array(self::$globalVariables[$varname]) && is_callable(self::$globalVariables[$varname])) {
 			$base = self::$globalVariables[$varname];
 			$args = array_splice($base,2);
 			$result = call_user_func_array($base,$args);
