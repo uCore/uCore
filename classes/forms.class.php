@@ -2637,7 +2637,7 @@ FIN;
 		//$url = htmlentities($url);
 		// htmlentities moved here from the to do.
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
-		if ((array_key_exists('htmlencode',$fieldData) && $fieldData['htmlencode']) || $inputType == itTEXTAREA) $value = htmlentities($value,ENT_COMPAT,CHARSET_ENCODING);
+		if ((array_key_exists('htmlencode',$fieldData) && $fieldData['htmlencode']) && $inputType != itTEXTAREA) $value = htmlentities($value,ENT_COMPAT,CHARSET_ENCODING);
 		if ($inputType !== itNONE && (($row !== NULL && flag_is_set($this->GetOptions(),ALLOW_EDIT)) || ($row === NULL  && flag_is_set($this->GetOptions(),ALLOW_ADD)))) {
 			$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
 			$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
