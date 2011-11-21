@@ -340,7 +340,7 @@ class utopia {
 				$out .= "<input type=\"text\" $attr value=\"$val\"/>";
 				break;
 			case itTEXTAREA:
-				$defaultValue = $htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
+				$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
 				//				settype($possibleValues,'integer');
 				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " cols=\"$possibleValues\" rows=\"".floor($possibleValues*0.08)."\"" : "";
 				$out .= "<textarea $attr>$defaultValue</textarea>";
