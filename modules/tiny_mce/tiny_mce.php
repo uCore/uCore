@@ -76,7 +76,7 @@ class module_TinyMCE extends uBasicModule {
 				// hide toolbar
 				$('.mceExternalToolbar').hide();
 				// update field if different
-				var content = ed.getContent({format : 'raw'});
+				var content = ed.getContent();
 				if ($(ed.getElement()).val() != content)
 					uf(ed.getElement(),content,ed.getContainer());
 			});
