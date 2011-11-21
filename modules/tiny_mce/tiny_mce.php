@@ -35,12 +35,11 @@ class module_TinyMCE extends uBasicModule {
 			$options['theme_advanced_toolbar_location'] = "top";
 			$options['theme_advanced_toolbar_align'] = "left";
 			$options['forced_root_block'] = false;
+			$options['preformatted'] = true;
 			$options['content_css'] = '{utopia.templatedir}styles.css,'.PATH_REL_CORE.'default.css';
 			$options['setup'] = 'tinyMceSetup';
 
-			$richOpts = $options;
-			$htmlOpts = $options;
-
+			$richOpts = array();
 			$richOpts['editor_selector'] = "mceEditorRich";
 			$richOpts['plugins'] = "inlinepopups,spellchecker";
 			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p';
@@ -49,6 +48,7 @@ class module_TinyMCE extends uBasicModule {
 			$richOpts['theme_advanced_buttons3'] = "";
 			$richOpts['theme_advanced_buttons4'] = "";
 
+			$htmlOpts = array();
 			$htmlOpts['editor_selector'] = "mceEditorHTML";
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
@@ -58,6 +58,7 @@ class module_TinyMCE extends uBasicModule {
 			$htmlOpts['theme_advanced_buttons3_add'] = ",|,styleprops,spellchecker,|,tablecontrols";
 			//$htmlOpts['theme_advanced_buttons4'] = "";
 
+			$baseOpts = json_encode($options);
 			$richOpts = json_encode($richOpts);
 			$htmlOpts = json_encode($htmlOpts);
 
@@ -100,9 +101,9 @@ class module_TinyMCE extends uBasicModule {
 		mb.dialog('close');
 	}
 	function InitMCE() {
-		tinyMCE.init($richOpts);
-		tinyMCE.init($htmlOpts);
-		//$(".mceRichText").live("change",function() { uf(this); });
+		var defaultOptions = $baseOpts;
+		tinyMCE.init($.extend({},defaultOptions,$richOpts));
+		tinyMCE.init($.extend({},defaultOptions,$htmlOpts));
 	}
 	InitJavascript.add(InitMCE);
 FIN
