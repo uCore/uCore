@@ -76,8 +76,9 @@ class module_TinyMCE extends uBasicModule {
 				// hide toolbar
 				$('.mceExternalToolbar').hide();
 				// update field if different
-				if ($(ed.getElement()).val() != ed.getContent())
-					uf(ed.getElement(),ed.getContent(),ed.getContainer());
+				var content = ed.getContent({format : 'raw'});
+				if ($(ed.getElement()).val() != content)
+					uf(ed.getElement(),content,ed.getContainer());
 			});
 		});
 	}
