@@ -544,7 +544,7 @@ function _uf(ele,hourglass) {
 		eleVal = forcedValue;
 	} else {
 		var eleVal = [];
-		$('[name*="'+eleName+'"]').each(function () {
+		$(ele).siblings('[name*="'+eleName+'"]').each(function () {
 			if (this.tagName == 'INPUT' && $(this).is(':checkbox')) {
 				if ($(this).is(':checked')) eleVal.push($(this).val());// else eleVal.push('');
 			} else {
