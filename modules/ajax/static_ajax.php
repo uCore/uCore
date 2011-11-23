@@ -19,9 +19,17 @@ class internalmodule_StaticAjax extends uBasicModule {
 		$this->RegisterAjax('getFile',array($this,'getFile'));
 		$this->RegisterAjax('getUpload',array($this,'getUpload'));
 		$this->RegisterAjax('getCompressed',array($this,'getCompressed'));
+		$this->RegisterAjax('getParserContent',array($this,'getParserContent'));
 	}
 
 	public function RunModule() {
+	}
+
+	public function getParserContent() {
+		$ident = isset($_GET['ident']) ? $_GET['ident'] : null;
+		$data = isset($_GET['data']) ? '.'.$_GET['data'] : null;
+		echo '{'.$ident.$data.'}';
+		utopia::Finish();
 	}
 
 	public function getCompressed() {
