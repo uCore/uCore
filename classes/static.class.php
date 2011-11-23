@@ -789,17 +789,7 @@ class utopia {
 						}
 						//if (self::IsInsideNoProcess($string,$pos)) { $offset = $pos + $searchLen; continue; }
 
-
-						if ($arr[1]) ob_start();
-						if ($varsArr) { // must process, get replacement
-							$id = $varsArr[$k];
-							$replace = call_user_func($arr[0],$id);
-						} else
-							$replace = call_user_func($arr[0]);
-						if ($arr[1]) {
-							$replace = ob_get_contents();
-							ob_end_clean();
-						}
+						$replace = self::RunTemplateParser($ident,$varsArr?$varsArr[$k]:null);
 
 						if ($replace === NULL || $replace === FALSE) {
 							$offset = $pos + $searchLen;
@@ -831,6 +821,22 @@ class utopia {
 		//if (array_key_exists($ident,self::$templateParsers)) { error_log("$ident is already defined as a template parser."); return; }
 		//if (!is_callable($function)) { error_log("Function for template parser ($ident) is not callable."); return; }
 		self::$templateParsers[$ident] = array($function,$catchOutput);
+	}
+	static function RunTemplateParser($ident,$data=null) {
+		if (!isset(self::$templateParsers[$ident])) return;
+		$parser = self::$templateParsers[$ident];
+
+		if ($parser[1]) ob_start();
+		if ($data)
+			$replace = call_user_func($parser[0],$data);
+		else
+			$replace = call_user_func($parser[0]);
+
+		if ($parser[1]) {
+			$replace = ob_get_contents();
+			ob_end_clean();
+		}
+		return $replace;
 	}
 	static function parseVars($id) {
 		$replacement = self::GetVar($id.':before').self::GetVar($id).self::GetVar($id.':after');
