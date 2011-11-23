@@ -38,25 +38,27 @@ class module_TinyMCE extends uBasicModule {
 			$options['preformatted'] = true;
 			$options['content_css'] = '{utopia.templatedir}styles.css,'.PATH_REL_CORE.'default.css';
 			$options['setup'] = 'tinyMceSetup';
+			$options['save_onsavecallback'] = 'onSave';
+			$options['save_enablewhendirty'] = true;
 
 			$richOpts = array();
 			$richOpts['editor_selector'] = "mceEditorRich";
-			$richOpts['plugins'] = "inlinepopups,spellchecker";
+			$richOpts['plugins'] = "inlinepopups,spellchecker,autoresize,save";
 			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p';
 			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
 			$richOpts['theme_advanced_buttons3'] = "";
-			$richOpts['theme_advanced_buttons4'] = "";
+			$richOpts['theme_advanced_buttons4'] = "save";
 
 			$htmlOpts = array();
 			$htmlOpts['editor_selector'] = "mceEditorHTML";
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
-			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,fullscreen";
+			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,fullscreen,autoresize,save";
 			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor,|,fullscreen';
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media,|,insertlayer,moveforward,movebackward,absolute';
 			$htmlOpts['theme_advanced_buttons3_add'] = ",|,styleprops,spellchecker,|,tablecontrols";
-			//$htmlOpts['theme_advanced_buttons4'] = "";
+			$htmlOpts['theme_advanced_buttons4'] = "save";
 
 			$baseOpts = json_encode($options);
 			$richOpts = json_encode($richOpts);
@@ -75,12 +77,11 @@ class module_TinyMCE extends uBasicModule {
 			tinymce.dom.Event.add(ed.getWin(), 'blur', function(e) {
 				// hide toolbar
 				$('.mceExternalToolbar').hide();
-				// update field if different
-				var content = ed.getContent();
-				if ($(ed.getElement()).val() != content)
-					uf(ed.getElement(),content,ed.getContainer());
 			});
 		});
+	}
+	function onSave(ed) {
+		uf(ed.getElement(),ed.getContent(),ed.getContainer());		
 	}
 	var mb = null;
 	function openMediaBrowser(field_name, url, type, win) {
