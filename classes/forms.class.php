@@ -2871,15 +2871,19 @@ SCR_END
 		);
 	}
 
-	public function ShowData() {//$sortColumn=NULL) {
+	public function ShowData($dataSource = null) {//$sortColumn=NULL) {
 		//	echo "showdata ".get_class($this)."\n";
 		//	print_r($this->fields);
 		//check pk and ptable are set up
-		if (is_empty($this->GetTabledef()) && !$this->UnionModules) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
+		if ($dataSource) {
+			$num_rows = count($dataSource);
+		} else {
+			if (is_empty($this->GetTabledef()) && !$this->UnionModules) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
-		$dataset = $this->GetDataset(TRUE);
-		$num_rows = $this->GetRowCount();
-		if (mysql_error()) return;
+			$dataset = $this->GetDataset(TRUE);
+			$num_rows = $this->GetRowCount();
+			if (mysql_error()) return;
+		}
 
 		$children = utopia::GetChildren(get_class($this));
 		//print_r($children);
@@ -3003,7 +3007,7 @@ SCR_END
 			ob_end_clean();
 
 			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
-			$records = ($dataset == FALSE || $num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows.' (Max 150 shown)';
+			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows.' (Max 150 shown)';
 			echo '<tr><td colspan="'.$colcount.'">'.$pager.'<b>{list.'.get_class($this).'}'.$records.'</b></td></tr>';
 
 			echo $c;
@@ -3045,12 +3049,12 @@ SCR_END
 		//			$gUrl = " l_url='$gUrl'";
 
 		$body = "<tbody$gUrl>";
-		if ($dataset == FALSE || $num_rows == 0) {
+		if ($num_rows == 0) {
 		} else {
 			//			if ($result != FALSE && mysql_num_rows($result) > 200)
 			//				echo "<tr><td colspan=\"$colcount\">There are more than 200 rows. Please use the filters to narrow your results.</td></tr>";
 			$i = 0;
-			while (($row = $this->GetRecord($dataset,$i)) && $i <= 150) {
+			while (($dataSource && isset($dataSource[$i]) && $row = $dataSource[$i]) || ($row = $this->GetRecord($dataset,$i)) && $i <= 150) {
 				$i++;
 				// move totals here
 				foreach ($this->fields as $fieldName => $fieldData) {
