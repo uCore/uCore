@@ -107,6 +107,13 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
 		$content = <<<FIN
+#deny access to config file
+<Files uConfig.php>
+	order allow,deny
+	deny from all
+</Files>
+
+#enable default cache control and compression
 <FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
 	<IfModule mod_deflate.c>
 		SetOutputFilter DEFLATE
@@ -117,6 +124,7 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 	</IfModule>
 </FilesMatch>
 
+#URL Rewriting
 <IfModule mod_rewrite.c>
 	# Tell PHP that the mod_rewrite module is ENABLED.
 	SetEnv HTTP_MOD_REWRITE On
