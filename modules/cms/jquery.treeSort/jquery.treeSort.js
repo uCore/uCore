@@ -25,8 +25,8 @@
 		tree:	'ul',
 		branch:	'li'
 	};
-  var onselstart = null;
-	
+	var onselstart = null;
+
 	$.fn.treeSort = function(settings) {
 		var options = $.extend({}, optionDefaults, settings);
 
@@ -65,8 +65,8 @@
 				drag: function(e, ui) {
 					if (!overElement || !overElement.offset()) return;
 
-					cX = e.clientX + $("body").scrollLeft();
-					cY = e.clientY + $("body").scrollTop();
+					cX = e.originalEvent.clientX + $("body").scrollLeft();
+					cY = e.originalEvent.clientY + $("body").scrollTop();
 					
 					oX = cX - overElement.offset().left;
 					oY = cY - overElement.offset().top;
