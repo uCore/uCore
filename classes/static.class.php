@@ -723,8 +723,7 @@ class utopia {
 		self::PrependVar('<head>','<meta name="generator" content="uCore '.file_get_contents(PATH_ABS_CORE.'version.txt').' - Utopia Core PHP Framework"/>');
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
 		if (self::VarExists('script_include'))
-			self::AppendVar('</head>','<script type="text/javascript">'.utopia::GetVar('script_include').'</script>'."\n");
-//		self::AppendVar('</head>','<base href="http://'.self::GetDomainName().self::GetRelativePath($templateDir).'/" />'."\n");
+			self::AppendVar('</head>','<script type="text/javascript">//<![CDATA['.PHP_EOL.utopia::GetVar('script_include').PHP_EOL.'//]]></script>'."\n");
 
 		while (self::MergeVars($template));
 
