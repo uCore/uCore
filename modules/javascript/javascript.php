@@ -69,8 +69,8 @@ class uJavascript extends uBasicModule {
 		if (file_exists(__FILE__.'.cache') && file_exists(__FILE__.'.cache.sha1')) $minifyCache = file_get_contents(__FILE__.'.cache.sha1');
 		if ($etag !== $minifyCache) {
 			$out = self::BuildJavascript(true);
-			file_put_contents(__FILE__.'.cache',$out);
-			file_put_contents(__FILE__.'.cache.sha1',$etag);
+			file_put_contents(__FILE__.'.cache',$out); chmod(__FILE__.'.cache', 0664);
+			file_put_contents(__FILE__.'.cache.sha1',$etag); chmod(__FILE__.'.cache.sha1', 0664);
 		} else {
 			$out = file_get_contents(__FILE__.'.cache');
 		}
