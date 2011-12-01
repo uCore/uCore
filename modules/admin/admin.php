@@ -107,6 +107,9 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
 		$content = <<<FIN
+#don't use file id in ETag
+FileETag MTime Size
+
 #deny access to config file
 <Files uConfig.php>
 	order allow,deny
