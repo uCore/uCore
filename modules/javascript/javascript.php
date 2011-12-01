@@ -84,13 +84,13 @@ class uJavascript extends uBasicModule {
 	static function BuildJavascript($minify=true) {
 		$body = self::GetJavascriptConstants();
 
+		$body .= self::$includeText;
+
 		foreach (self::$includeFiles as $filename) {
 			if (!file_exists($filename)) continue;
 			$body .= file_get_contents($filename).";\n\n";
 		}
     
-		$body .= self::$includeText;
-
 		if ($minify) $body = JSMin::minify($body);
 
 		return $body;
