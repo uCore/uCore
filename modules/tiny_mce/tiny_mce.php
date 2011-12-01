@@ -9,6 +9,8 @@ class module_TinyMCE extends uBasicModule {
 	public function SetupParents() {
 		utopia::AddInputType(itRICHTEXT,array($this,'drti_func'));
 		utopia::AddInputType(itHTML,array($this,'drti_func'));
+		uJavascript::IncludeText('var tinyMCEPreInit={base:"' . utopia::GetRelativePath(dirname(__FILE__)) . '",suffix:""};');
+		uJavascript::IncludeFile(utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce.js',true);
 		module_TinyMCE::InitScript();
 	}
 
@@ -16,7 +18,6 @@ class module_TinyMCE extends uBasicModule {
 	static function InitScript() {
 		if (!self::$hasDrawnJS) {
 			self::$hasDrawnJS = true;
-			utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce.js',true);
 			$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/spellchecker/rpc.php';
 			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/preview/preview.php';
 			list($fileManagerPath) = fileManager::Init();
