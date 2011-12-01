@@ -9,7 +9,7 @@ class fileManager extends uBasicModule implements iAdminModule {
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 
 		uJavascript::IncludeFile(jqFileManager::GetPathJS());
-		utopia::AddCSSFile(jqFileManager::GetPathCSS());
+		uCSS::IncludeFile(jqFileManager::GetPathCSS());
 	}
 	function show_fileman($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
 		list($path) = self::Init();

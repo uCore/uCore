@@ -51,6 +51,8 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('is_published','is_published','cms');
 	}
 	public function SetupParents() {
+		uCSS::IncludeFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
+
 		$nTemplates = utopia::GetTemplates(false,true);
 		modOpts::AddOption('CMS','default_template','Default Template',PATH_REL_CORE.'styles/default',itCOMBO,$nTemplates);
 		$o = modOpts::GetOption('CMS','default_template');
@@ -85,7 +87,6 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		echo '</div></td>';
 		echo '<td style="width:100%;vertical-align:top; border-left:1px solid #333"><div style="width:100%" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
 
-		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
 		$editObj = utopia::GetInstance('uCMS_Edit');
 		$editLink = $editObj->GetURL();
 		$fid = $editObj->FindFilter('cms_id');
