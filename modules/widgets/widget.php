@@ -258,12 +258,12 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		if (class_exists($type)) $type::Initialise($this);
 		$this->AddField('preview',array($this,'getPreview'),'blocks','Preview');
 	}
-	public function UpdateField($field,$newValue,$pkVal=null) {
+	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		$rec = $this->LookupRecord($pkVal);
 		$this->InitInstance($rec['block_type']);
 
-		$ret = parent::UpdateField($field,$newValue,$pkVal);
-		if ($field == 'block_type') AjaxEcho("window.location.reload(false);");
+		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
+		if ($fieldAlias == 'block_type') AjaxEcho("window.location.reload(false);");
 		return $ret;
 	}
 	public function RunModule() {
