@@ -120,6 +120,7 @@ class uConfig {
 	}
 	static function ShowConfig($skipAuth = false) {
 		utopia::UseTemplate(TEMPLATE_ADMIN);
+		utopia::SetTitle('uCore Configuration');
 		echo '<h1>uCore Configuration</h1>';
 
 		// does login exist?
