@@ -74,11 +74,6 @@ class uConfig {
 		}
 //		foreach ($arr as $key => $val) define($key,$val);
 
-		//--  Charset
-		define('CHARSET_ENCODING'        , 'utf-8');
-		define('SQL_CHARSET_ENCODING'    , 'utf8');
-		define('SQL_COLLATION'           , 'utf8_general_ci');
-
 		define("FORMAT_DATETIME"         , FORMAT_DATE.' '.FORMAT_TIME);
 
 		self::$isDefined = TRUE;

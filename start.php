@@ -1,4 +1,9 @@
 <?php
+//--  Charset
+define('CHARSET_ENCODING'        , 'utf-8');
+define('SQL_CHARSET_ENCODING'    , 'utf8');
+define('SQL_COLLATION'           , 'utf8_general_ci');
+
 $enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
 define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
 if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
