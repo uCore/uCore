@@ -198,11 +198,11 @@ abstract class uTableDef implements iUtopiaModule {
 			$renamed = true;
 		}
 
+		$checksum = sha1($oldTable.$this->tablename.$this->engine.print_r($this->fields,true));
 		if (!$tableExists) { // create table
 			$this->CreateTable();
 		} else {
 			// checksum
-			$checksum = sha1($oldTable.$this->tablename.$this->engine.print_r($this->fields,true));
 			if (!$renamed && self::checksumValid(get_class($this),$checksum)) return;
 
 			$fullColumns = sql_query('SHOW FULL COLUMNS FROM `'.$this->tablename.'`',true);

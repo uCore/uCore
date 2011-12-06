@@ -7,8 +7,6 @@ class uSearch extends uBasicModule {
 	function GetTitle() { return $_GET['q'].' - '.utopia::GetDomainName().' search'; }
 	private static $recipients = array();
 	static function AddSearchRecipient($module, $searchFields, $titleField, $descField) {
-		if ($weight > 1) $weight = 1;
-		if ($weight < 0) $weight = 0;
 		if (!is_array($searchFields)) $searchFields = array($searchFields);
 		self::$recipients[$module] = array($searchFields,$titleField,$descField);
 	}
