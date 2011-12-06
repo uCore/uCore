@@ -59,8 +59,9 @@ class uConfig {
 		unset($_SESSION['config_edit_authed']);
 	}
 	static $isDefined = FALSE;
-	static function DefineConfig($arr) {
-		if (!$arr) $arr = self::$oConfig;
+	static function DefineConfig() {
+		$arr = self::$oConfig;
+		if (isset($_REQUEST['__config_submit']) && $_REQUEST['__config_submit'] === $_SESSION['__config_validate']) $arr = $_REQUEST;
 		foreach (self::$configVars as $key => $info) {
 			if (!isset($arr[$key])) {
 				if (!$info['default']) continue;
@@ -96,7 +97,7 @@ class uConfig {
 			}
 		}
 
-		if ($showConfig) self::ShowConfig();
+		if ($showConfig) self::ShowConfig(true);
 
 		$srv = SQL_SERVER.(SQL_PORT !== '' ? ':'.SQL_PORT : '');
 
@@ -108,7 +109,7 @@ class uConfig {
 		$changed = false;
 		foreach (self::$configVars as $key => $info) {
 			if (isset($info['notice'])) self::ShowConfig();
-			if (self::$oConfig[$key] !== constant($key)) $changed = true;
+			if (!isset(self::$oConfig[$key]) || self::$oConfig[$key] !== constant($key)) $changed = true;
 		}
 		
 		if ($changed) {
@@ -117,12 +118,12 @@ class uConfig {
 		
 		return true;
 	}
-	static function ShowConfig() {
+	static function ShowConfig($skipAuth = false) {
 		utopia::UseTemplate(TEMPLATE_ADMIN);
 		echo '<h1>uCore Configuration</h1>';
 
 		// does login exist?
-		if (defined('admin_user') && defined('admin_pass')) {
+		if (!$skipAuth && defined('admin_user') && defined('admin_pass')) {
 			// not authed?
 			internalmodule_AdminLogin::TryLogin(true);
 			if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER) && !isset($_SESSION['config_edit_authed'])) {
@@ -174,7 +175,10 @@ FIN;
 			}
 			echo '</tr>';
 		}
-		echo '</table><input name="__config_submit" type="submit" value="Save"></form>';
-		utopia::Finish();
+		$vStr = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=!@£$%^&*()_+';
+		$_SESSION['__config_validate'] = '';
+		for ($i = 0; $i < 20; $i++) $_SESSION['__config_validate'] .= utf8_decode(substr($vStr,rand(0,strlen($vStr)-1),1));
+		echo '</table><input type="hidden" name="__config_submit" value="'.$_SESSION['__config_validate'].'" /><input type="submit" value="Save"></form>';
+		if ($skipAuth || !defined('admin_user') || !defined('admin_pass')) utopia::Finish();
 	}
 }
