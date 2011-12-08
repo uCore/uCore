@@ -44,7 +44,7 @@ class module_TinyMCE extends uBasicModule {
 
 			$richOpts = array();
 			$richOpts['editor_selector'] = "mceEditorRich";
-			$richOpts['plugins'] = "inlinepopups,spellchecker,autoresize,save";
+			$richOpts['plugins'] = "inlinepopups,spellchecker,save";
 			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p';
 			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
@@ -55,7 +55,7 @@ class module_TinyMCE extends uBasicModule {
 			$htmlOpts['editor_selector'] = "mceEditorHTML";
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
-			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,fullscreen,autoresize,save";
+			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,fullscreen,save";
 			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor,|,fullscreen';
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media,|,insertlayer,moveforward,movebackward,absolute';
 			$htmlOpts['theme_advanced_buttons3_add'] = ",|,styleprops,spellchecker,|,tablecontrols";

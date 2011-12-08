@@ -262,7 +262,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 
 		$this->AddField('content','content','cms','Page Content',itHTML);
 		$this->AddPreProcessCallback('content',array($this,'processWidget'));
-		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
+		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'30em'));
 		$this->AddField('content_published','content_published','cms');
 
 		$this->AddField('content_time','content_time','cms','Last Saved');
