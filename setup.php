@@ -128,9 +128,10 @@ class uConfig {
 				utopia::Finish();
 			}
 		}
-	
+
+		$frmAction = DEFAULT_FILE;
 		echo <<<FIN
-<form method="post">
+<form method="post" action="$frmAction">
 <table>
 	<colgroup>
 		<col align="right">
