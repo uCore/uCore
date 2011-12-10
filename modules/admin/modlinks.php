@@ -38,6 +38,17 @@ class modLinks extends uBasicModule {
 				$arr[] = array($title,$url,$order,$child['moduleName']);
 			}
 		}
+		$foundCurrent = false;
+		foreach ($arr as $child) {
+			if ($child[3] == utopia::GetCurrentModule()) $foundCurrent = true;
+		}
+		if (!$foundCurrent) {
+			$obj = utopia::GetInstance(utopia::GetCurrentModule());
+			$order = $obj->GetSortOrder();
+			$title = $obj->GetTitle();
+			if (!$url || !$title) continue;
+			$arr[] = array($title,$_SERVER['REQUEST_URI'],$order,utopia::GetCurrentModule());
+		}
 
 		array_sort_subkey($arr,2); // sort first, to find the highest order value
 		$highest = end($arr); $highest = $highest[2];
