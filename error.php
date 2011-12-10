@@ -46,5 +46,7 @@ function DebugMail($subject,$message) {
 	$message = "$url$ref$ip$ua\n$message";
 	try {
 		mail(ERROR_EMAIL,$subject,$message);
-	} catch (Exception $e) {}
+	} catch (Exception $e) {
+		echo $e->getMessage();
+	}
 }
