@@ -46,7 +46,6 @@ class modLinks extends uBasicModule {
 			$obj = utopia::GetInstance(utopia::GetCurrentModule());
 			$order = $obj->GetSortOrder();
 			$title = $obj->GetTitle();
-			if (!$url || !$title) continue;
 			$arr[] = array($title,$_SERVER['REQUEST_URI'],$order,utopia::GetCurrentModule());
 		}
 
