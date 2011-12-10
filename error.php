@@ -44,5 +44,7 @@ function DebugMail($subject,$message) {
 	$url = 'URL: http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']."\n";
 
 	$message = "$url$ref$ip$ua\n$message";
-	mail(ERROR_EMAIL,$subject,$message);
+	try {
+		mail(ERROR_EMAIL,$subject,$message);
+	} catch (Exception $e) {}
 }
