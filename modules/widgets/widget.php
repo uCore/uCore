@@ -134,7 +134,7 @@ class uCustomWidget implements iWidget {
 		$sender->AddMetaField('order','Order',itTEXT);
 		$sender->AddMetaField('limit','Limit',itTEXT);
 		$sender->AddField('content_info','"The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element a class of _r (class=\"_r\"), or _ri to repeat contained elements only (innerHTML)."','','');
-		$sender->AddField('fields',array(get_class($this),'getPossibleFields'),'blocks','Possible Fields');
+		$sender->AddField('fields',array(__CLASS__,'getPossibleFields'),'blocks','Possible Fields');
 		$sender->AddMetaField('content','Content',itHTML);
 		$sender->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
 	}
