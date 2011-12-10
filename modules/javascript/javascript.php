@@ -58,7 +58,7 @@ class uJavascript extends uBasicModule {
 			//does it exist?
 			if (!file_exists($filename)) continue;
 			clearstatcache(true,$filename);
-			$uStr .= filemtime($filename).'-'.filesize($filename);
+			$uStr .= $filename.filemtime($filename).'-'.filesize($filename);
 		}
 
 		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()).self::$includeText);
