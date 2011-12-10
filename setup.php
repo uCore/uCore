@@ -56,12 +56,11 @@ class uConfig {
 			$text .= "$key=$val".PHP_EOL;
 		}
 		file_put_contents(PATH_ABS_CONFIG,trim($text,PHP_EOL));
-		unset($_SESSION['config_edit_authed']);
 	}
 	static $isDefined = FALSE;
 	static function DefineConfig() {
 		$arr = self::$oConfig;
-		if (isset($_REQUEST['__config_submit']) && $_REQUEST['__config_submit'] === $_SESSION['__config_validate']) $arr = $_REQUEST;
+		if (isset($_SESSION['__config_validate']) && $_SESSION['__config_validate']) $arr = $_REQUEST;
 		foreach (self::$configVars as $key => $info) {
 			if (!isset($arr[$key])) {
 				if (!$info['default']) continue;
@@ -97,14 +96,12 @@ class uConfig {
 			}
 		}
 
-		if ($showConfig) self::ShowConfig(true);
-
-		$srv = SQL_SERVER.(SQL_PORT !== '' ? ':'.SQL_PORT : '');
-
-		if (mysql_connect($srv,SQL_USERNAME,SQL_PASSWORD) === FALSE)
-			self::$configVars['SQL_SERVER']['notice'] = mysql_error();
-		elseif (mysql_select_db(SQL_DBNAME) === FALSE)
-			self::$configVars['SQL_SERVER']['SQL_DBNAME'] = "Unable to set the default schema. ".mysql_error();
+		if ($showConfig) self::ShowConfig();
+		try {
+			sql_query('SHOW TABLES FROM '.SQL_DBNAME);
+		} catch (Exception $e) {
+			self::$configVars['SQL_SERVER']['notice'] = 'Unable to connect to database ('.$e->getCode().')';
+		}
 
 		$changed = false;
 		foreach (self::$configVars as $key => $info) {
@@ -112,22 +109,20 @@ class uConfig {
 			if (!isset(self::$oConfig[$key]) || self::$oConfig[$key] !== constant($key)) $changed = true;
 		}
 		
-		if ($changed) {
-			self::SaveConfig();
-		}		
-		
+		if ($changed) self::SaveConfig();
+
+		unset($_SESSION['__config_validate']);
 		return true;
 	}
-	static function ShowConfig($skipAuth = false) {
+	static function ShowConfig() {
 		utopia::UseTemplate(TEMPLATE_ADMIN);
 		utopia::SetTitle('uCore Configuration');
 		echo '<h1>uCore Configuration</h1>';
 
 		// does login exist?
-		if (!$skipAuth && defined('admin_user') && defined('admin_pass')) {
+		if (defined('admin_user') && defined('admin_pass')) {
 			// not authed?
-			internalmodule_AdminLogin::TryLogin(true);
-			if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER) && !isset($_SESSION['config_edit_authed'])) {
+			if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) {
 				$obj = utopia::GetInstance('internalmodule_AdminLogin');
 				$obj->_RunModule();
 				utopia::Finish();
@@ -144,17 +139,14 @@ class uConfig {
 FIN;
 		foreach (self::$configVars as $key => $info) {
 			$val = defined($key) ? constant($key) : $info['default'];
-			if (isset($info['notice'])) {
-				echo '<tr><td style="color:red">'.$info['name'].':<br><span style="font-size:0.8em">'.$info['notice'].'</span></td>';
-			} else {
-				echo '<tr><td>'.$info['name'].':</td>';
-			}
+			echo '<tr><td>'.$info['name'].':</td>';
 			if (($info['type'] & CFG_TYPE_CALLBACK) && is_callable($info['values'][0])) {
 				$info['values'] = call_user_func_array($info['values'][0],$info['values'][1]);
 			}
+			echo '<td>';
+			if (isset($info['notice'])) echo '<span style="color:red;font-size:0.8em">'.$info['notice'].'</span><br/>';
 			if (is_array($info['values'])) {
 				$assoc = is_assoc($info['values']);
-				echo '<td>';
 				if ($info['type'] & CFG_TYPE_PATH) echo PATH_REL_ROOT;
 				echo '<select name="'.$key.'">';
 				foreach ($info['values'] as $k => $v) {
@@ -163,23 +155,20 @@ FIN;
 					$selVal = $assoc ? ' value="'.$k.'"' : '';
 					echo '<option'.$selected.$selVal.'>'.$v.'</option>';
 				}
-				echo '</select></td>';
+				echo '</select>';
 			} else {
 				$type = $info['type'] & CFG_TYPE_PASSWORD ? 'password' : 'text';
 				$dVal = $info['type'] & CFG_TYPE_PASSWORD ? '' : $val;
-				echo '<td>';
 				if ($info['type'] & CFG_TYPE_PATH) {
 					echo PATH_REL_ROOT;
 					$dVal = str_replace(PATH_ABS_ROOT,'',$dVal);
 				}
-				echo '<input name="'.$key.'" type="'.$type.'" size="40" value="'.$dVal.'"></td>';
+				echo '<input name="'.$key.'" type="'.$type.'" size="40" value="'.$dVal.'">';
 			}
-			echo '</tr>';
+			echo '</td></tr>';
 		}
-		$vStr = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-=!@£$%^&*()_+';
-		$_SESSION['__config_validate'] = '';
-		for ($i = 0; $i < 20; $i++) $_SESSION['__config_validate'] .= utf8_decode(substr($vStr,rand(0,strlen($vStr)-1),1));
-		echo '</table><input type="hidden" name="__config_submit" value="'.$_SESSION['__config_validate'].'" /><input type="submit" value="Save"></form>';
-		if ($skipAuth || !defined('admin_user') || !defined('admin_pass')) utopia::Finish();
+		$_SESSION['__config_validate'] = true;
+		echo '</table><input type="submit" value="Save"></form>';
+		utopia::Finish();
 	}
 }
