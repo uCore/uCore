@@ -1301,7 +1301,7 @@ FIN;
 		if (!$this->includeMeta) return NULL;
 		$metadata = json_decode($rec['__metadata'],true);
 		if (isset($metadata[$name])) return $metadata[$name];
-		return $row['__metadata'];
+		return NULL;
 	}
 	public function SetMetaValue($fieldAlias,$newValue,&$pkVal=NULL) {
 		if ($pkVal == NULL) {
