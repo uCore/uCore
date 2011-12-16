@@ -115,11 +115,11 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public function getImage() {
 		$qry = "SELECT ".mysql_real_escape_string($_GET['f'])." as img FROM ".mysql_real_escape_string($_GET['t'])." WHERE ".mysql_real_escape_string($_GET['k'])." = ".mysql_real_escape_string($_GET['p']);
 		$data = '';
-		ob_start();
-		$result = sql_query($qry);
-		ob_end_clean();
-		if ($result !== FALSE && mysql_num_rows($result) > 0)
-			$data = mysql_result($result,0,'img');
+		try {
+			$result = sql_query($qry);
+			if ($result !== FALSE && mysql_num_rows($result) > 0)
+				$data = mysql_result($result,0,'img');
+		} catch (Exception $e) {}
 
 		if (!$data) {
 			utopia::UseTemplate();
