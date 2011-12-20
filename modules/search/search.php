@@ -2,17 +2,22 @@
 class uSearch extends uBasicModule {
 	function SetupParents() {
 		$this->SetRewrite('{q}');
+		uCSS::IncludeFile(dirname(__FILE__).'/search.css');
 	}
 	function GetUUID() { return 'search'; }
-	function GetTitle() { return $_GET['q'].' - '.utopia::GetDomainName().' search'; }
+	function GetTitle() { return (isset($_GET['q']) ? $_GET['q'].' - ' : '').utopia::GetDomainName().' search'; }
 	private static $recipients = array();
 	static function AddSearchRecipient($module, $searchFields, $titleField, $descField) {
 		if (!is_array($searchFields)) $searchFields = array($searchFields);
 		self::$recipients[$module] = array($searchFields,$titleField,$descField);
 	}
 	function RunModule() {
-		echo '<h1>Search Results for '.$_GET['q'].'</h1>';
-		$scores = self::RunSearch($_GET['q']);
+		$query = isset($_GET['q']) ? $_GET['q'] : '';
+		echo '<form method="GET" action="'.$this->GetURL(array()).'">Search: <input type="text" name="q" value="'.$query.'" /><input type="submit" value="Search" /></form>';
+
+		if (!$query) return;
+		echo '<h1>Search Results for '.$query.'</h1>';
+		$scores = self::RunSearch($query);
 
 		foreach ($scores as $row) {
 			$score = $row[0];
