@@ -13,7 +13,7 @@ class uDataOnly extends uBasicModule {
 
 	public static function inject($module) {
 		$obj = utopia::GetInstance(__CLASS__);
-		$this->AddParentCallback($module,array($obj,'inject_run'));
+		$obj->AddParentCallback($module,array($obj,'inject_run'));
 	}
 
 	public function inject_run($parent) {
