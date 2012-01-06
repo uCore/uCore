@@ -530,6 +530,8 @@ class uCMS_View extends uSingleDataModule {
 		
 		//breadcrumb::AddURL($rec['nav_text'] ? $rec['nav_text'] : $rec['title'],$this->GetURL(array('cms_id'=>$rec['cms_id'])),-1000);
 		utopia::SetTitle($rec['title']);
+		if (isset($_GET['preview']) && internalmodule_AdminLogin::IsLoggedIn())
+			utopia::SetTitle($rec['title'].' (Preview)');
 		utopia::SetDescription($rec['description']);
 		$robots = array();
 		if ($rec['nofollow']) $robots[] = 'NOFOLLOW';
