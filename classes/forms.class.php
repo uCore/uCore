@@ -584,7 +584,7 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function GetSortOrder() {
 		//if (is_object($module)) $module = get_class($module);
 //		if (get_class($this) == utopia::GetCurrentModule()) return 1;
-		return 0;
+		return 10000;
 	}
 	//	public function __construct() { $this->_SetupFields(); } //$this->SetupParents(); }
 	public abstract function RunModule();  // called when current_path = parent_path/<module_name>/
