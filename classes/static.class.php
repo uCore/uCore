@@ -754,6 +754,9 @@ class utopia {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
 
+		// this line prevents script wrapped with CDATA comments added into the CMS from being accidentally commented out
+		$template = preg_replace('/>\/\/\s*\<\!\[CDATA\[\s*/','>//<![CDATA['.PHP_EOL,$template);
+
 		echo $template;
 	}
 
