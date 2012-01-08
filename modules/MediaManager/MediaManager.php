@@ -32,6 +32,8 @@ FIN
 		//return $out.$defaultValue.utopia::DrawInput($fieldName,itBUTTON,'Choose File',$possibleValues,$attributes,$noSubmit);
 	}
 	function ajax() {
+		header("X-Robots-Tag: noindex", true);
+
 		utopia::CancelTemplate();
 		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');
 	}
