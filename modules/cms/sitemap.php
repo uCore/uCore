@@ -22,21 +22,35 @@ class uSitemap {
 		if (!$children) return;
 		$level = $level -1;
 		array_sort_subkey($children,'position');
-		echo '<ul class="u-menu">';
 		$obj = utopia::GetInstance('uCMS_View');
-		foreach ($children as $child) {
+		$i = 0;
+		$showChildren = array();
+		foreach ($children as $k=>$child) {
 			if ($child['hide']) continue;
 			if ($child['content_time'] == '0000-00-00 00:00:00' && !$child['is_published']) continue;
 			if (!$child['is_published'] && !$child['content']) continue;
+			$showChildren[$k] = $child;
+		}
+
+		$count = count($showChildren);
+		if (!$count) return;
+		echo '<ul class="u-menu">';
+		foreach ($showChildren as $child) {
 			$menu_title = $child['nav_text'] ? $child['nav_text'] : $child['title'];
 			//$hide = $child['hide'] ? 'hiddenItem' : '';  //class="'.$hide.'"
 			$url = $obj->GetURL($child['cms_id']);
 			//$sel = (strpos($url,$_SERVER['REQUEST_URI']) !== FALSE) ? ' u-menu-active' : '';
 			//$sel = ($url == $_SERVER['REQUEST_URI']) ? ' u-menu-active' : ''; //handled by javascript
-			echo '<li id="'.$child['cms_id'].'" style="position:relative;cursor:pointer">';
+			$class = array();
+			if ($i === 0) $class[] = 'first-item';
+			if ($i === $count-1) $class[] = 'last-item';
+
+			$class = $class ? ' class="'.implode(' ',$class).'"' : '';
+			echo '<li id="'.$child['cms_id'].'" style="position:relative;cursor:pointer"'.$class.'>';
 			echo '<a class="cmsEdit" href="'.$url.'" title="'.$child['title'].'">'.$menu_title.'</a>';
 			if ($level !== 0) self::DrawChildren($child['children'],$child['cms_id'],$level);
 			echo '</li>';
+			$i++;
 		}
 		echo '</ul>';
 	}
