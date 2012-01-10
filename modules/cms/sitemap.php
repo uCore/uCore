@@ -46,7 +46,7 @@ class uSitemap {
 			if ($i === $count-1) $class[] = 'last-item';
 
 			$class = $class ? ' class="'.implode(' ',$class).'"' : '';
-			echo '<li id="'.$child['cms_id'].'" style="position:relative;cursor:pointer"'.$class.'>';
+			echo '<li id="'.$child['cms_id'].'" '.$class.'>';
 			echo '<a class="cmsEdit" href="'.$url.'" title="'.$child['title'].'">'.$menu_title.'</a>';
 			if ($level !== 0) self::DrawChildren($child['children'],$child['cms_id'],$level);
 			echo '</li>';
