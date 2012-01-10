@@ -269,8 +269,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (is_array($fieldLinks)) {
 			foreach ($fieldLinks as &$linkInfo) {
 				if (empty($linkInfo['ct'])) $linkInfo['ct'] = ctEQ;
-				if (is_subclass_of($this,'uDataModule')) 
-{
+				if (is_subclass_of($this,'uDataModule')) {
 					$fltr =& $this->FindFilter($linkInfo['toField'],$linkInfo['ct'],itNONE,FILTER_WHERE);
 					if ($fltr === NULL) {
 						$fltr =& $this->AddFilterWhere($linkInfo['toField'],$linkInfo['ct']);
@@ -614,7 +613,7 @@ abstract class uBasicModule implements iUtopiaModule {
 	//		if (array_search($this,$lm,true) === FALSE) continue;
 
 			$cModuleObj = utopia::GetInstance(utopia::GetCurrentModule());
-			if (($parentName != 'internalmodule_Admin' && ($obj instanceof iAdminModule)) && $parentName != utopia::GetCurrentModule()) return;
+			if (($parentName != 'uDashboard' && ($obj instanceof iAdminModule)) && $parentName != utopia::GetCurrentModule()) return;
 			//echo get_class($this).' '.$parentName.'<br/>';
 
 			$parentObj = utopia::GetInstance($parentName);

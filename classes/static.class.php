@@ -40,7 +40,7 @@ class utopia {
 				$currentPage   = uCMS_View::findPage();
 				if ($currentPage['is_home'] && isset(self::$children[''])) $baseModule = self::$children[''];
 				break;
-			case ADMIN_HOME:
+			case 'uDashboard':
 				if (isset(self::$children[''])) $baseModule = self::$children[''];
 		}
 
@@ -215,7 +215,7 @@ class utopia {
 		}
 
 		// admin root?
-		if (strpos($_SERVER['REQUEST_URI'],PATH_REL_CORE) === 0) return ADMIN_HOME;
+		if (strpos($_SERVER['REQUEST_URI'],PATH_REL_CORE) === 0) return 'uDashboard';
 
 		// CMS
 		return 'uCMS_View';

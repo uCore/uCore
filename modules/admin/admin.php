@@ -17,10 +17,9 @@ class internalmodule_Reconfigure extends uBasicModule implements iAdminModule {
 	}
 }
 
-define('ADMIN_HOME', 'internalmodule_Admin');
-class internalmodule_Admin extends uBasicModule implements iAdminModule {
+class uDashboard extends uBasicModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'Admin Home'; }
+	public function GetTitle() { return 'Dashboard'; }
 	public function GetOptions() { return ALWAYS_ACTIVE; }
 
 	public function GetSortOrder() { return -10000; }
@@ -85,13 +84,13 @@ class internalmodule_Admin extends uBasicModule implements iAdminModule {
 	}
 
 	public function RunModule() {
-		echo '<h1>Welcome to Admin Home</h1>';
+		echo '<h1>Welcome to Dashboard</h1>';
 
 		$myVer = file_get_contents(PATH_ABS_CORE.'version.txt');
 		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
 		if ($gitTags) {
 			$gitTags = array_keys($gitTags['tags']);
-			usort($gitTags,'internalmodule_Admin::compareVersions');
+			usort($gitTags,'uDashboard::compareVersions');
 			$latestVer = end($gitTags);
 			if (self::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
 			else echo 'You are using the latest version of uCore.';

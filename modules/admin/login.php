@@ -23,7 +23,7 @@ class uAdminUsersList extends uListDataModule implements iAdminModule {
         }
 
         public function SetupParents() {
-		$this->AddParent('internalmodule_Admin');
+		$this->AddParent('');
 	}
 
 	public function RunModule() {
@@ -39,7 +39,7 @@ class adminLogout extends uBasicModule implements iAdminModule {
         }
         public function RunModule() {
 		unset($_SESSION['admin_auth']);
-		$obj = utopia::GetInstance('internalmodule_Admin');
+		$obj = utopia::GetInstance('uDashboard');
 		header('Location: '.$obj->GetURL());
 		die();
 	}
@@ -87,7 +87,7 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 		}
 
 		if (self::IsLoggedIn() && ((utopia::GetCurrentModule() == __CLASS__) || (array_key_exists('adminredirect',$_REQUEST) && $_REQUEST['adminredirect'] == 1))) {
-			$obj = utopia::GetInstance('internalmodule_Admin');
+			$obj = utopia::GetInstance('uDashboard');
 			header('Location: '.$obj->GetURL()); die();
 		}
 	}
@@ -129,19 +129,6 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 		}
 	}
 
-	public function GetAdminPanel() {
-		$errs = utopia::GetVar('error_log'); if (!$errs) $errs = 'No Errors';
-		if (!self::IsLoggedIn()) {
-			return '<form id="loginForm" action="" onsubmit="this.action = window.location;" method="post"><input type="hidden" name="adminredirect" value="1">'.
-			'U:'.utopia::DrawInput('__admin_login_u',itTEXT,'',NULL,array('style'=>'width:100px')).' P:'.utopia::DrawInput('__admin_login_p',itPASSWORD,'',NULL,array('style'=>'width:100px')).
-			' '.utopia::DrawInput('',itSUBMIT,'Log In').'</form>';
-		}
-
-		$obj = utopia::GetInstance('internalmodule_Admin');
-		return '[ <a href="'.$obj->GetURL().'">Admin Home</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=adminLogout\')">Logout</a> ] [ <a href="#" onclick="javascript:$.getScript(\'?__ajax=toggleT\')">Toggle Timers</a> ]'.// [ <a href="#" onclick="javascript:$(\'#errFrame\').toggle()">Show Errors</a> ]'.
-				'<div id="errFrame" style="display:none; max-height:500px; overflow:scroll;">'.$errs.'</div>';
-	}
-  
 	static function RequireLogin($accounts=NULL) { }
 
 	public function RunModule() {
