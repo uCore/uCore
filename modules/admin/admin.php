@@ -65,24 +65,6 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		die('window.location.reload();');
 	}
 
-	static function compareVersions($ver1,$ver2) {
-		if ($ver1 == $ver2) return 0;
-
-		//major.minor.maintenance.build
-		preg_match_all('/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?\.?([0-9]+)?/',$ver1,$matches1,PREG_SET_ORDER); $matches1 = $matches1[0]; array_shift($matches1);
-		preg_match_all('/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?\.?([0-9]+)?/',$ver2,$matches2,PREG_SET_ORDER); $matches2 = $matches2[0]; array_shift($matches2);
-
-		if ($matches1 == $matches2) return 0;
-		while (count($matches1) < 4) $matches1[] = 0;
-		while (count($matches2) < 4) $matches2[] = 0;
-		foreach ($matches1 as $k => $v) {
-			if ($v == $matches2[$k]) continue;
-			if ($v < $matches2[$k]) return -1;
-			if ($v > $matches2[$k]) return 1;
-		}
-		return 0;
-	}
-
 	public function RunModule() {
 		echo '<h1>Welcome to Dashboard</h1>';
 
@@ -90,9 +72,9 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
 		if ($gitTags) {
 			$gitTags = array_keys($gitTags['tags']);
-			usort($gitTags,'uDashboard::compareVersions');
+			usort($gitTags,'utopia::compareVersions');
 			$latestVer = end($gitTags);
-			if (self::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
+			if (utopia::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
 			else echo 'You are using the latest version of uCore.';
 		} else {
 			$latestVer = 'Cannot get latest version information';

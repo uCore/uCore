@@ -1026,4 +1026,22 @@ class utopia {
 		$t = strtotime( $originalValue );
 		return strftime(FORMAT_DATETIME,$t);
 	}
+
+	static function compareVersions($ver1,$ver2) {
+		if ($ver1 == $ver2) return 0;
+
+		//major.minor.maintenance.build
+		preg_match_all('/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?\.?([0-9]+)?/',$ver1,$matches1,PREG_SET_ORDER); $matches1 = $matches1[0]; array_shift($matches1);
+		preg_match_all('/([0-9]+)\.?([0-9]+)?\.?([0-9]+)?\.?([0-9]+)?/',$ver2,$matches2,PREG_SET_ORDER); $matches2 = $matches2[0]; array_shift($matches2);
+
+		if ($matches1 == $matches2) return 0;
+		while (count($matches1) < 4) $matches1[] = 0;
+		while (count($matches2) < 4) $matches2[] = 0;
+		foreach ($matches1 as $k => $v) {
+			if ($v == $matches2[$k]) continue;
+			if ($v < $matches2[$k]) return -1;
+			if ($v > $matches2[$k]) return 1;
+		}
+		return 0;
+	}
 }
