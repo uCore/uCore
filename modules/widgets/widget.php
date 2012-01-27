@@ -152,7 +152,17 @@ class uCustomWidget implements iWidget {
 	}
 	static function DrawData($rec) {
 		$meta = json_decode($rec['__metadata'],true);
+
+		if (!isset($meta['module'])) $meta['module'] = null;
+		if (!isset($meta['filter'])) $meta['filter'] = null;
+		if (!isset($meta['order'])) $meta['order'] = null;
+		if (!isset($meta['limit'])) $meta['limit'] = null;
+		if (!isset($meta['content'])) $meta['content'] = null;
+
 		if ($meta['module'] && ($instance = utopia::GetInstance($meta['module']))) {
+			foreach ($instance->fields as $fieldName => $fieldInfo) {
+				if (isset($fieldInfo['ismetadata']) && !isset($meta[$fieldName])) $meta[$fieldName] = null;
+			}
 			// create module instance
 			$instance->ClearFilters();
 
@@ -167,9 +177,14 @@ class uCustomWidget implements iWidget {
 			// init limit
 			$instance->limit = $meta['limit'];
 
-			// get rows    
-			$dataset = $instance->GetDataset(NULL);
-			$rows = GetRows($dataset);
+			// get rows
+			$rows = array();
+			try {
+				$dataset = $instance->GetDataset(NULL);
+				$rows = GetRows($dataset);
+			} catch (Exception $e) {
+				echo '<p>There was a problem accessing the records, please check your filter and sorting options for invalid fields.</p>';
+			}
 		} else $rows = array();
 
 		$content = $append = $prepend = '';
