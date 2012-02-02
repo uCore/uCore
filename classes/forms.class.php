@@ -190,6 +190,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 		$lc = $this->LoadChildren(0);
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
+		if (uEvents::TriggerEvent($this,'BeforeRunModule') === FALSE) return FALSE;
 
 		timer_start('Run Module');
 		ob_start();
@@ -202,6 +203,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($result === FALSE) return false;
 		$this->hasRun = true;
 
+		if (uEvents::TriggerEvent($this,'AfterRunModule') === FALSE) return FALSE;
 		$lc = $this->LoadChildren(1);
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 	}
@@ -681,12 +683,14 @@ abstract class uDataModule extends uBasicModule {
 		if ($this->fieldsSetup == TRUE) return;
 		$this->fieldsSetup = TRUE;
 
+		uEvents::TriggerEvent($this,'BeforeSetupFields');
 		$this->SetupFields();
 		$this->SetupUnionFields();
 		if (is_array($this->UnionModules)) foreach ($this->UnionModules as $modulename) {
 			$obj = utopia::GetInstance($modulename);
 			$obj->_SetupFields();
 		}
+		uEvents::TriggerEvent($this,'AfterSetupFields');
 	}
 
 	public function ParseRewrite($caseSensative = false) {
