@@ -19,9 +19,9 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 	public function GetTitle() { return 'Admin Login'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | NO_NAV; }
 
-	public function GetTabledef() { return 'tabledef_AdminUsers'; }
+	public function GetTabledef() { return 'tabledef_Users'; }
 	public function SetupFields() {
-		$this->CreateTable('users','tabledef_AdminUsers');
+		$this->CreateTable('users','tabledef_Users');
 		$this->AddField('password','password','users');
 	}
 
