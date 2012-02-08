@@ -190,9 +190,10 @@ class utopia {
 		$REQUESTED_URL = array_key_exists('HTTP_X_REWRITE_URL',$_SERVER) ? $_SERVER['HTTP_X_REWRITE_URL'] : $_SERVER['REQUEST_URI'];
 		$REQUESTED_URL = preg_replace('/\?.*/i','',$REQUESTED_URL);
 
-		if (strpos($REQUESTED_URL, PATH_REL_ROOT.'u/')===FALSE) return FALSE;
-		$path = urldecode(str_replace(PATH_REL_ROOT.'u/','',$REQUESTED_URL));
-		$return = array();
+		$REQUESTED_URL = preg_replace('/^'.addcslashes(PATH_REL_ROOT,'/').'/','',$REQUESTED_URL);
+		$REQUESTED_URL = preg_replace('/^u\//','',$REQUESTED_URL);
+
+		$path = urldecode($REQUESTED_URL);
 
 		return explode('/',$path);
 	}
@@ -222,6 +223,14 @@ class utopia {
 	}
 
 	static function Launcher($module = NULL) {
+		// requesting a real path?
+		$path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+		if (is_file(PATH_ABS_ROOT.$path) && $path !== PATH_REL_CORE.'index.php') {
+			self::CancelTemplate();
+			include(PATH_ABS_ROOT.$path);
+			self::Finish();
+		}
+
 		if ($module == NULL) $module = self::GetCurrentModule();
 
 		if (!utopia::ModuleExists($module)) {

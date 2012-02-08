@@ -461,7 +461,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (isset($filters['uuid'])) unset($filters['uuid']);
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
 
-		$newPath = PATH_REL_ROOT.'u/'.join('/',$mapped);
+		$newPath = PATH_REL_ROOT.join('/',$mapped);
 		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
                 if ($this->rewritePersistPath && utopia::GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);

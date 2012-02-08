@@ -117,15 +117,7 @@ FileETag MTime Size
 	RewriteRule ^(.*/)?(\.svn)|(\.git) - [F,L]
 	ErrorDocument 403 "Access Forbidden"
 
-	RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
-
-	RewriteCond %{REQUEST_URI} ^$ [OR]
-	RewriteCond %{REQUEST_URI} ^/$
-	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
-
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d     
-	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
+	RewriteRule ^(.*)$	/uCore/index.php [NE,L,QSA]
 </IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
