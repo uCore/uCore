@@ -136,7 +136,6 @@ FileETag MTime Size
 	ErrorDocument 403 "Access Forbidden"
 
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule ^(.*)$	/uCore/index.php [NE,L,QSA]
 </IfModule>
 FIN;
