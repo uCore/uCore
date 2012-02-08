@@ -911,6 +911,12 @@ FIN;
 		return utopia::DrawInput($fieldName,$inputType,$defaultValue,$values,$attributes);
 	}
 
+	public function GetPrimaryKeyField($fieldAlias=NULL) {
+		if (!is_null($fieldAlias)) {
+			return '_'.$this->GetFieldProperty($fieldAlias,'tablename').'_pk';
+		}
+		return '_'.$this->sqlTableSetup['alias'].'_pk';
+	}
 	public function GetPrimaryKey($fieldAlias=NULL) {
 		if (!is_null($fieldAlias)) {
 			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
@@ -1123,6 +1129,7 @@ FIN;
 		$newTable['table']	= TABLE_PREFIX.$tableModule;
 		$newTable['pk']		= $tableObj->GetPrimaryKey();
 		$newTable['tModule']= $tableModule;
+		$this->AddField('_'.$alias.'_pk',&$newTable['pk'],$alias);
 		if ($parent==NULL) {
 			if ($this->sqlTableSetup != NULL) {
 				ErrorLog('Can only have one base table');
@@ -1135,7 +1142,6 @@ FIN;
 			return;
 		} else {
 			$newTable['parent'] = $parent;
-			$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
 		}
 
 		// $fromField in $this->sqlTableSetupFlat[$parent]['tModule']
@@ -2468,6 +2474,11 @@ FIN;
 
 		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
 
+		if (uEvents::TriggerEvent($this,'BeforeUpdateField',array($fieldAlias)) === FALSE) return FALSE;
+		
+		$oldPkVal = $pkVal;
+		$fieldPK = $this->GetPrimaryKey($fieldAlias);
+		
 		$tbl		= $this->fields[$fieldAlias]['vtable'];
 		$values		= $this->GetValues($fieldAlias);
 
@@ -2481,18 +2492,32 @@ FIN;
 		$field = $this->fields[$fieldAlias]['field'];
 		$table		= $tbl['table'];
 		$tablePk	= $tbl['pk'];
-
+		
 		if (array_key_exists('parent',$tbl)) {
-			foreach ($tbl['joins'] as $fromField=>$toField)
-			if ($toField == $tbl['pk']) {
-				$field = $fromField;
-				break;
-			}
-			$tbl = $this->sqlTableSetupFlat[$tbl['parent']];
-			$table		= $tbl['table'];
-			$tablePk	= $tbl['pk'];
-		}
+			foreach ($tbl['joins'] as $fromField=>$toField) {
+				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) {
+					// find target PK value
+					$row = $this->LookupRecord($pkVal);
+					$pkVal = $row[$this->GetPrimaryKeyField($fieldAlias)];
+					
+					// initialise a row if needed
+					$tableObj = utopia::GetInstance($table);
+					$tableObj->UpdateField($toField,$oldPkVal,$pkVal);
 
+					break; // if linkFrom is the primary key of our main table then we don't update the parent table.
+				}
+			}
+			foreach ($tbl['joins'] as $fromField=>$toField) {
+				if ($toField == $tablePk) {
+					$field = $fromField;
+					$tbl = $this->sqlTableSetupFlat[$tbl['parent']];
+					$table		= $tbl['table'];
+					$tablePk	= $tbl['pk'];
+					break;
+				}
+			}
+		}
+				
 		if ((preg_match('/{[^}]+}/',$field) > 0) || IsSelectStatement($field) || is_array($field)) {
 			$this->ResetField($fieldAlias,$pkVal);
 			return FALSE; // this field is a pragma or select statement
@@ -2534,24 +2559,16 @@ FIN;
 
 		// lets update the field
 		$ret = true;
-		if ($pkVal === NULL) { // create new record
-			$insertQry = "INSERT INTO $table SET `$field` = $newValue";
-			//echo "//$insertQry\n";
+		
+		$tableObj = utopia::GetInstance($table);
+		$tableObj->UpdateField($field,$newValue,$pkVal);
+		
+		
+		$this->ResetField($fieldAlias,$pkVal);
+		$this->ResetField($fieldAlias,$oldPkVal);
 
-			sql_query($insertQry);
-
-			if (mysql_error()) {
-				$this->ResetField($fieldAlias,$pkVal);
-				return FALSE;
-			}
-
-			// new record - reload the page to the new pk
-			if ($field == $this->GetPrimaryKey($fieldAlias))
-				$pkVal = $pfVal;
-			else
-				$pkVal = mysql_insert_id();
-			$ret = $this->GetURL($pkVal);
-
+		if ($oldPkVal === NULL) {
+			// new record added
 			// update default values
 			if (!$this->noDefaults) {
 				$this->noDefaults = true;
@@ -2574,20 +2591,16 @@ FIN;
 				$obj = utopia::GetInstance($child);
 				if (method_exists($obj,'OnParentNewRecord')) $obj->OnParentNewRecord($pkVal);
 			}
-		} else { // update existing record
-			$updateQry = "UPDATE $table SET `$field` = $newValue WHERE `$tablePk` = '$pkVal'";
-			//echo "//$updateQry";
-			sql_query($updateQry);
-			if (mysql_error()) {
-				$this->ResetField($fieldAlias,$pkVal);
-				return FALSE;
-			}
-			if ($field == $this->GetPrimaryKey($fieldAlias)) {
-				$ret = $this->GetURL($pfVal);
+		}
+		
+		if ($oldPkVal !== $pkVal) {
+			// updated PK
+			if ($this->FindFilter($fieldAlias)) {
 				$pkVal = $pfVal;
+				$ret = $this->GetURL($pkVal);
 			}
 		}
-
+		
 		if (array_key_exists('onupdate',$this->fields[$fieldAlias])) {
 			foreach ($this->fields[$fieldAlias]['onupdate'] as $callback) {
 				list($callback,$arr) = $callback;
@@ -2607,6 +2620,8 @@ FIN;
 		elseif (is_string($ret)) {
 			AjaxEcho("window.location.replace('$ret');");
 		}
+		
+		if (uEvents::TriggerEvent($this,'AfterUpdateField',array($fieldAlias)) === FALSE) return FALSE;
 
 		return $ret;
 	}
@@ -2631,7 +2646,13 @@ FIN;
 			return $obj->GetCellData($fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		}
 		$pkVal = NULL;
-		if (is_array($row)) $pkVal = isset($row['__module_pk__']) ? $row['__module_pk__'] : $row[$this->GetPrimaryKey()];
+		if (is_array($row)) {
+			if ($this->UNION_MODULE)
+				$pkField = '__module_pk__';
+			else
+				$pkField = $this->GetPrimaryKey();
+			$pkVal = $row[$pkField];
+		}
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
 		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$row);

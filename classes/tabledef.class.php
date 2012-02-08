@@ -362,4 +362,29 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
 	public function AddInputDate($fieldName = 'input_date') { $this->AddFieldArray($fieldName,ftTIMESTAMP,NULL,array('default'=>'CURRENT_TIMESTAMP')); }
+	
+	public function UpdateField($fieldName,$value,&$pkVal=NULL) {
+		$this->UpdateFields(array($fieldName=>$value),$pkVal);
+	}
+	public function UpdateFields($valuePairs,&$pkVal=NULL) {
+		if (!is_array($valuePairs)) return FALSE;
+		
+		if ($pkVal === NULL) {
+			$fields = '`'.implode('`,`',array_keys($valuePairs)).'`';
+			$values = implode(',',array_values($valuePairs));
+			$query = 'INSERT INTO `'.$this->tablename.'` ('.$fields.') VALUES ('.$values.')';
+		} else {
+			$newPk = null;
+			$updateQry = array();
+			foreach ($valuePairs as $k=>$v) {
+				$updateQry[] = '`'.$k.'` = '.$v.'';
+				if ($k == $this->GetPrimaryKey()) $newPk = $v;
+			}
+			$query = 'UPDATE `'.$this->tablename.'` SET '.implode(', ',$updateQry).' WHERE `'.$this->GetPrimaryKey().'` = \''.$pkVal.'\'';
+			if ($newPk) $pkVal = $newPk;
+		}
+		
+		sql_query($query);
+		if ($pkVal === NULL) $pkVal = mysql_insert_id();
+	}
 }
