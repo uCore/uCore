@@ -2464,6 +2464,8 @@ FIN;
 
 		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
 
+		if (uEvents::TriggerEvent($this,'BeforeUpdateField',array($fieldAlias)) === FALSE) return FALSE;
+		
 		$tbl		= $this->fields[$fieldAlias]['vtable'];
 		$values		= $this->GetValues($fieldAlias);
 
@@ -2603,6 +2605,8 @@ FIN;
 		elseif (is_string($ret)) {
 			AjaxEcho("window.location.replace('$ret');");
 		}
+		
+		if (uEvents::TriggerEvent($this,'AfterUpdateField',array($fieldAlias)) === FALSE) return FALSE;
 
 		return $ret;
 	}
