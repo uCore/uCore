@@ -528,13 +528,13 @@ abstract class uBasicModule implements iUtopiaModule {
 	}
 
 	public function GetFileFromTable($field,$table,$key,$pkVal,$att = 'inline') {
-		return PATH_REL_SELF."?__ajax=getFile&f=$field&t=$table&k=$key&p=$pkVal&a=$att";
+		return PATH_REL_CORE."index.php?__ajax=getFile&f=$field&t=$table&k=$key&p=$pkVal&a=$att";
 	}
 
 	public function GetImageLinkFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL) {
 		if ($width) $width = "&w=$width";
 		if ($height) $height = "&h=$height";
-		return PATH_REL_SELF."?__ajax=getImage&f=$field&t=$table&k=$key&p=$pkVal$width$height";
+		return PATH_REL_CORE."index.php?__ajax=getImage&f=$field&t=$table&k=$key&p=$pkVal$width$height";
 	}
 
 	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {
