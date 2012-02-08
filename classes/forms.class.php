@@ -463,7 +463,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (isset($filters['uuid'])) unset($filters['uuid']);
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
 
-		$newPath = PATH_REL_ROOT.'u/'.join('/',$mapped);
+		$newPath = PATH_REL_ROOT.join('/',$mapped);
 		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
                 if ($this->rewritePersistPath && utopia::GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
@@ -530,13 +530,13 @@ abstract class uBasicModule implements iUtopiaModule {
 	}
 
 	public function GetFileFromTable($field,$table,$key,$pkVal,$att = 'inline') {
-		return PATH_REL_SELF."?__ajax=getFile&f=$field&t=$table&k=$key&p=$pkVal&a=$att";
+		return PATH_REL_CORE."index.php?__ajax=getFile&f=$field&t=$table&k=$key&p=$pkVal&a=$att";
 	}
 
 	public function GetImageLinkFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL) {
 		if ($width) $width = "&w=$width";
 		if ($height) $height = "&h=$height";
-		return PATH_REL_SELF."?__ajax=getImage&f=$field&t=$table&k=$key&p=$pkVal$width$height";
+		return PATH_REL_CORE."index.php?__ajax=getImage&f=$field&t=$table&k=$key&p=$pkVal$width$height";
 	}
 
 	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {

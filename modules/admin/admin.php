@@ -30,7 +30,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	public function SetupParents() {
 		$this->AddParent('/');
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
-//		$this->RegisterAjax('optimizeTables',array($this,'optimizeTables'),false);
+		$this->UpdateHtaccess();
 	}
 	public function optimizeTables() {
 		echo '<h3>Optimise Tables</h3>';
@@ -84,6 +84,24 @@ class uDashboard extends uBasicModule implements iAdminModule {
 
 		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 
+		echo "<h3>Variables</h3><pre>";
+		echo 'PATH_ABS_ROOT: '.PATH_ABS_ROOT.'<br>';
+		echo 'PATH_REL_ROOT: '.PATH_REL_ROOT.'<br>';
+		echo 'PATH_ABS_CORE: '.PATH_ABS_CORE.'<br>';
+		echo 'PATH_REL_CORE: '.PATH_REL_CORE.'<br>';
+		echo 'PATH_ABS_CONFIG: '.PATH_ABS_CONFIG.'<br>';
+		echo '</pre>';
+
+		$installed = utopia::GetModules();
+		echo '<h3 style="cursor:pointer" onclick="$(\'#modulesList\').toggle();">Installed Modules</h3><div id="modulesList" style="display:none"><pre>';
+		foreach ($installed as $m)
+			echo $m['module_name']."\n";
+		echo '</pre></div>';
+		
+		echo '<a href="?optimise=1">Optimise Tables</a>';
+		if (isset($_GET['optimise'])) $this->optimizeTables();
+	}
+	public function UpdateHtaccess() {
 		$rc = PATH_REL_CORE;
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
@@ -117,15 +135,9 @@ FileETag MTime Size
 	RewriteRule ^(.*/)?(\.svn)|(\.git) - [F,L]
 	ErrorDocument 403 "Access Forbidden"
 
-	RewriteRule u/([^/?$]+)	{$rc}index.php?uuid=$1&%2 [NE,L,QSA]
-
-	RewriteCond %{REQUEST_URI} ^$ [OR]
-	RewriteCond %{REQUEST_URI} ^/$
-	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
-
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d     
-	RewriteRule ^(.*)$ {$rc}index.php?uuid=cms [NE,L,QSA]
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$	/uCore/index.php [NE,L,QSA]
 </IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
@@ -144,23 +156,7 @@ FIN;
 
 			$htaccess = trim($htaccess).$search;
 			file_put_contents(PATH_ABS_ROOT.'.htaccess',$htaccess);
-			echo 'Updated .htaccess';
+			return true;
 		}
-		echo "<h3>Variables</h3><pre>";
-		echo 'PATH_ABS_ROOT: '.PATH_ABS_ROOT.'<br>';
-		echo 'PATH_REL_ROOT: '.PATH_REL_ROOT.'<br>';
-		echo 'PATH_ABS_CORE: '.PATH_ABS_CORE.'<br>';
-		echo 'PATH_REL_CORE: '.PATH_REL_CORE.'<br>';
-		echo 'PATH_ABS_CONFIG: '.PATH_ABS_CONFIG.'<br>';
-		echo '</pre>';
-
-		$installed = utopia::GetModules();
-		echo '<h3 style="cursor:pointer" onclick="$(\'#modulesList\').toggle();">Installed Modules</h3><div id="modulesList" style="display:none"><pre>';
-		foreach ($installed as $m)
-			echo $m['module_name']."\n";
-		echo '</pre></div>';
-		
-		echo '<a href="?optimise=1">Optimise Tables</a>';
-		if (isset($_GET['optimise'])) $this->optimizeTables();
 	}
 }
