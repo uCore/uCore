@@ -465,6 +465,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 		$newPath = PATH_REL_ROOT.join('/',$mapped);
 		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
+		if (strpos($oldPath,'/u/')===0) $oldPath = str_replace('/u/','/',$oldPath);
 
                 if ($this->rewritePersistPath && utopia::GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
 
