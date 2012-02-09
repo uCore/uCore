@@ -710,6 +710,7 @@ class utopia {
 		return $path.'/';
 	}
 	public static function OutputTemplate() {
+		uEvents::TriggerEvent('BeforeOutputTemplate');
 		ob_end_clean();
 		if (self::UsingTemplate()) {
 			self::SetVar('templatedir',utopia::GetTemplateDir(true));

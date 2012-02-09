@@ -2,31 +2,36 @@
 
 class uEvents {
 	private static $callbacks = array();
-	public static function AddCallback($module, $eventName, $callback) {
+	public static function AddCallback($eventName, $callback, $module = '') {
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
 		
-		if (isset(self::$callbacks[$module][$eventName]) && in_array($callback,self::$callbacks[$module][$eventName])) return;
-		self::$callbacks[$module][$eventName][] = $callback;
+		if (isset(self::$callbacks[$eventName][$module]) && in_array($callback,self::$callbacks[$eventName][$module])) return;
+		self::$callbacks[$eventName][$module][] = $callback;
 	}
 	public static function RemoveCallback($module, $eventName, $callback) {
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
 
-		if (!isset(self::$callbacks[$module][$eventName])) return;
-		$key = array_search($callback,self::$callbacks[$module][$eventName]);
-		if ($key !== NULL) unset(self::$callbacks[$module][$eventName][$key]);
+		if (!isset(self::$callbacks[$eventName][$module])) return;
+		$key = array_search($callback,self::$callbacks[$eventName][$module]);
+		if ($key !== NULL) unset(self::$callbacks[$eventName][$module][$key]);
 	}
-	public static function TriggerEvent($object,$eventName,$eventData=null) {
-		$module = strtolower(get_class($object));
+	public static function TriggerEvent($eventName,$object=null,$eventData=null) {
+		$module = null;
+		if (is_object($object)) $module = get_class($object);
+		$module = strtolower($module);
 		$eventName = strtolower($eventName);
 
-		if (!isset(self::$callbacks[$module][$eventName])) return TRUE;
+		if (!isset(self::$callbacks[$eventName][$module])) return TRUE;
 		
 		$callbackArgs = array($object,$eventName);
 		if ($eventData) $callbackArgs[] = $eventData;
 		
-		foreach (self::$callbacks[$module][$eventName] as $callback) {
+		foreach (self::$callbacks[$eventName][$module] as $callback) {
+			if (call_user_func_array($callback,$callbackArgs)===FALSE) return FALSE;
+		}
+		if ($module !== '') foreach (self::$callbacks[$eventName][''] as $callback) {
 			if (call_user_func_array($callback,$callbackArgs)===FALSE) return FALSE;
 		}
 		return TRUE;

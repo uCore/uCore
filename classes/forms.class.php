@@ -190,7 +190,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 		$lc = $this->LoadChildren(0);
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
-		if (uEvents::TriggerEvent($this,'BeforeRunModule') === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('BeforeRunModule',$this) === FALSE) return FALSE;
 
 		timer_start('Run Module');
 		ob_start();
@@ -203,7 +203,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($result === FALSE) return false;
 		$this->hasRun = true;
 
-		if (uEvents::TriggerEvent($this,'AfterRunModule') === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('AfterRunModule',$this) === FALSE) return FALSE;
 		$lc = $this->LoadChildren(1);
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 	}
@@ -684,14 +684,14 @@ abstract class uDataModule extends uBasicModule {
 		if ($this->fieldsSetup == TRUE) return;
 		$this->fieldsSetup = TRUE;
 
-		uEvents::TriggerEvent($this,'BeforeSetupFields');
+		uEvents::TriggerEvent('BeforeSetupFields',$this);
 		$this->SetupFields();
 		$this->SetupUnionFields();
 		if (is_array($this->UnionModules)) foreach ($this->UnionModules as $modulename) {
 			$obj = utopia::GetInstance($modulename);
 			$obj->_SetupFields();
 		}
-		uEvents::TriggerEvent($this,'AfterSetupFields');
+		uEvents::TriggerEvent('AfterSetupFields',$this);
 	}
 
 	public function ParseRewrite($caseSensative = false) {
@@ -2475,7 +2475,7 @@ FIN;
 
 		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
 
-		if (uEvents::TriggerEvent($this,'BeforeUpdateField',array($fieldAlias)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias)) === FALSE) return FALSE;
 		
 		$oldPkVal = $pkVal;
 		$fieldPK = $this->GetPrimaryKey($fieldAlias);
@@ -2622,7 +2622,7 @@ FIN;
 			AjaxEcho("window.location.replace('$ret');");
 		}
 		
-		if (uEvents::TriggerEvent($this,'AfterUpdateField',array($fieldAlias)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldAlias)) === FALSE) return FALSE;
 
 		return $ret;
 	}
