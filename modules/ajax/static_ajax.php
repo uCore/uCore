@@ -229,7 +229,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 				foreach ($vars as $enc_name => $value) {
 					$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
 					//$value = cbase64_decode($value);
-					if (get_magic_quotes_gpc()) $value = stripslashes($value);
 
 					InterpretSqlString($string, $module, $field, $pkVal);
 					$obj = utopia::GetInstance($module);

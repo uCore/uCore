@@ -5,6 +5,8 @@ timer_start('Load Files');
 LoadFiles();
 timer_end('Load Files');
 
+if ($_POST && get_magic_quotes_gpc()) $_POST = utopia::stripslashes_deep($_POST);
+
 ob_start('utopia::output_buffer',2);
 register_shutdown_function('utopia::Finish');
 
