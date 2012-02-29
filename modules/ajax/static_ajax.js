@@ -178,8 +178,11 @@ function UpdateSelectedLinks() {
 			if ((_href != window.location.pathname) && (_href == '/' || window.location.pathname.indexOf(_href.slice(0,-4)) != 0)) return;
 			var classname = (_href == window.location.pathname) ? 'active-link' : 'active-link-parent';
 		}
+		if (!classname) return;
+		
 		if ($(this).parent('li').length) {
 			$(this).parent('li').addClass(classname);
+			$(this).parent('li').parents('li').addClass('active-link-parent');
 		} else {
 			$(this).addClass(classname);
 		}
