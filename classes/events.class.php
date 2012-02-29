@@ -20,20 +20,27 @@ class uEvents {
 	public static function TriggerEvent($eventName,$object=null,$eventData=null) {
 		$module = null;
 		if (is_object($object)) $module = get_class($object);
+		if (is_string($object)) {
+			$module = $object;
+			$object = utopia::GetInstance($object);
+		}
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
 
-		if (!isset(self::$callbacks[$eventName][$module])) return TRUE;
+		if (!isset(self::$callbacks[$eventName])) return TRUE;
+		if (!isset(self::$callbacks[$eventName][$module])) $module = '';
 		
 		$callbackArgs = array($object,$eventName);
 		if ($eventData) $callbackArgs[] = $eventData;
 		
+		$return = true;
+		
 		foreach (self::$callbacks[$eventName][$module] as $callback) {
-			if (call_user_func_array($callback,$callbackArgs)===FALSE) return FALSE;
+			$return = $return && call_user_func_array($callback,$callbackArgs) !== FALSE;
 		}
 		if ($module !== '') foreach (self::$callbacks[$eventName][''] as $callback) {
-			if (call_user_func_array($callback,$callbackArgs)===FALSE) return FALSE;
+			$return = $return && call_user_func_array($callback,$callbackArgs) !== FALSE;
 		}
-		return TRUE;
+		return $return;
 	}
 }

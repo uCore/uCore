@@ -68,6 +68,8 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	public function RunModule() {
 		echo '<h1>Welcome to Dashboard</h1>';
 
+		uEvents::TriggerEvent('ShowDashboard');
+		
 		$myVer = file_get_contents(PATH_ABS_CORE.'version.txt');
 		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
 		if ($gitTags) {

@@ -185,6 +185,7 @@ abstract class uBasicModule implements iUtopiaModule {
 			}
 		}
 		if ($this instanceof iAdminModule) utopia::UseTemplate(TEMPLATE_ADMIN);
+		if (!uEvents::TriggerEvent('CanAccessModule',$this)) return FALSE;
 
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
@@ -2475,6 +2476,7 @@ FIN;
 
 		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
 
+		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return FALSE;
 		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias)) === FALSE) return FALSE;
 		
 		$oldPkVal = $pkVal;

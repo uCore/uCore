@@ -36,14 +36,16 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 		$obj->Initialise(); // setup Parents
 	timer_end('Init: '.$row['module_name']);
 }
-
 timer_end('Module Initialise');
+
+uEvents::TriggerEvent('InitComplete');
 
 // process ajax function
 if (array_key_exists('__ajax',$_REQUEST)) {
 	//utopia::CancelTemplate();
 	// TODO: ajax parentloading?  EG: login modules
 	$cm = utopia::GetCurrentModule();
+	if (uEvents::TriggerEvent('CanAccessModule',$cm) === FALSE) die();
 	if ($cm && $cm !== 'uDashboard') {
 		$obj = utopia::GetInstance($cm);
 		$lc = $obj->LoadChildren(0); // now part of runmodule and loadparents, call here to check for

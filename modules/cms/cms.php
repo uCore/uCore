@@ -421,7 +421,7 @@ class uCMS_View extends uSingleDataModule {
 		$rec = $obj->GetRows($id);
 		$rec = $rec[0];
 		$content = $rec['content_published'];
-		if (isset($_GET['preview']) && internalmodule_AdminLogin::IsLoggedIn())
+		if (isset($_GET['preview']) && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') !== FALSE)
 			$content = $rec['content'];
 		if ($rec['content_time'] == 0)
 			$content = $rec['content'];
@@ -465,6 +465,8 @@ class uCMS_View extends uSingleDataModule {
 		$rec = self::findPage();
 		if (!$rec) $rec = self::GetHomepage();
 		if (!$rec) $rec = $this->GetRecord($this->GetDataset(),0);
+		if (isset($_GET['preview']) && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') !== FALSE)
+			return $rec['title'].' (Preview)';
 		return $rec['title'];
 	}
 	public function SetupFields() {
