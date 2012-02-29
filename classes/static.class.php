@@ -19,6 +19,7 @@ utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 class utopia {
 	private static $children = array();
 	static function AddChild($parent, $child, $info) {
+		$info['parent'] = $parent;
 		if (isset(self::$children[$parent]) && isset(self::$children[$parent][$child])) {
 			foreach (self::$children[$parent][$child] as $compare) {
 				if ($info == $compare) return;
@@ -26,10 +27,8 @@ class utopia {
 		}
 		self::$children[$parent][$child][] = $info;
 	}
- // static $gc_cache = array();
-	static function GetChildren($parent) {
-//	  if (isset(self::$gc_cache[$parent]) && self::$gc_cache[$parent]) return self::$gc_cache[$parent];
 
+	static function GetChildren($parent) {
 		$specific      = (isset(self::$children[$parent]))     ? self::$children[$parent] : array();
 		$currentModule = ($parent == utopia::GetCurrentModule() && isset(self::$children['/'])) ? self::$children['/'] : array();
 		$catchAll      = (isset(self::$children['*'])) ? self::$children['*'] : array();
@@ -44,8 +43,8 @@ class utopia {
 				if (isset(self::$children[''])) $baseModule = self::$children[''];
 		}
 
-		$arr = array_merge($specific,$currentModule,$baseModule,$catchAll);
- //   self::$gc_cache[$parent] = $arr;
+		$arr = array_merge($catchAll,$baseModule,$currentModule,$specific);
+
 		return $arr;
 	}
 
@@ -198,6 +197,15 @@ class utopia {
 		return explode('/',$path);
 	}
 
+	static function SetCurrentModule($module) {
+		if (!self::ModuleExists($module)) return;
+		
+		$cm = utopia::GetCurrentModule();
+		$o = utopia::GetInstance($cm);
+		if (flag_is_set($o->GetOptions(),PERSISTENT)) return;
+		
+		utopia::SetVar('current_module',$module);
+	}
 	static function GetCurrentModule() {
 		// cm variable
 		if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
@@ -289,6 +297,8 @@ class utopia {
 			$attributes['style'] = join(';',$style);
 		}
 
+		$defaultValue = utopia::jsonTryDecode($defaultValue);
+		
 		//print_r($attributes);
 		$attr = BuildAttrString($attributes);
 
@@ -309,7 +319,7 @@ class utopia {
 				break;
 			case itCHECKBOX:
 				if (is_array($possibleValues)) foreach ($possibleValues as $name => $val) {
-					$checked = ($val == $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
+					$checked = ($val === $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
 					$out .= "<input$attr type=\"checkbox\"$checked value=\"$val\"/> $name<br>";
 				} else {
 					$checked = ($defaultValue == 1) ? ' checked="checked"': '';
@@ -1037,6 +1047,13 @@ class utopia {
 		return strftime(FORMAT_DATETIME,$t);
 	}
 
+	static function stripslashes_deep($value) {
+		$value = is_array($value) ?
+			array_map('utopia::stripslashes_deep', $value) :
+			stripslashes($value);
+
+		return $value;
+	}
 	static function compareVersions($ver1,$ver2) {
 		if ($ver1 == $ver2) return 0;
 
@@ -1053,5 +1070,11 @@ class utopia {
 			if ($v > $matches2[$k]) return 1;
 		}
 		return 0;
+	}
+	static function jsonTryDecode($value) {
+		$originalValue = $value;
+		$value = json_decode($value);
+		if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
+		return $value;
 	}
 }
