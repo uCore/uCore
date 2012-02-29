@@ -342,11 +342,10 @@ abstract class uTableDef implements iUtopiaModule {
 			// build field
 			$type = getSqlTypeFromFieldType($fieldData['type']);
 			$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
-			if ($fieldData['type'] == ftTIMESTAMP) {
-				if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
-				else $default = " DEFAULT 0";
-			} else
-			$default = $fieldData['default'] === NULL ? '' : " DEFAULT '{$fieldData['default']}'";
+			if ($fieldData['type'] == ftTIMESTAMP && strtolower($fieldData['default']) == 'current_timestamp')
+				$default = " DEFAULT CURRENT_TIMESTAMP";
+			else
+				$default = $fieldData['default'] === NULL ? '' : " DEFAULT '{$fieldData['default']}'";
 			$comments = $fieldData['comments'] === NULL ? '' : " COMMENT '{$fieldData['comments']}'";
 			$collate = $fieldData['collation'] === NULL ? '' : " COLLATE '{$fieldData['collation']}'";
 			$flds[] = "`$fieldName` $type$length {$fieldData['null']}$default {$fieldData['extra']}$comments$collate";
@@ -362,29 +361,56 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
 	public function AddInputDate($fieldName = 'input_date') { $this->AddFieldArray($fieldName,ftTIMESTAMP,NULL,array('default'=>'CURRENT_TIMESTAMP')); }
-	
-	public function UpdateField($fieldName,$value,&$pkVal=NULL) {
-		$this->UpdateFields(array($fieldName=>$value),$pkVal);
-	}
-	public function UpdateFields($valuePairs,&$pkVal=NULL) {
-		if (!is_array($valuePairs)) return FALSE;
+
+	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
+		if ($fieldType === NULL) $fieldType = $this->fields[$fieldName]['type'];
 		
-		if ($pkVal === NULL) {
-			$fields = '`'.implode('`,`',array_keys($valuePairs)).'`';
-			$values = implode(',',array_values($valuePairs));
-			$query = 'INSERT INTO `'.$this->tablename.'` ('.$fields.') VALUES ('.$values.')';
-		} else {
-			$newPk = null;
-			$updateQry = array();
-			foreach ($valuePairs as $k=>$v) {
-				$updateQry[] = '`'.$k.'` = '.$v.'';
-				if ($k == $this->GetPrimaryKey()) $newPk = $v;
+		if (is_array($newValue))
+			$newValue = json_encode($newValue);
+		else
+			$newValue = trim($newValue);
+		
+		if ($fieldType != ftRAW) $newValue = mysql_real_escape_string($newValue);
+		if ($newValue) switch ($fieldType) {      //"STR_TO_DATE('$newValue','".FORMAT_DATE."')"; break;
+			case ftRAW: break;
+			case ftDATE:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('".fixdateformat($newValue)."','".FORMAT_DATE."'))"; break;
+			case ftTIME:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('$newValue','".FORMAT_TIME."'))"; break;
+			case ftDATETIME:	// datetime
+			case ftTIMESTAMP:	$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('$newValue','".FORMAT_DATETIME."'))"; break;
+			case ftCURRENCY:	// currency
+			case ftPERCENT:		// percent
+			case ftFLOAT:		// float
+			case ftDECIMAL:		$newValue = floatval(preg_replace('/[^0-9\.-]/','',$newValue)); break;
+			case ftBOOL:		// bool
+			case ftNUMBER:		$newValue = ($newValue==='' ? '' : intval(preg_replace('/[^0-9\.-]/','',$newValue))); break;
+		}
+
+		if ($newValue === '' || $newValue === NULL)
+			$newValue = 'NULL';
+		else {
+			$dontQuoteTypes = array(ftRAW,ftDATE,ftTIME,ftDATETIME,ftTIMESTAMP,ftCURRENCY,ftPERCENT,ftFLOAT,ftDECIMAL,ftBOOL,ftNUMBER);
+			if (!in_array($fieldType,$dontQuoteTypes)) {
+				$newValue = "'$newValue'";
 			}
-			$query = 'UPDATE `'.$this->tablename.'` SET '.implode(', ',$updateQry).' WHERE `'.$this->GetPrimaryKey().'` = \''.$pkVal.'\'';
-			if ($newPk) $pkVal = $newPk;
+		}
+
+		$newPk = false;
+		$updateQry = array();
+
+		if ($fieldName == $this->GetPrimaryKey()) $newPk = $newValue;
+
+		if ($pkVal === NULL) {
+			$query = 'INSERT INTO `'.$this->tablename.'` ('.$fieldName.') VALUES ('.$newValue.')';
+		} else {
+			$query = 'UPDATE `'.$this->tablename.'` SET '.$fieldName.' = '.$newValue.' WHERE `'.$this->GetPrimaryKey().'` = \''.$pkVal.'\'';
 		}
 		
 		sql_query($query);
-		if ($pkVal === NULL) $pkVal = mysql_insert_id();
+		if ($newPk) {
+			// this allows us to get the real evaluated value of the new primary key
+			$row = GetRow(sql_query('SELECT '.$newPk.' AS new_pk'));
+			$pkVal = $row['new_pk'];
+		}
+		elseif ($pkVal === NULL) $pkVal = mysql_insert_id();
 	}
 }

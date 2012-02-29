@@ -2525,47 +2525,17 @@ FIN;
 			$this->ResetField($fieldAlias,$pkVal);
 			return FALSE; // this field is a pragma or select statement
 		}
-
-		// preformat the value
-		if (is_array($newValue))
-			$newValue = json_encode($newValue);
-		else
-			$newValue = trim($newValue);
-		$pfVal = $newValue;
-		if ($this->GetFieldType($fieldAlias) != ftRAW) $newValue = mysql_real_escape_string($newValue);
-		if ($newValue) switch ($this->GetFieldType($fieldAlias)) {      //"STR_TO_DATE('$newValue','".FORMAT_DATE."')"; break;
-			case ftRAW: break;
-			case ftDATE:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('".fixdateformat($newValue)."','".FORMAT_DATE."'))"; break;
-			case ftTIME:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('$newValue','".FORMAT_TIME."'))"; break;
-			case ftDATETIME:	// datetime
-			case ftTIMESTAMP:	$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('$newValue','".FORMAT_DATETIME."'))"; break;
-			case ftCURRENCY:	// currency
-			case ftPERCENT:		// percent
-			case ftFLOAT:		// float
-			case ftDECIMAL:		$newValue = floatval(preg_replace('/[^0-9\.-]/','',$newValue)); break;
-			case ftBOOL:		// bool
-			case ftNUMBER:		$newValue = ($newValue==='' ? '' : intval(preg_replace('/[^0-9\.-]/','',$newValue))); break;
-		}
+		
 
 		if (isset($this->fields[$fieldAlias]['ismetadata']) && $this->fields[$fieldAlias]['ismetadata']) {
 			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
 		}
-
-		if ($newValue === '' || $newValue === NULL)
-			$newValue = 'NULL';
-		else {
-			$dontQuoteTypes = array(ftRAW,ftDATE,ftTIME,ftDATETIME,ftTIMESTAMP,ftCURRENCY,ftPERCENT,ftFLOAT,ftDECIMAL,ftBOOL,ftNUMBER);
-			if (!in_array($this->GetFieldType($fieldAlias),$dontQuoteTypes)) {
-				$newValue = "'$newValue'";
-			}
-		}
+		
+		$fieldType = $this->GetFieldType($fieldAlias);
 
 		// lets update the field
-		$ret = true;
-		
 		$tableObj = utopia::GetInstance($table);
-		$tableObj->UpdateField($field,$newValue,$pkVal);
-		
+		$ret = $tableObj->UpdateField($field,$newValue,$pkVal,$fieldType) === FALSE ? FALSE : TRUE;
 		
 		$this->ResetField($fieldAlias,$pkVal);
 		$this->ResetField($fieldAlias,$oldPkVal);
