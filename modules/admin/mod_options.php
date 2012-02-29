@@ -41,22 +41,28 @@ class modOpts extends uListDataModule implements iAdminModule {
 		self::RefreshCache();
 	}
 	public static function AddOption($module,$ident,$name,$init='',$fieldType=itTEXT,$values=NULL) {
+		$optionID = $module.'::'.$ident;
+		$obj = utopia::GetInstance('modOpts');
 		if (!self::OptionExists($module,$ident)) {
-			$obj = utopia::GetInstance('modOpts');
-			$obj->UpdateFields(array('ident'=>$module.'::'.$ident,'module'=>$module,'name'=>$name,'value'=>$init));
+			$obj->UpdateFields(array('ident'=>$optionID,'module'=>$module,'name'=>$name,'value'=>$init));
 		}
-		self::$types[$module.'::'.$ident] = array($fieldType,$values);
+		self::$types[$module.'::'.$ident] = array($fieldType,$values,$name);
 	}
 	public static $optCache = NULL;
 	public static function RefreshCache() {
 		self::$optCache = array();
 		$obj = utopia::GetInstance('modOpts');
 		foreach ($obj->GetRows() as $row) {
-			if (!$row['module']) {
-				$module = substr($row['ident'],0,strpos($row['ident'],'::'));
-				$obj->UpdateField('module',$module,$row['ident']);
+			$ident = $row['ident'];
+		
+			if (!$row['module'] && strpos($ident,'::')) {
+				$row['module'] = substr($ident,0,strpos($ident,'::'));
+				$obj->UpdateField('module',$row['module'],$ident);
 			}
-			self::$optCache[$row['ident']] = $row['value'];
+			if (isset(self::$types[$ident]) && $row['name'] !== self::$types[$ident][2]) {
+				$obj->UpdateField('name',self::$types[$ident][2],$ident);
+			}
+			self::$optCache[$ident] = $row['value'];
 		}
 	}
 	public static function OptionExists($module,$ident) {
