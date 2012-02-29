@@ -2,9 +2,6 @@
 // include SwiftMailer library
 include('lib/swift_required.php');
 
-define('DOC_TYPE_PRINT',flag_gen('DOC_TYPE'));
-define('DOC_TYPE_EMAIL',flag_gen('DOC_TYPE'));
-
 class tabledef_EmailTemplates extends uTableDef {
 	public $tablename = 'tabledef_Documents';
 
@@ -14,7 +11,6 @@ class tabledef_EmailTemplates extends uTableDef {
 		// SetPrimaryKey($name);
 
 		$this->AddField('identifier',ftVARCHAR,60);
-		$this->AddField('type',ftNUMBER);
 		$this->AddField('subject',ftVARCHAR,100);
 		$this->AddField('body',ftLONGTEXT);
 
@@ -66,7 +62,6 @@ class uEmailTemplateDetails extends uSingleDataModule implements iAdminModule {
 		$this->CreateTable('docs');
 
 		$this->AddField('ident','identifier','docs','Ident',itTEXT);
-		$this->AddField('type','type','docs','Type',itCOMBO,array('Letter'=>DOC_TYPE_PRINT,'Email'=>DOC_TYPE_EMAIL));
 		$this->AddField('subject','subject','docs','Subject',itTEXT);
 		$this->AddField('fields',array($this,'getTemplateFields'),NULL,'Fields Available');
 		$this->AddField('body','body','docs','Body',itHTML);
@@ -123,6 +118,7 @@ class uEmailer extends uDataModule {
 		modOpts::AddOption('smtp','pass','SMTP Password','',itPLAINPASSWORD);
 		modOpts::AddOption('mailer','name','Mailer Default Name',utopia::GetDomainName().' Mailer');
 		modOpts::AddOption('mailer','email','Mailer Default Email','mailer@'.utopia::GetDomainName());
+		uEvents::AddCallback('InitComplete',array($this,'InitialiseTemplates'));
 	}
 
 	public function SetupFields() {
@@ -130,13 +126,18 @@ class uEmailer extends uDataModule {
 
 		$this->AddField('ident','identifier','docs','Ident');
 		$this->AddField('subject','subject','docs','Subject');
-		$this->AddField('type','type','docs','Type');
 		$this->AddField('body','body','docs','Body');
 	}
 
 	public function RunModule() { }
 
 	public function ShowData() { }
+
+	public function InitialiseTemplates() {
+		foreach (self::$init as $ident => $data) {
+			self::GetTemplate($ident);
+		}
+	}
 	
 	public static $init = array();
 	public static function InitialiseTemplate($ident,$subject,$content,$fields=NULL) {
@@ -154,6 +155,10 @@ class uEmailer extends uDataModule {
 		if (!$row) {
 			$pk = null;
 			$obj->UpdateField('ident',$ident,$pk);
+			if (isset(self::$init[$ident])) {
+				$obj->UpdateField('subject',self::$init[$ident]['subject'],$pk);
+				$obj->UpdateField('body',self::$init[$ident]['content'],$pk);
+			}
 			uNotices::AddNotice('No email template found called '.$ident.'.  This has been created automatically.',NOTICE_TYPE_WARNING);
 			$row = $obj->LookupRecord($pk);
 		}
