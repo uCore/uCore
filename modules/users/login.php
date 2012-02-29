@@ -73,7 +73,7 @@ class uUserLogin extends uDataModule {
 	}
 
 	public function checkLogin($object) {
-		if (flag_is_set(PERSISTENT,$object->GetOptions())) return;
+		if (flag_is_set($object->GetOptions(), PERSISTENT)) return;
 		$parent = get_class($object);
 		self::TryLogin();
 

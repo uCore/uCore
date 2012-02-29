@@ -126,7 +126,7 @@ class uAssertAdminUser extends uBasicModule {
 		$obj = utopia::GetInstance('uRegisterUser');
 		$user_id = $obj->RegisterForm();
 		// login as this user, then perform the update
-		
+
 		if ($user_id) {
 			// now set this users role
 			$obj->UpdateField('role',-1,$user_id);

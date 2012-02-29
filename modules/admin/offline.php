@@ -20,7 +20,7 @@ class module_Offline extends uBasicModule {
 	}
 
 	public function siteOffline($object) {
-		if (flag_is_set(PERSISTENT,$object->GetOptions())) return;
+		if (flag_is_set($object->GetOptions(), PERSISTENT)) return;
 		$parent = get_class($object);
 		if (isset(self::$states[$parent]) && self::$states[$parent]) return;
 

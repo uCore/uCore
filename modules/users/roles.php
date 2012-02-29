@@ -14,7 +14,7 @@ class tabledef_UserRoles extends uTableDef  {
 /* Admin is a fixed role */
 class uUserRoles extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'User Roles'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT; }
+	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT | PERSISTENT; }
 
 	public function GetTabledef() { return 'tabledef_UserRoles'; }
 	public function SetupFields() {
@@ -41,9 +41,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	}
 	public function AssertAdminRole() {
 		$rec = $this->LookupRecord(-1,true);
-		if (!$rec) {
-			$this->UpdateFields(array('name'=>'Site Administrator',$this->GetPrimaryKey()=>-1));
-		}
+		if (!$rec) $this->UpdateFields(array('name'=>'Site Administrator',$this->GetPrimaryKey()=>-1));
 	}
 	private static $roleCache = null;
 	public static function GetUserRole() {
@@ -82,16 +80,3 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	}
 }
 
-/* Admin is a fixed role */
-/*class uTEST extends uBasicModule implements iAdminModule {
-	public function GetTitle() { return 'TEST'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT; }
-
-	public function SetupParents() {
-		$this->AddParent('uUserRoles');
-	}
-	
-	public function RunModule() {
-	}
-}
-*/
