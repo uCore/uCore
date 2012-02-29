@@ -1,6 +1,9 @@
 body.centerWrap {width:100%; text-align:center}
 div.centerWrap {width: 950px; margin: 0 auto; position: relative; text-align:left }
 
+.left { float:left } .right { float:right }
+.cl { clear:left } .cr { clear:right } .cb { clear:both }
+
 .datalist th { vertical-align: top; background-color:#DDDDDD; border: 1px solid #BBBBBB; padding: 2px 5px;
   border-radius: 15px 15px 0px 0px; -moz-border-radius: 15px 15px 0px 0px; -webkit-border-bottom-right-radius: 0px; -webkit-border-bottom-left-radius: 0px; }
 .datalist th .uFilter { float:left; margin:2px;}
