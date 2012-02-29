@@ -38,7 +38,7 @@ class modOpts extends uListDataModule implements iAdminModule {
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		parent::UpdateField($fieldAlias,$newValue,$pkVal);
-		self::RefreshCache();
+		self::$optCache[$pkVal] = $newValue;
 	}
 	public static function AddOption($module,$ident,$name,$init='',$fieldType=itTEXT,$values=NULL) {
 		$optionID = $module.'::'.$ident;
