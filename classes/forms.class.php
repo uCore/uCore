@@ -2401,9 +2401,10 @@ FIN;
 		$func = 'ProcessUpdates_'.$function;
 		$this->$func($sendingField,$fieldAlias,$value,$pkVal);
     
-		// reset all fields with preprocess.
+		// reset all fields.
+		$this->ResetField($fieldAlias,$pkVal);
 		foreach ($this->fields as $alias => $field) {
-			if (isset($field['preprocess'])) $this->ResetField($alias,$pkVal);
+			$this->ResetField($alias,$pkVal);
 		}
 	}
 
@@ -2414,7 +2415,7 @@ FIN;
 
 	function ProcessUpdates_md5($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
 		if (empty($value)) return FALSE;
-		return $this->UpdateField($fieldAlias,md5($value),$pkVal);
+		return $this->UpdateField($fieldAlias,$value,$pkVal);
 	}
 
 	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
@@ -2489,6 +2490,7 @@ FIN;
 			$srch = array_search($newValue, $valSearch);
 			if ($srch !== FALSE) $newValue = $srch;
 		}
+		if ($this->fields[$fieldAlias]['inputtype'] == itMD5 || $this->fields[$fieldAlias]['inputtype'] == itPASSWORD) $newValue = md5($newValue);
 		$originalValue = $newValue;
 
 		$field = $this->fields[$fieldAlias]['field'];
@@ -2557,18 +2559,13 @@ FIN;
 			}
 
 			// new record has been created.  pass the info on to child modules, incase they need to act on it.
-			$this->OnNewRecord($pkVal);
-			$children = utopia::GetChildren(get_class($this));
-			foreach ($children as $child => $links) {
-				$obj = utopia::GetInstance($child);
-				if (method_exists($obj,'OnParentNewRecord')) $obj->OnParentNewRecord($pkVal);
-			}
+			uEvents::TriggerEvent('OnNewRecord',$this,$pkVal);
 		}
 		
 		if ($oldPkVal !== $pkVal) {
 			// updated PK
 			if ($this->FindFilter($fieldAlias)) {
-				$pkVal = $pfVal;
+				//$pkVal = $pfVal;
 				$ret = $this->GetURL($pkVal);
 			}
 		}
@@ -2770,10 +2767,10 @@ FIN;
 		// reset the field.
 
 		$enc_name = $this->GetEncodedFieldName($fieldAlias,$pkVal);
-		$newRec = is_null($pkVal) ? NULL : $this->LookupRecord($pkVal);
-
+		$newRec = is_null($pkVal) ? NULL : $this->LookupRecord($pkVal,true);
+		
 		$data = $this->GetCellData($fieldAlias,$newRec,$this->GetTargetURL($fieldAlias,$newRec));
-
+		
 		utopia::AjaxUpdateElement($enc_name,$data);
 		//$ov = base64_encode($data);
 		//AjaxEcho("$('div#$enc_name').html(Base64.decode('$ov'));\n");
