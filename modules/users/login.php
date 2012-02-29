@@ -1,93 +1,87 @@
 <?php
 
-class adminLogout extends uBasicModule implements iAdminModule {
-        public function GetTitle() { return 'Logout'; }
+class adminLogout extends uBasicModule {
+	public function GetOptions() { return PERSISTENT; }
+	public function GetTitle() { return 'Logout'; }
 	public function GetSortOrder() { return -9900;}
-        public function SetupParents() {
-                $this->AddParent('/');
-        }
-        public function RunModule() {
-		unset($_SESSION['admin_auth']);
+	public function SetupParents() {
+		$this->AddParent('/');
+	}
+	public function RunModule() {
+		unset($_SESSION['current_user']);
 		$obj = utopia::GetInstance('uDashboard');
 		header('Location: '.$obj->GetURL());
 		die();
 	}
 }
 
-class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
+class uUserLogin extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'Admin Login'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT_PARENT | NO_NAV; }
-
+	public function GetTitle() { return 'User Login'; }
+	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT | NO_NAV; }
+	public function GetUUID() { return 'login'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function SetupFields() {
 		$this->CreateTable('users','tabledef_Users');
+		$this->AddField('username','username','users');
 		$this->AddField('password','password','users');
 	}
 
 	public function SetupParents() {
-		$this->AddParentCallback('*',array($this,'checkLogin'),0);
-
-		// admin account has not been set up, redirect to config.
-		if (!constant('admin_user')) {
-			utopia::cancelTemplate();
-			echo 'No admin user has been set up.';
-			uConfig::ShowConfig();
-			die();
-		}
+		uEvents::AddCallback('CanAccessModule',array($this,'checkLogin'));
+		uEvents::AddCallback('InitComplete',array($this,'CheckSession'));
 
 		self::TryLogin();
+		$this->SetRewrite(true);
+	}
+	
+	public function CheckSession() {
+		if (!isset($_SESSION['current_user'])) return;
+		$rec = $this->LookupRecord($_SESSION['current_user']);
+		if (!$rec) {
+			uNotices::AddNotice('Your user no longer exists.',NOTICE_TYPE_ERROR);
+			unset($_SESSION['current_user']);
+		}
 	}
 
-	public static function TryLogin($adminOnly=false) {
+	public static function TryLogin() {
 		// login not attempted.
-		if (!array_key_exists('__admin_login_u',$_REQUEST)) return;
+		if (!array_key_exists('__login_u',$_REQUEST)) return;
 
-		$un = $_REQUEST['__admin_login_u']; $pw = $_REQUEST['__admin_login_p'];
-		unset($_REQUEST['__admin_login_u']); unset($_REQUEST['__admin_login_p']);
+		$un = $_REQUEST['__login_u']; $pw = $_REQUEST['__login_p'];
+		unset($_REQUEST['__login_u']); unset($_REQUEST['__login_p']);
 
 		$obj = utopia::GetInstance(__CLASS__);
-		if ( strcasecmp($un,constant('admin_user')) == 0 && $pw===constant('admin_pass') ) {
-			$_SESSION['admin_auth'] = ADMIN_USER;
-		} elseif (!$adminOnly && $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)))) {
-			$_SESSION['admin_auth'] = $un;
+		$rec = $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)));
+		if ($rec) {
+			$_SESSION['current_user'] = $rec['user_id'];
 		} else {
-			ErrorLog('Username and password do not match.');
+			uNotices::AddNotice('Username and password do not match.',NOTICE_TYPE_ERROR);
 		}
 
-		if (self::IsLoggedIn() && ((utopia::GetCurrentModule() == __CLASS__) || (array_key_exists('adminredirect',$_REQUEST) && $_REQUEST['adminredirect'] == 1))) {
+/*		if (self::IsLoggedIn() && ((utopia::GetCurrentModule() == __CLASS__) || (array_key_exists('adminredirect',$_REQUEST) && $_REQUEST['adminredirect'] == 1))) {
 			$obj = utopia::GetInstance('uDashboard');
 			header('Location: '.$obj->GetURL()); die();
-		}
+		}*/
 	}
-  
-	public static function IsLoggedIn($authType = NULL) {
+
+	public static function IsLoggedIn() {
 		self::TryLogin();
-		if (!isset($_SESSION['admin_auth'])) return false;
-		if ($authType === NULL) return true;
-
-		return ($_SESSION['admin_auth'] === $authType);
-	}
-/*
-	private $map = array();
-	public static function RequireLogin($module,$authType = true, $orHigher=true) {
-		self::$map[$module] = array($authType,$orHigher);
+		if (!isset($_SESSION['current_user'])) return false;
+		
+		return ($_SESSION['current_user']);
 	}
 
-	public static function IsAuthed($module) {
-		if (!array_key_exists($module,self::$map)) return true;
-		return self::IsLoggedIn(self::$map[$module][0],self::$map[$module][1]);
-		//return array_key_exists('admin_auth',$_SESSION) && ($_SESSION['admin_auth'] >= $authType);
-	}*/
-
-	public function ParentLoadPoint() { return 0; }
-	public function checkLogin($parent) {
+	public function checkLogin($object) {
+		if (flag_is_set(PERSISTENT,$object->GetOptions())) return;
+		$parent = get_class($object);
 		self::TryLogin();
 
 		// if auth not required, return
-		$obj = utopia::GetInstance($parent);
-		if (!($obj instanceof iAdminModule)) return true;
-		if ($parent === get_class($this)) return true;
+		// trigger IsAuthenticated
+//		if ($parent === get_class($this)) return true;
+		if (uEvents::TriggerEvent('IsAuthenticated',$object) !== FALSE) return true;
+//		if (!($object instanceof iAdminModule)) return true;
 
 		// if authed, dont show the login
 		if (!self::IsLoggedIn()) {
@@ -101,14 +95,16 @@ class internalmodule_AdminLogin extends uDataModule implements iAdminModule{
 	static function RequireLogin($accounts=NULL) { }
 
 	public function RunModule() {
-		//__admin_login_u
-		//__admin_login_p
-		// perform login
+		if (self::IsLoggedIn()) {
+			echo '<p>You are already logged in.</p>';
+			return;
+		}
 		echo 'Please log in';
 		echo '<form id="loginForm" action="" onsubmit="this.action = window.location;" method="post"><table>';
-		echo '<tr><td align="right">Username:</td><td>'.utopia::DrawInput('__admin_login_u',itTEXT,'',NULL,array('id'=>'lu')).'</td></tr>';
-		echo '<tr><td align="right">Password:</td><td>'.utopia::DrawInput('__admin_login_p',itPASSWORD).'</td></tr>';
+		echo '<tr><td align="right">Username:</td><td>'.utopia::DrawInput('__login_u',itTEXT,'',NULL,array('id'=>'lu')).'</td></tr>';
+		echo '<tr><td align="right">Password:</td><td>'.utopia::DrawInput('__login_p',itPASSWORD).'</td></tr>';
 		echo '<tr><td></td><td align="right">'.utopia::DrawInput('',itSUBMIT,'Log In').'</td></tr>';
 		echo '</table></form><script type="text/javascript">$(function (){$(\'#lu\').focus()})</script>';
+		uEvents::TriggerEvent('LoginRequired');
 	}
 }

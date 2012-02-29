@@ -58,14 +58,8 @@ if (array_key_exists('__ajax',$_REQUEST)) {
 	$ajaxIdent	= $_REQUEST['__ajax'];
 	if (!array_key_exists('ajax',$GLOBALS) || !array_key_exists($ajaxIdent,$GLOBALS['ajax'])) die("Cannot perform ajax request, '$ajaxIdent' has not been registered.");
 
-	$requireAdmin = $GLOBALS['ajax'][$ajaxIdent]['req_admin'];
 	$callback	= $GLOBALS['ajax'][$ajaxIdent]['callback'];
 	$class		= $GLOBALS['ajax'][$ajaxIdent]['class'];
-
-	if (is_bool($requireAdmin) && ($requireAdmin === TRUE && !internalmodule_AdminLogin::IsLoggedIn()))
-		die('// Not Authenticated');
-	elseif (function_exists($requireAdmin) && !call_user_func($requireAdmin))
-		die('// Not Authenticated');
 
 	// validate
 	if (!is_callable($callback))

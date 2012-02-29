@@ -2,6 +2,7 @@
 
 uCSS::IncludeFile(PATH_REL_CORE.'default.css');
 class uCSS extends uBasicModule {
+	public function GetOptions() { return PERSISTENT; }
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME

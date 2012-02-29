@@ -78,6 +78,7 @@ define('ALLOW_EDIT',flag_gen());
 define('ALLOW_ADD',flag_gen());
 define('ALLOW_DELETE',flag_gen());
 define('NO_NAV',flag_gen());
+define('PERSISTENT',flag_gen());
 define('PERSISTENT_PARENT',flag_gen());
 define('SHOW_FUNCTIONS',flag_gen());
 define('SHOW_TOTALS',flag_gen());

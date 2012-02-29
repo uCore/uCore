@@ -6,7 +6,6 @@ class internalmodule_Reconfigure extends uBasicModule implements iAdminModule {
 	public function GetOptions() { return ALWAYS_ACTIVE; }
 
 	public function SetupParents() {
-		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) $this->DisableModule('You must log in as the Site Administrator to use this module.');
 		$this->AddParent('/');
 	}
 
@@ -83,8 +82,6 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		}
 		
 		echo '<table><tr><td>Current Version:</td><td>'.$myVer.'</td></tr><tr><td>Latest Version:</td><td>'.$latestVer.'</td></tr></table>';
-
-		if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) return;
 
 		echo "<h3>Variables</h3><pre>";
 		echo 'PATH_ABS_ROOT: '.PATH_ABS_ROOT.'<br>';

@@ -18,9 +18,6 @@ uConfig::AddConfigVar('DEFAULT_CURRENCY','Default Currency');
 uConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Date Format</a>','%d/%m/%Y');
 uConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format">Time Format</a>','%H:%i:%s');
 
-uConfig::AddConfigVar('admin_user','Admin Username');
-uConfig::AddConfigVar('admin_pass','Admin Password',NULL,NULL,CFG_TYPE_PASSWORD);
-
 uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'styles/admin',array('utopia::GetTemplates',array(false)),CFG_TYPE_CALLBACK|CFG_TYPE_PATH);
 
 uConfig::ReadConfig();
@@ -120,16 +117,6 @@ class uConfig {
 		utopia::UseTemplate(TEMPLATE_ADMIN);
 		utopia::SetTitle('uCore Configuration');
 		echo '<h1>uCore Configuration</h1>';
-
-		// does login exist?
-		if (defined('admin_user') && defined('admin_pass')) {
-			// not authed?
-			if (!internalmodule_AdminLogin::IsLoggedIn(ADMIN_USER)) {
-				$obj = utopia::GetInstance('internalmodule_AdminLogin');
-				$obj->_RunModule();
-				utopia::Finish();
-			}
-		}
 
 		$frmAction = DEFAULT_FILE;
 		echo <<<FIN
