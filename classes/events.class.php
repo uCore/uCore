@@ -29,6 +29,7 @@ class uEvents {
 
 		if (!isset(self::$callbacks[$eventName])) return TRUE;
 		if (!isset(self::$callbacks[$eventName][$module])) $module = '';
+		if (!isset(self::$callbacks[$eventName][$module])) return TRUE;
 		
 		$callbackArgs = array($object,$eventName);
 		if ($eventData) $callbackArgs[] = $eventData;
