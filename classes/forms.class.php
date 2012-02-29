@@ -213,8 +213,8 @@ abstract class uBasicModule implements iUtopiaModule {
 	public abstract function SetupParents();
 	public function _SetupParents() {
 		if ($this->parentsAreSetup) return;
-		$this->SetupParents();
 		$this->parentsAreSetup = true;
+		$this->SetupParents();
 	}
 
 	public $parents = array();
@@ -2260,8 +2260,7 @@ FIN;
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
 		$originalValue = $value;
 		if (isset($this->fields[$fieldName]['ismetadata'])) {
-			$value = json_decode($value);
-			if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
+			$value = utopia::jsonTryDecode($value);
 		}
 		$suf = ''; $pre = ''; $isNumeric=true;
 		if ($forceType === NULL) $forceType = $this->GetFieldType($fieldName);
@@ -2754,7 +2753,7 @@ FIN;
 			if (!empty($value))
 				$newFilter['_f_'.$linkInfo['toField']] = $value;
 		}
-    return $newFilter;
+		return $newFilter;
 		//print_r(array_merge($newFilter,$additional));
 		return array_merge($newFilter,$additional);
 		// now returns an array
