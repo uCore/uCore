@@ -130,6 +130,8 @@ class uAssertAdminUser extends uBasicModule {
 		if ($user_id) {
 			// now set this users role
 			$obj->UpdateField('role',-1,$user_id);
+			// and automatically verify the email
+			$obj->UpdateField('email_confirm_code',true,$user_id);
 			unset($_SESSION['db_admin_authed']);
 			echo '<p>Admin user has now been set up.</p>';
 		}
@@ -147,6 +149,8 @@ class uRegisterUser extends uDataModule {
 		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('password','password','users','Password',itPASSWORD);
 		$this->AddField('role','name','roles','Role',itCOMBO);
+
+		$this->AddField('email_confirm_code','email_confirm_code','users');
 	}
 	public function SetupParents() {
 		$this->SetRewrite(false);
