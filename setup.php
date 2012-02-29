@@ -60,7 +60,7 @@ class uConfig {
 	static $isDefined = FALSE;
 	static function DefineConfig() {
 		$arr = self::$oConfig;
-		if (isset($_SESSION['__config_validate']) && $_SESSION['__config_validate']) $arr = $_REQUEST;
+		if (isset($_SESSION['__config_validate']) && $_SESSION['__config_validate'] && $_POST) $arr = $_POST;
 		foreach (self::$configVars as $key => $info) {
 			if (!isset($arr[$key])) {
 				if (!$info['default']) continue;
@@ -78,6 +78,7 @@ class uConfig {
 
 		self::$isDefined = TRUE;
 	}
+	static $isValid = FALSE;
 	static function ValidateConfig() {
 		$showConfig = false;
 		foreach (self::$configVars as $key => $info) {
@@ -112,6 +113,7 @@ class uConfig {
 		if ($changed) self::SaveConfig();
 
 		unset($_SESSION['__config_validate']);
+		self::$isValid = TRUE;
 		return true;
 	}
 	static function ShowConfig() {
@@ -170,6 +172,6 @@ FIN;
 		}
 		$_SESSION['__config_validate'] = true;
 		echo '</table><input type="submit" value="Save"></form>';
-		utopia::Finish();
+		if (!self::$isValid) utopia::Finish();
 	}
 }
