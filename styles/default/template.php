@@ -5,7 +5,7 @@
 </head>
 
 <body>
-<div></div>
+{notices}
 <div style="background-color:#efefef;width:96%;margin:0 auto">
 {UTOPIA.breadcrumb}
 {UTOPIA.content}

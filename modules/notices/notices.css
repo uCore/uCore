@@ -1,0 +1,22 @@
+.uNotice {
+	display:block;
+	padding: 1px 10px;
+	border-radius: 10px;
+	margin:0.1em;
+}
+.uNotice p { font-size: 12px; margin:0.5em 0; }
+
+.uNotice-info {
+	background-color:#d0e5f5;
+	border:1px solid #4297d7;
+}
+
+.uNotice-warning {
+	background-color:#f9fbb1;
+	border:1px solid #FAD42E;
+}
+
+.uNotice-error {
+	background-color:#feecec;
+	border:1px solid #CD0A0A;
+}
