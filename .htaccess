@@ -8,5 +8,5 @@ Options -Indexes
 	RewriteRule \.svn|\.git - [F,L]
 	ErrorDocument 403 "Access Forbidden"
 
-	RewriteRule ^$ index.php
+	RewriteRule ^$ %{REQUEST_URI}index.php [R]
 </IfModule>
