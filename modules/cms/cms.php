@@ -54,12 +54,12 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		uCSS::IncludeFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
 
 		$nTemplates = utopia::GetTemplates(false,true);
-		modOpts::AddOption('CMS','default_template','Default Template',PATH_REL_CORE.'styles/default',itCOMBO,$nTemplates);
+		$dTemplate = '/'.basename(PATH_REL_CORE).'/styles/default';
+		modOpts::AddOption('CMS','default_template','Default Template',$dTemplate,itCOMBO,$nTemplates);
 		$o = modOpts::GetOption('CMS','default_template');
-		if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('CMS','default_template',PATH_REL_CORE.'styles/default');
+		//if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('CMS','default_template','/'.basename(PATH_REL_CORE).'/styles/default');
 
 		$this->AddParent('/');
-		$this->AddParent('uCMS_Edit');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 	}
 	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
@@ -393,6 +393,7 @@ EOF;
 	}
 	public function SetupParents() {
 		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
+		$this->AddParent('uCMS_List','cms_id');
 	}
 	public function RunModule() {
 		if (isset($_REQUEST['inline']))

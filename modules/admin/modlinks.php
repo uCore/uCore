@@ -21,13 +21,22 @@ class modLinks extends uBasicModule {
 
 		foreach ($children as $links) {
 			foreach ($links as $child) {
-				if (isset($child['fieldLinks'])) continue;
 				if (isset($child['callback'])) continue;
 				if ($specificOnly && $child['parent'] !== $module) continue;
 
+				if (isset($child['fieldLinks'])) {
+					$obj = utopia::GetInstance(utopia::GetCurrentModule());
+					$fv = false;
+					if ($obj instanceof uDataModule) foreach ($child['fieldLinks'] as $link) {
+						$fltr = $obj->FindFilter($link['fromField']);
+						if ($obj->GetFilterValue($fltr['uid'])) $fv = true;
+					}
+					if (!$fv) continue; // if fieldlinks and the linked field is not currently have a filtered.
+				}
+
 				$obj = utopia::GetInstance($child['moduleName']);
 				if ($obj->isDisabled) continue;
-
+				
 				$opts = $obj->GetOptions();
 				if (flag_is_set($opts,NO_NAV)) continue;
 				//if (!$admin && ($obj instanceof iAdminModule)) continue;

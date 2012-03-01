@@ -469,7 +469,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 		if (strpos($oldPath,'/u/')===0) $oldPath = str_replace('/u/','/',$oldPath);
 
-                if ($this->rewritePersistPath && utopia::GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
+		if ($this->rewritePersistPath && utopia::GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
 
 		// DONE: ensure all rewrite segments are accounted for (all '/' are present)
 		return $newPath;
@@ -744,28 +744,26 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($filterType as $filterSet) {
 				foreach ($filterSet as $filter) {
 					$val = $this->GetFilterValue($filter['uid']);
-					//echo $val;
-					//print_r($filter);
+
+					if ($val) {
+						$filArr['_f_'.$filter['uid']] = $val;
+						continue;
+					}
+					
 					if (!empty($filter['default']) && $val == $filter['default']) {
-						//echo 'is_default: '.$filter['fieldName'];
 						unset($filters[$filter['fieldName']]);
 						continue;
 					}
-					//print_r($filter);
+					
 					if (is_array($filters) && array_key_exists($filter['fieldName'],$filters)) {
 						$filArr['_f_'.$filter['uid']] = $filters[$filter['fieldName']];
 						unset($filters[$filter['fieldName']]);
 						continue;
 					}
-					//if (!empty($filter['default'])) continue;
-		//			$val = $this->GetFilterValue($filter['uid']);
-					//ErrorLog($val);
-				//	$isNew = is_array($filters) && array_key_exists($this->GetModuleId().'_new',$filters);
-				//	if (!empty($val) && !($filter['fieldName'] == $this->GetPrimaryKey() && $isNew))
-				//		$filArr['_f_'.$filter['uid']] = $val;
 				}
 			}
 		}
+		//print_r($filArr);
 
 		// TODO: remove 'if' if rewrite not working
 		if ($this->HasRewrite()) foreach ($filArr as $uid => $val) {
