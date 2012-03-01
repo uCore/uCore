@@ -105,6 +105,6 @@ class uUserLogin extends uDataModule {
 		echo '<tr><td align="right">Password:</td><td>'.utopia::DrawInput('__login_p',itPASSWORD).'</td></tr>';
 		echo '<tr><td></td><td align="right">'.utopia::DrawInput('',itSUBMIT,'Log In').'</td></tr>';
 		echo '</table></form><script type="text/javascript">$(function (){$(\'#lu\').focus()})</script>';
-		uEvents::TriggerEvent('LoginRequired');
+		uEvents::TriggerEvent('AfterShowLogin');
 	}
 }
