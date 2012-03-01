@@ -904,9 +904,7 @@ class utopia {
 
 	static function GetRelativePath($fullpath) {
 		$fullpath = realpath($fullpath);
-		$pos = strpos($fullpath,PATH_ABS_ROOT);
-		
-		$path = PATH_REL_ROOT.trim(substr($fullpath,$pos+strlen(PATH_ABS_ROOT)),DIRECTORY_SEPARATOR);
+		$path = str_replace(PATH_ABS_ROOT,PATH_REL_ROOT,$fullpath);
 		$path = str_replace(DIRECTORY_SEPARATOR,'/',$path);
 		return $path;
 	}
