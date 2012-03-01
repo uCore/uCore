@@ -902,10 +902,16 @@ class utopia {
 		return $_SERVER['HTTP_HOST'];
 	}
 
-	static function GetRelativePath($fullpath) {
-		$fullpath = realpath($fullpath);
-		$path = str_replace(PATH_ABS_ROOT,PATH_REL_ROOT,$fullpath);
+	static function GetRelativePath($path) {
+		$path = realpath($path);
+		$path = str_replace(PATH_ABS_ROOT,PATH_REL_ROOT,$path);
 		$path = str_replace(DIRECTORY_SEPARATOR,'/',$path);
+		return $path;
+	}
+	static function GetAbsolutePath($path) {
+		if (strpos($path,PATH_REL_ROOT) === 0) $path = substr_replace($path,PATH_ABS_ROOT,0,strlen(PATH_REL_ROOT));
+		$path = realpath($path);
+		if (!file_exists($path)) return FALSE;
 		return $path;
 	}
 
