@@ -6,10 +6,8 @@ class uCSS extends uBasicModule {
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
-		if (!file_exists($path)) {
-			if (!file_exists(PATH_ABS_ROOT.$path)) return;
-			$path = PATH_ABS_ROOT.$path;
-		}
+		if (!file_exists($path)) $path = utopia::GetAbsolutePath($path);
+		if (!file_exists($path)) return;
 		self::$includeFiles[] = $path;
 	}
 	public function GetUUID() { return 'styles.css'; }
