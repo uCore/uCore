@@ -140,7 +140,7 @@ class uCustomWidget implements iWidget {
 	}
 	public static function getPossibleFields($originalVal,$pk,$processedVal,$rec) {
 		$meta = json_decode($rec['__metadata'],true);
-		if (!$meta || !$meta['module']) return 'Please select a module.';
+		if (!$meta || !isset($meta['module']) || !$meta['module']) return 'Please select a module.';
 		$obj = utopia::GetInstance($meta['module']);
 		if (!$obj) return '';
 		$fields = $obj->fields;
@@ -183,7 +183,7 @@ class uCustomWidget implements iWidget {
 				$dataset = $instance->GetDataset(NULL);
 				$rows = GetRows($dataset);
 			} catch (Exception $e) {
-				echo '<p>There was a problem accessing the records, please check your filter and sorting options for invalid fields.</p>';
+				uNotices::AddNotice('<p>There was a problem accessing the records, please check your filter and sorting options for invalid fields.</p>',NOTICE_TYPE_WARNING);
 			}
 		} else $rows = array();
 

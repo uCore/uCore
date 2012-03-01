@@ -2172,7 +2172,6 @@ FIN;
 			$this->lastRowNum = $rowNum;
 			//$_SESSION['datastore'][get_class($this)] = $this->currentRecord;
 		}
-		if (isset($row['__metadata'])) $row['__metadata'] = stripslashes($row['__metadata']);
 		return $row;
 	}
 
