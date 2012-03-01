@@ -342,10 +342,11 @@ abstract class uTableDef implements iUtopiaModule {
 			// build field
 			$type = getSqlTypeFromFieldType($fieldData['type']);
 			$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
-			if ($fieldData['type'] == ftTIMESTAMP && strtolower($fieldData['default']) == 'current_timestamp')
-				$default = " DEFAULT CURRENT_TIMESTAMP";
-			else
-				$default = $fieldData['default'] === NULL ? '' : " DEFAULT '{$fieldData['default']}'";
+			if ($fieldData['type'] == ftTIMESTAMP) {
+				if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
+				else $default = " DEFAULT 0";
+			} else
+			$default = $fieldData['default'] === NULL ? '' : "DEFAULT '{$fieldData['default']}'";
 			$comments = $fieldData['comments'] === NULL ? '' : " COMMENT '{$fieldData['comments']}'";
 			$collate = $fieldData['collation'] === NULL ? '' : " COLLATE '{$fieldData['collation']}'";
 			$flds[] = "`$fieldName` $type$length {$fieldData['null']}$default {$fieldData['extra']}$comments$collate";

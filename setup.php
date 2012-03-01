@@ -96,9 +96,9 @@ class uConfig {
 
 		if ($showConfig) self::ShowConfig();
 		try {
-			sql_query('SHOW TABLES FROM '.SQL_DBNAME);
+			sql_query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
 		} catch (Exception $e) {
-			self::$configVars['SQL_SERVER']['notice'] = 'Unable to connect to database ('.$e->getCode().')';
+			self::$configVars['SQL_SERVER']['notice'] = $e->getMessage().' ('.$e->getCode().')';
 		}
 
 		$changed = false;
