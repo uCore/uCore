@@ -460,7 +460,7 @@ class uCMS_View extends uSingleDataModule {
 
 		if (!$ishome) $path[] = $cms_id.'.php';
 
-		return '/'.implode('/',$path).$qs;
+		return PATH_REL_ROOT.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
 		$rec = self::findPage();
