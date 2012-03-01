@@ -1132,7 +1132,7 @@ FIN;
 		$newTable['table']	= TABLE_PREFIX.$tableModule;
 		$newTable['pk']		= $tableObj->GetPrimaryKey();
 		$newTable['tModule']= $tableModule;
-		$this->AddField('_'.$alias.'_pk',&$newTable['pk'],$alias);
+		$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
 		if ($parent==NULL) {
 			if ($this->sqlTableSetup != NULL) {
 				ErrorLog('Can only have one base table');
