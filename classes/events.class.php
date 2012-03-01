@@ -28,19 +28,17 @@ class uEvents {
 		$eventName = strtolower($eventName);
 
 		if (!isset(self::$callbacks[$eventName])) return TRUE;
-		if (!isset(self::$callbacks[$eventName][$module])) $module = '';
-		if (!isset(self::$callbacks[$eventName][$module])) return TRUE;
+		$process = array_unique(array($module,''));
 		
 		$callbackArgs = array($object,$eventName);
 		if ($eventData) $callbackArgs[] = $eventData;
 		
 		$return = true;
-		
-		foreach (self::$callbacks[$eventName][$module] as $callback) {
-			$return = $return && call_user_func_array($callback,$callbackArgs) !== FALSE;
-		}
-		if ($module !== '') foreach (self::$callbacks[$eventName][''] as $callback) {
-			$return = $return && call_user_func_array($callback,$callbackArgs) !== FALSE;
+		foreach ($process as $module) {
+			if (!isset(self::$callbacks[$eventName][$module])) continue;
+			foreach (self::$callbacks[$eventName][$module] as $callback) {
+				$return = $return && call_user_func_array($callback,$callbackArgs) !== FALSE;
+			}
 		}
 		return $return;
 	}
