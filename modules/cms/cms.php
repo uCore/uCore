@@ -343,6 +343,7 @@ EOF;
 	}
 	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		if ($pkVal == NULL && $fieldAlias == 'title') $this->UpdateField('cms_id',UrlReadable($newValue),$pkVal);
 		if ($fieldAlias == 'revert') {
 			$rec = $this->LookupRecord($pkVal);
 			$this->UpdateField('content',$rec['content_published'],$pkVal);
