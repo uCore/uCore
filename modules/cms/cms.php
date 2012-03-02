@@ -1,33 +1,31 @@
 <?php
 
 class tabledef_CMS extends uTableDef {
-  public $tablename = 'cms';
-  public function SetupFields() {
-    //$this->AddField('id',ftNUMBER);
-    $this->AddField('cms_id',ftVARCHAR,150);
-    $this->AddField('parent',ftVARCHAR,150);
-    $this->AddField('rewrite',ftVARCHAR,200);
-    $this->AddField('position',ftNUMBER);
-    $this->AddField('nav_text',ftVARCHAR,66);
-    $this->AddField('template',ftVARCHAR,50);
-    $this->AddField('hide',ftBOOL);
-    $this->AddField('noindex',ftBOOL);
-    $this->AddField('nofollow',ftBOOL);
-    $this->AddField('title',ftVARCHAR,66);  // google only shows 66 chars in title
-    $this->AddField('description',ftVARCHAR,150); // google only shows 150 chars in description
-    $this->AddField('content',ftTEXT);
-    $this->AddField('content_time',ftTIMESTAMP);
-    $this->AddField('content_published',ftTEXT);
-    $this->AddField('content_published_time',ftTIMESTAMP);
-    $this->AddField('is_published',ftBOOL);
+	public function SetupFields() {
+		$this->AddField('cms_id',ftVARCHAR,150);
+		$this->AddField('parent',ftVARCHAR,150);
+		$this->AddField('rewrite',ftVARCHAR,200);
+		$this->AddField('position',ftNUMBER);
+		$this->AddField('nav_text',ftVARCHAR,66);
+		$this->AddField('template',ftVARCHAR,50);
+		$this->AddField('hide',ftBOOL);
+		$this->AddField('noindex',ftBOOL);
+		$this->AddField('nofollow',ftBOOL);
+		$this->AddField('title',ftVARCHAR,66);  // google only shows 66 chars in title
+		$this->AddField('description',ftVARCHAR,150); // google only shows 150 chars in description
+		$this->AddField('content',ftTEXT);
+		$this->AddField('content_time',ftTIMESTAMP);
+		$this->AddField('content_published',ftTEXT);
+		$this->AddField('content_published_time',ftTIMESTAMP);
+		$this->AddField('is_published',ftBOOL);
 
-    $this->AddField('updated',ftTIMESTAMP);
-    $this->SetFieldProperty('updated','extra','ON UPDATE CURRENT_TIMESTAMP');
-    $this->SetFieldProperty('updated','default','current_timestamp');
+		$this->AddField('updated',ftTIMESTAMP);
+		$this->SetFieldProperty('updated','extra','ON UPDATE CURRENT_TIMESTAMP');
+		$this->SetFieldProperty('updated','default','current_timestamp');
 
-    $this->SetPrimaryKey('cms_id');
-    $this->SetFieldProperty('position','default',999);
-  }
+		$this->SetPrimaryKey('cms_id');
+		$this->SetFieldProperty('position','default',999);
+	}
 }
 
 class uCMS_List extends uDataModule implements iAdminModule {
@@ -508,7 +506,7 @@ class uCMS_View extends uSingleDataModule {
 		$uri = $_SERVER['REQUEST_URI'];
 		$uri = preg_replace('/(\?.*)?/','',$uri);
 
-		if ($uri == '/') return self::GetHomepage();    
+		if ($uri === PATH_REL_ROOT) return self::GetHomepage();    
 
 		preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
 		if (array_key_exists(1,$matches)) {
