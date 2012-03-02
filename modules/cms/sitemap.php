@@ -42,8 +42,6 @@ class uSitemap {
 			//$sel = (strpos($url,$_SERVER['REQUEST_URI']) !== FALSE) ? ' u-menu-active' : '';
 			//$sel = ($url == $_SERVER['REQUEST_URI']) ? ' u-menu-active' : ''; //handled by javascript
 			$class = array();
-			if ($i === 0) $class[] = 'first-item';
-			if ($i === $count-1) $class[] = 'last-item';
 
 			$class = $class ? ' class="'.implode(' ',$class).'"' : '';
 			echo '<li id="'.$child['cms_id'].'" '.$class.'>';
