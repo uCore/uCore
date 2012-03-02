@@ -1511,16 +1511,18 @@ FIN;
 		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$title);
 	}
 
-	private $filterUID = 0;
-	public function GetNewUID() {
-		$this->filterUID = $this->filterUID +1;
-		return $this->GetModuleId().'_'.($this->filterUID - 1);
+	private $filterUID = array();
+	public function GetNewUID($fieldName) {
+		if (!isset($this->filterUID[$fieldName])) $this->filterUID[$fieldName] = 0;
+		$this->filterUID[$fieldName]++;
+		return $this->GetModuleId().'_'.($this->filterUID[$fieldName] - 1);
 	}
 
 	// private - must use addfilter or addfilterwhere.
 	private function &AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) {
-		//		if (!isset($value) || empty($value)) return;
-		$uid = $this->GetNewUID();
+		if (($fltr = $this->FindFilter($fieldName,$compareType,$inputType,$filterType))) return $fltr;
+		
+		$uid = $this->GetNewUID($fieldName);
 		$value = $dvalue;
 
 		if ($filterType == NULL) // by default, filters are HAVING unless otherwise specified
@@ -2174,13 +2176,10 @@ FIN;
 	}
 
 	public function GetCurrentRecord($refresh = FALSE) {
+		if (!$refresh) return $this->currentRecord;
 
-		if ($refresh === TRUE) {
-			if ($this->currentRecord !== NULL)
-				return $this->LookupRecord($this->currentRecord[$this->GetPrimaryKey()]);
-			else
-				return $this->GetRecord($this->GetDataset(),0);
-		}
+		if ($this->currentRecord !== NULL)
+			return $this->LookupRecord($this->currentRecord[$this->GetPrimaryKey()]);
 
 		return $this->currentRecord;
 	}
