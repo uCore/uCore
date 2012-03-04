@@ -15,6 +15,8 @@ class adminLogout extends uBasicModule {
 	}
 }
 
+utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
+utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
 class uUserLogin extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'User Login'; }
@@ -92,7 +94,12 @@ class uUserLogin extends uDataModule {
 		}
 	}
 
-	static function RequireLogin($accounts=NULL) { }
+	public static function GetLoginUserBox() {
+		return utopia::DrawInput('__login_u',itTEXT,'',NULL,array('id'=>'lu'));
+	}
+	public static function GetLoginPassBox() {
+		return utopia::DrawInput('__login_p',itPASSWORD);
+	}
 
 	public function RunModule() {
 		if (self::IsLoggedIn()) {
@@ -100,9 +107,9 @@ class uUserLogin extends uDataModule {
 			return;
 		}
 		echo 'Please log in';
-		echo '<form id="loginForm" action="" onsubmit="this.action = window.location;" method="post"><table>';
-		echo '<tr><td align="right">Username:</td><td>'.utopia::DrawInput('__login_u',itTEXT,'',NULL,array('id'=>'lu')).'</td></tr>';
-		echo '<tr><td align="right">Password:</td><td>'.utopia::DrawInput('__login_p',itPASSWORD).'</td></tr>';
+		echo '<form id="loginForm" action="" method="POST"><table>';
+		echo '<tr><td align="right">Username:</td><td>{login_user}</td></tr>';
+		echo '<tr><td align="right">Password:</td><td>{login_pass}</td></tr>';
 		echo '<tr><td></td><td align="right">'.utopia::DrawInput('',itSUBMIT,'Log In').'</td></tr>';
 		echo '</table></form><script type="text/javascript">$(function (){$(\'#lu\').focus()})</script>';
 		uEvents::TriggerEvent('AfterShowLogin');
