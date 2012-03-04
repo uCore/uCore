@@ -347,9 +347,9 @@ abstract class uTableDef implements iUtopiaModule {
 				else $default = " DEFAULT 0";
 			} else
 			$default = $fieldData['default'] === NULL ? '' : "DEFAULT '{$fieldData['default']}'";
-			$comments = $fieldData['comments'] === NULL ? '' : " COMMENT '{$fieldData['comments']}'";
-			$collate = $fieldData['collation'] === NULL ? '' : " COLLATE '{$fieldData['collation']}'";
-			$flds[] = "`$fieldName` $type$length {$fieldData['null']}$default {$fieldData['extra']}$comments$collate";
+			$comments = $fieldData['comments'] === NULL ? '' : "COMMENT '{$fieldData['comments']}'";
+			$collate = $fieldData['collation'] === NULL ? '' : "COLLATE '{$fieldData['collation']}'";
+			$flds[] = "`$fieldName` $type$length {$fieldData['null']} $default {$fieldData['extra']} $comments $collate";
 		}
 		if ($pk === NULL)		ErrorLog('Must specify a PRIMARY KEY ('.get_class($this).')');
 		elseif ($pk === FALSE)	ErrorLog('Cannot assign multiple PRIMARY KEYS ('.get_class($this).')');
