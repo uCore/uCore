@@ -13,6 +13,7 @@ utopia::AddTemplateParser('session','utopia::parseSession');
 utopia::AddTemplateParser('const','utopia::parseConst');
 utopia::AddTemplateParser('cssHead','utopia::GetCSSHead','');
 utopia::AddTemplateParser('jsHead','utopia::GetJSHead','');
+utopia::AddTemplateParser('home_url',function() { return PATH_REL_ROOT; },'');
 
 utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
