@@ -1762,13 +1762,13 @@ FIN;
 		//		echo "FindFilter($fieldName, $compareType, $inputType): ";
 		//print_r($this->filters);
 		foreach ($this->filters as $ftypeID => $filterType) {
-			if ($set != NULL && $ftypeID !== $set) continue;
+			if ($set && $ftypeID !== $set) continue;
 			foreach ($filterType as $fsetID => $filterset) {
 				if (is_array($filterset)) foreach ($filterset as $arrID => $filterInfo) {
-					if ($filterInfo['fieldName'] === $fieldName && ($compareType === NULL || $filterInfo['ct'] === $compareType) && ($inputType === NULL || $filterInfo['it'] === $inputType)) {
-						//						echo "found filter matching ($fieldName $compareType $inputType) at ($uid)<br/>";
-						return $this->filters[$ftypeID][$fsetID][$arrID];
-					}
+					if ($filterInfo['fieldName'] != $fieldName) continue;
+					if ($compareType && $filterInfo['ct'] !== $compareType) continue;
+					if ($inputType && $filterInfo['it'] !== $inputType) continue;
+					return $this->filters[$ftypeID][$fsetID][$arrID];
 				}
 			}
 		}
@@ -2200,7 +2200,7 @@ FIN;
 		if ($clearFilters) $instance->ClearFilters();
 		foreach ($filter as $field => $val) {
 			// does filter exist already?
-			if ($fltr =& $instance->FindFilter($field)) {
+			if ($fltr =& $instance->FindFilter($field,ctEQ)) {
 				$fltr['value'] = $val;
 			} else {
 				if (!is_numeric($field))
