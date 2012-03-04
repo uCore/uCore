@@ -178,7 +178,8 @@ class uEmailer extends uDataModule {
 				->setPassword(modOpts::GetOption('smtp','pass'));
 		} else {
 			// mail
-			$transport = Swift_MailTransport::newInstance();
+			//$transport = Swift_MailTransport::newInstance();
+			// sendmail
 			$transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -bs');
 		}
 		
@@ -195,16 +196,18 @@ class uEmailer extends uDataModule {
 			$message->attach($attachment);
 		}
 
+		$failures = array();
 		try {
 			foreach ($data as $item) {
 				$message->setTo($item[$emailField]);
 				$message->setSubject(self::ReplaceData($item,$row['subject']));
 				$message->setBody(self::ReplaceData($item,$row['body']),'text/html');
-				$mailer->send($message);
+				$mailer->send($message,$failures);
 			}
 		} catch (Exception $e) {
 			 DebugMail('Email Error',$e->getMessage());
 		}
+		return $failures;
 	}
 
 	public static function ReplaceData($pairs,$text,$encode=false) {
