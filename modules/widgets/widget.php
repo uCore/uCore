@@ -305,7 +305,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		$w = isset($meta['width']) ? $meta['width'] : '';	if (is_numeric($w)) $w = $w.'px';	if ($w) $w = 'width:'.$w.';';
 		$h = isset($meta['height'])?$meta['height'] : '';	if (is_numeric($h)) $h = $h.'px';	if ($h) $h = 'height:'.$h.';';
 		$style = ($w || $h) ? ' style="'.$w.$h.'"' : '';
-		$ret = '<div'.$style.'>'.$content.'</div>';
+		$ret = '<div class="uWidget uWidget-'.$rec['block_id'].'" '.$style.'>'.$content.'</div>';
 
 		return $ret;
 	}
