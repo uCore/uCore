@@ -808,7 +808,12 @@ abstract class uDataModule extends uBasicModule {
 
 	public function IsNewRecord() {
 		if ($this->forceNewRec === TRUE) return true;
-		if (isset($_REQUEST[$this->GetModuleId().'_new'])) return true;
+		
+		$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
+		if ($this->GetFilterValue($fltr['uid'])) return false;
+		
+		if (!$this->GetCurrentRecord() && flag_is_set($this->GetOptions(),ALLOW_ADD)) return true;
+		
 		return false;
 	}
 
@@ -2559,14 +2564,6 @@ FIN;
 			uEvents::TriggerEvent('OnNewRecord',$this,$pkVal);
 		}
 		
-		if ($oldPkVal !== $pkVal) {
-			// updated PK
-			if ($this->FindFilter($fieldAlias)) {
-				//$pkVal = $pfVal;
-				$ret = $this->GetURL($pkVal);
-			}
-		}
-		
 		if (array_key_exists('onupdate',$this->fields[$fieldAlias])) {
 			foreach ($this->fields[$fieldAlias]['onupdate'] as $callback) {
 				list($callback,$arr) = $callback;
@@ -2580,12 +2577,6 @@ FIN;
 		}
 
 		$this->ResetField($fieldAlias,$pkVal);
-
-		if ($ret === NULL)
-			AjaxEcho("window.location.reload(false);");
-		elseif (is_string($ret)) {
-			AjaxEcho("window.location.replace('$ret');");
-		}
 		
 		if (uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldAlias)) === FALSE) return FALSE;
 
@@ -2885,7 +2876,7 @@ SCR_END
 				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
 						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'uSingleDataModule')) {
-					$url = $obj->GetURL(array($obj->GetModuleId().'_new'=>1));
+					$url = $obj->GetURL();
 					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
 				}
 			}
@@ -3169,6 +3160,19 @@ abstract class uSingleDataModule extends uDataModule {
 	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
 		parent::ProcessUpdates_del($sendingField,$fieldAlias,$value,$pkVal);
 		AjaxEcho('history.go(-1);');
+	}
+	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		$oldPkVal = $pkVal;
+		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
+		
+		if ($ret === NULL)
+			AjaxEcho("window.location.reload(false);");
+		elseif ($oldPkVal !== $pkVal) {
+			// updated PK
+			$url = $this->GetURL($pkVal);
+			AjaxEcho("window.location.replace('$url');");
+		}
+		return $ret;
 	}
 
 	public function ShowData(){//$customFilter=NULL) {//,$sortColumn=NULL) {

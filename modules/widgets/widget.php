@@ -104,7 +104,7 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 		$rows = array_merge($rows,$widgets);
 
 		$obj = utopia::GetInstance('uWidgets');
-		$newUrl = $obj->GetURL(array($obj->GetModuleId().'_new'=>1));
+		$newUrl = $obj->GetURL();
 
 		$rows = array($newUrl, $rows);
 		header('Content-Type: application/json');

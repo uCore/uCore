@@ -68,9 +68,8 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$tabGroupName = utopia::Tab_InitGroup();
 		ob_start();
 
-		$m = utopia::ModuleExists('uCMS_Edit');
 		$obj = utopia::GetInstance('uCMS_Edit');
-		$newUrl = $obj->GetURL(array($m['module_id'].'_new'=>1));
+		$newUrl = $obj->GetURL();
 		$relational = $this->GetNestedArray();
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
 		echo '<div style="white-space:nowrap"><a class="btn" style="font-size:0.8em" href="'.$newUrl.'">New Page</a><a class="btn" style="font-size:0.8em" href="javascript:t()">Toggle Hidden</a>';
