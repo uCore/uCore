@@ -485,7 +485,6 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
-		$this->AddFilter('cms_id',ctEQ);
 	}
 
 	public function SetupParents() {
