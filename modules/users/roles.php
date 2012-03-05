@@ -36,7 +36,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 
 	public function SetupParents() {
 		$this->AddParent('uUsersList');
-		uEvents::AddCallback('IsAuthenticated','uUserRoles::checkPermission');
+		uEvents::AddCallback('CanAccessModule','uUserRoles::checkPermission');
 		uEvents::AddCallback('InitComplete',array($this,'AssertAdminRole'));
 	}
 	public function AssertAdminRole() {
@@ -61,7 +61,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	public static function checkPermission($object) {
 		if (!($object instanceof iAdminModule)) return true;
 		$parent = get_class($object);
-		
+
 		$role = self::GetUserRole();
 		if ($role) {
 			if ($role[0] === '-1') return true; // site admin
@@ -69,9 +69,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 				if ($r === $parent) return true;
 			}
 		}
-		
-		if ($parent == utopia::GetCurrentModule()) uNotices::AddNotice('Sorry, you do not have access to this feature.',NOTICE_TYPE_WARNING);
-		
+
 		return false;
 	}
 	

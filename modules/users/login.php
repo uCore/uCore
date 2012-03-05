@@ -5,6 +5,7 @@ class adminLogout extends uBasicModule {
 	public function GetTitle() { return 'Logout'; }
 	public function GetSortOrder() { return -9900;}
 	public function SetupParents() {
+		if (!uUserLogin::IsLoggedIn()) return;
 		$this->AddParent('/');
 	}
 	public function RunModule() {
@@ -14,6 +15,12 @@ class adminLogout extends uBasicModule {
 		die();
 	}
 }
+
+uEvents::AddCallback('BeforeRunModule',function ($object) {
+	$ret = uEvents::TriggerEvent('CanAccessModule',$object);
+	if ($ret === FALSE && get_class($object) == utopia::GetCurrentModule()) uNotices::AddNotice('Sorry, you do not have access to this feature.',NOTICE_TYPE_WARNING);
+	return $ret;
+});
 
 utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
 utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
@@ -30,7 +37,7 @@ class uUserLogin extends uDataModule {
 	}
 
 	public function SetupParents() {
-		uEvents::AddCallback('CanAccessModule',array($this,'checkLogin'));
+		uEvents::AddCallback('BeforeRunModule',array($this,'checkLogin'),utopia::GetCurrentModule());
 		uEvents::AddCallback('InitComplete',array($this,'CheckSession'));
 
 		self::TryLogin();
@@ -75,23 +82,15 @@ class uUserLogin extends uDataModule {
 	}
 
 	public function checkLogin($object) {
+		if (self::IsLoggedIn()) return;
 		if (flag_is_set($object->GetOptions(), PERSISTENT)) return;
+
 		$parent = get_class($object);
-		self::TryLogin();
 
-		// if auth not required, return
-		// trigger IsAuthenticated
-//		if ($parent === get_class($this)) return true;
-		if (uEvents::TriggerEvent('IsAuthenticated',$object) !== FALSE) return true;
-//		if (!($object instanceof iAdminModule)) return true;
-
-		// if authed, dont show the login
-		if (!self::IsLoggedIn()) {
-			if (!AjaxEcho('window.location.reload();') && $parent == utopia::GetCurrentModule()) {
-				$this->_RunModule();
-			}
-			return FALSE;
+		if ($parent == utopia::GetCurrentModule() && $parent !== __CLASS__ && !AjaxEcho('window.location.reload();')) {
+			$this->_RunModule();
 		}
+		return FALSE;
 	}
 
 	public static function GetLoginUserBox() {

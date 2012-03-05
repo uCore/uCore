@@ -3,10 +3,10 @@
 class modLinks extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Admin Home'; }
-	public function GetOptions() { return NO_NAV | ALWAYS_ACTIVE; }
+	public function GetOptions() { return NO_NAV | ALWAYS_ACTIVE | PERSISTENT; }
 
 	public function SetupParents() {
-		$this->AddParentCallback('/','modLinks::drawLinks');
+		uEvents::AddCallback('BeforeRunModule','modLinks::drawLinks',utopia::GetCurrentModule());
 	}
 	public static function GetLinks($module,$specificOnly=false) {
 		$arr = array();
@@ -70,7 +70,8 @@ class modLinks extends uBasicModule {
 	}
 	
 	//public function ParentLoadPoint() { return 0; }
-	public static function drawLinks($parent) {
+	public static function drawLinks($object) {
+		$parent = get_class($object);
 		$arr = self::GetLinks($parent);
 
 		// find current module in list.
@@ -127,7 +128,7 @@ class modLinks extends uBasicModule {
 		$lastWasBlank = true;
 		foreach ($links as $link) {
 			if (empty($link['url']) && $lastWasBlank) continue;
-			if (isset($link['module']) && !uEvents::TriggerEvent('CanAccessModule',$link['module'])) continue;
+			if (isset($link['module']) && uEvents::TriggerEvent('CanAccessModule',$link['module']) === FALSE) continue;
 			$l = !empty($link['url']) ? '<a href="'.$link['url'].'">'.$link['title'].'</a>' : '&nbsp;';
 			$out[] = '<li>';
 			$out[] = $l;
