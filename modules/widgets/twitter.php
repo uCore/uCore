@@ -10,8 +10,8 @@ class uTwitterWidget implements iWidget {
                 $meta = json_decode($data['__metadata'],true);
                 $blockId = $data['block_id'];
                 $id = $meta['twitter_id'];
-                $width = $meta['width'] ? $meta['width'] : 250;
-                $height = $meta['height'] ? $meta['height'] : 350;
+                $width = isset($meta['width']) ? $meta['width'] : 250;
+                $height = isset($meta['height']) ? $meta['height'] : 350;
                 return <<<FIN
 <div id="twitter_$blockId"></div>
 <script type="text/javascript">
