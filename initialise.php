@@ -44,17 +44,6 @@ uEvents::TriggerEvent('InitComplete');
 
 // process ajax function
 if (array_key_exists('__ajax',$_REQUEST)) {
-	//utopia::CancelTemplate();
-	// TODO: ajax parentloading?  EG: login modules
-	$cm = utopia::GetCurrentModule();
-	if (uEvents::TriggerEvent('CanAccessModule',$cm) === FALSE) die();
-	if ($cm && $cm !== 'uDashboard') {
-		$obj = utopia::GetInstance($cm);
-		$lc = $obj->LoadChildren(0); // now part of runmodule and loadparents, call here to check for
-		if ($lc !== TRUE && $lc !== NULL) die();
-	}
-
-
 	$ajaxIdent	= $_REQUEST['__ajax'];
 	if (!array_key_exists('ajax',$GLOBALS) || !array_key_exists($ajaxIdent,$GLOBALS['ajax'])) die("Cannot perform ajax request, '$ajaxIdent' has not been registered.");
 
