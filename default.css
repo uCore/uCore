@@ -1,5 +1,5 @@
-body.centerWrap {width:100%; text-align:center}
-div.centerWrap {width: 950px; margin: 0 auto; position: relative; text-align:left }
+body.centerWrap { text-align:center }
+div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 
 .left { float:left } .right { float:right }
 .cl { clear:left } .cr { clear:right } .cb { clear:both }
