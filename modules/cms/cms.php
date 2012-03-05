@@ -72,7 +72,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$newUrl = $obj->GetURL();
 		$relational = $this->GetNestedArray();
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
-		echo '<div style="white-space:nowrap"><a class="btn" style="font-size:0.8em" href="'.$newUrl.'">New Page</a><a class="btn" style="font-size:0.8em" href="javascript:t()">Toggle Hidden</a>';
+		echo '<div style="white-space:nowrap"><a class="btn" style="font-size:0.8em" href="'.$newUrl.'">New Page</a>';
 
 		$modOptsObj = utopia::GetInstance('modOpts');
 		$modOptsObj->_SetupFields();
@@ -89,12 +89,6 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$fid = $editObj->FindFilter('cms_id');
 		echo <<<FIN
 		<script type="text/javascript">
-		var hidden=true;
-		function t() {
-			if (hidden) $('.hiddenItem').not('#ui-treesort-placeholder').show();
-			else $('.hiddenItem').hide();
-			hidden = !hidden;
-		}
 		function RefreshIcons() {
 			$('.ui-treesort-item:not(.ui-treesort-folder) > .cmsParentToggle').remove();
 			$('.ui-treesort-folder').each(function () {
