@@ -311,18 +311,11 @@ EOF;
 		$url = $obj->GetURL($id);
 
 		$rep = uWidgets::DrawWidget($id);
-		$ele = str_get_html($rep);
+		$ele = str_get_html('<div style="display:inline">'.$rep.'</div>');
 
-		$editBtn = '';
 		$delBtn = '<input type="button" value="Remove" onclick="var a = this.parentNode; while (a.className.indexOf(\'uWidgetPlaceholder\')==-1) { a = a.parentNode } a.parentNode.removeChild(a);">';
-		$addition = '';
-		if (!$ele->root->children) {
-			$ele = str_get_html('<span>'.$ele.'</span>');
-			$addition = $delBtn;
-		} else {
-			$editBtn = '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
-			$addition = '<div class="uWidgetHeader">'.$delBtn.$editBtn.$id.'</div>';
-		}
+		$editBtn = '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
+		$addition = '<div class="uWidgetHeader">'.$delBtn.$editBtn.$id.'</div>';
 
 		$ele = $ele->root->children[0];
 		$ele->class .= ' uWidgetPlaceholder mceNonEditable';
