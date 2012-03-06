@@ -36,12 +36,22 @@
 
 
 class jqFileManager {
+	private static $docroot = NULL;
+	public static function SetDocRoot($path) {
+		self::$docroot = $path;
+	}
+	private static $relroot = '/';
+	public static function SetRelRoot($path) {
+		self::$relroot = $path;
+	}
+	
 	private static $data = array();
 	static function GetRelativePath($path) {
-		$path = self::ResolvePath($path);
-		$pos = strpos($path,realpath($_SERVER['DOCUMENT_ROOT']));
-		if ($pos === false) return $path;
-		return '/'.ltrim(substr($path,$pos+strlen(realpath($_SERVER['DOCUMENT_ROOT']))),DIRECTORY_SEPARATOR);
+		$docroot = self::$docroot ? self::$docroot : $_SERVER['DOCUMENT_ROOT'];
+		$path = realpath($path);
+		$path = str_replace($docroot,self::$relroot,$path);
+		$path = str_replace(DIRECTORY_SEPARATOR,'/',$path);
+		return $path;
 	}
 	static function GetPathFolder() {
 		return self::GetRelativePath(dirname(__FILE__)).DIRECTORY_SEPARATOR;
