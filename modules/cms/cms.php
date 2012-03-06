@@ -370,6 +370,8 @@ EOF;
 		return $ret;
 	}
 	public function getPossibleBlocks($val,$pk,$original) {
+		$t = uCMS_View::GetTemplate($pk);
+		$this->fields['content']['attr']['mce_options'] = '{content_css:\''.PATH_REL_ROOT.$t.'/styles.css\'}';
 		$obj = utopia::GetInstance('uWidgets_List');
 		$rows = $obj->GetRows();
 		foreach (uWidgets::$staticWidgets as $widgetID => $callback) $rows[]['block_id'] = $widgetID;

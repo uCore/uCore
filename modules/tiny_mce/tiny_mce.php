@@ -37,13 +37,12 @@ class module_TinyMCE extends uBasicModule {
 			$options['theme_advanced_toolbar_align'] = "left";
 			$options['forced_root_block'] = false;
 			$options['preformatted'] = true;
-			$options['content_css'] = '{utopia.templatedir}styles.css,'.PATH_REL_CORE.'default.css';
+			$options['content_css'] = PATH_REL_CORE.'default.css';
 			$options['setup'] = 'tinyMceSetup';
 			$options['save_onsavecallback'] = 'onSave';
 			$options['save_enablewhendirty'] = true;
 
 			$richOpts = array();
-			$richOpts['editor_selector'] = "mceEditorRich";
 			$richOpts['plugins'] = "inlinepopups,spellchecker,save";
 			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p';
 			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
@@ -52,7 +51,6 @@ class module_TinyMCE extends uBasicModule {
 			$richOpts['theme_advanced_buttons4'] = "save";
 
 			$htmlOpts = array();
-			$htmlOpts['editor_selector'] = "mceEditorHTML";
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,fullscreen,save";
@@ -72,7 +70,7 @@ class module_TinyMCE extends uBasicModule {
 				$includeOpts = ','.$jsOptionVar;
 			}
 
-			uJavascript::AddText(<<< FIN
+			uJavascript::IncludeText(<<< FIN
 	function tinyMceSetup(ed) {
 		ed.onInit.add(function(ed, evt) {
 			tinymce.dom.Event.add(ed.getWin(), 'blur', function(e) {
@@ -103,31 +101,33 @@ class module_TinyMCE extends uBasicModule {
 		mceInfo.win.document.getElementById(mceInfo.field_name).value = item.fullPath;
 		mb.dialog('close');
 	}
-	function InitMCE() {
-		var defaultOptions = $baseOpts;
-		tinyMCE.init($.extend({},defaultOptions,$richOpts));
-		tinyMCE.init($.extend({},defaultOptions,$htmlOpts));
-	}
-	InitJavascript.add(InitMCE);
+	var mceDefaultOptions = $baseOpts;
+	var mceRichOptions = $.extend({},mceDefaultOptions,$richOpts);
+	var mceHtmlOptions = $.extend({},mceDefaultOptions,$htmlOpts);
 FIN
 );
 		}
 	}
 
 	function drti_func($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
-		$className = 'mceEditorRich';
-		if ($inputType == itHTML) $className = 'mceEditorHTML';
-
+		$saveClass = 'mceSave'.rand(1,5000);
+		
 		if (!is_array($attributes)) $attributes = array();
 		if (array_key_exists('class',$attributes))
-			$attributes['class'] .= ' '.$className;
+			$attributes['class'] .= ' '.$saveClass;
 		else
-			$attributes['class'] = $className;
+			$attributes['class'] = $saveClass;
 
-		$saveClass = 'mceSave'.rand(1,5000);
-		$attributes['class'] .= ' '.$saveClass;
-
-		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit);
+		$extendOpts = '';
+		if (isset($attributes['mce_options'])) {
+			$extendOpts = ','.$attributes['mce_options'];
+			unset($attributes['mce_options']);
+		}
+		$optName = 'mceRichOptions';
+		if ($inputType == itHTML) $optName = 'mceHtmlOptions';
+		$script = '<script type="text/javascript">tinyMCE.init($.extend({},'.$optName.$extendOpts.',{editor_selector:"'.$saveClass.'"}))</script>';
+		
+		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).$script;
 	}
 	public function RunModule() {
 	}
