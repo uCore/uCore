@@ -721,19 +721,14 @@ abstract class uDataModule extends uBasicModule {
 		if (!is_array($filters) && $filters !== NULL) $filters = array($this->GetPrimaryKey()=>$filters);
 
 		if ($this->HasRewrite() && is_array($filters) && array_key_exists($this->GetPrimaryKey(), $filters)) {
+			$rec = $this->LookupRecord($filters);
 			$fields = array();
 			foreach ($this->rewriteMapping as $seg) {
 				if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
 					foreach ($matches[1] as $match) {
-						if (array_key_exists($match,$this->fields) && !array_key_exists($match,$filters)) $fields[] = $match;
+						if (array_key_exists($match,$this->fields)) $filters[$match] = $rec[$match];
 					}
 				}
-			}
-			array_unique($fields);
-			if ($fields) {
-				$rec = $this->LookupRecord($filters);
-				//print_r($rec);
-				foreach ($fields as $field) $filters[$field] = $rec[$field];
 			}
 		}
 
