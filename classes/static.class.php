@@ -687,6 +687,14 @@ class utopia {
 			$v = str_replace(PATH_ABS_ROOT,'/',$v);
 			$nTemplates[$v] = $v;
 		}
+		
+		foreach ($nTemplates as $template => $v) {
+			if (file_exists(PATH_ABS_ROOT.$template.'/template.ini')) {
+				$inifile = parse_ini_file(PATH_ABS_ROOT.$template.'/template.ini');
+				if (isset($inifile['hidden'])) unset($nTemplates[$template]);
+			}
+		}
+		
 		return $nTemplates;
 	}
 	public static $adminTemplate = false;
