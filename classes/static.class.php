@@ -720,9 +720,9 @@ class utopia {
 		if ($relative) $path = self::GetRelativePath($path);
 		return $path.'/';
 	}
+	private static $templateCSS = array();
 	public static function OutputTemplate() {
 		uEvents::TriggerEvent('BeforeOutputTemplate');
-		ob_end_clean();
 		if (self::UsingTemplate()) {
 			self::SetVar('templatedir',utopia::GetTemplateDir(true));
 
@@ -730,16 +730,31 @@ class utopia {
 
 			if (utopia::IsMobile() && file_exists($templateDir.'mobile.php')) {
 				$templatePath = $templateDir.'mobile.php';
-				if (file_exists($templateDir.'mobile.css')) self::AddCSSFile($templateDir.'mobile.css');
+				if (file_exists($templateDir.'mobile.css')) self::$templateCSS[] = $templateDir.'mobile.css';
 			} else {
 				$templatePath = $templateDir.'template.php';
-				if (file_exists($templateDir.'styles.css')) self::AddCSSFile($templateDir.'styles.css');
+				if (file_exists($templateDir.'styles.css')) self::$templateCSS[] = $templateDir.'styles.css';
+			}
+
+			$inifile = $templateDir.'template.ini';
+			if (file_exists($inifile)) {
+				$inifile = parse_ini_file($inifile);
+				if (isset($inifile['parent'])) { // this templates ini file specifies parent, so read in the current template, and put the result into the content var
+					$template = get_include_contents($templatePath);
+					while (self::MergeVars($template));
+					self::SetVar('content',$template);
+					self::UseTemplate($inifile['parent']);
+					self::OutputTemplate();
+					return;
+				}
 			}
 
 			$template = get_include_contents($templatePath);
 		} else {
 			$template = '{utopia.content}';
 		}
+		ob_end_clean();
+		foreach (array_reverse(self::$templateCSS) as $cssfile) self::AddCSSFile($cssfile);
 
 		self::PrependVar('<head>','<meta name="generator" content="uCore '.file_get_contents(PATH_ABS_CORE.'version.txt').' - Utopia Core PHP Framework"/>'.PHP_EOL);
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
