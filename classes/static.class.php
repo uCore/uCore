@@ -697,7 +697,7 @@ class utopia {
 		if (!$template) $template = TEMPLATE_BLANK;
 		$ret = true;
 
-		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template.'/template.php')) {
+		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template)) {
 			$template = TEMPLATE_BLANK;
 			$ret = false;
 		}
@@ -723,6 +723,7 @@ class utopia {
 	private static $templateCSS = array();
 	public static function OutputTemplate() {
 		uEvents::TriggerEvent('BeforeOutputTemplate');
+		$template = '';
 		if (self::UsingTemplate()) {
 			self::SetVar('templatedir',utopia::GetTemplateDir(true));
 
@@ -740,9 +741,11 @@ class utopia {
 			if (file_exists($inifile)) {
 				$inifile = parse_ini_file($inifile);
 				if (isset($inifile['parent'])) { // this templates ini file specifies parent, so read in the current template, and put the result into the content var
-					$template = get_include_contents($templatePath);
-					while (self::MergeVars($template));
-					self::SetVar('content',$template);
+					if (file_exists($templatePath)) {
+						$template = get_include_contents($templatePath);
+						while (self::MergeVars($template));
+						self::SetVar('content',$template);
+					}
 					self::UseTemplate($inifile['parent']);
 					self::OutputTemplate();
 					return;
@@ -750,9 +753,9 @@ class utopia {
 			}
 
 			$template = get_include_contents($templatePath);
-		} else {
-			$template = '{utopia.content}';
 		}
+		if (!$template) $template = '{utopia.content}';
+
 		ob_end_clean();
 		foreach (array_reverse(self::$templateCSS) as $cssfile) self::AddCSSFile($cssfile);
 
