@@ -470,7 +470,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($this->rewritePersistPath && utopia::GetCurrentModule() == get_class($this)) $newPath .= str_replace($newPath,'',$oldPath);
 
 		// DONE: ensure all rewrite segments are accounted for (all '/' are present)
-		return $newPath;
+		return rtrim($newPath,'/');
 	}
 
 	public function GetURL($filters = NULL, $encodeAmp = false) {
