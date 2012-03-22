@@ -720,13 +720,21 @@ abstract class uDataModule extends uBasicModule {
 		$this->_SetupFields();
 		if (!is_array($filters) && $filters !== NULL) $filters = array($this->GetPrimaryKey()=>$filters);
 
-		if ($this->HasRewrite() && is_array($filters) && array_key_exists($this->GetPrimaryKey(), $filters)) {
-			$rec = $this->LookupRecord($filters);
-			$fields = array();
-			foreach ($this->rewriteMapping as $seg) {
-				if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
-					foreach ($matches[1] as $match) {
-						if (array_key_exists($match,$this->fields)) $filters[$match] = $rec[$match];
+		if ($this->HasRewrite() && is_array($filters)) {
+			foreach ($filters as $uid => $val) {
+				$fltr = $this->GetFilterInfo(substr($uid,3));
+				if (!$fltr) continue;
+				$filters[$fltr['fieldName']] = $val;
+				unset($filters[$uid]);
+			}
+			if (array_key_exists($this->GetPrimaryKey(), $filters)) {
+				$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()]);
+				$fields = array();
+				foreach ($this->rewriteMapping as $seg) {
+					if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
+						foreach ($matches[1] as $match) {
+							if (array_key_exists($match,$this->fields)) $filters[$match] = $rec[$match];
+						}
 					}
 				}
 			}
@@ -737,34 +745,36 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($filterType as $filterSet) {
 				foreach ($filterSet as $filter) {
 					$val = $this->GetFilterValue($filter['uid']);
-
-					if ($val) {
-						$filArr['_f_'.$filter['uid']] = $val;
-						continue;
-					}
 					
 					if (!empty($filter['default']) && $val == $filter['default']) {
 						unset($filters[$filter['fieldName']]);
+						unset($filters['_f_'.$filter['uid']]);
+						continue;
+					}
+
+					if ($val) {
+						$s = $this->HasRewrite() ? $filter['fieldName'] : '_f_'.$filter['uid'];
+						$filArr[$s] = $val;
 						continue;
 					}
 					
-					if (is_array($filters) && array_key_exists($filter['fieldName'],$filters)) {
-						$filArr['_f_'.$filter['uid']] = $filters[$filter['fieldName']];
-						unset($filters[$filter['fieldName']]);
-						continue;
-					}
+			/*		if (is_array($filters)) {
+						if (array_key_exists($filter['fieldName'],$filters)) {
+							$filArr['_f_'.$filter['uid']] = $filters[$filter['fieldName']];
+							unset($filters[$filter['fieldName']]);
+							continue;
+						}
+						if (array_key_exists('_f_'.$filter['uid'],$filters)) {
+							$filArr['_f_'.$filter['uid']] = $filters['_f_'.$filter['uid']];
+							unset($filters[$filter['fieldName']]);
+							continue;
+						}
+					}*/
 				}
 			}
 		}
-		//print_r($filArr);
-
-		// TODO: remove 'if' if rewrite not working
-		if ($this->HasRewrite()) foreach ($filArr as $uid => $val) {
-			$fltr = $this->GetFilterInfo(substr($uid,3));
-			$filArr[$fltr['fieldName']] = $val;
-			unset($filArr[$uid]);
-		}
-
+		
+		
 		if (is_array($filters)) {
 			//print_r($filters);
 			foreach ($filters as $fieldName => $val) {
@@ -775,7 +785,7 @@ abstract class uDataModule extends uBasicModule {
 				$filArr[$fieldName] = $val;
 			}
 		}
-//print_r($filArr);
+
 		return parent::GetURL($filArr,$encodeAmp);
 		//return BuildQueryString($url,$filArr);
 		/*		if (empty($filArr)) return $url;
@@ -802,8 +812,12 @@ abstract class uDataModule extends uBasicModule {
 	public function IsNewRecord() {
 		if ($this->forceNewRec === TRUE) return true;
 		
-		$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
-		if ($this->GetFilterValue($fltr['uid'])) return false;
+		$pk = $this->GetPrimaryKey();
+		foreach ($this->fields as $fieldname => $info) {
+			if ($info['field'] != $pk) continue;
+			$fltr = $this->FindFilter($fieldname,ctEQ,itNONE);
+			if ($this->GetFilterValue($fltr['uid'])) return false;
+		}
 		
 		if (!$this->GetCurrentRecord() && flag_is_set($this->GetOptions(),ALLOW_ADD)) return true;
 		
@@ -1189,9 +1203,7 @@ FIN;
 	public function FindValues($aliasName,$values,$stringify = FALSE) {
 		$arr = NULL;
 		$sort = true;
-		// if string field, strigify
-		if (strpos($this->GetFieldType($aliasName), 'text') !== FALSE || strpos($this->GetFieldType($aliasName), 'char') !== FALSE) $stringify = true;
-		
+
 		if (is_array($values)) {
 			if (!is_assoc($values)) { // assume we want the key = val
 				$values = array_flip($values);
@@ -1219,10 +1231,12 @@ FIN;
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
 			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) $arr = array_combine(array_keys($arr),array_keys($arr));
 		}
-
-		if ($stringify && is_array($arr) && !is_assoc($arr))
-		foreach ($arr as $key=>$val) {
-			$arr[$key]=$key;
+		
+		if ($stringify && is_array($arr)) {
+			//if (!is_assoc($arr)) //array_flip($arr);
+//				$arr = array_combine(array_values($arr),array_values($arr));
+//			else
+				$arr = array_combine(array_keys($arr),array_keys($arr));
 		}
 		if (is_array($arr) && $sort) ksort($arr);
 		return $arr;
@@ -1513,7 +1527,9 @@ FIN;
 	public function GetNewUID($fieldName) {
 		if (!isset($this->filterUID[$fieldName])) $this->filterUID[$fieldName] = 0;
 		$this->filterUID[$fieldName]++;
-		return $this->GetModuleId().'_'.($this->filterUID[$fieldName] - 1);
+		
+		$count = $this->filterUID[$fieldName]-1 > 0 ? '_'.$this->filterUID[$fieldName] : '';
+		return $this->GetModuleId().'_'.$fieldName.$count;
 	}
 
 	// private - must use addfilter or addfilterwhere.
@@ -1791,6 +1807,7 @@ FIN;
 
 		// ptime static filter value
 		// this line grabs STATIC filters (filters set by code), this enforced if the input type is null
+		if (isset($filterData['default'])) return $filterData['default'];
 		$defaultValue = (is_array($filterData) && array_key_exists('value',$filterData)) ? $filterData['value'] : NULL;
 
 		if (is_array($filterData) && $filterData['it'] == itNONE) {
@@ -2262,7 +2279,7 @@ FIN;
 		switch ($forceType) {
 			case ftFILE:
 				$filename = '';
-				$link = $this->GetFileFromTable($fieldName,TABLE_PREFIX.$this->GetTabledef(),$this->GetPrimaryKey(),$pkVal);
+				$link = $this->GetFileFromTable($fieldName,$this->fields[$fieldName]['vtable']['table'],$this->fields[$fieldName]['vtable']['pk'],$rec['_'.$this->fields[$fieldName]['vtable']['alias'].'_pk']);
 				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
 				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
@@ -2694,6 +2711,7 @@ FIN;
 //		$additional = array();
 		//print_r($info['fieldLinks']);
 		foreach ($info['fieldLinks'] as $linkInfo) {
+			$value = NULL;
 			// fromfield == mortgage_id
 			// module_pk == VAL:note_id
 			if (!$this->FieldExists($linkInfo['fromField']) and ($fltr = $this->FindFilter($linkInfo['fromField']))) {
@@ -2728,7 +2746,7 @@ FIN;
 				//ErrorLog(print_r($linkInfo,true));
 			}
 			//echo $value."<br/>";
-			if (!empty($value))
+			if ($value !== NULL)
 				$newFilter['_f_'.$linkInfo['toField']] = $value;
 		}
 		return $newFilter;
