@@ -13,7 +13,8 @@ utopia::AddTemplateParser('session','utopia::parseSession');
 utopia::AddTemplateParser('const','utopia::parseConst');
 utopia::AddTemplateParser('cssHead','utopia::GetCSSHead','');
 utopia::AddTemplateParser('jsHead','utopia::GetJSHead','');
-utopia::AddTemplateParser('home_url',function() { return PATH_REL_ROOT; },'');
+utopia::AddTemplateParser('home_url',PATH_REL_ROOT,'');
+utopia::AddTemplateParser('domain','utopia::GetDomainName','');
 
 utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
@@ -1129,7 +1130,7 @@ class utopia {
 	static function jsonTryDecode($value) {
 		$originalValue = $value;
 		$value = json_decode($value);
-		if (json_last_error() !== JSON_ERROR_NONE) $value = $originalValue;
+		if ($value === NULL) $value = $originalValue;
 		return $value;
 	}
 }

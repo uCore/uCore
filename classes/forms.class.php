@@ -675,7 +675,7 @@ abstract class uDataModule extends uBasicModule {
 	//public abstract function ShowData();//$customFilter = NULL);
 
 	private $makeSortable = array();
-	public function MakeSortable($updateField,$selector) {
+	public function MakeSortable($updateField,$selector='') {
 		$this->makeSortable[] = array($selector,$updateField);
 	}
 

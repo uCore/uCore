@@ -270,7 +270,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 	}
 
 	public function InitInstance($type) {
-		if (class_exists($type)) $type::Initialise($this);
+		if (class_exists($type)) call_user_func(array($type,'Initialise'),$this);
 		$this->AddField('preview',array($this,'getPreview'),'blocks','Preview');
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
@@ -297,7 +297,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 			if (!$rec) return '';
 		}
 		$content = '';
-		if ($rec['block_type'] && class_exists($rec['block_type'])) $content = $rec['block_type']::DrawData($rec);
+		if ($rec['block_type'] && class_exists($rec['block_type'])) $content = call_user_func(array($rec['block_type'],'DrawData'),$rec);
 
 		$meta = json_decode($rec['__metadata'],true);
 

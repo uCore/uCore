@@ -56,7 +56,7 @@ class uJavascript extends uBasicModule {
 		foreach (self::$includeFiles as $filename) {
 			//does it exist?
 			if (!file_exists($filename)) continue;
-			clearstatcache(true,$filename);
+			clearstatcache();
 			$uStr .= $filename.filemtime($filename).'-'.filesize($filename);
 		}
 

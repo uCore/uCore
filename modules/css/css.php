@@ -30,7 +30,7 @@ class uCSS extends uBasicModule {
 		foreach (self::$includeFiles as $filename) {
 			//does it exist?
 			if (!file_exists($filename)) continue;
-			clearstatcache(true,$filename);
+			clearstatcache();
 			$uStr .= filemtime($filename).'-'.filesize($filename);
 		}
 
