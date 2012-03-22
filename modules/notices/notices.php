@@ -11,7 +11,7 @@ class uNotices extends uBasicModule {
 	}
 
 	public static function AddNotice($message,$type=NOTICE_TYPE_INFO) {
-		if (!AjaxEcho('$(\'.uNotices\').append(Base64.decode("\''.base64_encode(self::GetNotice($message,$type)).'\'"));'))
+		if (!AjaxEcho('$(\'.uNotices\').append(Base64.decode("'.base64_encode(self::GetNotice($message,$type)).'"));'))
 			$_SESSION['notices'][] = array('message'=>$message, 'type'=>$type);
 	}
 

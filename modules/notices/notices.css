@@ -4,7 +4,7 @@
 	border-radius: 10px;
 	margin:0.1em;
 }
-.uNotice p { font-size: 12px; margin:0.5em 0; }
+.uNotice p { font-size: 12px; margin:0.5em 0; color:black; }
 
 .uNotice-info {
 	background-color:#d0e5f5;
