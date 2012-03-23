@@ -236,7 +236,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
-		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}.php">'.PATH_REL_ROOT.'{cms_id}.php</a>','cms','View Page');
+		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}">'.PATH_REL_ROOT.'{cms_id}</a>','cms','View Page');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
 		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
 		$templates = utopia::GetTemplates(true);
@@ -448,7 +448,7 @@ class uCMS_View extends uSingleDataModule {
 		}
 		$path = array_reverse($path);
 
-		if (!$ishome) $path[] = $cms_id.'.php';
+		if (!$ishome) $path[] = $cms_id;
 
 		return PATH_REL_ROOT.implode('/',$path).$qs;
 	}
