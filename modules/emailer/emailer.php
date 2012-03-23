@@ -189,17 +189,27 @@ class uEmailer extends uDataModule {
 		$mailer = Swift_Mailer::newInstance($transport);
 		$message = Swift_Message::newInstance()->setFrom(array($fromEmail => $fromName));
 
-		$obj = utopia::GetInstance('uEmailTemplateAttachmentList');
-		$attachments = $obj->GetRows(array('doc_id'=>$ident));
+		if (!is_array($attachments)) $attachments = array($attachments);
 		foreach ($attachments as $attachment) {
-			$attachment = Swift_Attachment::newInstance($attachment['attachment'], $attachment['attachment_filename'], $attachment['attachment_filetype']);
-			$message->attach($attachment);
+			if (!$attachment) continue;
+			if ($attachment instanceof Swift_Attachment)
+				$message->attach($attachment);
+			else
+				$message->attach(Swift_Attachment::fromPath($attachment));
+		}
+		$obj = utopia::GetInstance('uEmailTemplateAttachmentList');
+		$templateAttachments = $obj->GetRows(array('doc_id'=>$ident));
+		foreach ($templateAttachments as $attachment) {
+			$message->attach(Swift_Attachment::newInstance($attachment['attachment'], $attachment['attachment_filename'], $attachment['attachment_filetype']));
 		}
 
 		$failures = array();
 		try {
 			foreach ($data as $item) {
-				$message->setTo($item[$emailField]);
+				$message->setTo(array());
+				$recip = explode(',',$item[$emailField]);
+				foreach ($recip as $r) $message->addTo($r);
+				
 				$message->setSubject(self::ReplaceData($item,$row['subject']));
 				$message->setBody(self::ReplaceData($item,$row['body']),'text/html');
 				$mailer->send($message,$failures);
@@ -215,6 +225,7 @@ class uEmailer extends uDataModule {
 			if ($encode) $value = htmlspecialchars($value);
 			$text = str_replace('{'.$field.'}',str_replace("\n",'<w:br/>',$value),$text);
 		}
+		while (utopia::MergeVars($text));
 		return $text;
 	}
 }
