@@ -68,37 +68,6 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		echo '<h1>Welcome to Dashboard</h1>';
 
 		uEvents::TriggerEvent('ShowDashboard');
-		
-		$myVer = file_get_contents(PATH_ABS_CORE.'version.txt');
-		$gitTags = json_decode(curl_get_contents("http://github.com/api/v2/json/repos/show/oridan/utopia/tags"),true);
-		if ($gitTags) {
-			$gitTags = array_keys($gitTags['tags']);
-			usort($gitTags,'utopia::compareVersions');
-			$latestVer = end($gitTags);
-			if (utopia::compareVersions($myVer,$latestVer) < 0) echo '<a href="https://github.com/oridan/utopia/zipball/'.$latestVer.'">Update Available</a>';
-			else echo 'You are using the latest version of uCore.';
-		} else {
-			$latestVer = 'Cannot get latest version information';
-		}
-		
-		echo '<table><tr><td>Current Version:</td><td>'.$myVer.'</td></tr><tr><td>Latest Version:</td><td>'.$latestVer.'</td></tr></table>';
-
-		echo "<h3>Variables</h3><pre>";
-		echo 'PATH_ABS_ROOT: '.PATH_ABS_ROOT.'<br>';
-		echo 'PATH_REL_ROOT: '.PATH_REL_ROOT.'<br>';
-		echo 'PATH_ABS_CORE: '.PATH_ABS_CORE.'<br>';
-		echo 'PATH_REL_CORE: '.PATH_REL_CORE.'<br>';
-		echo 'PATH_ABS_CONFIG: '.PATH_ABS_CONFIG.'<br>';
-		echo '</pre>';
-
-		$installed = utopia::GetModules();
-		echo '<h3 style="cursor:pointer" onclick="$(\'#modulesList\').toggle();">Installed Modules</h3><div id="modulesList" style="display:none"><pre>';
-		foreach ($installed as $m)
-			echo $m['module_name']."\n";
-		echo '</pre></div>';
-		
-		echo '<a href="?optimise=1">Optimise Tables</a>';
-		if (isset($_GET['optimise'])) $this->optimizeTables();
 	}
 	public function UpdateHtaccess() {
 		$rc = PATH_REL_CORE;
