@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta name="robots" content="noindex"/>
-<?php utopia::AddCSSFile(PATH_REL_CORE.'/styles/admin/jquery/jquery-ui-1.8.12.ucore.css');?>
+<?php utopia::AddCSSFile(dirname(__FILE__).'/jquery/jquery-ui-1.8.12.ucore.css');?>
 </head>
 <body>
 <div id="wrap">
