@@ -57,7 +57,10 @@ class uConfig {
 	static $isDefined = FALSE;
 	static function DefineConfig() {
 		$arr = self::$oConfig;
-		if (isset($_SESSION['__config_validate']) && $_SESSION['__config_validate'] && $_POST) $arr = $_POST;
+		if (isset($_SESSION['__config_validate']) && $_SESSION['__config_validate'] && $_POST) {
+			$arr = $_POST;
+			unset($_SESSION['__config_validate']);
+		}
 		foreach (self::$configVars as $key => $info) {
 			if (!isset($arr[$key])) {
 				if (!$info['default']) continue;
@@ -69,7 +72,6 @@ class uConfig {
 			}
 			define($key,$val);
 		}
-//		foreach ($arr as $key => $val) define($key,$val);
 
 		define("FORMAT_DATETIME"         , FORMAT_DATE.' '.FORMAT_TIME);
 
@@ -109,7 +111,6 @@ class uConfig {
 		
 		if ($changed) self::SaveConfig();
 
-		unset($_SESSION['__config_validate']);
 		self::$isValid = TRUE;
 		return true;
 	}
