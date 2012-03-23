@@ -903,6 +903,10 @@ class utopia {
 		if (!isset(self::$templateParsers[$ident])) return;
 		$parser = self::$templateParsers[$ident];
 
+		if (!is_callable($parser[0]) && is_string($parser)) {
+			return $parser;
+		}
+
 		if ($parser[1]) ob_start();
 		if ($data)
 			$replace = call_user_func($parser[0],$data);
