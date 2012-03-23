@@ -18,8 +18,8 @@ class module_TinyMCE extends uBasicModule {
 	static function InitScript() {
 		if (!self::$hasDrawnJS) {
 			self::$hasDrawnJS = true;
-			$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/spellchecker/rpc.php';
-			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/preview/preview.php';
+		//	$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce/plugins/spellchecker/rpc.php';
+			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce/plugins/preview/preview.php';
 			list($fileManagerPath) = fileManager::Init();
 			$relUploads = utopia::GetRelativePath(PATH_UPLOADS);
 
@@ -31,7 +31,7 @@ class module_TinyMCE extends uBasicModule {
 			$options['cleanup'] = true;
 			$options['theme'] = "advanced";
 			$options['file_browser_callback'] = "openMediaBrowser";
-			$options['spellchecker_rpc_url'] = $scUrl;
+			//$options['spellchecker_rpc_url'] = $scUrl;
 			$options['plugin_preview_pageurl'] = $previewUrl;
 			$options['theme_advanced_toolbar_location'] = "top";
 			$options['theme_advanced_toolbar_align'] = "left";
@@ -45,10 +45,10 @@ class module_TinyMCE extends uBasicModule {
 			$richOpts = array();
 			$richOpts['plugins'] = "inlinepopups,spellchecker,save";
 			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p';
-			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
+			$richOpts['theme_advanced_buttons1'] = "save,|,bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
 			$richOpts['theme_advanced_buttons3'] = "";
-			$richOpts['theme_advanced_buttons4'] = "save";
+			$richOpts['theme_advanced_buttons4'] = "";
 
 			$htmlOpts = array();
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
