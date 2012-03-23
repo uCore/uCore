@@ -35,7 +35,7 @@ class uCSS extends uBasicModule {
 			$uStr .= filemtime($filename).'-'.filesize($filename);
 		}
 
-		$etag = sha1($uStr.'-'.count(self::$includeFiles));
+		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.PATH_REL_CORE);
 		utopia::Cache_Check($etag,'text/css');
 
 		// minify caching
