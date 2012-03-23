@@ -1,8 +1,9 @@
 body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 
-.left { float:left } .right { float:right }
+.left { float:left } .right { float:right } .oh { overflow:hidden }
 .cl { clear:left } .cr { clear:right } .cb { clear:both }
+.aw { width:auto }
 
 .datalist th { vertical-align: top; background-color:#DDDDDD; border: 1px solid #BBBBBB; padding: 2px 5px;
   border-radius: 15px 15px 0px 0px; -moz-border-radius: 15px 15px 0px 0px; -webkit-border-bottom-right-radius: 0px; -webkit-border-bottom-left-radius: 0px; }
@@ -22,6 +23,7 @@ img { border: none }
 
 .ui-widget { font-size:0.8em !important; }
 .ui-tabs-panel { font-size: 1.2em }
+.ui-button .ui-button-text { line-height:normal; }
 
 .ui-icon { display: inline-block !important; }
 
@@ -69,6 +71,9 @@ img { border: none }
 }
 
 .layoutDetailSection td.fld { white-space:nowrap; width:1px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
+
+.layoutDetailSection .inputtype-text { width: 30% }
+.layoutDetailSection .inputtype-richtext { width: 80% }
 
 .red {
 	color: #f00
