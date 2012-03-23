@@ -27,6 +27,7 @@ class modLinks extends uBasicModule {
 				if (isset($child['fieldLinks'])) {
 					$obj = utopia::GetInstance(utopia::GetCurrentModule());
 					$fv = false;
+					if ($child['parentField'] !== null && $child['parentField'] !== '*') continue;
 					if ($obj instanceof uDataModule) foreach ($child['fieldLinks'] as $link) {
 						$fltr = $obj->FindFilter($link['fromField']);
 						if ($obj->GetFilterValue($fltr['uid'])) $fv = true;
