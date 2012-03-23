@@ -2864,22 +2864,16 @@ SCR_END
 		);
 	}
 
-	public function ShowData($dataSource = null) {//$sortColumn=NULL) {
+	public function ShowData($rows = null, $tabTitle = null,$tabOrder = null) {
 		//	echo "showdata ".get_class($this)."\n";
-		//	print_r($this->fields);
-		//check pk and ptable are set up
-		if ($dataSource) {
-			$num_rows = count($dataSource);
-		} else {
-			if (is_empty($this->GetTabledef()) && !$this->UnionModules) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
-			$dataset = $this->GetDataset(TRUE);
-			$num_rows = $this->GetRowCount();
-			if (mysql_error()) return;
-		}
-
+		if (!$rows) $rows = $this->GetRows();
+		$num_rows = count($rows);
+		
+		if (!$tabTitle) $tabTitle = $this->GetTitle();
+		if (!$tabOrder) $tabOrder = $this->GetSortOrder();
+		
 		$children = utopia::GetChildren(get_class($this));
-		//print_r($children);
 		foreach ($children as $childModule => $links) {
 			foreach ($links as $link) {
 				//if (!$child) continue;
@@ -2904,7 +2898,7 @@ SCR_END
 		$tabGroupName = utopia::Tab_InitGroup();
 
 		//$layoutID = utopia::tab_ //$tabGroupName.'-'.get_class($this)."_list_".$GLOBALS['inlineListCount'];
-		$metadataTitle = ' {tabTitle:\''.$this->GetTitle().'\', tabPosition:\''.$this->GetSortOrder().'\'}';
+		$metadataTitle = ' {tabTitle:\''.$tabTitle.'\', tabPosition:\''.$this->GetSortOrder().'\'}';
 		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
 		echo "<table class=\"layoutListSection datalist\">";
@@ -3047,7 +3041,7 @@ SCR_END
 			//			if ($result != FALSE && mysql_num_rows($result) > 200)
 			//				echo "<tr><td colspan=\"$colcount\">There are more than 200 rows. Please use the filters to narrow your results.</td></tr>";
 			$i = 0;
-			while (($dataSource && isset($dataSource[$i]) && $row = $dataSource[$i]) || ($row = $this->GetRecord($dataset,$i)) && $i <= 150) {
+			foreach ($rows as $row) {
 				$i++;
 				// move totals here
 				foreach ($this->fields as $fieldName => $fieldData) {
@@ -3125,7 +3119,7 @@ SCR_END
 		ob_end_clean();
 
 		$soMod = get_class($this) == utopia::GetCurrentModule() ? -10 : 0;
-		utopia::Tab_Add($this->GetTitle(),$cont,$tabGroupName,false,$this->GetSortOrder()+$soMod);
+		utopia::Tab_Add($tabTitle,$cont,$tabGroupName,false,$tabOrder+$soMod);
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 
