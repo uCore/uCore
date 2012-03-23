@@ -32,20 +32,16 @@ class uJavascript extends uBasicModule {
 		uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
 		uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
 
-		modOpts::AddOption('uJavascript','googleAPI','Google API Key');
-		$key = ($gAPI = modOpts::GetOption('uJavascript','googleAPI')) ? 'key='.$gAPI.'&' : '';
+		modOpts::AddOption('google_api_key','Google API Key');
+		$key = ($gAPI = modOpts::GetOption('google_api_key')) ? 'key='.$gAPI.'&' : '';
 
 		// commented because if a user enters an incorrect version (too high for example) they can not change it back.
-//		modOpts::AddOption('uJavascript','jQuery','jQuery Version',1);
-//		$jq  = modOpts::GetOption('uJavascript','jQuery');
+//		modOpts::AddOption('jquery_version','jQuery Version',NULL,1);
+//		$jq  = modOpts::GetOption('jQuery');
 
-//		modOpts::AddOption('uJavascript','jQueryUI','jQuery UI Version',1);
-//		$jqui = modOpts::GetOption('uJavascript','jQueryUI');
+//		modOpts::AddOption('jquery_ui_version','jQuery UI Version',NULL,1);
+//		$jqui = modOpts::GetOption('jquery_ui_version');
 
-		modOpts::AddOption('uJavascript','jQueryUI-Theme','jQuery UI Theme','ui-lightness');
-		$jquitheme = modOpts::GetOption('uJavascript','jQueryUI-Theme');
-		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',true);
-		uCSS::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
 
 	public function RunModule() {

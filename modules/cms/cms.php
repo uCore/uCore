@@ -53,9 +53,9 @@ class uCMS_List extends uDataModule implements iAdminModule {
 
 		$nTemplates = utopia::GetTemplates(false,true);
 		$dTemplate = '/'.basename(PATH_REL_CORE).'/styles/default';
-		modOpts::AddOption('CMS','default_template','Default Template',$dTemplate,itCOMBO,$nTemplates);
-		$o = modOpts::GetOption('CMS','default_template');
-		//if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('CMS','default_template','/'.basename(PATH_REL_CORE).'/styles/default');
+		modOpts::AddOption('default_template','Default Template',NULL,$dTemplate,itCOMBO,$nTemplates);
+		$o = modOpts::GetOption('default_template');
+		//if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('default_template','/'.basename(PATH_REL_CORE).'/styles/default');
 
 		$this->AddParent('/');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
@@ -76,7 +76,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 
 		$modOptsObj = utopia::GetInstance('modOpts');
 		$modOptsObj->_SetupFields();
-		$row = $modOptsObj->LookupRecord('CMS::default_template');//$this->GetCell($fieldName,$row,$targetUrl)
+		$row = $modOptsObj->LookupRecord('default_template');
 		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row,NULL);
 
 		echo '<hr>';
@@ -532,7 +532,7 @@ class uCMS_View extends uSingleDataModule {
 			if ($rec['template']) { $template = $rec['template']; break; }
 			$id = $rec['parent'];
 		}
-		if (!$template) $template = modOpts::GetOption('CMS','default_template');
+		if (!$template) $template = modOpts::GetOption('default_template');
 
 		// check if template exists, if not, check if template exists in templates folder, if it does then update the field with the full path and return it
 		$templates = utopia::GetTemplates();

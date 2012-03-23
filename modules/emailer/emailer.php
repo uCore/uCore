@@ -112,12 +112,12 @@ class uEmailer extends uDataModule {
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 
 	public function SetupParents() {
-		modOpts::AddOption('smtp','host','SMTP Host');
-		modOpts::AddOption('smtp','port','SMTP Port',25);
-		modOpts::AddOption('smtp','user','SMTP Username','yourname@yourdomain.tld');
-		modOpts::AddOption('smtp','pass','SMTP Password','',itPLAINPASSWORD);
-		modOpts::AddOption('mailer','name','Mailer Default Name',utopia::GetDomainName().' Mailer');
-		modOpts::AddOption('mailer','email','Mailer Default Email','mailer@'.utopia::GetDomainName());
+		modOpts::AddOption('smtp_host','SMTP Host','Emails');
+		modOpts::AddOption('smtp_port','SMTP Port','Emails',25);
+		modOpts::AddOption('smtp_user','SMTP Username','Emails','yourname@yourdomain.tld');
+		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
+		modOpts::AddOption('emailer_from_name','Mailer From Name','Emails',utopia::GetDomainName().' Mailer');
+		modOpts::AddOption('emailer_from_email','Mailer From Email','Emails','mailer@'.utopia::GetDomainName());
 		uEvents::AddCallback('InitComplete',array($this,'InitialiseTemplates'));
 	}
 
@@ -166,16 +166,16 @@ class uEmailer extends uDataModule {
 		return $row;
 	}
 
-	public static function SendEmail($ident,$data,$emailField,$fromName=null,$fromEmail=null) {
+	public static function SendEmail($ident,$data,$emailField,$fromName=null,$fromEmail=null,$attachments = null) {
 		$row = self::GetTemplate($ident);
 
 		if (!array_key_exists(0,$data)) $data = array($data);
 
 		
-		if (modOpts::GetOption('smtp','host')) {
-			$transport = Swift_SmtpTransport::newInstance(modOpts::GetOption('smtp','host'), modOpts::GetOption('smtp','port'))
-				->setUsername(modOpts::GetOption('smtp','user'))
-				->setPassword(modOpts::GetOption('smtp','pass'));
+		if (modOpts::GetOption('smtp_host')) {
+			$transport = Swift_SmtpTransport::newInstance(modOpts::GetOption('smtp_host'), modOpts::GetOption('smtp_port'))
+				->setUsername(modOpts::GetOption('smtp_user'))
+				->setPassword(modOpts::GetOption('smtp_pass'));
 		} else {
 			// mail
 			//$transport = Swift_MailTransport::newInstance();
@@ -183,8 +183,8 @@ class uEmailer extends uDataModule {
 			$transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -bs');
 		}
 		
-		$fromName = $fromName ? $fromName : modOpts::GetOption('mailer','name');
-		$fromEmail = $fromEmail ? $fromEmail : modOpts::GetOption('mailer','email');
+		$fromName = $fromName ? $fromName : modOpts::GetOption('emailer_from_name');
+		$fromEmail = $fromEmail ? $fromEmail : modOpts::GetOption('emailer_from_email');
 		
 		$mailer = Swift_Mailer::newInstance($transport);
 		$message = Swift_Message::newInstance()->setFrom(array($fromEmail => $fromName));

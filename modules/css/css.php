@@ -17,9 +17,10 @@ class uCSS extends uBasicModule {
 		$this->SetRewrite(true);
 		utopia::AddCSSFile($this->GetURL(),true);
 
-		modOpts::AddOption('uJavascript','jQueryUI-Theme','jQuery UI Theme','ui-lightness');
-		$jquitheme = modOpts::GetOption('uJavascript','jQueryUI-Theme');
+		modOpts::AddOption('jQueryUI-Theme','jQuery UI Theme',null,'ui-lightness');
+		$jquitheme = modOpts::GetOption('jQueryUI-Theme');
 		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',true);
+		uCSS::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
 
 	public function RunModule() {

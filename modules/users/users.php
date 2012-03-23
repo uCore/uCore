@@ -154,17 +154,18 @@ class uRegisterUser extends uDataModule {
 	}
 	public function SetupParents() {
 		$this->SetRewrite(false);
-		uEvents::AddCallback('LoginRequired',array($this,'RegisterLink'));
-		modOpts::AddOption(__CLASS__,'open_user_registration','Allow User Registrations',false,itYESNO);
+		uEvents::AddCallback('LoginButtons',array($this,'RegisterLink'));
+		modOpts::AddOption('open_user_registration','Allow User Registrations',NULL,false,itYESNO);
 	}
 	public function GetUUID() { return 'register'; }
 	public function RegisterLink() {
-		if (!modOpts::GetOption(__CLASS__,'open_user_registration')) return;
-		echo '<p>Don&apos;t have an account?  <a href="'.$this->GetURL().'">Register</a> now.</p>';
+		if (!modOpts::GetOption('open_user_registration')) return;
+		echo '<a class="btn" href="'.$this->GetURL().'">Register</a>';
+//		echo '<p>Don&apos;t have an account?  <a href="'.$this->GetURL().'">Register</a> now.</p>';
 	}
 	public function RunModule() {
 		echo '<h1>User Registration</h1>';
-		if (!modOpts::GetOption(__CLASS__,'open_user_registration')) {
+		if (!modOpts::GetOption('open_user_registration')) {
 			echo '<p>Sorry. User registrations have been disabled by the administrator.</p>';
 			return;
 		}

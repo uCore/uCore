@@ -9,7 +9,7 @@ class module_Offline extends uBasicModule {
 	public function GetTitle() { return 'Site Offline'; }
 	public function GetOptions() { return NO_NAV; }
 	public function SetupParents() {
-		modOpts::AddOption('module_Offline','online','Site Online',0,itYESNO);
+		modOpts::AddOption('site_online','Site Online',NULL,0,itYESNO);
 		uEvents::AddCallback('CanAccessModule',array($this,'siteOffline'),utopia::GetCurrentModule());
 	}
 	public function GetUUID() { return 'site-offline'; }
@@ -24,7 +24,7 @@ class module_Offline extends uBasicModule {
 		$parent = get_class($object);
 		if (isset(self::$states[$parent]) && self::$states[$parent]) return;
 
-		if (modOpts::GetOption('module_Offline','online')) return;
+		if (modOpts::GetOption('site_online')) return;
 
 		$role = uUserRoles::GetUserRole();
 		if ($role && $role[0] === '-1') return; // site admin
