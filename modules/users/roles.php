@@ -41,7 +41,12 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	}
 	public function AssertAdminRole() {
 		$rec = $this->LookupRecord(-1,true);
-		if (!$rec) $this->UpdateFields(array('name'=>'Site Administrator',$this->GetPrimaryKey()=>-1));
+		if (!$rec) { // insert directly to table to avoid checking permissions
+			$o = utopia::GetInstance('tabledef_UserRoles');
+			$pk = null;
+			$o->UpdateField($o->GetPrimaryKey(),-1,$pk);
+			$o->UpdateField('name','Site Administrator',$pk);
+		}
 	}
 	private static $roleCache = null;
 	public static function GetUserRole() {
