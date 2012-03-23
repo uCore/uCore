@@ -401,9 +401,9 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($fieldName == $this->GetPrimaryKey()) $newPk = $newValue;
 
 		if ($pkVal === NULL) {
-			$query = 'INSERT INTO `'.$this->tablename.'` ('.$fieldName.') VALUES ('.$newValue.')';
+			$query = 'INSERT INTO `'.$this->tablename.'` (`'.$fieldName.'`) VALUES ('.$newValue.')';
 		} else {
-			$query = 'UPDATE `'.$this->tablename.'` SET '.$fieldName.' = '.$newValue.' WHERE `'.$this->GetPrimaryKey().'` = \''.$pkVal.'\'';
+			$query = 'UPDATE `'.$this->tablename.'` SET `'.$fieldName.'` = '.$newValue.' WHERE `'.$this->GetPrimaryKey().'` = \''.$pkVal.'\'';
 		}
 		
 		sql_query($query);
