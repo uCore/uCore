@@ -715,30 +715,35 @@ abstract class uDataModule extends uBasicModule {
 		//print_r($filters);
 		return parent::RewriteURL($filters);
 		}*/
+
+	public function RewriteFilters(&$filters = NULL) {
+		if (!is_array($filters)) return false;
+		foreach ($filters as $uid => $val) {
+			$fltr = $this->GetFilterInfo(substr($uid,3));
+			if (!$fltr) continue;
+			$filters[$fltr['fieldName']] = $val;
+			unset($filters[$uid]);
+		}
+		if (array_key_exists($this->GetPrimaryKey(), $filters)) {
+			$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()]);
+			$fields = array();
+			if ($this->HasRewrite()) foreach ($this->rewriteMapping as $seg) {
+				if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
+					foreach ($matches[1] as $match) {
+						if (array_key_exists($match,$this->fields)) $filters[$match] = $rec[$match];
+					}
+				}
+			}
+		}
+		return true;
+	}
+
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 		$this->_SetupParents();
 		$this->_SetupFields();
 		if (!is_array($filters) && $filters !== NULL) $filters = array($this->GetPrimaryKey()=>$filters);
 
-		if ($this->HasRewrite() && is_array($filters)) {
-			foreach ($filters as $uid => $val) {
-				$fltr = $this->GetFilterInfo(substr($uid,3));
-				if (!$fltr) continue;
-				$filters[$fltr['fieldName']] = $val;
-				unset($filters[$uid]);
-			}
-			if (array_key_exists($this->GetPrimaryKey(), $filters)) {
-				$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()]);
-				$fields = array();
-				foreach ($this->rewriteMapping as $seg) {
-					if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
-						foreach ($matches[1] as $match) {
-							if (array_key_exists($match,$this->fields)) $filters[$match] = $rec[$match];
-						}
-					}
-				}
-			}
-		}
+		$this->RewriteFilters($filters);
 
 		$filArr = array();
 		foreach ($this->filters as $filterType) {
