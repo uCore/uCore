@@ -42,7 +42,7 @@ class tabledef_Users extends uTableDef {
 			$obj = utopia::GetInstance('uVerifyEmail');
 			$url = 'http://'.utopia::GetDomainName().$obj->GetURL(array('c'=>$randKey));
 			uNotices::AddNotice('Please check your email for a validation link.');
-			uEmailer::SendEmail('account_activate',array('email'=>$newValue,'activate_link'=>$url),'email');
+			uEmailer::SendEmailTemplate('account_activate',array('email'=>$newValue,'activate_link'=>$url),'email');
 			return TRUE;
 		}
 		if ($pkVal === NULL) parent::UpdateField('username','unverified_'.genRandom(75),$pkVal);

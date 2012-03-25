@@ -116,8 +116,7 @@ class uEmailer extends uDataModule {
 		modOpts::AddOption('smtp_port','SMTP Port','Emails',25);
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','yourname@yourdomain.tld');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
-		modOpts::AddOption('emailer_from_name','Mailer From Name','Emails',utopia::GetDomainName().' Mailer');
-		modOpts::AddOption('emailer_from_email','Mailer From Email','Emails','mailer@'.utopia::GetDomainName());
+		modOpts::AddOption('emailer_from','Mailer From','Emails',utopia::GetDomainName().' Mailer <mailer@'.preg_replace('/^www./','',utopia::GetDomainName()).'>');
 		uEvents::AddCallback('InitComplete',array($this,'InitialiseTemplates'));
 	}
 
@@ -166,12 +165,31 @@ class uEmailer extends uDataModule {
 		return $row;
 	}
 
-	public static function SendEmail($ident,$data,$emailField,$fromName=null,$fromEmail=null,$attachments = null) {
+	public static function SendEmailTemplate($ident,$data,$emailField,$from=null,$attachments = null) {
 		$row = self::GetTemplate($ident);
 
 		if (!array_key_exists(0,$data)) $data = array($data);
 
-		
+		if (!is_array($attachments)) $attachments = array($attachments);
+
+		$obj = utopia::GetInstance('uEmailTemplateAttachmentList');
+		$templateAttachments = $obj->GetRows(array('doc_id'=>$ident));
+		foreach ($templateAttachments as $attachment) {
+			$attachments[] = Swift_Attachment::newInstance($attachment['attachment'], $attachment['attachment_filename'], $attachment['attachment_filetype']);
+		}
+
+		$failures = array();
+		foreach ($data as $item) {
+			$subject = self::ReplaceData($item,$row['subject']);
+			$body = self::ReplaceData($item,$row['body']);
+			$recip = explode(',',$item[$emailField]);
+
+			$failures = array_merge($failures,self::SendEmail($subject,$body,$recip,$from,$attachments));
+		}
+		return $failures;
+	}
+
+	public static function SendEmail($subject,$content,$to,$from=null,$attachments=null) {
 		if (modOpts::GetOption('smtp_host')) {
 			$transport = Swift_SmtpTransport::newInstance(modOpts::GetOption('smtp_host'), modOpts::GetOption('smtp_port'))
 				->setUsername(modOpts::GetOption('smtp_user'))
@@ -183,13 +201,12 @@ class uEmailer extends uDataModule {
 			$transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -bs');
 		}
 		
-		$fromName = $fromName ? $fromName : modOpts::GetOption('emailer_from_name');
-		$fromEmail = $fromEmail ? $fromEmail : modOpts::GetOption('emailer_from_email');
-		
-		$mailer = Swift_Mailer::newInstance($transport);
-		$message = Swift_Message::newInstance()->setFrom(array($fromEmail => $fromName));
+		$from = $from ? $from : modOpts::GetOption('emailer_from');
+		$from = self::ConvertEmails($from);
 
-		if (!is_array($attachments)) $attachments = array($attachments);
+		$mailer = Swift_Mailer::newInstance($transport);
+		$message = Swift_Message::newInstance()->setFrom($from);
+
 		foreach ($attachments as $attachment) {
 			if (!$attachment) continue;
 			if ($attachment instanceof Swift_Attachment)
@@ -197,23 +214,11 @@ class uEmailer extends uDataModule {
 			else
 				$message->attach(Swift_Attachment::fromPath($attachment));
 		}
-		$obj = utopia::GetInstance('uEmailTemplateAttachmentList');
-		$templateAttachments = $obj->GetRows(array('doc_id'=>$ident));
-		foreach ($templateAttachments as $attachment) {
-			$message->attach(Swift_Attachment::newInstance($attachment['attachment'], $attachment['attachment_filename'], $attachment['attachment_filetype']));
-		}
 
-		$failures = array();
+		$to = self::ConvertEmails($to);
+		$message->setTo($to);
 		try {
-			foreach ($data as $item) {
-				$message->setTo(array());
-				$recip = explode(',',$item[$emailField]);
-				foreach ($recip as $r) $message->addTo($r);
-				
-				$message->setSubject(self::ReplaceData($item,$row['subject']));
-				$message->setBody(self::ReplaceData($item,$row['body']),'text/html');
-				$mailer->send($message,$failures);
-			}
+			$mailer->send($message,$failures);
 		} catch (Exception $e) {
 			 DebugMail('Email Error',$e->getMessage());
 		}
@@ -227,5 +232,18 @@ class uEmailer extends uDataModule {
 		}
 		while (utopia::MergeVars($text));
 		return $text;
+	}
+
+	public static function ConvertEmails($string) {
+		$output = array();
+		if (!$string) return $output;
+		if (is_array($string)) $emails = $string;
+		else $emails = explode(',',$string);
+		foreach ($emails as $email) {
+			preg_match('/^([^<]+)<?([^>]+)?/',$email,$matches);
+			if (isset($matches[2]))	$output[$matches[2]] = $matches[1];
+			else $output[] = $matches[1];
+		}
+		return $output;
 	}
 }
