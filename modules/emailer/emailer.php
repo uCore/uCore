@@ -215,6 +215,9 @@ class uEmailer extends uDataModule {
 				$message->attach(Swift_Attachment::fromPath($attachment));
 		}
 
+		$message->setSubject($subject);
+		$message->setBody($content, 'text/html');
+
 		$to = self::ConvertEmails($to);
 		$message->setTo($to);
 		try {
