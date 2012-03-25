@@ -236,7 +236,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
-		$this->AddField('link','<a target="_blank" href="'.PATH_REL_ROOT.'{cms_id}">'.PATH_REL_ROOT.'{cms_id}</a>','cms','View Page');
+		$this->AddField('link',"'View Page'",'cms','');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
 		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
 		$templates = utopia::GetTemplates(true);
@@ -383,6 +383,7 @@ EOF;
 	public function SetupParents() {
 		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 		$this->AddParent('uCMS_List','cms_id');
+		$this->AddChild('uCMS_View','cms_id','link');
 	}
 	public function RunModule() {
 		if (isset($_REQUEST['inline']))
@@ -421,6 +422,7 @@ class uCMS_View extends uSingleDataModule {
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 		if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
 		if (!is_array($filters) && is_string($filters)) $filters = array('cms_id'=>$filters);
+		$this->RewriteFilters($filters);
 
 		if (isset($filters['cms_id']))
 			$rec = $this->LookupRecord($filters);
@@ -477,6 +479,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
+		$this->AddFilter('cms_id',ctEQ);
 	}
 
 	public function SetupParents() {
