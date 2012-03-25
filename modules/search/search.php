@@ -1,8 +1,11 @@
 <?php
 class uSearch extends uBasicModule {
 	function SetupParents() {
-		$this->SetRewrite('{q}');
+		$this->SetRewrite(array('{adv}','{q}'));
 		uCSS::IncludeFile(dirname(__FILE__).'/search.css');
+	}
+	public function GetURL($filters = NULL, $encodeAmp = false) {
+		return str_replace('//','/',parent::GetURL($filters, $encodeAmp));
 	}
 	function GetUUID() { return 'search'; }
 	function GetTitle() { return (isset($_GET['q']) ? $_GET['q'].' - ' : '').utopia::GetDomainName().' search'; }
@@ -10,15 +13,26 @@ class uSearch extends uBasicModule {
 	static function AddSearchRecipient($module, $searchFields, $titleField, $descField) {
 		if (!is_array($searchFields)) $searchFields = array($searchFields);
 		self::$recipients[$module] = array($searchFields,$titleField,$descField);
+		// addsearchfield - callback which modifies search results - NULL to use default 'text search'
+	}
+	private static $types = array();
+	static function AddSearchType($name,$module) {
+		self::$types[$name] = $module;
 	}
 	function RunModule() {
+		if (isset($_GET['adv']) && (!isset($_GET['q']) && !isset(self::$types[$_GET['adv']]))) { // if we're using advanced search
+			$_GET['q'] = $_REQUEST['q'] = $_GET['adv'];
+			$_GET['adv'] = $_REQUEST['adv'] = '';
+		}
 		$query = isset($_GET['q']) ? $_GET['q'] : '';
-		echo '<form method="GET" action="'.$this->GetURL(array()).'">Search: <input type="text" name="q" value="'.$query.'" /><input type="submit" value="Search" /></form>';
+		$adv = isset($_GET['adv']) ? $_GET['adv'] : '';
+		
+		echo '<h1>Search</h1>';
+		$this->OutputForm();
+		
+		echo '<p>Search Results for '.$query.'</p>';
 
-		if (!$query) return;
-		echo '<h1>Search Results for '.$query.'</h1>';
-		$scores = self::RunSearch($query);
-
+		$scores = self::RunSearch($query,$adv);
 		foreach ($scores as $row) {
 			$score = $row[0];
 			$module = $row[1];
@@ -28,14 +42,26 @@ class uSearch extends uBasicModule {
 			$data = $obj->LookupRecord($pkVal);
 			$url = $obj->GetURL($pkVal);
 			$title = word_trim(html2txt($data[$info[1]]),10,true);
-			$desc = word_trim(html2txt($data[$info[2]]),50,true);
+			$desc = word_trim(html2txt($data[$info[2]]),30,true);
 			echo '<div class="searchResult"><a href="'.$url.'">'.$title.'</a><div>'.$desc.'</div></div>';
 		}
 	}
+	
+	function OutputForm() {
+		$query = isset($_GET['q']) ? $_GET['q'] : '';
+		$adv = isset($_GET['adv']) ? $_GET['adv'] : '';
+		
+		echo '<form method="GET" action="'.$this->GetURL(array()).'">';
+		if ($adv) {
+			echo '<input type="hidden" name="adv" value="'.$adv.'" />';
+			// add fields for adv
+		}
+		echo 'Search: <input type="text" name="q" value="'.$query.'" /><input type="submit" value="Search" /></form>';
+	}
 
-	static function RunSearch($q) {
+	static function RunSearch($q,$adv=null) {
 		$scores = array();
-
+		
 		foreach (self::$recipients as $module => $info) {
 			$fields = $info[0];
 			$obj = utopia::GetInstance($module);
@@ -45,13 +71,20 @@ class uSearch extends uBasicModule {
 				$score = 0;
 				foreach ($fields as $field) {
 					if (!isset($row[$field])) continue;
-					$score += self::SearchCompareScore($_GET['q'],$row[$field]);
+					$score += self::SearchCompareScore($q,$row[$field]);
 				}
 				if ($score > 0) {
 					$scores[] = array($score,$module,$row[$pk],$info);
 				}
 			}
 		}
+		if ($adv) {
+			foreach ($scores as $k => $s) {
+				if ($s[1] != self::$types[$adv]) unset($scores[$k]);
+			}
+//			return call_user_func(self::$types[$adv]['callback'],$q,$scores);
+		}
+
 		array_sort_subkey($scores,0,'>');
 		return $scores;
 	}
