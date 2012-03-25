@@ -70,22 +70,28 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'unique') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
 		$this->fields[$name]['pk'] = true;
-		$this->fields[$name]['default'] = NULL;
-		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) $this->fields[$name]['extra'] = 'auto_increment';
+		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) {
+			$this->fields[$name]['default'] = NULL;
+			$this->fields[$name]['extra'] = 'auto_increment';
+		}
 	}
 	public function SetUniqueField($name) {
 		if (!isset($this->fields[$name])) return;
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
-			$this->fields[$name]['unique'] = true;
+		$this->fields[$name]['unique'] = true;
 	}
-	public function SetIndexField($name) {
+	public function SetIndexField($name, $auto_increment = false) {
 		if (!isset($this->fields[$name])) return;
 		//$name = strtolower($name);
 		if ($this->GetFieldProperty($name,'unique') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
 			ErrorLog('Cannot assign index flag to $name, already an indexed field.'); return; }
-			$this->fields[$name]['index'] = true;
+		$this->fields[$name]['index'] = true;
+		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) {
+			$this->fields[$name]['default'] = NULL;
+			$this->fields[$name]['extra'] = 'auto_increment';
+		}
 	}
 
 	public function GetPrimaryKey() {
