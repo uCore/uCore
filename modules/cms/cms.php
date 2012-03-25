@@ -24,7 +24,7 @@ class tabledef_CMS extends uTableDef {
 		$this->SetFieldProperty('updated','default','current_timestamp');
 
 		$this->SetPrimaryKey('cms_id');
-		$this->SetFieldProperty('position','default',999);
+		$this->SetIndexField('position',true);
 	}
 }
 
@@ -437,7 +437,7 @@ class uCMS_View extends uSingleDataModule {
 			$qs = http_build_query($filters); if ($qs) $qs = "?$qs";
 		}
 		$cms_id = $rec['cms_id'];
-		$ishome = $rec['is_home'];
+		if ($rec['is_home']) return PATH_REL_ROOT.$qs;
 
 		$path = array();
 
@@ -448,7 +448,7 @@ class uCMS_View extends uSingleDataModule {
 		}
 		$path = array_reverse($path);
 
-		if (!$ishome) $path[] = $cms_id;
+		$path[] = $cms_id;
 
 		return PATH_REL_ROOT.implode('/',$path).$qs;
 	}
