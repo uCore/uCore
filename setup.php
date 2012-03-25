@@ -57,7 +57,7 @@ class uConfig {
 	static $isDefined = FALSE;
 	static function DefineConfig() {
 		$arr = self::$oConfig;
-		if (isset($_SESSION['__config_validate']) && $_SESSION['__config_validate'] && $_POST) {
+		if (isset($_SESSION['__config_validate']) && $_SESSION['__config_validate'] && $_POST && isset($_POST['ucore_reconfig'])) {
 			$arr = $_POST;
 			unset($_SESSION['__config_validate']);
 		}
@@ -122,6 +122,7 @@ class uConfig {
 		$frmAction = DEFAULT_FILE;
 		echo <<<FIN
 <form method="post" action="$frmAction">
+<input type="hidden" name="ucore_reconfig" value="true" />
 <table>
 	<colgroup>
 		<col align="right">
