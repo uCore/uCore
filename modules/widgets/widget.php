@@ -78,7 +78,7 @@ class uCustomWidgetConverter extends uDataModule {
 }
 
 class uWidgets_List extends uListDataModule implements iAdminModule {
-	public function GetTitle() { return 'Widget Editor'; }
+	public function GetTitle() { return 'Widgets'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER; }
 	public function GetSortOrder() { return -8800; }
 	public function GetTabledef() { return 'tabledef_Widgets'; }

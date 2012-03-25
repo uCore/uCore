@@ -58,7 +58,7 @@ class tabledef_Users extends uTableDef {
 }
 
 class uUsersList extends uListDataModule implements iAdminModule {
-	public function GetTitle() { return 'User Accounts'; }
+	public function GetTitle() { return 'Users'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT; }
 
 	public function GetTabledef() { return 'tabledef_Users'; }

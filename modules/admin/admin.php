@@ -2,7 +2,7 @@
 
 class internalmodule_Reconfigure extends uBasicModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'Reconfigure Database'; }
+	public function GetTitle() { return 'Reconfigure'; }
 	public function GetOptions() { return ALWAYS_ACTIVE; }
 
 	public function SetupParents() {

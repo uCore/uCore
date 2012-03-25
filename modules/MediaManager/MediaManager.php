@@ -2,7 +2,7 @@
 define('itFILEMANAGER' ,'fileman');
 class fileManager extends uBasicModule implements iAdminModule {
 	public function GetSortOrder() { return -8700; }
-	function GetTitle() { return 'Media Manager'; }
+	function GetTitle() { return 'Media'; }
 	function SetupParents() {
 		$this->AddParent('/');
 		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));

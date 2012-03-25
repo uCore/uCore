@@ -29,7 +29,7 @@ class tabledef_CMS extends uTableDef {
 }
 
 class uCMS_List extends uDataModule implements iAdminModule {
-	public function GetTitle() { return 'Page Editor'; }
+	public function GetTitle() { return 'Pages'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
 	public function GetSortOrder() { return -8900; }
