@@ -41,6 +41,7 @@ class tabledef_Users extends uTableDef {
 			// TODO: send verification email!
 			$obj = utopia::GetInstance('uVerifyEmail');
 			$url = 'http://'.utopia::GetDomainName().$obj->GetURL(array('c'=>$randKey));
+			uNotices::AddNotice('Please check your email for a validation link.');
 			uEmailer::SendEmail('account_activate',array('email'=>$newValue,'activate_link'=>$url),'email');
 			return TRUE;
 		}
@@ -140,7 +141,7 @@ class uAssertAdminUser extends uBasicModule {
 
 class uRegisterUser extends uDataModule {
 	public function GetOptions() { return ALLOW_ADD; }
-
+	public function GetTitle() { return 'User Registration'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function SetupFields() {
 		$this->CreateTable('users');
@@ -171,7 +172,7 @@ class uRegisterUser extends uDataModule {
 		}
 		// already logged in?
 		if ($this->RegisterForm()) {
-			uNotices::AddNotice('Your account has now been created');
+			echo '<p>Your account has now been created.</p>';
 		}
 	}
 	public function RegisterForm() {
@@ -189,7 +190,7 @@ class uRegisterUser extends uDataModule {
 				}*/
 				if (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$_POST['username'])) {
 					uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
-					return FALSE;
+					break;
 				}
 				
 				if ($_POST['password'] === '') {
@@ -217,19 +218,20 @@ class uRegisterUser extends uDataModule {
 			} while (false);
 		}
 		?>
-		<p>Please enter the following details to set up your account.</p>
+		<p>To create an account, please enter the following details.</p>
+		<p>You will be sent an email to confirm your details and activate your account.</p>
 		<style>
 			form.register-user label { float:left; clear:both; display:block; width:150px; }
 			form.register-user input { float:left; width:150px; box-sizing: border-box; }
 		</style>
-		<form class="register-user" action="" method="POST">
+		<form class="register-user left oh" action="" method="POST">
 			<label for="username">Email:</label>
 			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" />
 			<label for="password">Password:</label>
 			<input type="password" name="password" id="password" />
 			<label for="password2">Confirm Password:</label>
 			<input type="password" name="password2" id="password2" />
-			<label>&nbsp;</label><input type="submit" value="Register" />
+			<label>&nbsp;</label><input class="btn right" style="float:right;width:auto" type="submit" value="Register" />
 		</form>
 		<?php
 	}
@@ -343,31 +345,47 @@ class uVerifyEmail extends uDataModule {
 	}
 
 	public function RunModule() {
+		echo '<h1>Email Verification</h1>';
 		if (!isset($_GET['c']) || !($rec = $this->LookupRecord(array('email_confirm_code'=>$_GET['c'])))) { // reset pw
 			// no code given or code not found.
-			uNotices::AddNotice('Could not validate your request.  If you are trying to change your email, please log in with your old credentials and re-submit the request.',NOTICE_TYPE_ERROR);
+			echo '<p>Could not validate your request.  If you are trying to change your email, please log in with your old credentials and re-submit the request.</p>';
+		} else {
+			echo '<p>Your email address has now been validated.</p>';
+			$this->UpdateField('email_confirm_code',true,$rec['user_id']);
+		}
+	}
+}
+
+class uUserProfile extends uSingleDataModule {
+	public function GetTitle() { return 'User Profile'; }
+	public function GetOptions() { return ALLOW_EDIT | ALLOW_FILTER; }
+	public function GetTabledef() { return 'tabledef_Users'; }
+	public function SetupFields() {
+		$this->CreateTable('users');
+		
+		$this->AddField('user_id','user_id','users');
+		$this->AddField('username','username','users','Username',itTEXT);
+		$this->AddField('password','password','users','Password',itPASSWORD);
+
+		$l = uUserLogin::IsLoggedIn();
+		$this->AddFilter('user_id',ctEQ,itNONE,$l);
+	}
+	public function GetUUID() { return 'user-profile'; }
+	public function SetupParents() {
+		$this->SetRewrite(true);
+	}
+	public function RunModule() {
+		$l = uUserLogin::IsLoggedIn();
+		if (!$l) {
+			$obj = utopia::GetInstance('uUserLogin');
+			$obj->_RunModule();
 			return;
 		}
-
-		$this->UpdateField('email_confirm_code',true,$rec['user_id']);
-		$obj = utopia::GetInstance('uUserLogin');
-		uNotices::AddNotice('Your email address has now been validated. You may now <a href="'.$obj->GetURL().'">Log In</a>');
+		echo '<h1>User Profile</h1>';
+		$this->ShowData();
+	}
+	public static function GetCurrentUser() {
+		$o = utopia::GetInstance(__CLASS__);
+		return $o->LookupRecord();
 	}
 }
-/*class tabledef_UserDetails extends uTableDef {
-	public function SetupFields() {
-		$this->AddField('detail_id',ftNUMBER);
-		$this->AddField('user_id',ftNUMBER);
-		$this->AddField('name',ftVARCHAR,50);
-
-		$this->SetPrimaryKey('detail_id');
-		
-		uEvents::AddCallback('uUsersList','AfterSetupFields',array($this,'addfields'));
-	}
-	
-	public function addfields($obj, $eventName) {
-		$obj->CreateTable('detail','tabledef_UserDetails','users','user_id');
-		$obj->AddField('name','name','detail','Name',itTEXT);
-	}
-}
-*/
