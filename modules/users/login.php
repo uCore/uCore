@@ -9,7 +9,17 @@ class adminLogout extends uBasicModule {
 		$this->AddParent('/');
 	}
 	public function RunModule() {
-		unset($_SESSION['current_user']);
+		$_SESSION = array();
+
+		if (ini_get("session.use_cookies")) {
+			$params = session_get_cookie_params();
+			setcookie(session_name(), '', time() - 42000,
+				$params["path"], $params["domain"],
+				$params["secure"], $params["httponly"]
+			);
+		}
+
+		session_destroy();
 		$obj = utopia::GetInstance('uDashboard');
 		header('Location: '.$obj->GetURL());
 		die();
@@ -73,6 +83,10 @@ class uUserLogin extends uDataModule {
 		$rec = $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)));
 		if ($rec) {
 			$_SESSION['current_user'] = $rec['user_id'];
+			if (isset($_REQUEST['remember_me'])) {
+				session_set_cookie_params(604800,'/');
+				session_regenerate_id(true);
+			}
 		} else {
 			uNotices::AddNotice('Username and password do not match.',NOTICE_TYPE_ERROR);
 		}
@@ -119,6 +133,7 @@ class uUserLogin extends uDataModule {
 		echo '<form id="loginForm" action="" method="POST"><table>';
 		echo '<tr><td align="right">Username:</td><td>{login_user}</td></tr>';
 		echo '<tr><td align="right">Password:</td><td>{login_pass}</td></tr>';
+		echo '<tr><td><input type="checkbox" value="1" name="remember_me"/> Remember me</td></tr>';
 		echo '<tr><td colspan="2" align="right">';
 		echo utopia::DrawInput('',itSUBMIT,'Log In');
 		uEvents::TriggerEvent('LoginButtons');

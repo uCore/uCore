@@ -15,6 +15,8 @@ function runtimeHeader($startTime) {
 $startTime = microtime(true);
 register_shutdown_function('runtimeHeader',$startTime);
 
+session_set_cookie_params(0,'/');
+session_name('ucore');
 session_start();
 
 include('error.php');
