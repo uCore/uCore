@@ -240,37 +240,44 @@ class uRegisterUser extends uDataModule {
 class uResetPassword extends uDataModule {
 	public function GetTitle() { return 'Reset Password'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
+	public function GetOptions() { return PERSISTENT; }
 
 	public function GetUUID() { return 'reset-password'; }
 
 	public function SetupParents() {
 		$this->SetRewrite(array('{e}','{c}'));
+		uEmailer::InitialiseTemplate('account_activate','Activate your account','Hi {email},<br/>Please activate your account by clicking the link below:<br/>{activate_link}');
+		uEmailer::InitialiseTemplate('account_resetpw','Reset your password','Hi {email},<br/>You can reset your password by clicking the link below:<br/>{activate_link}');
+		uEvents::AddCallback('LoginButtons',array($this,'forgottenPasswordButton'));
+	}
+	public function forgottenPasswordButton() {
+		echo '<a href="'.$this->GetURL(array()).'" class="left">Forgotten Password?</a>';
 	}
 
 	public function SetupFields() {
 		$this->CreateTable('users');
 		$this->CreateTable('roles','tabledef_UserRoles','users',array('role'=>'role_id'));
 
+		$this->AddField('user_id','user_id','users');
 		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('password','password','users','Password',itPASSWORD);
-		$this->AddField('username','username','users','Username',itTEXT);
-		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('role','name','roles','Role',itCOMBO);
+		$this->AddField('email_confirm_code','email_confirm_code','users');
 	}
 
 	public function ResetPW($user) {
-		$rec = $this->LookupRecord(array('email'=>$user));
+		$rec = $this->LookupRecord(array('username'=>$user));
 		if (!$rec) return FALSE; // user not found.
 
 		$randKey = genRandom(20);
-		$this->UpdateField('pw_reset',$randKey,$rec['account_id']);
+		$this->UpdateField('email_confirm_code',$randKey,$rec['user_id']);
 
 		//email out verification
-		$name = $rec['contact_name'] ? ' '.$rec['contact_name'] : '';
+		$name = $rec['username'] ? ' '.$rec['username'] : '';
 		if (empty($rec['password']))
-			uDocuments::toEmail('account_activate',array('email'=>$user,'contact_name'=>$name,'activate_link'=>'http://'.utopia::GetDomainName()."/resetpw/$user/$randKey"),'email','Top4 Accounts');
+			uEmailer::SendEmailTemplate('account_activate',array('email'=>$user,'contact_name'=>$name,'activate_link'=>'http://'.utopia::GetDomainName().$this->GetURL(array('e'=>$user,'c'=>$randKey))),'email');
 		else
-			uDocuments::toEmail('account_resetpw',array('email'=>$user,'contact_name'=>$name,'activate_link'=>'http://'.utopia::GetDomainName()."/resetpw/$user/$randKey"),'email','Top4 Accounts');
+			uEmailer::SendEmailTemplate('account_resetpw',array('email'=>$user,'contact_name'=>$name,'activate_link'=>'http://'.utopia::GetDomainName().$this->GetURL(array('e'=>$user,'c'=>$randKey))),'email');
 	}
 
 	public function RunModule() {
@@ -278,14 +285,14 @@ class uResetPassword extends uDataModule {
 		$email = array_key_exists('e',$_REQUEST) ? $_REQUEST['e'] : '';
 		$notice = '';
 
-		$rec = $this->LookupRecord(array('email'=>$email));
+		$rec = $this->LookupRecord(array('username'=>$email));
 		if (empty($email) || !$rec) {
 			if (!$rec && !empty($email)) echo $noticeBox.'No account was found with this email address. Please try again.</div>';
 			echo '<h1 style="color:#336600">Reset Password</h1><div style="margin-left:20px;">';
-			echo '<form id="loginForm" action="" onsubmit="this.action = window.location;" method="post">';
+			echo '<form id="loginForm" action="'.$this->GetURL(array()).'" method="post">';
 			echo '<div style="color:#336600;margin-top:10px">What is your email address?</div>';
 			echo '<div style="margin-left:20px;">My e-mail address is '.utopia::DrawInput('e',itTEXT).'</div>';
-			echo '<input type="image" style="border:none" src="/uTemplates/top4/images/confirm.png" height="25px">';
+			echo '<input type="submit" class="btn" value="Recover Password" />';
 			echo '</form></div>';
 			return;
 		}
@@ -296,17 +303,16 @@ class uResetPassword extends uDataModule {
 			return true;
 		}
 
-		if ($rec['pw_reset'] !== $_REQUEST['c']) {
-			echo '<p>Unfortunately we could not validate this request.</p><p>If you are trying to activate your account or reset your password, please <a href="/resetpw">click here</a> for a new link.</p>';
+		if ($rec['email_confirm_code'] !== $_REQUEST['c']) {
+			echo '<p>Unfortunately we could not validate this request.</p><p>If you are trying to activate your account or reset your password, please <a href="'.$this->GetURL(array('e'=>$email)).'">click here</a> for a new link.</p>';
 			return;
 		}
 		if (array_key_exists('__newpass_c',$_POST)) {
 			if ($_POST['__newpass'] !== $_POST['__newpass_c']) {
 				$notice = $noticeBox.'Password confirmation did not match, please try again.</div>';
 			} else {
-				$this->UpdateFields(array('pw_reset'=>'','password'=>md5($_POST['__newpass'])),$rec['account_id']);
-				$obj = utopia::GetInstance('module_AccountLogin');
-				echo '<p>You have successfully reset your password.</p><p>You may now <a href="'.$obj->GetURL().'">Log In</a></p>';
+				$this->UpdateFields(array('email_confirm_code'=>'','password'=>$_POST['__newpass']),$rec['user_id']);
+				echo '<p>You have successfully reset your password.</p>';
 				return;
 			}
 		}
@@ -315,11 +321,11 @@ class uResetPassword extends uDataModule {
 		if (empty($rec['password'])) $action = 'Activate Account';
 		else $action = 'Reset Password';
 		echo '<h1 style="color:#336600">'.$action.'</h1><div style="margin-left:20px;">';
-		echo '<form id="loginForm" action="" onsubmit="this.action = window.location;" method="post"><input type="hidden" name="e" value="'.$email.'"><input type="hidden" name="c" value="'.$_REQUEST['c'].'">';
+		echo '<form id="loginForm" action="" method="post"><input type="hidden" name="e" value="'.$email.'"><input type="hidden" name="c" value="'.$_REQUEST['c'].'">';
 		echo '<table style="margin-left:20px;margin-top:10px;" cellpadding="5">';
 		echo '<tr><td align="right">New Password:</td><td>'.utopia::DrawInput('__newpass',itPASSWORD).'</td></tr>';
 		echo '<tr><td align="right">Confirm Password:</td><td>'.utopia::DrawInput('__newpass_c',itPASSWORD).'</td></tr>';
-		echo '<tr><td colspan="2" align="right"><input type="image" style="border:none" src="/uTemplates/top4/images/confirm.png" height="25px"></td></tr>';
+		echo '<tr><td colspan="2" align="right"><input type="submit" class="btn" value="Set Password" /></td></tr>';
 		echo '</table></form></div>';
 	}
 }
