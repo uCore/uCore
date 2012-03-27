@@ -12,11 +12,6 @@ if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
 function runtimeHeader($startTime) {
 	$endTime = microtime(true);
 	header('X-Runtime: '.($endTime-$startTime));
-
-	while(ob_get_level()>2)ob_end_flush(); // stop before gzip
-	if (!ob_get_length()) ob_end_clean();
-	header('Content-Length: '.ob_get_length());
-	ob_end_flush();
 }
 $startTime = microtime(true);
 register_shutdown_function('runtimeHeader',$startTime);
