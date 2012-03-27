@@ -4,6 +4,7 @@ define('CHARSET_ENCODING'        , 'utf-8');
 define('SQL_CHARSET_ENCODING'    , 'utf8');
 define('SQL_COLLATION'           , 'utf8_general_ci');
 
+if (!ini_get('output_buffering')) ob_start();
 $enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
 define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
 if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
@@ -11,10 +12,16 @@ if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
 function runtimeHeader($startTime) {
 	$endTime = microtime(true);
 	header('X-Runtime: '.($endTime-$startTime));
+
+	while(ob_get_level()>2)ob_end_flush(); // stop before gzip
+	if (!ob_get_length()) ob_end_clean();
+	else ob_end_flush();
+		header('Content-Length: '.ob_get_length());
 }
 $startTime = microtime(true);
 register_shutdown_function('runtimeHeader',$startTime);
 
+session_cache_limiter(false);
 session_set_cookie_params(0,'/');
 session_name('ucore');
 session_start();
