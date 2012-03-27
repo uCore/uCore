@@ -15,8 +15,8 @@ function runtimeHeader($startTime) {
 
 	while(ob_get_level()>2)ob_end_flush(); // stop before gzip
 	if (!ob_get_length()) ob_end_clean();
-	else ob_end_flush();
-		header('Content-Length: '.ob_get_length());
+	header('Content-Length: '.ob_get_length());
+	ob_end_flush();
 }
 $startTime = microtime(true);
 register_shutdown_function('runtimeHeader',$startTime);
