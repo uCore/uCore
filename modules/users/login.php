@@ -3,8 +3,12 @@
 class adminLogout extends uBasicModule {
 	public function GetOptions() { return PERSISTENT; }
 	public function GetTitle() { return 'Logout'; }
-	public function GetSortOrder() { return -9900;}
+	public function GetSortOrder() { return -9900; }
+	public function GetUUID() { return 'logout'; }
 	public function SetupParents() {
+		$this->SetRewrite(true);
+		utopia::AddTemplateParser('logout','<a href="'.$this->GetURL().'">Logout</a>','');
+		
 		if (!uUserLogin::IsLoggedIn()) return;
 		$this->AddParent('/');
 	}
@@ -133,7 +137,7 @@ class uUserLogin extends uDataModule {
 		echo '<form id="loginForm" action="" method="POST"><table>';
 		echo '<tr><td align="right">Username:</td><td>{login_user}</td></tr>';
 		echo '<tr><td align="right">Password:</td><td>{login_pass}</td></tr>';
-		echo '<tr><td><input type="checkbox" value="1" name="remember_me"/> Remember me</td></tr>';
+		echo '<tr><td colspan="2" align="right"><label>Remember Me <input type="checkbox" value="1" name="remember_me"/></label></td></tr>';
 		echo '<tr><td colspan="2" align="right">';
 		echo utopia::DrawInput('',itSUBMIT,'Log In');
 		uEvents::TriggerEvent('LoginButtons');
