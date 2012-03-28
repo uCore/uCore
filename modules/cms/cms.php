@@ -124,7 +124,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			e.stopPropagation();
 		});
 		$('.cmsItemText').live('click',function (e) {
-			$('#previewFrame').load('$editLink&inline=1&_f_{$fid['uid']}='+$(this).closest('.cmsItem').attr('id'), function() {
+			$('#previewFrame').load('$editLink&{inline}&_f_{$fid['uid']}='+$(this).closest('.cmsItem').attr('id'), function() {
 				InitJavascript.run();
 			});
 			e.stopPropagation();
@@ -386,8 +386,6 @@ EOF;
 		$this->AddChild('uCMS_View','cms_id','link');
 	}
 	public function RunModule() {
-		if (isset($_REQUEST['inline']))
-			utopia::CancelTemplate();
 		$this->ShowData();
 	}
 	public static function StartNoProcess() {

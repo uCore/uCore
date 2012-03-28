@@ -185,7 +185,7 @@ abstract class uBasicModule implements iUtopiaModule {
 				header('Location: '.$abs.$url,true,301); die();
 			}
 		}
-		if ($this instanceof iAdminModule) utopia::UseTemplate(TEMPLATE_ADMIN);
+		if ($this instanceof iAdminModule && utopia::UsingTemplate()) utopia::UseTemplate(TEMPLATE_ADMIN);
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
 		if (uEvents::TriggerEvent('BeforeRunModule',$this) === FALSE) return FALSE;

@@ -62,4 +62,4 @@ if (array_key_exists('__ajax',$_REQUEST)) {
 	die();
 }
 
-if (!array_key_exists('_noTemplate',$_GET)) utopia::UseTemplate();
+if (!isset($_GET['inline'])) utopia::UseTemplate();
