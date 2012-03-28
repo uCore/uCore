@@ -275,7 +275,8 @@ class utopia {
 	static function Finish() {
 		if (self::$finished) return;
 		self::$finished = true;
-
+		$obEnabled = ini_get('output_buffering') ? 1 : 0;
+		while (ob_get_level() > (2+$obEnabled)) ob_end_flush();
 		include(PATH_ABS_CORE.'finalise.php');
 	}
 
