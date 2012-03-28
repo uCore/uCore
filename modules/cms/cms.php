@@ -372,8 +372,9 @@ EOF;
 	public function getPossibleBlocks($val,$pk,$original) {
 		$t = uCMS_View::GetTemplate($pk);
 		$cssfiles = utopia::GetTemplateCSS(PATH_REL_ROOT.$t);
+		$cssfiles[] = PATH_ABS_CORE.'default.css';
 		$cssfiles = array_map('utopia::GetRelativePath',$cssfiles);
-		if ($cssfiles) $this->fields['content']['attr']['mce_options'] = '{content_css:\''.implode(',',$cssfiles).'\'}';
+		if ($cssfiles) $this->fields['content']['attr']['mce_options']['content_css'] = implode(',',$cssfiles);
 		
 		$obj = utopia::GetInstance('uWidgets_List');
 		$rows = $obj->GetRows();

@@ -12,7 +12,7 @@ td { vertical-align: top }
 
 th.sortable { cursor:pointer; }
 
-.mceContentBody  { background-color: white; border:4px solid transparent; padding:10px; margin:0; background-image:none; overflow:auto; } /* remove opacity */
+.mceContentBody  { background:transparent none; border:4px solid transparent; padding:10px; margin:0; overflow:auto; } /* remove opacity */
 .utopia-filter-default { color: #AAA; }
 *:focus { outline: 1px; }
 

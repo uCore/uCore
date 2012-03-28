@@ -120,7 +120,7 @@ FIN
 
 		$extendOpts = '';
 		if (isset($attributes['mce_options'])) {
-			$extendOpts = ','.$attributes['mce_options'];
+			$extendOpts = ','.json_encode($attributes['mce_options']);
 			unset($attributes['mce_options']);
 		}
 		$optName = 'mceRichOptions';
