@@ -477,20 +477,16 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (!is_array($filters)) $filters = array();
 
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
-		$filters['uuid'] = $uuid;
-		if (isset($filters['uuid']) && $filters['uuid'] !== $uuid) {
-			$m = utopia::UUIDExists($filters['uuid']);
-			if ($m) {
-				$obj = utopia::GetInstance($m['module_name']);
-				return $obj->GetURL($filters);
-			}
-		}
+		unset($filters['uuid']);
+		$filters = array('uuid'=>$uuid) + $filters;
 
 		$url = DEFAULT_FILE;
 		if ($this->rewriteMapping !== NULL)
 			$url = $this->RewriteURL($filters);
-
-		return BuildQueryString($url,$filters,$encodeAmp);
+		
+		$query = http_build_query($filters);
+		if ($query) $query = '?'.$query;
+		return $url.$query;
 	}
 	public function IsInstalled() {
 		//check if its installed in the db
@@ -641,8 +637,6 @@ abstract class uBasicModule implements iUtopiaModule {
 							$filters["_f_".$li['toField']] = $cr[$li['fromField']];
 						}
 						utopia::LinkList_Add($listDestination,$btnText,$this->GetURL($filters),$sortOrder,NULL,array('class'=>'btn'));
-						//echo "<a id=\"fhtest\" href=\"".BuildQueryString($this->GetURL(),$filters)."\" class=\"draggable {tabTitle:'$btnText', tabPosition:'".$GLOBALS['modules'][get_class($this)]['sort_order']."'}\">$btnText</a>";
-						//		utopia::AppendVar('child_buttons',CreateNavButton($linkInfo['text'],BuildQueryString($this->GetURL(),$filters)));
 					}
 				} else { // not linked to fields (so no filters)
 					utopia::LinkList_Add($listDestination,$btnText,$this->GetURL(),$sortOrder,NULL,array('class'=>'btn'));
@@ -718,6 +712,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function RewriteFilters(&$filters = NULL) {
 		if (!is_array($filters)) return false;
+		if (!$this->HasRewrite()) return false;
 		foreach ($filters as $uid => $val) {
 			$fltr = $this->GetFilterInfo(substr($uid,3));
 			if (!$fltr) continue;
@@ -727,7 +722,7 @@ abstract class uDataModule extends uBasicModule {
 		if (array_key_exists($this->GetPrimaryKey(), $filters)) {
 			$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()]);
 			$fields = array();
-			if ($this->HasRewrite()) foreach ($this->rewriteMapping as $seg) {
+			foreach ($this->rewriteMapping as $seg) {
 				if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
 					foreach ($matches[1] as $match) {
 						if (array_key_exists($match,$this->fields)) $filters[$match] = $rec[$match];
@@ -781,26 +776,12 @@ abstract class uDataModule extends uBasicModule {
 		
 		
 		if (is_array($filters)) {
-			//print_r($filters);
 			foreach ($filters as $fieldName => $val) {
-				//	$filter = $this->FindFilter($fieldName);
-				//	if ($filter)
-				//		$filArr['_f_'.$filter['uid']]=$val;
-				//	else
 				$filArr[$fieldName] = $val;
 			}
 		}
 
 		return parent::GetURL($filArr,$encodeAmp);
-		//return BuildQueryString($url,$filArr);
-		/*		if (empty($filArr)) return $url;
-
-		if (strpos($return,'?') === FALSE)
-		$return = "$return?$filters";
-		else
-		$return = "$return&$filters";
-
-		return $return;*/
 	}
 
 	public function Initialise() {
@@ -2347,23 +2328,13 @@ FIN;
 	}
 
 	public function GetUploadURL($fieldAlias,$pkVal) {
-//		$field = $this->GetFieldProperty($fieldAlias ,'field');
-//		$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
-//		$table = $setup['table'];
-//		$key = $setup['pk'];
-
-//		$uuid = $this->GetUUID();
-
 		$filters = array(
 			'__ajax'=>'getUpload',
-			//'m'		=>$this->GetUUID(),
 			'f'		=>$fieldAlias,
 			'p'		=>$pkVal
 		);
 
-		//return BuildQueryString(PATH_REL_SELF,$filters);
 		return $this->GetURL($filters);
-//		return PATH_REL_ROOT.DEFAULT_FILE."?__ajax=getUpload&f=$fieldAlias&m=$uuid&p=$pkVal";
 	}
 
 	// TODO: Requests for XML data (ajax)
@@ -3160,7 +3131,7 @@ abstract class uSingleDataModule extends uDataModule {
 		if ($linkInfo['parentField'] !== NULL) continue; // is linked to fields in the list, skip it
 		if (flag_is_set($this->GetOptions(),ALLOW_ADD)) { // create an addition button  --  && utopia::GetCurrentModule() == get_class($this)
 		$filters = array('newrec'=>1); // set this filter so that the primary key is negative, this will force no policy to be found, and show a new form
-		utopia::AppendVar('footer_left',CreateNavButton('New Record',BuildQueryString($this->GetURL(),$filters),NULL,array('class'=>'btn greenbg')));
+		utopia::AppendVar('footer_left',CreateNavButton('New Record',$this->GetURL($filters),NULL,array('class'=>'btn greenbg')));
 		}
 		}
 		}

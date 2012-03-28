@@ -483,6 +483,7 @@ class uCMS_View extends uSingleDataModule {
 	public function SetupParents() {
 		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
 		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');
+		$this->SetRewrite(true);
 	}
 
 	static function GetHomepage() {

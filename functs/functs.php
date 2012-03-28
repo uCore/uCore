@@ -131,15 +131,8 @@ function CreateButton($btnText,$attrs = NULL) {
 }
 
 function CreateNavButton($btnText,$url,$attrs=array()){
-	//$url = BuildQueryString($url,$vals);
-
-	/*	if (isset($attrs['onclick']) && !empty($attrs['onclick']))
-		$attrs['onclick'] .= '; nav(\''.htmlentities($url,ENT_QUOTES,CHARSET_ENCODING).'\')';
-		else
-		$attrs['onclick'] = 'nav(\''.htmlentities($url,ENT_QUOTES,CHARSET_ENCODING).'\')';*/
 	$attrs['href'] = $url;
 	return CreateButton($btnText,$attrs);
-	//return CreateNavButtonOnClick($btnText,'',$url,$vals);
 }
 
 /*function CreateNavButtonOnClick($btnText,$url,$onClick,$vals=array()){
@@ -165,21 +158,6 @@ function CreateSubmitButton($btnText, $vals=array()) {
 		$onClick = trim($onClick);
 		if (!empty($onClick) && substr($onClick, -0) != ';') $onClick = $onClick.';';
 		$out .= " <input type=submit value='$btnText' onclick='$onClick$sets' />";
-		return $out;*/
-}
-
-function CreateNavLink($linkText,$url,$vals=array()){
-	$url = BuildQueryString($url,$vals);
-	return " <a href=\"$url\">$linkText</a>";
-	/*return;
-	 $vals['next_url'] = htmlspecialchars($url);
-	 $out = "";
-	 $sets = "";
-	 foreach ($vals as $key => $val) {
-		AddHiddenField($key);
-		$sets .= " SetElementValue(\"$key\",\"$val\");";
-		}
-		$out = " <a href='javascript:SubmitMainForm()' onClick='$sets'>$linkText</a>";
 		return $out;*/
 }
 
@@ -288,37 +266,6 @@ function UrlReadable($string) {
 	$string = preg_replace('/[^0-9a-z\-_\.]+/i','-',$string);
 	$string = preg_replace('/[\-]{2,}/i','-',$string);
 	return trim($string,'-');
-}
-
-function BuildQueryString($ourl,$vl,$encodeAmp=false) {
-  if (!$vl) return $ourl;
-	$url = htmlspecialchars_decode($ourl);
-	if (empty($url)) $url = $_SERVER['REQUEST_URI'];
-  
-  $qsPairs = GetQSPairs($url);
-  $pairs = array();
-  if (strpos($url,'?') !== false) {
-    $arr = array();
-    list($url) = explode('?',$url);
-  }
-  
-  $endSlash = substr($url,-1) === '/' ? '/' : '';
-  $startSlash = substr($url,0,1) === '/' ? '/' : '';
-	$url = trim($url,'/');
-	if (is_string($vl)) $vl = explode('&',$vl);
-
-	foreach ($vl as $name => $val)
-	if ($val !== NULL) $pairs[$name] = $val;
-
-	foreach ($qsPairs as $key=>$val) {
-		if (array_key_exists($key,$pairs)) continue;
-		$pairs[$key] = $val;
-	}
-
-	$qs = $encodeAmp ? http_build_query($pairs,'','&amp;') : http_build_query($pairs);
-	if ($qs) $qs = '?'.$qs;
-
-	return $startSlash.$url.$endSlash.$qs;
 }
 
 function DONT_USE_uuid()
