@@ -20,8 +20,8 @@ class adminLogout extends uBasicModule {
 		}
 
 		session_destroy();
-		$obj = utopia::GetInstance('uDashboard');
-		header('Location: '.$obj->GetURL());
+		$ref = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : PATH_REL_ROOT;
+		header('Location: '.$ref);
 		die();
 	}
 }
