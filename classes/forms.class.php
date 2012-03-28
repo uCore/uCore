@@ -411,6 +411,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$sections = utopia::GetRewriteSections();
 		if (!$sections) return FALSE;
 
+		$return = array();
 		foreach ($sections as $key => $value) {
 			$replace = array();
 			if (!array_key_exists($key,$this->rewriteMapping)) continue;
