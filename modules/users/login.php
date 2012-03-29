@@ -107,6 +107,9 @@ class uUserLogin extends uDataModule {
 		
 		return ($_SESSION['current_user']);
 	}
+	public static function SetLogin($id) {
+		$_SESSION['current_user'] = $id;
+	}
 
 	public function checkLogin($object) {
 		if (self::IsLoggedIn()) return;

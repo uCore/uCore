@@ -33,7 +33,7 @@ class tabledef_Users extends uTableDef {
 				return FALSE;
 			}
 			
-			if ($pkVal === NULL) parent::UpdateField('username','unverified_'.genRandom(75),$pkVal);
+			if ($pkVal === NULL) parent::UpdateField('username',$newValue,$pkVal);
 			// email address has been updated - set email_confirm and email_confirm_code
 			$randKey = genRandom(20);
 			parent::UpdateField('email_confirm',$newValue,$pkVal);
@@ -171,8 +171,13 @@ class uRegisterUser extends uDataModule {
 			return;
 		}
 		// already logged in?
-		if ($this->RegisterForm()) {
+		if (uUserLogin::IsLoggedIn()) {
+			echo '<p>You are already logged in.</p>';
+		}
+		
+		if ($usr = $this->RegisterForm()) {
 			echo '<p>Your account has now been created.</p>';
+			uUserLogin::SetLogin($usr);
 		}
 	}
 	public function RegisterForm() {
