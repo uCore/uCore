@@ -12,6 +12,7 @@ class tabledef_UserRoles extends uTableDef  {
 }
 
 /* Admin is a fixed role */
+uEvents::AddCallback('CanAccessModule','uUserRoles::checkPermission');
 class uUserRoles extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'User Roles'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT | PERSISTENT; }
@@ -36,7 +37,6 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 
 	public function SetupParents() {
 		$this->AddParent('uUsersList');
-		uEvents::AddCallback('CanAccessModule','uUserRoles::checkPermission');
 		uEvents::AddCallback('InitComplete',array($this,'AssertAdminRole'));
 	}
 	public function AssertAdminRole() {
@@ -74,7 +74,6 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 				if ($r === $parent) return true;
 			}
 		}
-
 		return false;
 	}
 	
