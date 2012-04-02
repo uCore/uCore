@@ -127,7 +127,8 @@ function &sql_query($query, $quiet = FALSE) { $false = FALSE;
 	$GLOBALS['sql_queries'][$GLOBALS['sql_query_count']] = $query;
 	$result = mysql_query($query);
 	if (!$quiet && !$result) {
-		$err = mysql_error();	if (!empty($err)) { trigger_error($err."\n\n".$query); ErrorLog($err); }//ErrorLog("$err<br/>$query");
+		$err = mysql_error();
+		if (!empty($err)) throw new Exception($err,mysql_errno());
 	}
 	$timetaken = timer_end($tID);
 	/*	if (false && $timetaken > 50) {

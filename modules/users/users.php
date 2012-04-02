@@ -22,10 +22,6 @@ class tabledef_Users extends uTableDef {
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
 		if ($fieldName == 'username') {
 			$newValue = trim($newValue);
-			if (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) {
-				uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
-				return FALSE;
-			}
 			// does this email already exist?
 			$r = sql_query('SELECT * FROM `'.$this->tablename.'` WHERE `username` = \''.$newValue.'\'');
 			if (mysql_num_rows($r)) {
@@ -33,16 +29,19 @@ class tabledef_Users extends uTableDef {
 				return FALSE;
 			}
 			
-			if ($pkVal === NULL) parent::UpdateField('username',$newValue,$pkVal);
-			// email address has been updated - set email_confirm and email_confirm_code
-			$randKey = genRandom(20);
-			parent::UpdateField('email_confirm',$newValue,$pkVal);
-			parent::UpdateField('email_confirm_code',$randKey,$pkVal);
-			// TODO: send verification email!
-			$obj = utopia::GetInstance('uVerifyEmail');
-			$url = 'http://'.utopia::GetDomainName().$obj->GetURL(array('c'=>$randKey));
-			uNotices::AddNotice('Please check your email for a validation link.');
-			uEmailer::SendEmailTemplate('account_activate',array('email'=>$newValue,'activate_link'=>$url),'email');
+			if (preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) { // email address has been updated - set email_confirm and email_confirm_code
+				if ($pkVal === NULL) parent::UpdateField('username',$newValue,$pkVal);
+				$randKey = genRandom(20);
+				parent::UpdateField('email_confirm',$newValue,$pkVal);
+				parent::UpdateField('email_confirm_code',$randKey,$pkVal);
+				// TODO: send verification email!
+				$obj = utopia::GetInstance('uVerifyEmail');
+				$url = 'http://'.utopia::GetDomainName().$obj->GetURL(array('c'=>$randKey));
+				uNotices::AddNotice('Please check your email for a validation link.');
+				uEmailer::SendEmailTemplate('account_activate',array('email'=>$newValue,'activate_link'=>$url),'email');
+			} else {
+				parent::UpdateField('username',$newValue,$pkVal);
+			}
 			return TRUE;
 		}
 		if ($pkVal === NULL) parent::UpdateField('username','unverified_'.genRandom(75),$pkVal);
@@ -180,6 +179,16 @@ class uRegisterUser extends uDataModule {
 			uUserLogin::SetLogin($usr);
 		}
 	}
+	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		if ($fieldAlias == 'username') {
+			$newValue = trim($newValue);
+			if (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) {
+				uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
+				return FALSE;
+			}
+		}
+		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
+	}
 	public function RegisterForm() {
 		if ($_POST && isset($_POST['username'])) {
 			// validate user information
@@ -304,5 +313,15 @@ class uUserProfile extends uSingleDataModule {
 	public static function GetCurrentUser() {
 		$o = utopia::GetInstance(__CLASS__);
 		return $o->LookupRecord();
+	}
+	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		if ($fieldAlias == 'username') {
+			$newValue = trim($newValue);
+			if (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) {
+				uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
+				return FALSE;
+			}
+		}
+		return parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
 }
