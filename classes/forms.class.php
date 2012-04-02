@@ -2525,7 +2525,17 @@ FIN;
 
 		// lets update the field
 		$tableObj = utopia::GetInstance($table);
-		$ret = $tableObj->UpdateField($field,$newValue,$pkVal,$fieldType) === FALSE ? FALSE : TRUE;
+		try {
+			$ret = $tableObj->UpdateField($field,$newValue,$pkVal,$fieldType) === FALSE ? FALSE : TRUE;
+		} catch (Exception $e) {
+			$ret = false;
+			switch ($e->getCode()) {
+				case 1062: // duplicate key
+					uNotices::AddNotice('An entry already exists with this value.',NOTICE_TYPE_ERROR);
+					break;
+				default: throw $e;
+			}
+		}
 		
 		$this->ResetField($fieldAlias,$pkVal);
 		$this->ResetField($fieldAlias,$oldPkVal);
