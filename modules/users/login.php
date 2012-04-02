@@ -138,7 +138,7 @@ class uUserLogin extends uDataModule {
 		}
 		echo '<h1>Please log in</h1>';
 		echo '<form id="loginForm" action="" method="POST"><table>';
-		echo '<tr><td align="right">Username:</td><td>{login_user}</td></tr>';
+		echo '<tr><td align="right">Email:</td><td>{login_user}</td></tr>';
 		echo '<tr><td align="right">Password:</td><td>{login_pass}</td></tr>';
 		echo '<tr><td colspan="2" align="right"><label>Remember Me <input type="checkbox" value="1" name="remember_me"/></label></td></tr>';
 		echo '<tr><td colspan="2" align="right">';
