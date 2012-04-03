@@ -53,11 +53,11 @@ class module_TinyMCE extends uBasicModule {
 			$htmlOpts = array();
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
-			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,fullscreen,save";
-			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor,|,fullscreen';
+			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,save,autoresize";
+			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor';
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media,|,insertlayer,moveforward,movebackward,absolute';
 			$htmlOpts['theme_advanced_buttons3_add'] = ",|,styleprops,spellchecker,|,tablecontrols";
-			$htmlOpts['theme_advanced_buttons4'] = "save";
+			$htmlOpts['theme_advanced_buttons4'] = "save,|,addWidgetButton";
 
 			$baseOpts = json_encode($options);
 			$richOpts = json_encode($richOpts);
@@ -70,6 +70,7 @@ class module_TinyMCE extends uBasicModule {
 				$includeOpts = ','.$jsOptionVar;
 			}
 
+			$prc = PATH_REL_CORE;
 			uJavascript::IncludeText(<<< FIN
 	function tinyMceSetup(ed) {
 		ed.onInit.add(function(ed, evt) {
@@ -78,9 +79,18 @@ class module_TinyMCE extends uBasicModule {
 				$('.mceExternalToolbar').hide();
 			});
 		});
+		ed.addButton('addWidgetButton', {
+			title : 'Insert Widget',
+			image : '{$prc}images/ucore-icon.png',
+			onclick : function() {
+				// Add you own code to execute something on click
+				ed.focus();
+				ChooseWidget();
+			}
+		});
 	}
 	function onSave(ed) {
-		uf(ed.getElement(),ed.getContent(),ed.getContainer());		
+		uf(ed.getElement(),ed.getContent(),ed.getContainer());
 	}
 	var mb = null;
 	function openMediaBrowser(field_name, url, type, win) {
