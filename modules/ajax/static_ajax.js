@@ -502,9 +502,9 @@ function StoppedUpdating(ele) {
 		if (isUpdating[e].element == ele) delete isUpdating[e];
 	}
 }
-$('.uf').live('change',_fieldChange);
-$('input[type=button].uf').live('click',_fieldChange);
-function _fieldChange(e) { uf(this); }
+$(document).on('change','.uf',_fieldChange);
+$(document).on('click','input[type=button].uf',_fieldChange);
+function _fieldChange(event) { uf(this); return false; }
 function uf(ele, forcedValue, hourglassEle) {
 	for (e in isUpdating) {
 		if (isUpdating[e].element == ele) return;
