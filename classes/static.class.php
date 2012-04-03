@@ -688,11 +688,13 @@ class utopia {
 		if (is_array($adminTemplates)) foreach ($adminTemplates as $k => $v) {
 			if ($v == '.' || $v == '..' || !is_dir($v)) continue;
 			$v = str_replace(PATH_ABS_ROOT,'/',$v);
+			$v = fix_path($v,'/');
 			$nTemplates[$v] = $v;
 		}
 		if (is_array($userTemplates)) foreach ($userTemplates as $k => $v) {
 			if ($v == '.' || $v == '..' || !is_dir($v)) continue;
 			$v = str_replace(PATH_ABS_ROOT,'/',$v);
+			$v = fix_path($v,'/');
 			$nTemplates[$v] = $v;
 		}
 		
