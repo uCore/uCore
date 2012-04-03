@@ -37,7 +37,7 @@ class uEvents {
 		foreach ($process as $module) {
 			if (!isset(self::$callbacks[$eventName][$module])) continue;
 			foreach (self::$callbacks[$eventName][$module] as $callback) {
-				$return = $return && call_user_func_array($callback,$callbackArgs) !== FALSE;
+				$return = $return && (call_user_func_array($callback,$callbackArgs) !== FALSE);
 			}
 		}
 		return $return;
