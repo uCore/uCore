@@ -1,0 +1,49 @@
+.admin-bar {
+	font-family: Arial;
+	position:relative;background-color:#333;right:0;top:0;left:0;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	overflow:hidden;
+}
+.admin-bar .admin-menu {
+	line-height:25px;
+	border-bottom: 1px solid #aaa;
+	margin:0; padding:0; overflow:hidden;
+}
+.admin-bar .admin-menu li {
+	border-left:1px solid #aaa;
+	float:left; list-style:none;
+	font-size:1em;	text-align:left;
+	padding:5px 10px 5px 10px; margin:0;
+	color: #ccc;
+	overflow:hidden;
+	background-color:#333;
+}
+.admin-bar .admin-menu li.first-item { border-left:0;}
+.admin-bar .admin-menu li.toggle {
+	cursor: pointer;
+	background-image: url(images/dropdown.png);
+	background-position: left center;
+	background-repeat: no-repeat;
+	padding-left:30px;
+}
+.admin-bar .admin-menu li a, .admin-bar .admin-menu li a:visited, .admin-bar .admin-menu li a:link {
+	color: #ccc; text-decoration:none;
+	display:block;
+}
+.admin-bar .admin-menu li span.actions {
+	margin-left:15px;
+	float:right;
+}
+.admin-bar .admin-body {
+	background-color:#ccc;
+}
+.admin-bar .admin-body-item {
+	display:none;
+}
+
+.admin-bar .layoutDetailSection { width:50% }
+.admin-bar .inputtype-text { width:100%; }
+
+.mceEditor.defaultSkin table.mceLayout { border: 0; }
+.mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }
