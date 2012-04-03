@@ -124,9 +124,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			e.stopPropagation();
 		});
 		$('.cmsItemText').live('click',function (e) {
-			$('#previewFrame').load('$editLink&{inline}&_f_{$fid['uid']}='+$(this).closest('.cmsItem').attr('id'), function() {
-				InitJavascript.run();
-			});
+			window.location = '/'+$(this).closest('.cmsItem').attr('id')+'?edit=1';
 			e.stopPropagation();
 		});
 		InitialiseTree();
@@ -253,7 +251,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 
 		$this->AddField('content','content','cms','Page Content',itHTML);
 		$this->AddPreProcessCallback('content',array($this,'processWidget'));
-		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'30em'));
+		$this->FieldStyles_Set('content',array('width'=>'100%'));
 		$this->AddField('content_published','content_published','cms');
 
 		$this->AddField('content_time','content_time','cms','Last Saved');
@@ -264,7 +262,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
 		$this->AddFilter('cms_id',ctEQ);
 	}
-	
 	public function publishLinks($field,$pkVal,$v,$rec) {
 		if ($rec['is_published'])
 			return utopia::DrawInput('published',itBUTTON,'Published',null,array('disabled'=>'disabled'));
@@ -385,6 +382,40 @@ EOF;
 		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 		$this->AddParent('uCMS_List','cms_id');
 		$this->AddChild('uCMS_View','cms_id','link');
+		$this->AddParentCallback('uCMS_View',array($this,'editPageCallback'));
+	}
+	public function editPageCallback($parent) {
+		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return;
+
+		$rec = uCMS_View::findPage();
+		if (!isset($_GET['edit'])) {
+			$obj = utopia::GetInstance('uCMS_View');
+			$editURL = $obj->GetURL(array('cms_id'=>$rec['cms_id'],'edit'=>1));
+			uAdminBar::AddItem('<a href="'.$editURL.'">Edit Page</a>');
+			return;
+		}
+
+		$this->fields['content']['attr']['mce_options']['theme_advanced_toolbar_location'] = 'external';
+
+		ob_start();
+		$this->ClearFilters();
+		$this->AddFilter('cms_id',ctEQ,itNONE,$rec['cms_id']);
+		$this->fields['content']['visiblename'] = NULL;
+		$this->fields['publishing']['visiblename'] = NULL;
+		$this->ShowData();
+		$c = ob_get_contents();
+		ob_end_clean();
+		$pubCell = '<span class="actions">'.$this->GetCell('publishing',$rec).'</span>';
+
+		
+		$obj = utopia::GetInstance('uCMS_View');
+		$url = $obj->GetURL(array('cms_id'=>$rec['cms_id']));
+		uAdminBar::AddItem('<a href="'.$url.'">Stop Editing</a>');
+		uAdminBar::AddItem('Edit Page Information'.$pubCell,$c);
+
+		// clear output
+		utopia::SetVar('content','');
+		echo $this->GetCell('content',$rec,'',itHTML);
 	}
 	public function RunModule() {
 		$this->ShowData();
