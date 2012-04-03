@@ -12,6 +12,9 @@ class uAdminBar {
 	public static function DrawAdminBar() {
 		if (!self::$items) return '';
 
+		if (utopia::GetInstance(utopia::GetCurrentModule()) instanceof iAdminModule)
+			self::AddItem('<a target="_blank" href="'.PATH_REL_ROOT.'">View Site</a>','',-9);
+
 		$items = self::$items;
 		array_sort_subkey($items,'order');
 		$arr = array();
