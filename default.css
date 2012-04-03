@@ -72,8 +72,8 @@ img { border: none }
 
 .layoutDetailSection td.fld { white-space:nowrap; width:1px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
-.layoutDetailSection .inputtype-text { width: 30% }
-.layoutDetailSection .inputtype-richtext { width: 80% }
+.layoutDetailSection .inputtype-text { width: 30%; min-width: 10em; }
+.layoutDetailSection .inputtype-richtext { width: 80%; min-width: 15em; }
 
 .red {
 	color: #f00
