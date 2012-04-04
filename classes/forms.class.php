@@ -2440,9 +2440,9 @@ FIN;
 			// set value to path.
 			$this->UpdateField($fieldAlias,$targetDir.'/'.$fileInfo['name'],$pkVal);
 		} else {
-			$this->UpdateField($fieldAlias,$value,$pkVal);
 			$this->UpdateField($fieldAlias.'_filename',$fileInfo['name'],$pkVal);
 			$this->UpdateField($fieldAlias.'_filetype',$fileInfo['type'],$pkVal);
+			$this->UpdateField($fieldAlias,$value,$pkVal);
 		}
 	}
 
@@ -2458,7 +2458,7 @@ FIN;
 	// returns a string pointing to a new url, TRUE if the update succeeds, false if it fails, and null to refresh the page
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
-		AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
+		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
@@ -2490,13 +2490,13 @@ FIN;
 			foreach ($tbl['joins'] as $fromField=>$toField) {
 				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) {
 					// find target PK value
-					$row = $this->LookupRecord($pkVal);
+					$row = $this->LookupRecord(array($fromField=>$pkVal));
 					$pkVal = $row[$this->GetPrimaryKeyField($fieldAlias)];
+					if ($pkVal === NULL) { // initialise a row if needed
+						$tableObj = utopia::GetInstance($table);
+						$tableObj->UpdateField($toField,$oldPkVal,$pkVal);
+					}
 					
-					// initialise a row if needed
-					$tableObj = utopia::GetInstance($table);
-					$tableObj->UpdateField($toField,$oldPkVal,$pkVal);
-
 					break; // if linkFrom is the primary key of our main table then we don't update the parent table.
 				}
 			}
@@ -2510,7 +2510,7 @@ FIN;
 				}
 			}
 		}
-				
+		
 		if ((preg_match('/{[^}]+}/',$field) > 0) || IsSelectStatement($field) || is_array($field)) {
 			$this->ResetField($fieldAlias,$pkVal);
 			return FALSE; // this field is a pragma or select statement
@@ -2536,9 +2536,7 @@ FIN;
 				default: throw $e;
 			}
 		}
-		
-		$this->ResetField($fieldAlias,$pkVal);
-		$this->ResetField($fieldAlias,$oldPkVal);
+		if ($oldPkVal !== NULL && $pkVal !== $oldPkVal) $pkVal = $oldPkVal;
 
 		if ($oldPkVal === NULL) {
 			// new record added
@@ -2574,6 +2572,7 @@ FIN;
 		}
 
 		$this->ResetField($fieldAlias,$pkVal);
+		if ($oldPkVal !== $pkVal) $this->ResetField($fieldAlias,$oldPkVal);
 		
 		if (uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldAlias)) === FALSE) return FALSE;
 
@@ -2749,7 +2748,7 @@ FIN;
 
 	public function ResetField($fieldAlias,$pkVal = NULL) {
 		if (!$this->FieldExists($fieldAlias)) return;
-		AjaxEcho("//".get_class($this)."@ResetField($fieldAlias~$pkVal)\n");
+		//AjaxEcho("//".get_class($this)."@ResetField($fieldAlias~$pkVal)\n");
 		// reset the field.
 
 		$enc_name = $this->GetEncodedFieldName($fieldAlias,$pkVal);
@@ -2802,16 +2801,17 @@ abstract class uListDataModule extends uDataModule {
 	public function UpdateField($fieldAlias,$newValue,&$pkVal = NULL) {
 		$isNew = ($pkVal === NULL);
 
-		if ($pkVal === NULL) $this->ResetField($fieldAlias,NULL); // reset the "new record" field
-
-		if ($isNew && !$this->CheckMaxRows(1)) return;
+		if ($isNew && !$this->CheckMaxRows(1)) {
+			$this->ResetField($fieldAlias,NULL); // reset the "new record" field
+			return;
+		}
 
 		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
 		if ($ret === FALSE) return $ret;
 
 		$enc_name = $this->GetEncodedFieldName($fieldAlias);
 		if ($isNew) { // && $ret !== FALSE
-			AjaxEcho("//$fieldAlias: pk=$pkVal\n");
+			//AjaxEcho("//$fieldAlias: pk=$pkVal\n");
 			// add the row
 			$newRec = $this->LookupRecord($pkVal);
 			$ov = base64_encode($this->DrawRow($newRec));
