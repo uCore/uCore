@@ -48,6 +48,9 @@ function getSqlTypeFromFieldType($fieldType) {
 
 abstract class uTableDef implements iUtopiaModule {
 	public $fields = array();
+	public $index = array();
+	public $unique = array();
+	public $primary = array();
 	public $engine = NULL;
 	public abstract function SetupFields();
 
@@ -66,10 +69,7 @@ abstract class uTableDef implements iUtopiaModule {
 
 	public function SetPrimaryKey($name, $auto_increment = true) {
 		if (!isset($this->fields[$name])) return;
-		//$name = strtolower($name);
-		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'unique') === TRUE) {
-			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
-		$this->fields[$name]['pk'] = true;
+		$this->primary[] = $name;
 		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) {
 			$this->fields[$name]['default'] = NULL;
 			$this->fields[$name]['extra'] = 'auto_increment';
@@ -77,17 +77,11 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 	public function SetUniqueField($name) {
 		if (!isset($this->fields[$name])) return;
-		//$name = strtolower($name);
-		if ($this->GetFieldProperty($name,'index') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
-			ErrorLog('Cannot assign unique flag to $name, already an indexed field.'); return; }
-		$this->fields[$name]['unique'] = true;
+		$this->unique[] = $name;
 	}
 	public function SetIndexField($name, $auto_increment = false) {
 		if (!isset($this->fields[$name])) return;
-		//$name = strtolower($name);
-		if ($this->GetFieldProperty($name,'unique') === TRUE || $this->GetFieldProperty($name,'pk') === TRUE) {
-			ErrorLog('Cannot assign index flag to $name, already an indexed field.'); return; }
-		$this->fields[$name]['index'] = true;
+		$this->index[] = $name;
 		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) {
 			$this->fields[$name]['default'] = NULL;
 			$this->fields[$name]['extra'] = 'auto_increment';
@@ -95,11 +89,7 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function GetPrimaryKey() {
-		foreach ($this->fields as $field => $fData) {
-			if (!array_key_exists('pk',$fData)) continue;
-			if ($fData['pk'] === true) return $field;
-		}
-		return NULL;
+		return reset($this->primary);
 	}
 
 	public function GetLookupData($fieldName) {
@@ -182,6 +172,25 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 		return FALSE;
 	}
+	
+	private function GetColDef($fieldName) {
+		$fieldData = $this->fields[$fieldName];
+		$type = getSqlTypeFromFieldType($fieldData['type']);
+		$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
+		if ($fieldData['type'] == ftTIMESTAMP) {
+			if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
+			else $default = " DEFAULT 0";
+		} else
+			$default = $fieldData['default'] === NULL ? '' : "DEFAULT '{$fieldData['default']}'";
+		$comments = $fieldData['comments'] === NULL ? '' : "COMMENT '{$fieldData['comments']}'";
+		$collate = $fieldData['collation'] === NULL ? '' : "COLLATE '{$fieldData['collation']}'";
+
+		$len = '';
+		if ($fieldData['type'] == ftTEXT || $fieldData['type'] == ftVARCHAR) $len = "({$fieldData['length']})";
+
+
+		return "`$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']} $default {$fieldData['extra']} $comments $collate";
+	}
 
 	public function Initialise() {
 		// create / update table
@@ -204,7 +213,7 @@ abstract class uTableDef implements iUtopiaModule {
 			$renamed = true;
 		}
 
-		$checksum = sha1($oldTable.$this->tablename.$this->engine.print_r($this->fields,true));
+		$checksum = sha1($oldTable.$this->tablename.$this->engine.print_r($this->fields,true).print_r($this->primary,true).print_r($this->unique,true).print_r($this->index,true));
 		if (!$tableExists) { // create table
 			$this->CreateTable();
 		} else {
@@ -232,8 +241,6 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	function RefreshTable($rows) {
-		$unique = array();
-		$index = array();
 		// loop fields
 		$pk = NULL;
 		$currentPK = NULL;
@@ -244,49 +251,23 @@ abstract class uTableDef implements iUtopiaModule {
 
 		// lets keep the sql querys to a minimum, get all the rows first, and process them locally.
 
-/*		foreach ($rows as $data) {
-			if (!array_key_exists($data['Field'],$this->fields)) {
-				$alterArray[] = "DROP `{$data['Field']}`";
-			}
-		}*/
-		//print_r($this->fields);
 		$keys = array_keys($this->fields);
 		$count = -1;
 		foreach ($this->fields as $fieldName => $fieldData) {
 			$count++;
 			// build field
-			if (array_key_exists('pk',$fieldData) && $fieldData['pk'] === true) if ($pk === NULL) $pk = $fieldName; else { $pk = FALSE; break; /* multiple pri key - break */ };
-			$type = getSqlTypeFromFieldType($fieldData['type']);
-			$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
-			if ($fieldData['type'] == ftTIMESTAMP) {
-				if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
-				else $default = " DEFAULT 0";
-			} else
-			$default = $fieldData['default'] === NULL ? '' : "DEFAULT '{$fieldData['default']}'";
-			$comments = $fieldData['comments'] === NULL ? '' : "COMMENT '{$fieldData['comments']}'";
-			$collate = $fieldData['collation'] === NULL ? '' : "COLLATE '{$fieldData['collation']}'";
-
-			$len = '';
-			if ($fieldData['type'] == ftTEXT || $fieldData['type'] == ftVARCHAR) $len = "({$fieldData['length']})";
-			if (array_key_exists('unique',$fieldData) && $fieldData['unique'] === TRUE) $unique[] = "`$fieldName`$len";
-			if (array_key_exists('index',$fieldData) && $fieldData['index'] === TRUE) $index[] = "`$fieldName`$len";
+			$position = $count==0 ? "FIRST" : 'AFTER `'.$keys[$count-1].'`';
+			$col_def = $this->GetColDef($fieldName).' '.$position;
 
 			$row = NULL;
 			for ($i = 0,$rowCount = count($rows); $i < $rowCount; $i++) // find if field is already in the table
 			if (strtolower($rows[$i]['Field']) === strtolower($fieldName)) { $row = $rows[$i]; break; }
-
 			
-			$position = $count==0 ? "FIRST" : 'AFTER `'.$keys[$count-1].'`';
+			if ($row !== NULL) // field exists, "modify" it
+				$alterArray[] = "\nMODIFY $col_def";
+			else // field doesnt exist, either hasnt been renamed, or hasnt been created yet. -- NO RENAME YET
+				$alterArray[] = "\nADD $col_def";
 
-			if ($row !== NULL) {
-				// field exists, "modify" it
-				$alterArray[] = "\nMODIFY `$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']} $default {$fieldData['extra']} $comments $collate $position";
-			} else {
-				// field doesnt exist, either hasnt been renamed, or hasnt been created yet. -- NO RENAME YET
-				$alterArray[] = "\nADD `$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']} $default {$fieldData['extra']} $comments $collate $position";
-			}
-
-			//				sql_query($qry);
 			// timestamps do not set their value correctly for previously created records if the default value is current_timestamp, we must set it now, to the default value
 			if ((strtolower($fieldData['type']) == 'timestamp') && (strtolower($fieldData['default']) == 'current_timestamp')) {
 				if ($fieldData['null'] == 'null')
@@ -297,11 +278,11 @@ abstract class uTableDef implements iUtopiaModule {
 			}
 		}
 
-		foreach ($rows as $row) {
+/*		foreach ($rows as $row) {
 			if (strpos($row['Extra'],'auto_increment') !== FALSE && (!isset($this->fields[$row['Field']]) || strpos($this->fields[$row['Field']]['extra'],'auto_increment') === FALSE))
 				array_unshift($alterArray, 'MODIFY `'.$row['Field'].'` '.$row['Type']);
 			if ($row['Key'] === 'PRI') $currentPK = $row['Field'];
-		}
+		}*/
 
 		// drop all indexes
 		$indexResult = sql_query("SHOW INDEX FROM `$this->tablename`");
@@ -310,61 +291,35 @@ abstract class uTableDef implements iUtopiaModule {
 			array_unshift($alterArray,"\nDROP INDEX `".$indexRow['Key_name']."`");
 		}
 
-		// reset pk
-		//if ($pk === NULL)		ErrorLog('Must specify a PRIMARY KEY ('.get_class($this).')');
-		if ($pk === FALSE)	ErrorLog('Cannot assign multiple PRIMARY KEYS ('.get_class($this).')');
-		elseif ($pk !== NULL && $pk !== $currentPK) {
-			$dropold = $currentPK === NULL ? '' : ' DROP PRIMARY KEY,';
-			$alterArray[] = "$dropold ADD PRIMARY KEY ($pk)";
-		}
-
-		foreach ($index as $val) {
-			$alterArray[] = "\nADD INDEX ($val)";
-		}
-
-		foreach ($unique as $val) {
-			$alterArray[] = "\nADD UNIQUE ($val)";
-		}
+		$alterArray[] = ' DROP PRIMARY KEY, ADD PRIMARY KEY ('.implode(',',$this->primary).')';
+		if ($this->index) $alterArray[] = ' ADD INDEX ('.implode(',',$this->index).')';
+		if ($this->unique) $alterArray[] = ' ADD UNIQUE ('.implode(',',$this->unique).')';
 
 		sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
 		array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
-		//echo "ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";";
-		//sql_query("ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
 		foreach ($otherArray as $qry) {
 			//echo $qry;
 			sql_query($qry);
-			$err = mysql_error();
-			if (!empty($err)) die($qry."\n".$err);
 		}
 	}
+	
 	private function CreateTable() {
 		// create table
 		$pk = NULL;
 		$flds = array();
 		$qry = "CREATE TABLE `$this->tablename` (";
 		foreach ($this->fields as $fieldName => $fieldData) {
-			// check pk
-			if (array_key_exists('pk',$fieldData) && $fieldData['pk'] === true) if ($pk === NULL) $pk = $fieldName; else { $pk = FALSE; break; };
-			// build field
-			$type = getSqlTypeFromFieldType($fieldData['type']);
-			$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
-			if ($fieldData['type'] == ftTIMESTAMP) {
-				if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
-				else $default = " DEFAULT 0";
-			} else
-			$default = $fieldData['default'] === NULL ? '' : "DEFAULT '{$fieldData['default']}'";
-			$comments = $fieldData['comments'] === NULL ? '' : "COMMENT '{$fieldData['comments']}'";
-			$collate = $fieldData['collation'] === NULL ? '' : "COLLATE '{$fieldData['collation']}'";
-			$flds[] = "`$fieldName` $type$length {$fieldData['null']} $default {$fieldData['extra']} $comments $collate";
+			$flds[] = $this->GetColDef($fieldName);
 		}
-		if ($pk === NULL)		ErrorLog('Must specify a PRIMARY KEY ('.get_class($this).')');
-		elseif ($pk === FALSE)	ErrorLog('Cannot assign multiple PRIMARY KEYS ('.get_class($this).')');
-		else {
-			$flds[] = "PRIMARY KEY (`$pk`)";
-			$qry .= join(",\n",$flds)."\n) CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION.";";
-			//				echo "$qry\n";
-			sql_query($qry,true);
-		}
+
+		$flds[] = 'PRIMARY KEY ('.implode(',',$this->primary).')';
+		if ($this->index) $flds[] = ' INDEX ('.implode(',',$this->index).')';
+		if ($this->unique) $flds[] = ' UNIQUE ('.implode(',',$this->unique).')';
+
+		$qry .= join(",\n",$flds)."\n) CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION.";";
+		//echo "$qry\n";
+		sql_query($qry,true);
+
 	}
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
 	public function AddInputDate($fieldName = 'input_date') { $this->AddFieldArray($fieldName,ftTIMESTAMP,NULL,array('default'=>'CURRENT_TIMESTAMP')); }
