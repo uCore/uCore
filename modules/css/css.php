@@ -17,7 +17,7 @@ class uCSS extends uBasicModule {
 		$this->SetRewrite(true);
 		utopia::AddCSSFile($this->GetURL(),true);
 
-		self::IncludeFile(TEMPLATE_ADMIN.'/global.css');
+		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 
 		modOpts::AddOption('jQueryUI-Theme','jQuery UI Theme',null,'ui-lightness');
 		$jquitheme = modOpts::GetOption('jQueryUI-Theme');
