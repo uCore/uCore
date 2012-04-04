@@ -58,16 +58,14 @@ class modOpts extends uListDataModule implements iAdminModule {
 	public static $types = array();
 	public static function AddOption($ident,$name,$group=NULL,$init='',$fieldType=itTEXT,$values=NULL) {
 		if (!$group) $group = 'Site Options';
-		if (self::GetOption($ident) === FALSE) {
-			$obj = utopia::GetInstance(__CLASS__);
-			$obj->UpdateFields(array('ident'=>$ident,'value'=>$init));
-		}
 		self::$types[$ident] = array($fieldType,$values,$name,$group,$init);
+		return self::GetOption($ident);
 	}
 	public static function GetOption($ident) {
 		$obj = utopia::GetInstance(__CLASS__);
 		$rec = $obj->LookupRecord($ident);
 		if ($rec) return $rec['value'];
+		$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
 		if (isset(self::$types[$ident])) return self::$types[$ident][4];
 		return FALSE;
 	}
