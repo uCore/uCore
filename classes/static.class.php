@@ -1140,9 +1140,9 @@ class utopia {
 		}
 		return 0;
 	}
-	static function jsonTryDecode($value) {
+	static function jsonTryDecode($value, $assoc = true) {
 		$originalValue = $value;
-		$value = json_decode($value);
+		$value = json_decode($value,$assoc);
 		if ($value === NULL) $value = $originalValue;
 		return $value;
 	}
