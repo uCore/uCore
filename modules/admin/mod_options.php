@@ -8,8 +8,8 @@ class tabledef_ModOpts extends uTableDef {
 		// AddField($name, $type, $length, $collation='', $attributes='', $null='not null', $default='', $extra='', $comments='')
 		// SetPrimaryKey($name);
 
-		$this->AddField('ident','varchar',50);
-		$this->AddField('value','varchar',200);
+		$this->AddField('ident','varchar',100);
+		$this->AddField('value',ftLONGTEXT);
 		$this->SetPrimaryKey('ident');
 	}
 }
