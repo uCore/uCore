@@ -1219,7 +1219,7 @@ FIN;
 			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) $arr = array_combine(array_keys($arr),array_keys($arr));
 		}
 		
-		if ($stringify && is_array($arr)) {
+		if ($stringify && is_array($arr) && $arr) {
 			//if (!is_assoc($arr)) //array_flip($arr);
 //				$arr = array_combine(array_values($arr),array_values($arr));
 //			else
