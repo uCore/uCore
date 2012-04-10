@@ -1146,4 +1146,28 @@ class utopia {
 		if ($value === NULL) $value = $originalValue;
 		return $value;
 	}
+	
+	static function OutputPagination($obj,$pages,$args = array(),$pageKey = 'page') {
+		if ($pages <= 1) return;
+		if (is_string($args)) parse_str($args,$args);
+
+		$page = isset($args[$pageKey]) ? $args[$pageKey] : 0;
+		echo '<ul class="pagination">';
+		if ($page > 0) {
+			$args[$pageKey] = $page -1;
+			if (!$args[$pageKey]) unset($args[$pageKey]);
+			echo '<li><a class="btn" href="'.$obj->GetURL($args).'">&lt; Previous</a></li>';
+		}
+		for ($i = 0; $i<$pages; $i++) {
+			$args[$pageKey] = $i;
+			if (!$args[$pageKey]) unset($args[$pageKey]);
+			$url = $obj->GetURL($args);
+			echo '<li><a class="btn" href="'.$url.'">'.($i+1).'</a></li>';
+		}
+		if ($page < $pages-1) {
+			$args[$pageKey] = $page +1;
+			echo '<li><a class="btn" href="'.$obj->GetURL($args).'">Next &gt;</a></li>';
+		}
+		echo '</ul>';
+	}
 }
