@@ -178,8 +178,8 @@ function UpdateSelectedLinks() {
 			var linkUUID = getParameterByName('uuid',_href);
 			var classname = (uuid == linkUUID) ? 'active-link' : '';
 		} else {
-			if ((_href != window.location.pathname) && (_href == PATH_REL_ROOT || window.location.pathname.indexOf(_href) != 0)) return;
-			var classname = (_href == window.location.pathname) ? 'active-link' : 'active-link-parent';
+			if ((_href != window.location.pathname) && (_href != window.location.pathname+window.location.search) && (_href == PATH_REL_ROOT || window.location.pathname.indexOf(_href) != 0)) return;
+			var classname = (_href == window.location.pathname) || (_href == window.location.pathname+window.location.search) ? 'active-link' : 'active-link-parent';
 		}
 		if (!classname) return;
 		
