@@ -468,6 +468,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('updated','updated','cms');
 		$this->AddField('parent','parent','cms','Parent');
 		$this->AddField('position','position','cms','position');
+		$this->AddField('hide','hide','cms');
 		$this->AddField('template','template','cms','template');
 		$this->AddField('nav_text','nav_text','cms');
 		$this->AddField('description','description','cms','description');
@@ -482,9 +483,23 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	public function SetupParents() {
+		uEvents::AddCallback('InitComplete',array($this,'InitSitemap'));
 		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
 		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');
 		$this->SetRewrite(true);
+	}
+	function InitSitemap() {
+		$rows = $this->GetRows();
+		
+		foreach ($rows as $row) {
+			if ($row['content_time'] == '0000-00-00 00:00:00' && !$row['is_published']) continue;
+			if (!$row['is_published'] && !$row['content']) continue;
+			
+			$title = $row['nav_text'] ? $row['nav_text'] : $row['title'];
+			$url = $this->GetURL($row['cms_id']);
+			$item =& uSitemap::AddItem($row['cms_id'],$title,$url,$row['parent'],array('id'=>$row['cms_id']));
+			$item['menu'] = !$row['hide'];
+		}
 	}
 
 	static function GetHomepage() {

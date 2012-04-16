@@ -1,70 +1,45 @@
 <?php
 
-utopia::AddTemplateParser('menu1','uSitemap::DrawMenu','.*',true);
-utopia::AddTemplateParser('menu','uSitemap::DrawNestedMenu','.*',true);
+utopia::AddTemplateParser('menu1','uSitemap::GetMenu','.*',true);
+utopia::AddTemplateParser('menu','uSitemap::GetNestedMenu','.*',true);
 utopia::AddTemplateParser('sitemap','uSitemap::DrawNestedMenu','',true);
 class uSitemap {
-	static function DrawNestedMenu($parent=NULL) {
-		self::DrawMenu($parent,-1);
+	private static $items = array();
+	public static function &AddItem($id,$text,$url,$group='',$attr=null,$pos=null) {
+		if ($group === NULL) $group = '';
+		if ($pos === NULL) $pos = isset(self::$items[$group]) ? count(self::$items[$group])+1 : 0;
+		self::$items[$group][$id] = array(
+			'id'	=>	$id,
+			'text'	=>	$text,
+			'url'	=>	$url,
+			'group'	=>	$group,
+			'attr'	=>	$attr,
+			'pos'	=>	$pos,
+			'menu'	=>	true,
+		);
+		return self::$items[$group][$id];
 	}
-	static function DrawMenu($parent=NULL,$level = 1) {
-		$obj = utopia::GetInstance('uCMS_List');
-		$arr = $obj->GetNestedArray();
-		if ($parent) {
-			$newarr = self::findKey($arr,$parent);
-			$newarr = $newarr[$parent];
-			if (isset($newarr['children'])) $arr = $newarr['children'];
-			else return;
-		}
-		self::DrawChildren($arr,$level);
-	}
-	static function DrawChildren($children,$level = -1) {
-		if (!$children) return;
+	public static function GetMenu($group='',$level = 1) {
+		if (!isset(self::$items[$group])) return;
 		$level = $level -1;
-		array_sort_subkey($children,'position');
-		$obj = utopia::GetInstance('uCMS_View');
-		$i = 0;
-		$showChildren = array();
-		foreach ($children as $k=>$child) {
-			if ($child['hide']) continue;
-			if ($child['content_time'] == '0000-00-00 00:00:00' && !$child['is_published']) continue;
-			if (!$child['is_published'] && !$child['content']) continue;
-			$showChildren[$k] = $child;
-		}
-
-		$count = count($showChildren);
-		if (!$count) return;
+		
+		array_sort_subkey(self::$items[$group],'pos');
+		
 		echo '<ul class="u-menu">';
-		foreach ($showChildren as $child) {
-			$menu_title = $child['nav_text'] ? $child['nav_text'] : $child['title'];
-			//$hide = $child['hide'] ? 'hiddenItem' : '';  //class="'.$hide.'"
-			$url = $obj->GetURL($child['cms_id']);
-			//$sel = (strpos($url,$_SERVER['REQUEST_URI']) !== FALSE) ? ' u-menu-active' : '';
-			//$sel = ($url == $_SERVER['REQUEST_URI']) ? ' u-menu-active' : ''; //handled by javascript
-			$class = array();
+		foreach (self::$items[$group] as $item) {
+			if ($item['menu'] !== true) continue;
+			$attrs = BuildAttrString($item['attr']);
 
-			$class = $class ? ' class="'.implode(' ',$class).'"' : '';
-			echo '<li id="'.$child['cms_id'].'" '.$class.'>';
-			echo '<a class="cmsEdit" href="'.$url.'" title="'.$child['title'].'">'.$menu_title.'</a>';
-			if ($level !== 0) self::DrawChildren($child['children'],$child['cms_id'],$level);
+			echo '<li '.$attrs.'>';
+			echo '<a href="'.$item['url'].'" title="'.$item['text'].'">'.$item['text'].'</a>';
+			if ($level !== 0) self::GetMenu($item['id'],$level);
 			echo '</li>';
-			$i++;
 		}
 		echo '</ul>';
 	}
-        static function findKey($array,$key) {
-                if (!$key) return $array;
-                $key = strtolower($key);
-                $array = array_change_key_case($array,CASE_LOWER);
-
-                if (array_key_exists($key, $array)) return array($key => $array[$key]);
-
-                foreach ($array as $v) {
-                        $found = self::findKey($v['children'],$key);
-                        if ($found) return $found;
-                }
-                return false;
-        }
+	static function GetNestedMenu($group='') {
+		self::GetMenu($group,-1);
+	}
 }
 
 class uSitemapXML extends uBasicModule {
@@ -100,3 +75,4 @@ FIN;
 		die();
 	}
 }
+
