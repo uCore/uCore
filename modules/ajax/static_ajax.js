@@ -26,8 +26,8 @@ $(document).ready(function(){
 	
 	if (typeof(DD_belatedPNG) != 'undefined') DD_belatedPNG.fix('*');
 
-	$('li:first').addClass('first-item');
-	$('li:last').addClass('last-item');
+	$('li:first','ul').addClass('first-item');
+	$('li:last','ul').addClass('last-item');
 
 	$(".tabGroup").tabs();
 	$(".tabGroup").bind("tabsshow", function(event, ui) { 
