@@ -532,7 +532,7 @@ class uCMS_View extends uSingleDataModule {
 
 			// add to menu
 			if (!$row['hide']) {
-				uMenu::AddItem($row['cms_id'],$title,$url,$row['parent'],array('id'=>$row['cms_id']));
+				uMenu::AddItem($row['cms_id'],$title,$url,$row['parent'],array('id'=>$row['cms_id']),$row['position']);
 			}
 
 			// add to sitemap
