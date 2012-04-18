@@ -490,15 +490,24 @@ class uCMS_View extends uSingleDataModule {
 	}
 	function InitSitemap() {
 		$rows = $this->GetRows();
-		
+
 		foreach ($rows as $row) {
+			// is published
 			if ($row['content_time'] == '0000-00-00 00:00:00' && !$row['is_published']) continue;
 			if (!$row['is_published'] && !$row['content']) continue;
-			
+
 			$title = $row['nav_text'] ? $row['nav_text'] : $row['title'];
 			$url = $this->GetURL($row['cms_id']);
-			$item =& uSitemap::AddItem($row['cms_id'],$title,$url,$row['parent'],array('id'=>$row['cms_id']));
-			$item['menu'] = !$row['hide'];
+
+			// add to menu
+			if (!$row['hide']) {
+				uMenu::AddItem($row['cms_id'],$title,$url,$row['parent'],array('id'=>$row['cms_id']));
+			}
+
+			// add to sitemap
+			$additional = array();
+			if ($row['is_home']) $additional['priority'] = 1;
+			uSitemap::AddItem('http://'.utopia::GetDomainName().$url,$additional);
 		}
 	}
 
