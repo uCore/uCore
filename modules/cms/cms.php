@@ -251,17 +251,18 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->FieldStyles_Set('description',array('width'=>'100%'));
 		$this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Add Widget');
 
+		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
+
 		$this->AddField('content','content','cms','Page Content',itHTML);
 		$this->AddPreProcessCallback('content',array($this,'processWidget'));
 		$this->FieldStyles_Set('content',array('width'=>'100%','height'=>'30em'));
 		$this->AddField('content_published','content_published','cms');
 
-		$this->AddField('content_time','content_time','cms','Last Saved');
-		$this->AddField('content_published_time','content_published_time','cms','Last Published');
+		$this->AddField('content_time','content_time','cms');
+		$this->AddField('content_published_time','content_published_time','cms');
 
 		$this->AddField('is_published','is_published','cms');
 
-		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
 		$this->AddFilter('cms_id',ctEQ);
 	}
 	
