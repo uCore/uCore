@@ -53,11 +53,13 @@ class module_TinyMCE extends uBasicModule {
 			$htmlOpts = array();
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
+
 			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,save,autoresize";
 			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor';
+			$htmlOpts['theme_advanced_buttons1_add_before'] = "save,|,";
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media,|,insertlayer,moveforward,movebackward,absolute';
 			$htmlOpts['theme_advanced_buttons3_add'] = ",|,styleprops,spellchecker,|,tablecontrols";
-			$htmlOpts['theme_advanced_buttons4'] = "save,|,addWidgetButton";
+			$htmlOpts['theme_advanced_buttons4'] = "addWidgetButton";
 
 			$baseOpts = json_encode($options);
 			$richOpts = json_encode($richOpts);
