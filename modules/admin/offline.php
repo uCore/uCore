@@ -32,7 +32,7 @@ class module_Offline extends uBasicModule {
 		$obj = utopia::GetInstance($parent);
 		if ($obj instanceof iAdminModule) return;
 
-		//don't use SetCurrentModule because we don't want to 301 redirect 
+		//don't use SetCurrentModule because we don't want to redirect
 		$this->RunModule();
 		return FALSE;
 	}
