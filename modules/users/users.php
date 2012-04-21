@@ -130,8 +130,6 @@ class uAssertAdminUser extends uBasicModule {
 		if ($user_id) {
 			// now set this users role
 			$obj->UpdateField('role',-1,$user_id);
-			// and automatically verify the email
-			$obj->UpdateField('email_confirm_code',true,$user_id);
 			unset($_SESSION['db_admin_authed']);
 			echo '<p>Admin user has now been set up.</p>';
 		}
