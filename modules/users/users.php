@@ -95,9 +95,17 @@ class uAssertAdminUser extends uBasicModule {
 		module_Offline::IgnoreClass(__CLASS__);
 	}
 	public function AssertAdminUser() {
+		// admin user exists?
 		$obj = utopia::GetInstance('uUsersList');
 		$rec = $obj->LookupRecord(array('_roles_pk'=>-1),true);
-		if (!$rec) utopia::SetCurrentModule(__CLASS__);
+		if ($rec) return;
+
+		// module is persist?
+		$curr = utopia::GetInstance(utopia::GetCurrentModule());
+		if (flag_is_set($curr->GetOptions(),PERSISTENT)) return;
+
+		// redirect to this module
+		$this->AssertURL(307,false);
 	}
 	public function RunModule() {
 		$obj = utopia::GetInstance('uUsersList');
@@ -130,10 +138,10 @@ class uAssertAdminUser extends uBasicModule {
 		if ($user_id) {
 			// now set this users role
 			$obj->UpdateField('role',-1,$user_id);
-			// and automatically verify the email
-			$obj->UpdateField('email_confirm_code',true,$user_id);
 			unset($_SESSION['db_admin_authed']);
-			echo '<p>Admin user has now been set up.</p>';
+			uNotices::AddNotice('Admin user has now been set up.');
+			uUserLogin::SetLogin($user_id);
+			header('Location: '.PATH_REL_CORE); die();
 		}
 	}
 }
