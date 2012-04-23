@@ -169,10 +169,9 @@ abstract class uBasicModule implements iUtopiaModule {
 		}
 		return true;
 	}
-
-	public $hasRun = false;
-	public function _RunModule() {
-		if (get_class($this) == utopia::GetCurrentModule()) {
+	
+	public function AssertURL($http_response_code = 301, $currentOnly = true) {
+		if (!$currentOnly || get_class($this) == utopia::GetCurrentModule()) {
 			$url = $this->GetURL($_GET);
 			$checkurl = $_SERVER['REQUEST_URI'];
 			if (($this->isSecurePage && !utopia::IsRequestSecure()) || $checkurl !== $url) {
@@ -182,9 +181,15 @@ abstract class uBasicModule implements iUtopiaModule {
 					if ($this->isSecurePage) $layer .= 's';
 					$abs = $layer.'://'.utopia::GetDomainName();
 				}
-				header('Location: '.$abs.$url,true,301); die();
+				header('Location: '.$abs.$url,true,$http_response_code); die();
 			}
 		}
+	}
+
+	public $hasRun = false;
+	public function _RunModule() {
+		$this->AssertURL();
+		
 		if ($this instanceof iAdminModule && utopia::UsingTemplate()) utopia::UseTemplate(TEMPLATE_ADMIN);
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
