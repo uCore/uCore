@@ -338,7 +338,7 @@ EOF;
 			return;
 		}
 		if ($fieldAlias == 'cms_id') $newValue = UrlReadable($newValue);
-		if ($fieldAlias == 'content') {
+		if (substr($fieldAlias,0,8) == 'content:') {
 			// replace uWidgetDiv with pragma
 			$html = str_get_html(stripslashes($newValue));
 			if ($html) {
@@ -348,6 +348,13 @@ EOF;
 				}
 				$newValue = $html;
 			}
+			$rec = $this->LookupRecord($pkVal);
+			$contentarr = utopia::jsonTryDecode($rec['content']);
+			if (!is_array($contentarr)) $contentarr = array(''=>$contentarr);
+			$id = substr($fieldAlias,8); if (!$id) $id = '';
+			$contentarr[$id] = (string)$newValue;
+			$fieldAlias = 'content';
+			$newValue = $contentarr;
 
 			$this->SetFieldType('content_time',ftRAW);
 			$this->UpdateField('content_time','NOW()',$pkVal);
@@ -380,10 +387,55 @@ EOF;
 		return '<span class="btn" onclick="ChooseWidget()">Insert Widget</span>';
 	}
 	public function SetupParents() {
+		utopia::AddTemplateParser('content',array($this,'getEditor'),'.*');
 		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 		$this->AddParent('uCMS_List','cms_id');
 		$this->AddChild('uCMS_View','cms_id','link');
 		$this->AddParentCallback('uCMS_View',array($this,'editPageCallback'));
+	}
+	public function getEditor($id = '') {
+		$canEdit = uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE;
+		// get content
+		$rec = uCMS_View::findPage();
+		
+		$content = utopia::jsonTryDecode($rec['content_published']);
+		if ($rec['content_time'] == 0)
+			$content = utopia::jsonTryDecode($rec['content']);
+		if ($canEdit && isset($_GET['edit']))
+			$content = utopia::jsonTryDecode($rec['content']);
+		
+		if (!is_array($content)) $content = array( '' => $content);
+		if (!isset($content[$id])) { $content[$id] = ''; }
+		
+		if ($canEdit && isset($_GET['edit'])) {
+			$this->fields['content:'.$id] = $this->fields['content'];
+			$this->fields['content:'.$id]['attr']['mce_options']['theme_advanced_toolbar_location'] = 'external';
+			$rec['content:'.$id] = $content[$id];
+			return $this->GetCell('content:'.$id,$rec,'');
+		}
+		
+			
+		return $content[$id];
+	}
+	public function ResetField($fieldAlias,$pkVal = NULL) {
+		if ($fieldAlias == 'content' && $pkVal) {
+			$canEdit = uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE;
+			$rec = $this->LookupRecord($pkVal);
+			$content = utopia::jsonTryDecode($rec['content']);
+			if (is_array($content)) {
+				foreach ($content as $id=>$v) {
+					$this->fields['content:'.$id] = $this->fields['content'];
+					$this->fields['content:'.$id]['attr']['mce_options'][''] = 'external';
+					$rec['content:'.$id] = $v;
+					$enc_name = $this->GetEncodedFieldName('content:'.$id,$pkVal);
+					$data = $this->GetCellData('content:'.$id,$rec,$this->GetTargetURL('content:'.$id,$rec));
+					
+					utopia::AjaxUpdateElement($enc_name,$data);
+				}
+				return;
+			}
+		}
+		return parent::ResetField($fieldAlias,$pkVal);
 	}
 	public function editPageCallback($parent) {
 		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return;
@@ -415,8 +467,8 @@ EOF;
 		uAdminBar::AddItem('Edit Page Information'.$pubCell,$c);
 
 		// clear output
-		utopia::SetVar('content','');
-		echo $this->GetCell('content',$rec,'',itHTML);
+		//utopia::SetVar('content',$this->GetCell('content',$rec,'',itHTML));
+		utopia::SetVar('content','{content}');
 	}
 	public function RunModule() {
 		$this->ShowData();
@@ -441,14 +493,13 @@ class uCMS_View extends uSingleDataModule {
 	}
 	static function templateParser($id) {
 		$obj = utopia::GetInstance('uCMS_View');
-		$rec = $obj->GetRows($id);
-		$rec = $rec[0];
+		$rec = $obj->LookupRecord($id);
 		$content = $rec['content_published'];
 		if (isset($_GET['preview']) && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') !== FALSE)
 			$content = $rec['content'];
 		if ($rec['content_time'] == 0)
 			$content = $rec['content'];
-		return '<div class="cms-'.$id.'">'.$content.'</div>';
+		return '<div class="cms-'.$id.'">{content}</div>';
 	}
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 		if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
