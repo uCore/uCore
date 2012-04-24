@@ -790,9 +790,20 @@ class utopia {
 						while (self::MergeVars($template));
 						self::SetVar('content',$template);
 					}
-					self::UseTemplate(str_replace(PATH_ABS_ROOT,'',str_replace(basename($templateDir),$inifile['parent'],$templateDir)));
-					self::OutputTemplate();
-					return;
+
+					$nextTemplate = null;
+					if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {
+						$nextTemplate = $inifile['parent'];
+					} else {
+						$nextTemplate = str_replace(PATH_ABS_ROOT,'',$templateDir);
+						$nextTemplate = dirname($nextTemplate).'/'.$inifile['parent'];
+					}
+
+					if ($nextTemplate) {
+						self::UseTemplate($nextTemplate);
+						self::OutputTemplate();
+						return;
+					}
 				}
 			}
 
