@@ -1179,13 +1179,13 @@ FIN;
 
 	public function GetValues($alias) {
 		if (!isset($this->fields[$alias])) {
-                        $fltr = $this->FindFilter($alias);
-                        return $fltr['values'];
+			$fltr = $this->FindFilter($alias);
+			return $fltr['values'];
 		}
 
 		if (isset($this->fields[$alias]['values_cache'])) return $this->fields[$alias]['values_cache'];
 
-		return $this->SetValuesCache($alias,$this->FindValues($alias,$this->fields[$alias]['values']));
+		return $this->SetValuesCache($alias,$this->FindValues($alias,isset($this->fields[$alias]['values'])?$this->fields[$alias]['values']:NULL));
 	}
 
 	public function SetValuesCache($alias,$vals) {
@@ -2595,7 +2595,7 @@ FIN;
 			$pkField = $this->GetPrimaryKey();
 		$fldId = $this->GetEncodedFieldName($fieldName,$row[$pkField]);
 		$celldata = $this->GetCellData($fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
-		return "<!-- NoProcess --><span id=\"$fldId\">$celldata</span><!-- /NoProcess -->";
+		return "<!-- NoProcess --><span class=\"$fldId\">$celldata</span><!-- /NoProcess -->";
 	}
 
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
@@ -2820,7 +2820,7 @@ abstract class uListDataModule extends uDataModule {
 			// add the row
 			$newRec = $this->LookupRecord($pkVal);
 			$ov = base64_encode($this->DrawRow($newRec));
-			AjaxEcho("$('#$enc_name').parents('TABLE.datalist:eq(0)').children('TBODY').append(Base64.decode('$ov'));\n");
+			AjaxEcho("$('.$enc_name').parents('TABLE.datalist:eq(0)').children('TBODY').append(Base64.decode('$ov'));\n");
 		}
 
 		return $ret;
