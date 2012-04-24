@@ -2615,7 +2615,7 @@ FIN;
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
 		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$row);
 
-		$fieldData = $this->fields[$fieldName];
+		$fieldData = isset($this->fields[$fieldName]) ? $this->fields[$fieldName] : array();
 		//$url = htmlentities($url);
 		// htmlentities moved here from the to do.
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
