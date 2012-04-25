@@ -117,8 +117,8 @@ class module_TinyMCE extends uBasicModule {
 		mb.dialog('close');
 	}
 	var mceDefaultOptions = $baseOpts;
-	var mceRichOptions = $.extend({},mceDefaultOptions,$richOpts);
-	var mceHtmlOptions = $.extend({},mceDefaultOptions,$htmlOpts);
+	var mceRichOptions = $.extend({},$richOpts);
+	var mceHtmlOptions = $.extend({},$htmlOpts);
 FIN
 );
 		}
@@ -140,7 +140,7 @@ FIN
 		}
 		$optName = 'mceRichOptions';
 		if ($inputType == itHTML) $optName = 'mceHtmlOptions';
-		$script = '<script type="text/javascript">tinyMCE.init($.extend({},'.$optName.$extendOpts.',{editor_selector:"'.$saveClass.'"}))</script>';
+		$script = '<script type="text/javascript">tinyMCE.init($.extend({},mceDefaultOptions,'.$optName.$extendOpts.',{editor_selector:"'.$saveClass.'"}))</script>';
 		
 		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).$script;
 	}
