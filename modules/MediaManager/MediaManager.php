@@ -38,7 +38,13 @@ FIN
 		header("X-Robots-Tag: noindex", true);
 
 		utopia::CancelTemplate();
-		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename');
+		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename','fileManager::GetIcon');
+	}
+	static function GetIcon($path) {
+		$type = utopia::GetMimeType($path);
+		if (strpos($type,'image/') !== 0) return false;
+		$path = str_replace(PATH_UPLOADS,'/uploads',$path);
+		return $path.'?w=64&h=64';
 	}
 	static function Init() {
 		uJavascript::IncludeText(<<<FIN
