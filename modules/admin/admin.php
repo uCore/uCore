@@ -32,7 +32,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		$this->UpdateHtaccess();
 
 		if (uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE)
-			uAdminBar::AddItem('<a class="dashboard-link" href="'.PATH_REL_CORE.'">Dashboard</a>','',-10);
+			uAdminBar::AddItem('<a class="dashboard-link" href="'.PATH_REL_CORE.'">Dashboard</a>',FALSE,-100);
 	}
 	public function optimizeTables() {
 		echo '<h3>Optimise Tables</h3>';

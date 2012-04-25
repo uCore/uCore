@@ -1,7 +1,7 @@
-html { margin-top: 36px; }
 .mceExternalToolbar { z-index:1001; }
-.admin-bar {
-	font-family: Arial; font-size: 12px;
+
+.admin-bar { position:relative; font-family: Arial; font-size:12px; }
+.admin-bar .admin-menu {
 	position:fixed;right:0;top:0;left:0;
 	z-index:1000;
 	background-color:#333;

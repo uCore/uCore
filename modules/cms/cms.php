@@ -449,6 +449,7 @@ EOF;
 		}
 
 		$this->fields['content']['attr']['mce_options']['theme_advanced_toolbar_location'] = 'external';
+		uAdminBar::AddItem(FALSE,'',10000,'mceToolbarContainer');
 
 		ob_start();
 		$this->ClearFilters();
@@ -463,8 +464,8 @@ EOF;
 		
 		$obj = utopia::GetInstance('uCMS_View');
 		$url = $obj->GetURL(array('cms_id'=>$rec['cms_id']));
-		uAdminBar::AddItem('<a href="'.$url.'">Stop Editing</a>');
 		uAdminBar::AddItem('Edit Page Information'.$pubCell,$c);
+		uAdminBar::AddItem('<a href="'.$url.'">Stop Editing</a>');
 
 		// clear output
 		//utopia::SetVar('content',$this->GetCell('content',$rec,'',itHTML));

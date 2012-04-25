@@ -4,4 +4,5 @@ $(function () {
 		if (!$body) return;
 		$body.animate({height:'toggle',width:'toggle'});
 	});
+	$('html').css('margin-top',parseInt($('html').css('margin-top'))+$('.admin-menu').height());
 });
