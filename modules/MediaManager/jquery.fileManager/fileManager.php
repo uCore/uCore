@@ -71,10 +71,10 @@ class jqFileManager {
 		return $newpath;
 	}
 
-	static function AddIcon($path, $title='',$folder=false) {
-		self::$data[] = array('path'=>$path,'title'=>$title,'type'=>$folder);
+	static function AddIcon($path, $title='',$folder=false,$icon='') {
+		self::$data[] = array('path'=>$path,'title'=>$title,'type'=>$folder,'icon'=>$icon);
 	}
-	static function ProcessAjax($rootPath,$deleteCallback=null,$renameCallback=null) {
+	static function ProcessAjax($rootPath,$deleteCallback=null,$renameCallback=null,$iconCallback=null) {
 		$pMod = array_key_exists('path',$_POST) ? $_POST['path'] : '';
 		$path = $rootPath.'/'.trim($pMod,'/');
 		$path = self::ResolvePath($path);
@@ -133,7 +133,8 @@ class jqFileManager {
 			$filename = basename($file);
 			if ($filename === '..' || $filename === '.') continue;
 			if (!is_dir($file) && array_key_exists('filter',$_POST) && !preg_match('/'.$_POST['filter'].'/i',$filename)) continue;
-			self::AddIcon($filename,$filename,is_dir($file)?1:0);
+			$icon = (is_callable($iconCallback)) ? call_user_func($iconCallback,$file) : '';
+			self::AddIcon($filename,$filename,is_dir($file)?1:0,$icon);
 		}
 
 		// uPath is full path less rootpath less filename

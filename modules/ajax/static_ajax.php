@@ -82,15 +82,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 		$fileMod = filemtime($path);
 		$etag = sha1($fileMod.'-'.filesize($path));
 
-		$cType = NULL;
-		if (function_exists('finfo_open')) {
-			$finfo = finfo_open(FILEINFO_MIME_TYPE);
-			$cType = finfo_file($finfo,$path);
-		} elseif (function_exists('mime_content_type')) {
-			$cType = mime_content_type($path);
-		} else {
-			ob_start();system("file -bi '$path'",$cType);ob_end_clean();
-		}
+		$cType = utopia::GetMimeType($path);
 
 		utopia::Cache_Check($etag,$cType,basename($path),$fileMod);
 
