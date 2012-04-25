@@ -22,10 +22,16 @@ class uAdminBar {
 		$body = array();
 		foreach($items as $r => $itm) {
 			$r = 'menu_'.$r;
-			if ($itm['class']) $r .= ' '.$itm['class'];
-			$toggle = ($itm['menu'] && $itm['body']) ? ' class="toggle '.$r.'"' : '';
-			if ($itm['menu'] !== FALSE) $arr[] = '<li'.$toggle.' rel="'.$r.'">'.$itm['menu'].'</li>';
-			if ($itm['body'] !== FALSE) $body[] = '<div class="admin-body-item '.$r.'">'.$itm['body'].'</div>';
+			$class = array($r);
+			if ($itm['class']) $class[] = $itm['class'];
+			if ($itm['menu'] && $itm['body']) $class[] = 'toggle';
+
+			$classt = ' class="'.implode(' ',$class).'"';
+			if ($itm['menu'] !== FALSE) $arr[] = '<li'.$classt.' rel="'.$r.'">'.$itm['menu'].'</li>';
+
+			$class[] = 'admin-body-item';
+			$classt = ' class="'.implode(' ',$class).'"';
+			if ($itm['body'] !== FALSE) $body[] = '<div'.$classt.'>'.$itm['body'].'</div>';
 		}
 
 		return '<div class="admin-bar"><ul class="admin-menu">'.implode('',$arr).'</ul><div class="admin-body">'.implode('',$body).'</div></div>';
