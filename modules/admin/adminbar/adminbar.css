@@ -1,5 +1,3 @@
-.mceExternalToolbar { z-index:1001; }
-
 .admin-bar { position:relative; font-family: Arial; font-size:12px; }
 .admin-bar .admin-menu {
 	position:fixed;right:0;top:0;left:0;
@@ -48,6 +46,3 @@
 
 .admin-bar .layoutDetailSection { width:50% }
 .admin-bar .inputtype-text { width:100%; }
-
-.mceEditor.defaultSkin table.mceLayout { border: 0; }
-.mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }

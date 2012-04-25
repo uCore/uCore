@@ -375,12 +375,6 @@ EOF;
 		return $ret;
 	}
 	public function getPossibleBlocks($val,$pk,$original) {
-		$t = uCMS_View::GetTemplate($pk);
-		$cssfiles = utopia::GetTemplateCSS(PATH_REL_ROOT.$t);
-		$cssfiles[] = PATH_ABS_CORE.'default.css';
-		$cssfiles = array_map('utopia::GetRelativePath',$cssfiles);
-		if ($cssfiles) $this->fields['content']['attr']['mce_options']['content_css'] = implode(',',$cssfiles);
-		
 		$obj = utopia::GetInstance('uWidgets_List');
 		$rows = $obj->GetRows();
 		foreach (uWidgets::$staticWidgets as $widgetID => $callback) $rows[]['block_id'] = $widgetID;
@@ -444,9 +438,16 @@ EOF;
 			return;
 		}
 
-		uAdminBar::AddItem('',FALSE,10000,'defaultSkin mceToolbarContainer');
+		echo '<style type="text/css">.mceEditor.defaultSkin table.mceLayout { border: 0; } .mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }</style>';
 
-		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false});');
+		$t = uCMS_View::GetTemplate($rec['cms_id']);
+		$cssfiles = utopia::GetTemplateCSS(PATH_REL_ROOT.$t);
+		$cssfiles[] = PATH_ABS_CORE.'default.css';
+		$cssfiles = array_map('utopia::GetRelativePath',$cssfiles);
+		$cssfiles = $cssfiles ? ','.json_encode(array('content_css'=>implode(',',$cssfiles))) : '';
+		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false}'.$cssfiles.');');
+
+		uAdminBar::AddItem('',FALSE,10000,'defaultSkin mceToolbarContainer');
 		uJavascript::AddText('function moveMceToolbars() {$(".mceExternalToolbar").appendTo(".mceToolbarContainer");}; InitJavascript.add(moveMceToolbars); $(window).load(moveMceToolbars);');
 
 		ob_start();
@@ -467,7 +468,7 @@ EOF;
 
 		// clear output
 		//utopia::SetVar('content',$this->GetCell('content',$rec,'',itHTML));
-		utopia::SetVar('content','{content}');
+		//utopia::SetVar('content','{content}');
 	}
 	public function RunModule() {
 		$this->ShowData();

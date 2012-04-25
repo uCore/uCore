@@ -25,6 +25,9 @@
 .admin-bar .mceExternalToolbar .mceToolbar {
 	float:left; width:auto; margin-right:20px;
 }
+.admin-bar .mceExternalToolbar td.mceToolbar {
+	width:100%;
+}
 .admin-bar .mceExternalClose {
   display:none !important;
 }
