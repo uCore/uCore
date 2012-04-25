@@ -1280,6 +1280,7 @@ FIN;
 	}
 
 	public function FieldStyles_Get($field,$value=NULL) {
+		if (strpos($field,':') !== FALSE) list($field) = explode(':',$field);
 		if (!isset($this->fields[$field])) return null;
 		$inputType = $this->fields[$field]['inputtype'];
 		$defaultStyles = array_key_exists($inputType,$this->defaultStyles) ? $this->defaultStyles[$inputType] : array();
@@ -2615,7 +2616,12 @@ FIN;
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
 		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$row);
 
-		$fieldData = isset($this->fields[$fieldName]) ? $this->fields[$fieldName] : array();
+		$fieldData = array();
+		if (isset($this->fields[$fieldName])) $fieldData = $this->fields[$fieldName];
+		if (!$fieldData && strpos($fieldName,':') !== FALSE) {
+			list($vname) = explode(':',$fieldName);
+			if (isset($this->fields[$vname])) $fieldData = $this->fields[$vname];
+		}
 		//$url = htmlentities($url);
 		// htmlentities moved here from the to do.
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
