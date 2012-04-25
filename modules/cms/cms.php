@@ -444,8 +444,9 @@ EOF;
 			return;
 		}
 
-		$this->fields['content']['attr']['mce_options']['theme_advanced_toolbar_location'] = 'external';
 		uAdminBar::AddItem(FALSE,'',10000,'mceToolbarContainer');
+
+		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external"});');
 
 		ob_start();
 		$this->ClearFilters();
