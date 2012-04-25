@@ -408,10 +408,8 @@ EOF;
 		if (!isset($content[$id])) { $content[$id] = ''; }
 		
 		if ($canEdit && isset($_GET['edit'])) {
-			$this->fields['content:'.$id] = $this->fields['content'];
-			$this->fields['content:'.$id]['attr']['mce_options']['theme_advanced_toolbar_location'] = 'external';
 			$rec['content:'.$id] = $content[$id];
-			return $this->GetCell('content:'.$id,$rec,'');
+			return $this->GetCell('content:'.$id,$rec);
 		}
 		
 			
@@ -424,11 +422,9 @@ EOF;
 			$content = utopia::jsonTryDecode($rec['content']);
 			if (is_array($content)) {
 				foreach ($content as $id=>$v) {
-					$this->fields['content:'.$id] = $this->fields['content'];
-					$this->fields['content:'.$id]['attr']['mce_options'][''] = 'external';
 					$rec['content:'.$id] = $v;
 					$enc_name = $this->GetEncodedFieldName('content:'.$id,$pkVal);
-					$data = $this->GetCellData('content:'.$id,$rec,$this->GetTargetURL('content:'.$id,$rec));
+					$data = $this->GetCellData('content:'.$id,$rec);
 					
 					utopia::AjaxUpdateElement($enc_name,$data);
 				}
