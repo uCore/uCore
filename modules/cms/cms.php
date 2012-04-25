@@ -444,9 +444,10 @@ EOF;
 			return;
 		}
 
-		uAdminBar::AddItem(FALSE,'',10000,'mceToolbarContainer');
+		uAdminBar::AddItem('',FALSE,10000,'defaultSkin mceToolbarContainer');
 
 		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external"});');
+		uJavascript::AddText('function moveMceToolbars() {$(".mceExternalToolbar").appendTo(".mceToolbarContainer");}; InitJavascript.add(moveMceToolbars); $(window).load(moveMceToolbars);');
 
 		ob_start();
 		$this->ClearFilters();

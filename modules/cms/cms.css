@@ -10,3 +10,21 @@
 
 .cmsItem.ui-treesort-folder { padding-left:0; }
 .cmsItem .cmsItem { padding-top:1px; min-height:18px; margin: 1px 0 0 16px; }
+
+.admin-bar .admin-menu .mceToolbarContainer { display: block; border-left:0; clear:both; padding:0; width:100%;}
+.admin-bar .mceExternalToolbar {
+	float:left;
+	position:relative !important;
+	width:100%;
+	top:0 !important;
+	z-index:1;
+}
+.admin-bar .mceExternalToolbar table {
+	width:100%;
+}
+.admin-bar .mceExternalToolbar .mceToolbar {
+	float:left; width:auto; margin-right:20px;
+}
+.admin-bar .mceExternalClose {
+  display:none !important;
+}
