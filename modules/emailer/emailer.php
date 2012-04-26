@@ -174,7 +174,7 @@ class uEmailer extends uDataModule {
 
 		$obj = utopia::GetInstance('uEmailTemplateAttachmentList');
 		$templateAttachments = $obj->GetRows(array('doc_id'=>$ident));
-		foreach ($templateAttachments as $attachment) {
+		if ($templateAttachments) foreach ($templateAttachments as $attachment) {
 			$attachments[] = Swift_Attachment::newInstance($attachment['attachment'], $attachment['attachment_filename'], $attachment['attachment_filetype']);
 		}
 
@@ -184,12 +184,12 @@ class uEmailer extends uDataModule {
 			$body = self::ReplaceData($item,$row['body']);
 			$recip = explode(',',$item[$emailField]);
 
-			$failures = array_merge($failures,self::SendEmail($subject,$body,$recip,$from,$attachments));
+			$failures = array_merge($failures,self::SendEmail($recip,$subject,$body,$from,$attachments));
 		}
 		return $failures;
 	}
 
-	public static function SendEmail($subject,$content,$to,$from=null,$attachments=null) {
+	public static function SendEmail($to,$subject,$content,$from=null,$attachments=null) {
 		if (modOpts::GetOption('smtp_host')) {
 			$transport = Swift_SmtpTransport::newInstance(modOpts::GetOption('smtp_host'), modOpts::GetOption('smtp_port'))
 				->setUsername(modOpts::GetOption('smtp_user'))
@@ -207,7 +207,7 @@ class uEmailer extends uDataModule {
 		$mailer = Swift_Mailer::newInstance($transport);
 		$message = Swift_Message::newInstance()->setFrom($from);
 
-		foreach ($attachments as $attachment) {
+		if ($attachments) foreach ($attachments as $attachment) {
 			if (!$attachment) continue;
 			if ($attachment instanceof Swift_Attachment)
 				$message->attach($attachment);
@@ -250,3 +250,4 @@ class uEmailer extends uDataModule {
 		return $output;
 	}
 }
+
