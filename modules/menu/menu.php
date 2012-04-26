@@ -7,6 +7,7 @@ class uMenu {
 	private static $items = array();
 	public static function &AddItem($id,$text,$url,$group='',$attr=null,$pos=null) {
 		if ($group === NULL) $group = '';
+		$group = strtolower($group);
 		if ($pos === NULL) $pos = isset(self::$items[$group]) ? count(self::$items[$group])+1 : 0;
 		self::$items[$group][$id] = array(
 			'id'	=>	$id,
@@ -19,6 +20,7 @@ class uMenu {
 		return self::$items[$group][$id];
 	}
 	public static function GetMenu($group='',$level = 1) {
+		$group = strtolower($group);
 		if (!isset(self::$items[$group])) return;
 		$level = $level -1;
 		
