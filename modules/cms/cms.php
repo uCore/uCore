@@ -392,11 +392,13 @@ EOF;
 		// get content
 		$rec = uCMS_View::findPage();
 		
-		$content = utopia::jsonTryDecode($rec['content_published']);
+		$content = $rec['content_published'];
 		if ($rec['content_time'] == 0)
-			$content = utopia::jsonTryDecode($rec['content']);
-		if ($canEdit && isset($_GET['edit']))
-			$content = utopia::jsonTryDecode($rec['content']);
+			$content = $rec['content'];
+		if ($canEdit && (isset($_GET['edit']) || isset($_GET['preview'])))
+			$content = $rec['content'];
+
+		$content = utopia::jsonTryDecode($content);
 		
 		if (!is_array($content)) $content = array( '' => $content);
 		if (!isset($content[$id])) { $content[$id] = ''; }
