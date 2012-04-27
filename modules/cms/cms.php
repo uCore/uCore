@@ -450,7 +450,7 @@ EOF;
 		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false}'.$cssfiles.');');
 
 		uAdminBar::AddItem('',FALSE,10000,'defaultSkin mceToolbarContainer');
-		uJavascript::AddText('function moveMceToolbars() {$(".mceExternalToolbar").appendTo(".mceToolbarContainer");}; InitJavascript.add(moveMceToolbars); $(window).load(moveMceToolbars);');
+		uJavascript::AddText('function moveMceToolbars() {$(".mceExternalToolbar").appendTo(".mceToolbarContainer"); $(".mceExternalToolbar,.mceToolbarContainer").click(function() {console.log(this);$(this).show();});}; InitJavascript.add(moveMceToolbars); $(window).load(moveMceToolbars);');
 
 		ob_start();
 		$this->ClearFilters();
