@@ -368,6 +368,8 @@ class utopia {
 				$out .= "<input type=\"text\" $attr value=\"$val\"/>";
 				break;
 			case itTEXTAREA:
+				//sanitise value.
+				if (!utopia::SanitiseValue($defaultValue,'string') && !utopia::SanitiseValue($defaultValue,'NULL')) $defaultValue = 'Value has been sanitised: '.var_export($defaultValue,true);
 				$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
 				//				settype($possibleValues,'integer');
 				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " cols=\"$possibleValues\" rows=\"".floor($possibleValues*0.08)."\"" : "";
@@ -1196,6 +1198,9 @@ class utopia {
 	}
 	
 	static function SanitiseValue(&$value,$type,$default=null,$isRegex=false) {
+		$type = strtolower($type);
+		if ($type === 'null') $type = 'NULL';
+		if ($type === 'float') $type = 'double';
 		if (($isRegex && preg_match($type,$value) > 0) || (gettype($value) !== $type)) {
 			if ($default !== null) $value = $default;
 			return false;
