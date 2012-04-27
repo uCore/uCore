@@ -1152,6 +1152,7 @@ class utopia {
 		return 0;
 	}
 	static function jsonTryDecode($value, $assoc = true) {
+		if (!is_string($value)) return $value;
 		$originalValue = $value;
 		$value = json_decode($value,$assoc);
 		if ($value === NULL) $value = $originalValue;
@@ -1192,5 +1193,13 @@ class utopia {
 			echo '<li><a class="btn" href="'.$obj->GetURL($args).'">Next &gt;</a></li>';
 		}
 		echo '</ul>';
+	}
+	
+	static function SanitiseValue(&$value,$type,$default=null,$isRegex=false) {
+		if (($isRegex && preg_match($type,$value) > 0) || (gettype($value) !== $type)) {
+			if ($default !== null) $value = $default;
+			return false;
+		}
+		return true;
 	}
 }
