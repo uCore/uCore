@@ -141,10 +141,12 @@ class uCustomWidget implements iWidget {
 	public static function getPossibleFields($originalVal,$pk,$processedVal,$rec) {
 		$meta = json_decode($rec['__metadata'],true);
 		if (!$meta || !isset($meta['module']) || !$meta['module']) return 'Please select a module.';
+		if (!class_exists($meta['module'])) return 'Widget type does not exist';
 		$obj = utopia::GetInstance($meta['module']);
 		if (!$obj) return '';
 		$fields = $obj->fields;
 		$ret = '';
+		$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">url</span>";
 		foreach ($fields as $field) {
 			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">{$field['alias']}</span>";
 		}
@@ -159,7 +161,9 @@ class uCustomWidget implements iWidget {
 		if (!isset($meta['limit'])) $meta['limit'] = null;
 		if (!isset($meta['content'])) $meta['content'] = null;
 
-		if ($meta['module'] && ($instance = utopia::GetInstance($meta['module']))) {
+		if (!$meta['module'] || !class_exists($meta['module'])) return '';
+
+		if (($instance = utopia::GetInstance($meta['module']))) {
 			foreach ($instance->fields as $fieldName => $fieldInfo) {
 				if (isset($fieldInfo['ismetadata']) && !isset($meta[$fieldName])) $meta[$fieldName] = null;
 			}
@@ -209,16 +213,17 @@ class uCustomWidget implements iWidget {
 			$repeatable = $ele;
 		}
 	
+		$obj = utopia::GetInstance($meta['module']);
 		if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$repeatable,$matches,PREG_PATTERN_ORDER)) {
 			$searchArr = $matches[0];
 			$typeArr = isset($matches[1]) ? $matches[1] : false;
 			$varsArr = isset($matches[2]) ? $matches[2] : false;
 			foreach ($rows as $row) {
+				$row['url'] = $obj->GetURL($row[$obj->GetPrimaryKey()]);
 				$c = $repeatable;
 				foreach ($searchArr as $k => $search) {
 					$field = $varsArr[$k];
 					if (!isset($row[$field])) continue;
-					$obj = utopia::GetInstance($meta['module']);
 					switch ($typeArr[$k]) {
 						case 'u':
 							$replace = $obj->PreProcess($field,$row[$field],$row);

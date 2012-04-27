@@ -23,7 +23,8 @@ class uErrorHandler {
 		$fullError = sprintf("<b>ERROR</b> [%s] %s<br />\n  Error on line %s in file %s<br />\n%s",$e->getCode(),$e->getMessage(),$e->getLine(),$e->getFile(),nl2br($e->getTraceAsString()));
 		DebugMail('Server Error: '.$e->getCode(),$fullError);
 
-		$role = uUserRoles::GetUserRole();
+		$role = null;
+		if (class_exists('uUserRoles')) $role = uUserRoles::GetUserRole();
 		if ($role && $role[0] !== '-1') $fullError = 'An error occurred. The site administrator has been notified.';
 		if (!AjaxEcho('alert("'.$fullError.'")')) echo $fullError;
 	}
