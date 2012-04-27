@@ -145,6 +145,7 @@ class uCustomWidget implements iWidget {
 		if (!$obj) return '';
 		$fields = $obj->fields;
 		$ret = '';
+		$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">url</span>";
 		foreach ($fields as $field) {
 			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">{$field['alias']}</span>";
 		}
@@ -214,6 +215,7 @@ class uCustomWidget implements iWidget {
 			$typeArr = isset($matches[1]) ? $matches[1] : false;
 			$varsArr = isset($matches[2]) ? $matches[2] : false;
 			foreach ($rows as $row) {
+				$row['url'] = $obj->GetURL($row[$obj->GetPrimaryKey()]);
 				$c = $repeatable;
 				foreach ($searchArr as $k => $search) {
 					$field = $varsArr[$k];
