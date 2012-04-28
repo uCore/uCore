@@ -461,12 +461,12 @@ EOF;
 		$this->ShowData();
 		$c = ob_get_contents();
 		ob_end_clean();
-		$pubCell = '<span class="actions">'.$this->GetCell('publishing',$rec).'</span>';
+		$pubCell = '<span class="left">'.$this->GetCell('publishing',$rec).'</span>';
 
 		
 		$obj = utopia::GetInstance('uCMS_View');
 		$url = $obj->GetURL(array('cms_id'=>$rec['cms_id']));
-		uAdminBar::AddItem('Edit Page Information'.$pubCell,$c);
+		uAdminBar::AddItem('<span class="left">Edit Page Information</span>'.$pubCell,$c);
 		uAdminBar::AddItem('<a href="'.$url.'">Stop Editing</a>');
 
 		// clear output

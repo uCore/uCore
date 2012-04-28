@@ -1,4 +1,4 @@
-.admin-bar { position:relative; font-family: Arial; font-size:12px; z-index:99999; }
+.admin-bar { position:relative; font-family: Arial; font-size:12px; z-index:99999; overflow:hidden; }
 .admin-bar .admin-menu {
 	position:fixed;right:0;top:0;left:0;
 	z-index:99999;
@@ -29,13 +29,13 @@
 	background-repeat: no-repeat;
 	padding-left:30px;
 }
+.admin-bar .admin-menu li a { float:left; }
 .admin-bar .admin-menu li a, .admin-bar .admin-menu li a:visited, .admin-bar .admin-menu li a:link {
 	color: #ccc; text-decoration:none;
-	float:left;
 }
 .admin-bar .admin-menu li span.actions {
 	margin-left:15px;
-	float:right;
+	float:right; box-sizing: border-box
 }
 .admin-bar .admin-menu .btn { margin-top:0; margin-bottom:0; }
 .admin-bar .admin-body {

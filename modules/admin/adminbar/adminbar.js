@@ -6,6 +6,8 @@ $(function () {
 	});
 	var top = parseInt($('html').css('margin-top'));
 	if (!top) top = 0;
-	top += $('.admin-menu').height();
+	$emp = $('.admin-menu li:empty:visible').hide(); // hide any empty menu items (assuming dynamic content) - outerHeight wont include them.
+	top += $('.admin-menu li:first').outerHeight();
+	$emp.show(); // show empty menu items again
 	$('html').css('margin-top',top);
 });
