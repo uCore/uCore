@@ -1,18 +1,18 @@
+// handle the toolbar show/hide with events
+$(document).on('click','*',function(event) {
+	if ($(this).closest('.mceExternalToolbar').length) return false;
+	$('.mceExternalToolbar').hide();
+});
+
 function moveMceToolbars(event,ed) {
-	ed.onPostRender.add(function(ed, cm) { // move the toolbars post render
+	// move the toolbars post render
+	ed.onPostRender.add(function(ed, cm) {
 		$(".mceExternalToolbar").appendTo(".mceToolbarContainer");
-		$(".mceExternalToolbar").click(function() {
-			$(this).show();
-		});
-	});
-	ed.onInit.add(function(ed, evt) { // hide the toolbars when leaving an editor
-		tinymce.dom.Event.add(ed.getWin(), 'blur', function(e) {
-			$('.mceExternalToolbar').hide();
-		});
 	});
 };
 $(document).on('tinyMceSetup',moveMceToolbars);
 
+// create 'cancel action' events for publish and revert - so the user has chance to abort
 $(document).on('click','.page-publish',function(event) {
 	if (!confirm('Any changes you have made will become visible to the public.  Do you wish to continue?')) {
 		event.stopImmediatePropagation();
