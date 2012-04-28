@@ -19,14 +19,24 @@
 	top:0 !important;
 	z-index:1;
 }
+.admin-bar .mceExternalToolbar { line-height: 50px; }
 .admin-bar .mceExternalToolbar table {
-	width:100%;
+	width:100%; display:block; float:left;
+}
+.admin-bar .mceExternalToolbar tbody {
+	width:100%; display:block; float:left;
+}
+.admin-bar .mceExternalToolbar tr {
+	width:100%; display:block; float:left;
 }
 .admin-bar .mceExternalToolbar .mceToolbar {
 	float:left; width:auto; margin-right:20px;
 }
 .admin-bar .mceExternalToolbar td.mceToolbar {
-	width:100%;
+	width:100%; height:auto;
+}
+.admin-bar .mceExternalToolbar table.mceToolbar  {
+	height:30px;
 }
 .admin-bar .mceExternalClose {
   display:none !important;

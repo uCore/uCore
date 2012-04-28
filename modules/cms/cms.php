@@ -439,6 +439,8 @@ EOF;
 			uAdminBar::AddItem('<a href="'.$editURL.'">Edit Page</a>');
 			return;
 		}
+		
+		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.js'));
 
 		echo '<style type="text/css">.mceEditor.defaultSkin table.mceLayout { border: 0; } .mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }</style>';
 
@@ -450,7 +452,6 @@ EOF;
 		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false}'.$cssfiles.');');
 
 		uAdminBar::AddItem('',FALSE,10000,'defaultSkin mceToolbarContainer');
-		uJavascript::AddText('function moveMceToolbars() {$(".mceExternalToolbar").appendTo(".mceToolbarContainer"); $(".mceExternalToolbar").click(function() {$(this).show();});}; InitJavascript.add(moveMceToolbars); $(window).load(moveMceToolbars);');
 
 		ob_start();
 		$this->ClearFilters();

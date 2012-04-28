@@ -78,6 +78,7 @@ class module_TinyMCE extends uBasicModule {
 			$prc = PATH_REL_CORE;
 			uJavascript::IncludeText(<<< FIN
 	function tinyMceSetup(ed) {
+		$(document).trigger('tinyMceSetup',ed);
 		ed.onInit.add(function(ed, evt) {
 			tinymce.dom.Event.add(ed.getWin(), 'blur', function(e) {
 				// hide toolbar
