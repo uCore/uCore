@@ -247,7 +247,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->FieldStyles_Set('title',array('width'=>'100%'));
 		$this->AddField('description','description','cms','Meta Description',itTEXT);
 		$this->FieldStyles_Set('description',array('width'=>'100%'));
-		$this->AddField('blocks',array($this,'getPossibleBlocks'),'cms','Add Widget');
 
 		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
 
@@ -265,7 +264,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	}
 	public function publishLinks($field,$pkVal,$v,$rec) {
 		if ($rec['is_published'])
-			return utopia::DrawInput('published',itBUTTON,'Published',null,array('disabled'=>'disabled'));
+			return utopia::DrawInput('published',itBUTTON,'Published');
 
 		// preview, publish, revert (red)
 		$obj = utopia::GetInstance('uCMS_View');
@@ -301,7 +300,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$ele = str_get_html('<div style="display:inline">'.$rep.'</div>');
 
 		$delBtn = '<input type="button" value="Remove" onclick="var a = this.parentNode; while (a.className.indexOf(\'uWidgetPlaceholder\')==-1) { a = a.parentNode } a.parentNode.removeChild(a);">';
-		$editBtn = '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
+		$editBtn = uWidgets::IsStaticWidget($id) ? '' : '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
 		$addition = '<div class="uWidgetHeader">'.$delBtn.$editBtn.$id.'</div>';
 
 		$ele = $ele->root->children[0];
