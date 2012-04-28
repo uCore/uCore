@@ -47,3 +47,19 @@ function InsertWidget(id) {
 		tinyMCE.execCommand('mceInsertContent',false,data);
 	});
 }
+
+
+function initialiseMceWidgetButton(event,ed) {
+	if (ed.settings.theme_advanced_buttons4) ed.settings.theme_advanced_buttons4 += ',addWidgetButton';
+	else ed.settings.theme_advanced_buttons4 = 'addWidgetButton';
+	ed.addButton('addWidgetButton', {
+		title : 'Insert Widget',
+		image : PATH_REL_CORE+'images/ucore-icon.png',
+		onclick : function() {
+			// Add you own code to execute something on click
+			ed.focus();
+			ChooseWidget();
+		}
+	});
+};
+$(document).on('tinyMceSetup',initialiseMceWidgetButton);

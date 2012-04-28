@@ -273,18 +273,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish'),itBUTTON);
 		$revert = $this->DrawSqlInput('revert','Revert',$pkVal,array('title'=>'Reset to published version','class'=>'page-revert'),itBUTTON);
 
-		$script = <<<EOF
-<script type="text/javascript">
-$('.page-publish').click(function() {
-	return confirm('Any changes you have made will become visible to the public.  Do you wish to continue?');
-});
-$('.page-revert').click(function() {
-	return confirm('Reverting this page will reset all of your changes to the last published version.  Do you wish to continue?');
-});
-</script>
-EOF;
-
-		return $preview.$publish.$revert.$script;
+		return $preview.$publish.$revert;
 	}
 	
 	public function processWidget($field,$pkVal,$value) {

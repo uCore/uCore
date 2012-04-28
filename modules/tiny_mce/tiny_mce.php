@@ -62,7 +62,6 @@ class module_TinyMCE extends uBasicModule {
 			$htmlOpts['theme_advanced_buttons1_add_before'] = "save,|,";
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media,|,insertlayer,moveforward,movebackward,absolute';
 			$htmlOpts['theme_advanced_buttons3_add'] = ",|,styleprops,spellchecker,|,tablecontrols";
-			$htmlOpts['theme_advanced_buttons4'] = "addWidgetButton";
 
 			$baseOpts = json_encode($options);
 			$richOpts = json_encode($richOpts);
@@ -75,25 +74,9 @@ class module_TinyMCE extends uBasicModule {
 				$includeOpts = ','.$jsOptionVar;
 			}
 
-			$prc = PATH_REL_CORE;
 			uJavascript::IncludeText(<<< FIN
 	function tinyMceSetup(ed) {
 		$(document).trigger('tinyMceSetup',ed);
-		ed.onInit.add(function(ed, evt) {
-			tinymce.dom.Event.add(ed.getWin(), 'blur', function(e) {
-				// hide toolbar
-				$('.mceExternalToolbar').hide();
-			});
-		});
-		ed.addButton('addWidgetButton', {
-			title : 'Insert Widget',
-			image : '{$prc}images/ucore-icon.png',
-			onclick : function() {
-				// Add you own code to execute something on click
-				ed.focus();
-				ChooseWidget();
-			}
-		});
 	}
 	function onSave(ed) {
 		uf(ed.getElement(),ed.getContent(),ed.getContainer());
