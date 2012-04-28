@@ -500,6 +500,8 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('change','.uf',_fieldChange);
 	$(document).on('click','input[type=button].uf, .btn.uf',_fieldChange);
 	$(document).on('click','.btn',function(event) {event.stopPropagation();});
+	$(document).on('click','.btn-submit',function(event) {var frm = $(this).closest('form'); if (frm.length) return frm[0].submit();});
+	$(document).on('click','.btn-reset',function(event) {var frm = $(this).closest('form'); if (frm.length) return frm[0].reset();});
 });
 var isUpdating = [];
 function StoppedUpdating(ele) {
