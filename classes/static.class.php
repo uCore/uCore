@@ -317,6 +317,13 @@ class utopia {
 		switch ($inputType) {
 			case itNONE: $out .= $defaultValue; break;
 			case itBUTTON:
+				if (isset($attributes['class']))
+				$attributes['class'] .= ' btn';
+				else
+				$attributes['class'] = 'btn';
+				$attr = BuildAttrString($attributes);
+				$out .= '<a '.$attr.' href="javascript:void(0)">'.$defaultValue.'</a>';
+				break;
 			case itSUBMIT:
 			case itRESET:
 				if (isset($attributes['class']))

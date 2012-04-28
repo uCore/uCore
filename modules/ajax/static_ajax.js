@@ -496,14 +496,17 @@ function showOptions() {
 }
 */
 
+$(function() { // call on docready to allow cancelling events to bind first.
+	$(document).on('change','.uf',_fieldChange);
+	$(document).on('click','input[type=button].uf, .btn.uf',_fieldChange);
+	$(document).on('click','.btn',function(event) {event.stopPropagation();});
+});
 var isUpdating = [];
 function StoppedUpdating(ele) {
 	for (e in isUpdating) {
 		if (isUpdating[e].element == ele) delete isUpdating[e];
 	}
 }
-$(document).on('change','.uf',_fieldChange);
-$(document).on('click','input[type=button].uf',_fieldChange);
 function _fieldChange(event) { uf(this); return false; }
 function uf(ele, forcedValue, hourglassEle) {
 	for (e in isUpdating) {
