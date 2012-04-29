@@ -13,7 +13,6 @@ td { vertical-align: top }
 
 th.sortable { cursor:pointer; }
 
-.mceContentBody { background:transparent none; border:0; padding:0; margin:0; overflow:auto; }
 .utopia-filter-default { color: #AAA; }
 *:focus { outline: 1px; }
 

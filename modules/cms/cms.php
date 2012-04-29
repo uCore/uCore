@@ -435,6 +435,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$t = uCMS_View::GetTemplate($rec['cms_id']);
 		$cssfiles = utopia::GetTemplateCSS(PATH_REL_ROOT.$t);
 		$cssfiles[] = PATH_ABS_CORE.'default.css';
+		$cssfiles[] = dirname(__FILE__).'/mce_style.css';
 		$cssfiles = array_map('utopia::GetRelativePath',$cssfiles);
 		$cssfiles = $cssfiles ? ','.json_encode(array('content_css'=>implode(',',$cssfiles))) : '';
 		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false}'.$cssfiles.');');
