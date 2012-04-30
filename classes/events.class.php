@@ -30,14 +30,14 @@ class uEvents {
 		if (!isset(self::$callbacks[$eventName])) return TRUE;
 		$process = array_unique(array($module,''));
 		
-		$callbackArgs = array($object,$eventName);
-		if ($eventData) $callbackArgs[] = $eventData;
-		
+		if (!is_array($eventData)) $eventData = array($eventData);
+		array_unshift($eventData,$object,$eventName);
+
 		$return = true;
 		foreach ($process as $module) {
 			if (!isset(self::$callbacks[$eventName][$module])) continue;
 			foreach (self::$callbacks[$eventName][$module] as $callback) {
-				$return = $return && (call_user_func_array($callback,$callbackArgs) !== FALSE);
+				$return = $return && (call_user_func_array($callback,$eventData) !== FALSE);
 			}
 		}
 		return $return;
