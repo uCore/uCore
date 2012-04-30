@@ -846,7 +846,7 @@ class utopia {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
 
-		if (self::UsingTemplate()) {
+		if (self::UsingTemplate() && class_exists('DOMDocument')) {
 			$doc = new DOMDocument();
 			try {
 				$doc->loadHTML($template);
