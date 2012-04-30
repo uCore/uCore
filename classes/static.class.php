@@ -862,8 +862,10 @@ class utopia {
 		}
 		
 		while (self::MergeVars($template));
-		
-		
+
+		// this line prevents script wrapped with CDATA comments added into the CMS from being accidentally commented out
+		$template = preg_replace('/>\s*\/\/\s*\<\!\[CDATA\[\s*/','>//<![CDATA['.PHP_EOL,$template);
+
 		echo $template;
 	}
 
