@@ -542,8 +542,8 @@ class uCMS_View extends uSingleDataModule {
 		$rec = self::findPage();
 		if (empty($rec)) utopia::PageNotFound();
 
+		utopia::SetVar('cms_id',$rec['cms_id']);
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
-
 		utopia::SetDescription($rec['description']);
 		$robots = array();
 		if ($rec['nofollow']) $robots[] = 'NOFOLLOW';
