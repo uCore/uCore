@@ -2404,7 +2404,7 @@ FIN;
 	}
 
 	public function ProcessUpdates_add($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { AjaxEcho('//Module does not allow record editing'); return; }
+		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { throw new Exception('Module does not allow record editing.'); }
 		$this->UpdateField($fieldAlias,$value,$pkVal);
 	}
 
@@ -2414,15 +2414,18 @@ FIN;
 	}
 
 	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { AjaxEcho('//Module does not allow record deletion'); return; }
 		AjaxEcho('//'.get_class($this)."@ProcessUpdates_del($fieldAlias,$value,$pkVal)");
-
+		
+		return $this->DeleteRecord($pkVal);
+	}
+	
+	public function DeleteRecord($pkVal) {
+		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
+		
 		$table = TABLE_PREFIX.$this->GetTabledef();
-		$where = $this->GetPrimaryKey()." = '$pkVal'";
-
-		sql_query("DELETE FROM $table WHERE $where");
-
-		return false;
+		sql_query("DELETE FROM $table WHERE `{$this->GetPrimaryKey()}` = '$pkVal';");
+		
+		return TRUE;
 	}
 
 	public function ProcessUpdates_file($sendingField,$fieldName,$value,&$pkVal = NULL) {

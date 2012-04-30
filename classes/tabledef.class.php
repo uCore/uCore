@@ -291,9 +291,9 @@ abstract class uTableDef implements iUtopiaModule {
 			array_unshift($alterArray,"\nDROP INDEX `".$indexRow['Key_name']."`");
 		}
 
-		$alterArray[] = ' DROP PRIMARY KEY, ADD PRIMARY KEY ('.implode(',',$this->primary).')';
-		if ($this->index) $alterArray[] = ' ADD INDEX ('.implode(',',$this->index).')';
-		if ($this->unique) $alterArray[] = ' ADD UNIQUE ('.implode(',',$this->unique).')';
+		$alterArray[] = ' DROP PRIMARY KEY, ADD PRIMARY KEY (`'.implode('`,`',$this->primary).'`)';
+		if ($this->index) $alterArray[] = ' ADD INDEX (`'.implode('`,`',$this->index).'`)';
+		if ($this->unique) $alterArray[] = ' ADD UNIQUE (`'.implode('`,`',$this->unique).'`)';
 
 		sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
 		array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
