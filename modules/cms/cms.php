@@ -559,9 +559,20 @@ class uCMS_View extends uSingleDataModule {
 
 	public function SetupParents() {
 		uEvents::AddCallback('InitComplete',array($this,'InitSitemap'));
+		uEvents::AddCallback('ProcessDomDocument','uCMS_View::ProcessDomDocument');
 		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
 		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');
 		$this->SetRewrite(true);
+	}
+	static function ProcessDomDocument($event,$obj,$templateDoc) {
+		$cms_id = utopia::GetVar('cms_id');
+		if (!$cms_id) return;
+		
+		$node = $templateDoc->getElementsByTagName('body')->item(0);
+		$cClass = $node->getAttribute('class');
+		if ($cClass) $cClass .= ' '.$cms_id;
+		else $cClass = $cms_id;
+		$node->setAttribute('class',$cClass);
 	}
 	function InitSitemap() {
 		$rows = $this->GetRows();
@@ -616,8 +627,8 @@ class uCMS_View extends uSingleDataModule {
 		$rec = self::findPage();
 		if (empty($rec)) utopia::PageNotFound();
 
+		utopia::SetVar('cms_id',$rec['cms_id']);
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
-
 		utopia::SetDescription($rec['description']);
 		$robots = array();
 		if ($rec['nofollow']) $robots[] = 'NOFOLLOW';

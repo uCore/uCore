@@ -254,8 +254,6 @@ class utopia {
 		utopia::SetVar('title',$obj->GetTitle());
 		// run module
 		$obj->_RunModule();
-
-		utopia::Finish();
 	}
 
 	static $instances = array();
@@ -818,7 +816,7 @@ class utopia {
 		self::PrependVar('<head>','<meta name="generator" content="uCore PHP Framework"/>'.PHP_EOL);
 		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
 		if (self::VarExists('script_include'))
-			self::AppendVar('</head>','<script type="text/javascript">//<![CDATA['.PHP_EOL.utopia::GetVar('script_include').PHP_EOL.'//]]></script>'."\n");
+			self::AppendVar('</head>','<script type="text/javascript">'.utopia::GetVar('script_include').'</script>'."\n");
 
 		while (self::MergeVars($template));
 
@@ -849,9 +847,24 @@ class utopia {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
 
-		// this line prevents script wrapped with CDATA comments added into the CMS from being accidentally commented out
-		$template = preg_replace('/>\/\/\s*\<\!\[CDATA\[\s*/','>//<![CDATA['.PHP_EOL,$template);
-
+		if (self::UsingTemplate() && class_exists('DOMDocument')) {
+			$doc = new DOMDocument();
+			try {
+				$doc->loadHTML($template);
+			} catch (Exception $e) { }
+			$doc->formatOutput = true;
+			
+			// template is all done, now lets run a post process event
+			uEvents::TriggerEvent('ProcessDomDocument',null,array(&$doc));
+			
+			$template = $doc->saveXML();
+			$template = preg_replace('/>\s*<\!\[CDATA\[/','>//<![CDATA[',$template);
+			$template = preg_replace('/\]\]>\s*</','//]]><',$template);
+		}
+		
+		while (self::MergeVars($template));
+		
+		
 		echo $template;
 	}
 
