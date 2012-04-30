@@ -254,8 +254,6 @@ class utopia {
 		utopia::SetVar('title',$obj->GetTitle());
 		// run module
 		$obj->_RunModule();
-
-		utopia::Finish();
 	}
 
 	static $instances = array();
