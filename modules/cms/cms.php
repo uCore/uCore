@@ -429,8 +429,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		}
 		
 		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.js'));
-
-		echo '<style type="text/css">.mceEditor.defaultSkin table.mceLayout { border: 0; } .mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }</style>';
+		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/mce_style.css'));
 
 		$t = uCMS_View::GetTemplate($rec['cms_id']);
 		$cssfiles = utopia::GetTemplateCSS(PATH_REL_ROOT.$t);
