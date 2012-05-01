@@ -1,12 +1,12 @@
 <?php
 
-utopia::AppendVar('<body>','{admin_bar}');
-utopia::AddTemplateParser('admin_bar','uAdminBar::DrawAdminBar','');
+uEvents::AddCallback('ProcessDomDocument','uAdminBar::ProcessDomDocument');
+//utopia::AddTemplateParser('admin_bar','uAdminBar::DrawAdminBar','');
 class uAdminBar {
 	static $items = array();
 	public static function AddItem($data,$body='',$order=10) {
-		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/adminbar.css'));
-		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/adminbar.js'));
+		uCSS::LinkFile(dirname(__FILE__).'/adminbar.css');
+		uJavascript::LinkFile(dirname(__FILE__).'/adminbar.js');
 		self::$items[] = array('data'=>$data,'body'=>$body,'order'=>$order);
 	}
 	public static function DrawAdminBar() {
@@ -27,5 +27,13 @@ class uAdminBar {
 		}
 
 		return '<div class="admin-bar"><ul class="admin-menu">'.implode('',$arr).'</ul><div class="admin-body">'.implode('',$body).'</div></div>';
+	}
+	static function ProcessDomDocument($event,$obj,$templateDoc) {
+		$html = self::DrawAdminBar();
+		if (!$html) return;
+		$body = $templateDoc->getElementsByTagName('body')->item(0);
+		$node = $templateDoc->createDocumentFragment();
+		$node->appendXML($html);
+		$body->appendChild($node);
 	}
 }

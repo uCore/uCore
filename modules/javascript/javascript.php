@@ -1,7 +1,24 @@
 <?php
 
+uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument');
 class uJavascript extends uBasicModule {
+	static function ProcessDomDocument($event,$obj,$templateDoc) {
+		$head = $templateDoc->getElementsByTagName('head')->item(0);
+		array_sort_subkey(self::$linkFiles,'order');
+		foreach (self::$linkFiles as $path) {
+			$node = $templateDoc->createElement('script');
+			$node->setAttribute('type','text/javascript'); $node->setAttribute('src',$path['path']);
+			$head->appendChild($node);
+		}
+	}
 	public function GetOptions() { return PERSISTENT; }
+	private static $linkFiles = array();
+	public static function LinkFile($path,$order=null) {
+		if ($order === null) $order = count(self::$linkFiles);
+		if (file_exists($path)) $path = utopia::GetRelativePath($path);
+		foreach (self::$linkFiles as $link) if ($link['path'] == $path) return;
+		self::$linkFiles[] = array('path'=>$path,'order'=>$order);
+	}
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
@@ -21,16 +38,16 @@ class uJavascript extends uBasicModule {
 	public function SetupParents() {
 		module_Offline::IgnoreClass(__CLASS__);
 		$this->SetRewrite(true);
-		utopia::AddJSFile($this->GetURL(),true);
+		self::LinkFile($this->GetURL(),-10);
 
-		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js',true);
-		utopia::AddJSFile('//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',true);
+		self::LinkFile('//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js',-100);
+		self::LinkFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js',-99);
 
-		uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
-		uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
-		uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
-		uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
-		uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');
+		self::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
+		self::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
+		self::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
+		self::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
+		self::IncludeFile(dirname(__FILE__).'/js/functs.js');
 
 		modOpts::AddOption('google_api_key','Google API Key');
 		$key = ($gAPI = modOpts::GetOption('google_api_key')) ? 'key='.$gAPI.'&' : '';
