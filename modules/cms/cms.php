@@ -545,8 +545,10 @@ class uCMS_View extends uSingleDataModule {
 		if ($row) return $row;
 		return FALSE;
 	}
-
+	
+	private static $currentPage = null;
 	static function findPage() {
+		if (self::$currentPage) return self::$currentPage;
 		$uri = $_SERVER['REQUEST_URI'];
 		$uri = preg_replace('/(\?.*)?/','',$uri);
 
@@ -556,7 +558,10 @@ class uCMS_View extends uSingleDataModule {
 		if (array_key_exists(1,$matches)) {
 			$obj = utopia::GetInstance('uCMS_View');
 			$row = $obj->LookupRecord($matches[1]);
-			if ($row) return $row;
+			if ($row) {
+				self::$currentPage = $row;
+				return $row;
+			}
 		}
 
 		return false;
