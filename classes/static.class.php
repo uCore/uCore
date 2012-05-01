@@ -87,7 +87,13 @@ class utopia {
 		return '<meta name="keywords" content="'.$content.'" />'."\n";
 	}
 	static function AddMetaTag($name,$content) {
-		utopia::AppendVar('<head>','<meta name="'.$name.'" content="'.$content.'" />');
+		$nifunc = create_function('$event,$obj,$doc','
+			$head = $doc->getElementsByTagName("head")->item(0);
+			$node = $doc->createElement("meta");
+			$node->setAttribute("name","'.$name.'"); $node->setAttribute("content","'.$content.'");
+			$head->appendChild($node);
+		');
+		uEvents::AddCallback('ProcessDomDocument',$nifunc);
 	}
 	
 	/**
@@ -990,8 +996,8 @@ class utopia {
 		utopia::SetTitle('404 Not Found');
 		echo '<h1>404 Not Found</h1>';
 		echo '<p>The page you requested could not be found. Return to the <a href="{home_url}">homepage</a>.</p>';
-		utopia::AppendVar('<head>','<meta name="robots" content="noindex" />');
-		utopia::Finish(); die();
+		self::AddMetaTag('robots','noindex');
+		die();
 	}
 
 	static function SecureRedirect() {
