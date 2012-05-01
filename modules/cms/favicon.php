@@ -1,16 +1,21 @@
 <?php
 
-uEvents::AddCallback('BeforeOutputTemplate','uFavicon::LinkFavicon');
+uEvents::AddCallback('ProcessDomDocument','uFavicon::LinkFavicon');
 class uFavicon {
-	public static function LinkFavicon() {
+	public static function LinkFavicon($event,$obj,$templateDoc) {
 		// first check template, then check root.
 		$iconPaths = array();
 		$iconPaths[] = utopia::GetTemplateDir(false).'favicon.ico';
 		$iconPaths[] = PATH_ABS_ROOT.'favicon.ico';
 		$iconPaths[] = PATH_ABS_CORE.'favicon.ico';
+		
+		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		foreach ($iconPaths as $iconPath) {
 			if (file_exists($iconPath)) {
-				utopia::PrependVar('<head>','<link rel="shortcut icon" href="'.utopia::GetRelativePath($iconPath).'"/>');
+				$node = $templateDoc->createElement('link');
+				$node->setAttribute('rel','shortcut icon');
+				$node->setAttribute('href',utopia::GetRelativePath($iconPath));
+				$head->appendChild($node);
 				return;
 			}
 		}
