@@ -564,14 +564,29 @@ class uCMS_View extends uSingleDataModule {
 		$this->SetRewrite(true);
 	}
 	static function ProcessDomDocument($event,$obj,$templateDoc) {
-		$cms_id = utopia::GetVar('cms_id');
-		if (!$cms_id) return;
+		$page = self::findPage();
 		
-		$node = $templateDoc->getElementsByTagName('body')->item(0);
-		$cClass = $node->getAttribute('class');
-		if ($cClass) $cClass .= ' '.$cms_id;
-		else $cClass = $cms_id;
-		$node->setAttribute('class',$cClass);
+		// set body class to cms_id
+		if ($page) {		
+			$body = $templateDoc->getElementsByTagName('body')->item(0);
+			$cClass = $body->getAttribute('class');
+			if ($cClass) $cClass .= ' '.$page['cms_id'];
+			else $cClass = $page['cms_id'];
+			$body->setAttribute('class',$cClass);
+		}
+		
+		// include robots meta
+		if ($page) {
+			$robots = array();
+			if ($page['nofollow']) $robots[] = 'nofollow';
+			if ($page['noindex']) $robots[] = 'noindex';
+			if (!empty($robots)) {
+				$head = $templateDoc->getElementsByTagName('head')->item(0);
+				$node = $templateDoc->createElement('meta');
+				$node->setAttribute('name','robots'); $node->setAttribute('content',implode(', ',$robots));
+				$head->appendChild($node);
+			}
+		}
 	}
 	function InitSitemap() {
 		$rows = $this->GetRows();
@@ -603,8 +618,10 @@ class uCMS_View extends uSingleDataModule {
 		if ($row) return $row;
 		return FALSE;
 	}
-
+	
+	private static $currentPage = null;
 	static function findPage() {
+		if (self::$currentPage) return self::$currentPage;
 		$uri = $_SERVER['REQUEST_URI'];
 		$uri = preg_replace('/(\?.*)?/','',$uri);
 
@@ -614,7 +631,10 @@ class uCMS_View extends uSingleDataModule {
 		if (array_key_exists(1,$matches)) {
 			$obj = utopia::GetInstance('uCMS_View');
 			$row = $obj->LookupRecord($matches[1]);
-			if ($row) return $row;
+			if ($row) {
+				self::$currentPage = $row;
+				return $row;
+			}
 		}
 
 		return false;
@@ -629,10 +649,6 @@ class uCMS_View extends uSingleDataModule {
 		utopia::SetVar('cms_id',$rec['cms_id']);
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 		utopia::SetDescription($rec['description']);
-		$robots = array();
-		if ($rec['nofollow']) $robots[] = 'NOFOLLOW';
-		if ($rec['noindex']) $robots[] = 'NOINDEX';
-		if (!empty($robots)) utopia::AppendVar('<head>','<META NAME="ROBOTS" CONTENT="'.implode(', ',$robots).'">');
 		echo '{cms.'.$rec['cms_id'].'}';
 	}
 

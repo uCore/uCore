@@ -11,8 +11,6 @@ utopia::AddTemplateParser('post','utopia::parsePost');
 utopia::AddTemplateParser('request','utopia::parseRequest');
 utopia::AddTemplateParser('session','utopia::parseSession');
 utopia::AddTemplateParser('const','utopia::parseConst');
-utopia::AddTemplateParser('cssHead','utopia::GetCSSHead','');
-utopia::AddTemplateParser('jsHead','utopia::GetJSHead','');
 utopia::AddTemplateParser('domain','utopia::GetDomainName','');
 
 utopia::AddTemplateParser('home_url',PATH_REL_ROOT,'');
@@ -91,49 +89,22 @@ class utopia {
 	static function AddMetaTag($name,$content) {
 		utopia::AppendVar('<head>','<meta name="'.$name.'" content="'.$content.'" />');
 	}
-
-	static $initCSShead = false;
-	static $cssFiles = array();
-	static function AddCSSFile($path,$start=false) {
-		if (!self::$initCSShead) utopia::PrependVar('</head>',"{cssHead}\n");
-		self::$initCSShead = true;
-
-		if (file_exists($path)) $path = self::GetRelativePath($path);
-
-		if (array_search($path,self::$cssFiles) !== FALSE) return;
-
-		if ($start)
-			array_unshift(self::$cssFiles,$path);
-		else
-			self::$cssFiles[] = $path;
+	
+	/**
+	 * Link a css file to the document
+	 *
+	 * @deprecated
+	 */
+	static function AddCSSFile($path,$start = false) {
+		uCSS::LinkFile($path,$start?-1:null);
 	}
-	static function GetCSSHead() {
-		$ret = '';
-		foreach (self::$cssFiles as $path)
-			$ret .= "<link type=\"text/css\" rel=\"stylesheet\" href=\"$path\" />\n";
-		return $ret;
-	}
-
-	static $initJShead = false;
-	static $jsFiles = array();
-	static function AddJSFile($path,$start=false) {
-		if (!self::$initJShead) utopia::AppendVar('</head>',"{jsHead}\n");
-		self::$initJShead = true;
-
-		if (file_exists($path)) $path = self::GetRelativePath($path);
-
-		if (array_search($path,self::$jsFiles) !== FALSE) return;
-
-		if ($start)
-			array_unshift(self::$jsFiles,$path);
-		else
-			self::$jsFiles[] = $path;
-	}
-	static function GetJSHead() {
-		$ret = '';
-		foreach (self::$jsFiles as $path)
-			$ret .= "<script type=\"text/javascript\" src=\"$path\"></script>\n";
-		return $ret;
+	/*
+	 * Link a javascript file to the document
+	 *
+	 * @deprecated
+	 */
+	static function AddJSFile($path,$start = false) {
+		uJavascript::LinkFile($path,$start?-1:null);
 	}
 
 	private static $allmodules = NULL;
@@ -772,7 +743,7 @@ class utopia {
 
 			if (!self::$doneCSS) {
 				$css = self::GetTemplateCSS();
-				foreach ($css as $cssfile) self::AddCSSFile($cssfile);
+				foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
 				self::$doneCSS = true;
 			}
 
@@ -813,10 +784,6 @@ class utopia {
 		if (!$template) $template = '{utopia.content}';
 		ob_end_clean();
 
-		self::PrependVar('<head>','<meta name="generator" content="uCore PHP Framework"/>'.PHP_EOL);
-		self::PrependVar('<head>',utopia::GetTitle().utopia::GetDescription().utopia::GetKeywords());
-		if (self::VarExists('script_include'))
-			self::AppendVar('</head>','<script type="text/javascript">'.utopia::GetVar('script_include').'</script>'."\n");
 
 		while (self::MergeVars($template));
 
@@ -847,25 +814,80 @@ class utopia {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
 
-		if (self::UsingTemplate() && class_exists('DOMDocument')) {
+		do if (self::UsingTemplate() && class_exists('DOMDocument')) {
 			$doc = new DOMDocument();
-			try {
-				$doc->loadHTML($template);
-			} catch (Exception $e) { }
 			$doc->formatOutput = true;
+			$doc->preserveWhiteSpace = false;
+			try {
+				if (!$doc->loadHTML($template)) break;
+			} catch (Exception $e) { }
+			
+			// no html tag?  break out.
+			if (!$doc->getElementsByTagName('html')->length) break;
+			
+			// assert BODY tag
+			if (!$doc->getElementsByTagName('body')->length) {
+				$node = $doc->createElement("body");
+				$doc->getElementsByTagName('html')->item(0)->appendChild($node);
+			}
+			
+			// assert HEAD tag
+			if (!$doc->getElementsByTagName('head')->length) {
+				// create head node
+				$node = $doc->createElement("head");
+				$body = $doc->getElementsByTagName('body')->item(0);
+				$newnode = $body->parentNode->insertBefore($node,$body);
+			}
+			
+			// add HEAD children
+			$head = $doc->getElementsByTagName('head')->item(0);
+			
+			$node = $doc->createElement('title',utopia::GetTitle(true));
+			$head->appendChild($node);
+			if (utopia::GetDescription(true)) {
+				$node = $doc->createElement('meta'); $node->setAttribute('name','description'); $node->setAttribute('content',utopia::GetDescription(true));
+				$head->appendChild($node);
+			}
+			if (utopia::GetKeywords(true)) {
+				$node = $doc->createElement('meta'); $node->setAttribute('name','ketwords'); $node->setAttribute('content',utopia::GetKeywords(true));
+				$head->appendChild($node);
+			}
+			
+			$node = $doc->createElement('meta'); $node->setAttribute('name','generator'); $node->setAttribute('content','uCore PHP Framework');
+			$head->appendChild($node);
 			
 			// template is all done, now lets run a post process event
 			uEvents::TriggerEvent('ProcessDomDocument',null,array(&$doc));
 			
-			$template = $doc->saveXML();
+			// move all LINK end of HEAD
+			$links = $head->getElementsByTagName('link');
+			for ($i = 0; $i < $links->length; $i++) { $head->appendChild($links->item(0)); }
+			// move all SCRIPT end of HEAD (after LINK)
+			$scripts = $head->getElementsByTagName('script');
+			for ($i = 0; $i < $scripts->length; $i++) { $head->appendChild($scripts->item(0)); }
+			
+			if (self::VarExists('script_include')) {
+				$node = $doc->createElement('script'); // add as text node to make domdocument treat it as cdata
+				$text = $doc->createTextNode(utopia::GetVar('script_include'));
+				$node->appendChild($text);
+				$node->setAttribute('type','text/javascript');
+				$head->appendChild($node);
+			}
+			
+			$doc->normalizeDocument();
+			if (strpos(strtolower($doc->doctype->publicId),' xhtml '))
+				$template = $doc->saveXML();
+			else
+				$template = $doc->saveHTML();
+
 			$template = preg_replace('/>\s*<\!\[CDATA\[/','>//<![CDATA[',$template);
 			$template = preg_replace('/\]\]>\s*</','//]]><',$template);
-		}
+		} while (false);
 		
 		while (self::MergeVars($template));
 
 		// this line prevents script wrapped with CDATA comments added into the CMS from being accidentally commented out
-		$template = preg_replace('/>\s*\/\/\s*\<\!\[CDATA\[\s*/','>//<![CDATA['.PHP_EOL,$template);
+		$template = preg_replace('/>\s*\/\/\s*\<\!\[CDATA\[\n*/','>//<![CDATA['.PHP_EOL,$template);
 
 		echo $template;
 	}

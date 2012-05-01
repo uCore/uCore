@@ -35,6 +35,7 @@ uEvents::AddCallback('BeforeRunModule','uUserLogin::CheckAccess');
 utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
 utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
 utopia::AddTemplateParser('login_status','uUserLogin::GetLoginStatus','');
+utopia::AddTemplateParser('login',array(utopia::GetInstance('uUserLogin'),'RunModule'),'',true);
 class uUserLogin extends uDataModule {
 	public static function CheckAccess($object) {
 		$ret = uEvents::TriggerEvent('CanAccessModule',$object);
@@ -53,7 +54,6 @@ class uUserLogin extends uDataModule {
 	}
 
 	public function SetupParents() {
-		utopia::AddTemplateParser('login',array($this,'RunModule'),'',true);
 		uEvents::AddCallback('BeforeRunModule',array($this,'checkLogin'),utopia::GetCurrentModule());
 		uEvents::AddCallback('InitComplete',array($this,'CheckSession'));
 

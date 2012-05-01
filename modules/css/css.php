@@ -1,8 +1,19 @@
 <?php
 
 uCSS::IncludeFile(PATH_REL_CORE.'default.css');
+uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument');
 class uCSS extends uBasicModule {
+	static function ProcessDomDocument($event,$obj,$templateDoc) {
+		$head = $templateDoc->getElementsByTagName('head')->item(0);
+		array_sort_subkey(self::$linkFiles,'order');
+		foreach (self::$linkFiles as $path) {
+			$node = $templateDoc->createElement('link');
+			$node->setAttribute('type','text/css'); $node->setAttribute('rel','stylesheet'); $node->setAttribute('href',$path['path']);
+			$head->appendChild($node);
+		}
+	}
 	public function GetOptions() { return PERSISTENT; }
+	public function GetUUID() { return 'styles.css'; }
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
@@ -10,19 +21,27 @@ class uCSS extends uBasicModule {
 		if (!file_exists($path)) return;
 		self::$includeFiles[] = $path;
 	}
-	public function GetUUID() { return 'styles.css'; }
+	
+	private static $linkFiles = array();
+	public static function LinkFile($path,$order=null) {
+		if ($order === null) $order = count(self::$linkFiles);
+		if (file_exists($path)) $path = utopia::GetRelativePath($path);
+		foreach (self::$linkFiles as $link) if ($link['path'] == $path) return;
+		self::$linkFiles[] = array('path'=>$path,'order'=>$order);
+	}
 
 	public function SetupParents() {
 		module_Offline::IgnoreClass(__CLASS__);
 		$this->SetRewrite(true);
-		utopia::AddCSSFile($this->GetURL(),true);
+		self::LinkFile($this->GetURL(),-10);
 
 		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 
 		modOpts::AddOption('jQueryUI-Theme','jQuery UI Theme',null,'ui-lightness');
 		$jquitheme = modOpts::GetOption('jQueryUI-Theme');
-		utopia::AddCSSFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',true);
-		uCSS::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
+		self::LinkFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',-100);
+		
+		self::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
 
 	public function RunModule() {
