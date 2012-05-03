@@ -43,7 +43,7 @@ FIN
 	static function GetIcon($path) {
 		$type = utopia::GetMimeType($path);
 		if (strpos($type,'image/') !== 0) return false;
-		$path = str_replace(PATH_UPLOADS,'/uploads',$path);
+		$path = str_replace(PATH_UPLOADS,PATH_REL_ROOT.'uploads',$path);
 		return $path.'?w=64&h=64';
 	}
 	static function Init() {
