@@ -883,8 +883,15 @@ class utopia {
 				$script = $scripts->item($i);
 				// set type
 				if (!$script->hasAttribute('type')) $script->setAttribute('type','text/javascript');
-				if ($script->hasAttribute('src')) continue;
 				if (!$script->childNodes->length) continue;
+				if ($script->hasAttribute('src')) { // if the script has src and content, assume the calling script will be looking up data - remove the cdata
+					if ($script->childNodes->item(0)->nodeType == XML_CDATA_SECTION_NODE) {
+						$tn = $doc->createTextNode($script->childNodes->item(0)->nodeValue);
+						$script->appendChild($tn);
+						$script->removeChild($script->childNodes->item(0));
+					}
+					continue;
+				}
 				
 				// already commented cdata?
 				if ($script->childNodes->length == 2 && $script->childNodes->item(0)->nodeType == XML_TEXT_NODE && $script->childNodes->item(1)->nodeType == XML_CDATA_SECTION_NODE) continue;
