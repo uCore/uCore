@@ -883,6 +883,7 @@ class utopia {
 				$script = $scripts->item($i);
 				// set type
 				if (!$script->hasAttribute('type')) $script->setAttribute('type','text/javascript');
+				if ($script->hasAttribute('src')) continue;
 				if (!$script->childNodes->length) continue;
 				
 				// already commented cdata?
