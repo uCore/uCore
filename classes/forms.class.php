@@ -2436,19 +2436,13 @@ FIN;
 	public function UploadFile($fieldAlias,$fileInfo,&$pkVal = NULL) {
 		//$allowedTypes = $this->GetFieldProperty($fieldAlias, 'allowed');
 		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); return; }
-		$value = file_get_contents($fileInfo['tmp_name']);
-		if ($this->GetFieldType($fieldAlias) === ftUPLOAD) {
-			$this->UpdateField($fieldAlias,'',$pkVal);
-			// build dir path
-			$targetDir = PATH_ABS_CORE.'uploads/'.date('Y-m-d').'/'.$pkVal;
-			// make dir
-			if (!file_exists($targetDir)) mkdir($targetDir,0755,true);
-			// copy file
-			file_put_contents($targetDir.'/'.$fileInfo['name'],$value);
-			chmod($targetDir.'/'.$fileInfo['name'],0755);
-			// set value to path.
-			$this->UpdateField($fieldAlias,$targetDir.'/'.$fileInfo['name'],$pkVal);
+		if ($this->GetFieldType($fieldAlias) !== ftFILE) {
+			$targetFile = get_class($this).'/'.date('Y-m-d').'/'.$pkVal.'/'.$fileInfo['name'];
+			$filename = uUploads::UploadFile($fileInfo,$targetFile);
+			if (!$filename) return;
+			$this->UpdateField($fieldAlias,$filename,$pkVal);
 		} else {
+			$value = file_get_contents($fileInfo['tmp_name']);
 			$this->UpdateField($fieldAlias.'_filename',$fileInfo['name'],$pkVal);
 			$this->UpdateField($fieldAlias.'_filetype',$fileInfo['type'],$pkVal);
 			$this->UpdateField($fieldAlias,$value,$pkVal);

@@ -514,16 +514,7 @@ class uCMS_View extends uSingleDataModule {
 		$cms_id = $rec['cms_id'];
 		if ($rec['is_home']) return PATH_REL_ROOT.$qs;
 
-		$path = array();
-
-		while ($rec['parent']) {
-			$path[] = $rec['parent'];
-			$rec = $this->LookupRecord($rec['parent']);
-			if (!$rec) break;
-		}
-		$path = array_reverse($path);
-
-		$path[] = $cms_id;
+		$path = $this->GetCmsParents($cms_id);
 
 		return PATH_REL_ROOT.implode('/',$path).$qs;
 	}
@@ -647,9 +638,25 @@ class uCMS_View extends uSingleDataModule {
 		if (empty($rec)) utopia::PageNotFound();
 
 		utopia::SetVar('cms_id',$rec['cms_id']);
+		$path = $this->GetCmsParents($rec['cms_id']);
+		utopia::SetVar('cms_root_id',reset($path));
+		
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 		utopia::SetDescription($rec['description']);
 		echo '{cms.'.$rec['cms_id'].'}';
+	}
+	
+	public function GetCmsParents($cms_id,$includeSelf=true) {
+		$parents = array();
+		$rec = $this->LookupRecord($cms_id);
+		while ($rec['parent']) {
+			$parents[] = $rec['parent'];
+			$rec = $this->LookupRecord($rec['parent']);
+			if (!$rec) break;
+		}
+		array_reverse($parents);
+		if ($includeSelf) $parents[] = $cms_id;
+		return $parents;
 	}
 
 	static function GetTemplate($id) {
