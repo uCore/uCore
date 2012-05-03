@@ -873,43 +873,6 @@ class utopia {
 			$scripts = $head->getElementsByTagName('script');
 			for ($i = 0; $i < $scripts->length; $i++) { $head->appendChild($scripts->item(0)); }
 			
-			if (self::VarExists('script_include')) {
-				$node = $doc->createElement('script'); //createCDATASection
-				$node->appendChild($doc->createCDATASection(trim(utopia::GetVar('script_include'))));
-				$head->appendChild($node);
-			}
-			
-			$scripts = $doc->getElementsByTagName('script');
-			for ($i = 0; $i < $scripts->length; $i++) { // now loop through all scripts, and ensure correct format
-				$script = $scripts->item($i);
-				// set type
-				if (!$script->hasAttribute('type')) $script->setAttribute('type','text/javascript');
-				if (!$script->childNodes->length) continue;
-				
-				// already commented cdata?
-				if ($script->childNodes->length == 2 && $script->childNodes->item(0)->nodeType == XML_TEXT_NODE && $script->childNodes->item(1)->nodeType == XML_CDATA_SECTION_NODE) continue;
-				// single child is not text or cdata
-				if ($script->childNodes->length != 1 || ($script->childNodes->item(0)->nodeType != XML_TEXT_NODE && $script->childNodes->item(0)->nodeType != XML_CDATA_SECTION_NODE)) continue;
-				
-				$v = NULL;
-				try { // attempt to create a fragment from the value - this will check if the data is infact valid xml. if it is then find the cnode child and use it
-					$v = $script->childNodes->item(0)->nodeValue;
-					$frag = $doc->createDocumentFragment();
-					$frag->appendXML($v);
-					foreach ($frag->childNodes as $node) {
-						if ($node->nodeType === XML_CDATA_SECTION_NODE) {
-							$v = trim($node->nodeValue,' /'); break;
-						}
-					}
-				} catch (Exception $e) {} // if it fails, then does not contain cdata so continue as normal
-				if ($v === NULL) $v = $script->childNodes->item(0)->nodeValue;
-				$script->removeChild($script->childNodes->item(0));
-				$cm = $doc->createTextNode("//");
-				$ct = $doc->createCDATASection("\n" . trim($v) . "\n//");
-				$script->appendChild($cm);
-				$script->appendChild($ct);
-			}
-			
 			$doc->normalizeDocument();
 			if (strpos(strtolower($doc->doctype->publicId),' xhtml '))
 				$template = $doc->saveXML();
