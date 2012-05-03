@@ -825,7 +825,7 @@ class utopia {
 			$doc->preserveWhiteSpace = false;
 			$doc->validateOnParse = true;
 			try {
-				if (!$doc->loadHTML($template)) break;
+				if (!$doc->loadHTML(utf8_decode($template))) break;
 			} catch (Exception $e) { }
 			
 			// no html tag?  break out.
