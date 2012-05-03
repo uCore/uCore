@@ -48,4 +48,14 @@ class uUploads extends uBasicModule {
 
 		utopia::Cache_Output($output,$etag,$cType,$fileName);
 	}
+	static function UploadFile($fileInfo,$targetFile,$relativeToUpload=true) {
+		// build dir path
+		if ($relativeToUpload) $targetFile = PATH_ABS_ROOT.'uUploads/'.trim($targetFile,'/\\');
+		$targetDir = dirname($targetFile);
+		// make dir
+		if (!file_exists($targetDir)) mkdir($targetDir,0755,true);
+		// move file
+		if (!move_uploaded_file($fileInfo['tmp_name'],$targetFile)) return FALSE;
+		return $targetFile;
+	}
 }
