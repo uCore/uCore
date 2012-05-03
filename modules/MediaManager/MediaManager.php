@@ -18,7 +18,7 @@ class fileManager extends uBasicModule implements iAdminModule {
 		list($path) = self::Init();
 		//if (!is_array($attributes)) $attributes = array();
 		//$attributes['onclick'] = 'alert("moo");return false;';
-		utopia::AppendVar('script_include', <<<FIN
+		uJavascript::AddText(<<<FIN
 	function filesel(id,item) {
 		if (item.type != 0) return;
 		$('#fileMan').dialog('close');
@@ -76,7 +76,7 @@ FIN
 			uPlupload::Init($jsOptionVar,$pathUpload);
 			$includeOpts = ','.$jsOptionVar;
 		}
-		utopia::AppendVar('script_include', "$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:FileManagerItemClick}}$includeOpts);});");
+		uJavascript::AddText("$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:FileManagerItemClick}}$includeOpts);});");
 
 		$out = ob_get_contents();
 		ob_end_clean();

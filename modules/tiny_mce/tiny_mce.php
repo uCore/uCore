@@ -9,8 +9,8 @@ class module_TinyMCE extends uBasicModule {
 	public function SetupParents() {
 		utopia::AddInputType(itRICHTEXT,array($this,'drti_func'));
 		utopia::AddInputType(itHTML,array($this,'drti_func'));
-		uJavascript::IncludeText('var tinyMCEPreInit={base:"' . utopia::GetRelativePath(dirname(__FILE__)) . '/tiny_mce",suffix:""};');
-		uJavascript::IncludeFile(dirname(__FILE__).'/tiny_mce/tiny_mce.js',true);
+		uJavascript::IncludeText('var tinyMCEPreInit={base:"' . utopia::GetRelativePath(dirname(__FILE__)) . '/lib",suffix:""};');
+		uJavascript::IncludeFile(dirname(__FILE__).'/lib/tiny_mce.js',true);
 		module_TinyMCE::InitScript();
 	}
 
@@ -18,8 +18,8 @@ class module_TinyMCE extends uBasicModule {
 	static function InitScript() {
 		if (!self::$hasDrawnJS) {
 			self::$hasDrawnJS = true;
-		//	$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce/plugins/spellchecker/rpc.php';
-			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/tiny_mce/plugins/preview/preview.php';
+		//	$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/lib/plugins/spellchecker/rpc.php';
+			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/lib/plugins/preview/preview.php';
 			list($fileManagerPath) = fileManager::Init();
 			$relUploads = utopia::GetRelativePath(PATH_UPLOADS);
 

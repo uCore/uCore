@@ -1,7 +1,7 @@
 <?php
-uJavascript::IncludeFile(dirname(__FILE__).'/plupload.full.js');
-uJavascript::IncludeFile(dirname(__FILE__).'/jquery.ui.plupload/jquery.ui.plupload.js');
-uCSS::IncludeFile(dirname(__FILE__).'/jquery.ui.plupload/css/jquery.ui.plupload.css');
+uJavascript::IncludeFile(dirname(__FILE__).'/lib/plupload.full.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/lib/jquery.ui.plupload/jquery.ui.plupload.js');
+uCSS::IncludeFile(dirname(__FILE__).'/lib/jquery.ui.plupload/css/jquery.ui.plupload.css');
 
 class uPlupload {
 	static function Init($jsVarName,$uploadPath) {
