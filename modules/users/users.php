@@ -123,7 +123,7 @@ class uAssertAdminUser extends uBasicModule {
 		if (!isset($_SESSION['db_admin_authed'])) {
 			// first confirm db password
 			echo '<p>No Site Administrator has been set up.</p><p>You can set one up now by confirming the database password:</p>';
-			echo '<form action="" method="post">';
+			echo '<form action="" method="POST">';
 			echo '<input type="password" name="db_pw" />';
 			echo '<input type="submit" value="Confirm" />';
 			echo '</form>';
@@ -246,7 +246,7 @@ class uRegisterUser extends uDataModule {
 			form.register-user label { float:left; clear:both; display:block; width:150px; }
 			form.register-user input { float:left; width:150px; box-sizing: border-box; }
 		</style>
-		<form class="register-user left oh" action="" method="post">
+		<form class="register-user left oh" action="" method="POST">
 			<label for="username">Email:</label>
 			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" />
 			<label for="password">Password:</label>
