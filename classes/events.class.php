@@ -2,20 +2,30 @@
 
 class uEvents {
 	private static $callbacks = array();
-	public static function AddCallback($eventName, $callback, $module = '') {
+	public static function AddCallback($eventName, $callback, $module = '',$order=NULL) {
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
+		if (!isset(self::$callbacks[$eventName][$module])) self::$callbacks[$eventName][$module] = array();
+		if (self::CallbackExists($eventName, $callback, $module)) return;
 		
-		if (isset(self::$callbacks[$eventName][$module]) && in_array($callback,self::$callbacks[$eventName][$module])) return;
-		self::$callbacks[$eventName][$module][] = $callback;
+		if ($order === NULL) $order = count(self::$callbacks[$eventName][$module])+1;
+
+		self::$callbacks[$eventName][$module][] = array('callback'=>$callback,'order'=>$order);
 	}
-	public static function RemoveCallback($module, $eventName, $callback) {
+	public static function RemoveCallback($eventName, $callback, $module = '') {
+		$cb = self::CallbackExists($eventName, $callback, $module);
+		if ($cb) unset($cb);
+	}
+	public static function &CallbackExists($eventName, $callback, $module = '') {
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
-
-		if (!isset(self::$callbacks[$eventName][$module])) return;
-		$key = array_search($callback,self::$callbacks[$eventName][$module]);
-		if ($key !== NULL) unset(self::$callbacks[$eventName][$module][$key]);
+		$false = FALSE;
+		
+		if (!isset(self::$callbacks[$eventName][$module])) return $false;
+		foreach (self::$callbacks[$eventName][$module] as $k => $v) {
+			if ($v['callback'] === $callback) return self::$callbacks[$eventName][$module][$k];
+		}
+		return $false;
 	}
 	public static function TriggerEvent($eventName,$object=null,$eventData=null) {
 		$module = null;
@@ -36,8 +46,9 @@ class uEvents {
 		$return = true;
 		foreach ($process as $module) {
 			if (!isset(self::$callbacks[$eventName][$module])) continue;
+			array_sort_subkey(self::$callbacks[$eventName][$module],'order');
 			foreach (self::$callbacks[$eventName][$module] as $callback) {
-				$return = $return && (call_user_func_array($callback,$eventData) !== FALSE);
+				$return = $return && (call_user_func_array($callback['callback'],$eventData) !== FALSE);
 			}
 		}
 		return $return;
