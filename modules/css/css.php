@@ -1,15 +1,46 @@
 <?php
 
 uCSS::IncludeFile(PATH_REL_CORE.'default.css');
-uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument');
+uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
+uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument','',99999);
 class uCSS extends uBasicModule {
-	static function ProcessDomDocument($event,$obj,$templateDoc) {
+	static function LinkToDocument($event,$obj,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		array_sort_subkey(self::$linkFiles,'order');
 		foreach (self::$linkFiles as $path) {
 			$node = $templateDoc->createElement('link');
 			$node->setAttribute('type','text/css'); $node->setAttribute('rel','stylesheet'); $node->setAttribute('href',$path['path']);
 			$head->appendChild($node);
+		}
+	}
+	static function ProcessDomDocument($event,$obj,$doc) {
+		$styles = $doc->getElementsByTagName('style');
+		for ($i = 0; $i < $styles->length; $i++) { // now loop through all scripts, and ensure correct format
+			$style = $styles->item($i);
+			if (!$style->hasAttribute('type')) $style->setAttribute('type','text/css');
+			if (!$style->childNodes->length) continue;
+			
+			// already commented cdata?
+			if ($style->childNodes->length == 2 && $style->childNodes->item(0)->nodeType == XML_TEXT_NODE && $style->childNodes->item(1)->nodeType == XML_CDATA_SECTION_NODE) continue;
+			// single child is not text or cdata
+			if ($style->childNodes->length != 1 || ($style->childNodes->item(0)->nodeType != XML_TEXT_NODE && $style->childNodes->item(0)->nodeType != XML_CDATA_SECTION_NODE)) continue;
+			
+			$v = NULL;
+			try { // attempt to create a fragment from the value - this will check if the data is infact valid xml. if it is then find the cnode child and use it
+				$v = $style->childNodes->item(0)->nodeValue;
+				$frag = $doc->createDocumentFragment();
+				$frag->appendXML($v);
+				foreach ($frag->childNodes as $node) {
+					if ($node->nodeType === XML_CDATA_SECTION_NODE) {
+						$v = trim($node->nodeValue,' /'); break;
+					}
+				}
+			} catch (Exception $e) {} // if it fails, then does not contain cdata so continue as normal
+			if ($v === NULL) $v = $style->childNodes->item(0)->nodeValue;
+			$style->removeChild($style->childNodes->item(0));
+			$style->appendChild($doc->createTextNode("/*"));
+			$style->appendChild($doc->createCDATASection("*/\n" . trim($v) . "\n/*"));
+			$style->appendChild($doc->createTextNode("*/"));
 		}
 	}
 	public function GetOptions() { return PERSISTENT; }

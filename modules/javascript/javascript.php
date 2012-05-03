@@ -1,14 +1,53 @@
 <?php
 
-uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument');
+uEvents::AddCallback('ProcessDomDocument','uJavascript::LinkToDocument');
+uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument','',99999);
 class uJavascript extends uBasicModule {
-	static function ProcessDomDocument($event,$obj,$templateDoc) {
+	static function LinkToDocument($event,$obj,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		array_sort_subkey(self::$linkFiles,'order');
 		foreach (self::$linkFiles as $path) {
 			$node = $templateDoc->createElement('script');
 			$node->setAttribute('type','text/javascript'); $node->setAttribute('src',$path['path']);
 			$head->appendChild($node);
+		}
+			
+		if (self::$script_include) {
+			$node = $templateDoc->createElement('script');
+			$node->appendChild($templateDoc->createCDATASection(trim(self::$script_include)));
+			$head->appendChild($node);
+		}
+	}
+	static function ProcessDomDocument($event,$obj,$doc) {
+		$scripts = $doc->getElementsByTagName('script');
+		for ($i = 0; $i < $scripts->length; $i++) { // now loop through all scripts, and ensure correct format
+			$script = $scripts->item($i);
+			// set type
+			if (!$script->hasAttribute('type')) $script->setAttribute('type','text/javascript');
+			if (!$script->childNodes->length) continue;
+			
+			// already commented cdata?
+			if ($script->childNodes->length == 2 && $script->childNodes->item(0)->nodeType == XML_TEXT_NODE && $script->childNodes->item(1)->nodeType == XML_CDATA_SECTION_NODE) continue;
+			// single child is not text or cdata
+			if ($script->childNodes->length != 1 || ($script->childNodes->item(0)->nodeType != XML_TEXT_NODE && $script->childNodes->item(0)->nodeType != XML_CDATA_SECTION_NODE)) continue;
+			
+			$v = NULL;
+			try { // attempt to create a fragment from the value - this will check if the data is infact valid xml. if it is then find the cnode child and use it
+				$v = $script->childNodes->item(0)->nodeValue;
+				$frag = $doc->createDocumentFragment();
+				$frag->appendXML($v);
+				foreach ($frag->childNodes as $node) {
+					if ($node->nodeType === XML_CDATA_SECTION_NODE) {
+						$v = trim($node->nodeValue,' /'); break;
+					}
+				}
+			} catch (Exception $e) {} // if it fails, then does not contain cdata so continue as normal
+			if ($v === NULL) $v = $script->childNodes->item(0)->nodeValue;
+			$script->removeChild($script->childNodes->item(0));
+			$cm = $doc->createTextNode("//");
+			$ct = $doc->createCDATASection("\n" . trim($v) . "\n//");
+			$script->appendChild($cm);
+			$script->appendChild($ct);
 		}
 	}
 	public function GetOptions() { return PERSISTENT; }
@@ -30,8 +69,9 @@ class uJavascript extends uBasicModule {
 	public static function IncludeText($text) {
 		self::$includeText .= "\n$text";
 	}
+	private static $script_include = '';
 	public static function AddText($text) {
-		utopia::AppendVar('script_include',"\n$text");
+		self::$script_include .= "\n$text";
 	}
 	public function GetUUID() { return 'javascript.js'; }
 
