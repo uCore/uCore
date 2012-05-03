@@ -872,10 +872,11 @@ class utopia {
 			for ($i = 0; $i < $scripts->length; $i++) { $head->appendChild($scripts->item(0)); }
 			
 			if (self::VarExists('script_include')) {
-				$node = $doc->createElement('script'); // add as text node to make domdocument treat it as cdata
-				$text = $doc->createTextNode(utopia::GetVar('script_include'));
-				$node->appendChild($text);
-				$node->setAttribute('type','text/javascript');
+				$node = $doc->createElement('script'); $node->setAttribute('type','text/javascript');
+				$cm = $doc->createTextNode("\n//");
+				$ct = $doc->createCDATASection("\n" . utopia::GetVar('script_include') . "\n//");
+				$node->appendChild($cm);
+				$node->appendChild($ct);
 				$head->appendChild($node);
 			}
 			
