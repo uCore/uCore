@@ -1,4 +1,6 @@
 .mceContentBody { background:transparent none; border:0; padding:0; margin:0; overflow:auto; }
+.mceContentBody.centerWrap { text-align:left }
+.mceContentBody.left, .mceContentBody.right { float:none }
 
 .mceEditor.defaultSkin table.mceLayout { border: 0; }
 .mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }

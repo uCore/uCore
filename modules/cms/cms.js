@@ -7,7 +7,24 @@ $(document).on('click','*',function(event) {
 function moveMceToolbars(event,ed) {
 	// move the toolbars post render
 	ed.onPostRender.add(function(ed, cm) {
-		$(".mceExternalToolbar").appendTo(".mceToolbarContainer");
+		// remove any existing toolbars for this editor
+		$('.mceToolbarContainer > .mceExternalToolbar').each(function () {
+			if ($(this).attr('id') == ed.editorId+'_external') $(this).remove();
+		});
+		$('.mceExternalToolbar').appendTo('.mceToolbarContainer');
+	});
+	
+	ed.onInit.add(function(ed) {
+		// copy all parents into the editor dom
+		var body = $(ed.getDoc().body);
+		var span = $(ed.getElement()).parent();
+		span.parentsUntil('body').each(function () {
+			body.addClass($(this)[0].className);
+		});
+		body.css({margin:0,padding:0});
+		
+		// wake up the autoresize plugin
+		setTimeout(function(){ed.execCommand('mceAutoResize');},1);
 	});
 };
 $(document).on('tinyMceSetup',moveMceToolbars);
