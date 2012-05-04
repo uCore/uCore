@@ -124,7 +124,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			e.stopPropagation();
 		});
 		$('.cmsItemText').live('click',function (e) {
-			window.location = '/'+$(this).closest('.cmsItem').attr('id')+'?edit=1';
+			window.location = PATH_REL_ROOT+$(this).closest('.cmsItem').attr('id')+'?edit=1';
 			e.stopPropagation();
 		});
 		InitialiseTree();
