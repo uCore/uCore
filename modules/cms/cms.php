@@ -60,8 +60,8 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddParent('/');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 	}
-	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		parent::ProcessUpdates_del($sendingField,$fieldAlias,$value,$pkVal);
+	public function DeleteRecord($pkVal) {
+		parent::DeleteRecord($pkVal);
 		AjaxEcho('window.location.reload();');
 	}
 	public function RunModule() {
@@ -454,6 +454,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		
 		$obj = utopia::GetInstance('uCMS_View');
 		$url = $obj->GetURL(array('cms_id'=>$rec['cms_id']));
+
 		uAdminBar::AddItem('<span class="left">Edit Page Information</span>'.$pubCell,$c);
 		uAdminBar::AddItem('<a href="'.$url.'">Stop Editing</a>');
 

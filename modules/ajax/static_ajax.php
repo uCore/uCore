@@ -11,28 +11,27 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public function SetupParents() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
 		// register ajax
-		$this->RegisterAjax('updateField',array($this,'UpdateField'));
-		$this->RegisterAjax('filterText',array($this,'FilterText'));
-		$this->RegisterAjax('Suggest',array($this,'getComboVals'));
-		$this->RegisterAjax('showQueries',array($this,'showQueries'));
-		$this->RegisterAjax('getImage',array($this,'getImage'));
-		$this->RegisterAjax('getFile',array($this,'getFile'));
-		$this->RegisterAjax('getUpload',array($this,'getUpload'));
-		$this->RegisterAjax('getCompressed',array($this,'getCompressed'));
-		$this->RegisterAjax('getParserContent',array($this,'getParserContent'));
+		$this->RegisterAjax('updateField','internalmodule_StaticAjax::UpdateField');
+		$this->RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
+		$this->RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
+		$this->RegisterAjax('showQueries','internalmodule_StaticAjax::showQueries');
+		$this->RegisterAjax('getImage','internalmodule_StaticAjax::getImage');
+		$this->RegisterAjax('getFile','internalmodule_StaticAjax::getFile');
+		$this->RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
+		$this->RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
+		$this->RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
 	}
 
-	public function RunModule() {
-	}
+	public function RunModule() { }
 
-	public function getParserContent() {
+	public static function getParserContent() {
 		$ident = isset($_GET['ident']) ? $_GET['ident'] : null;
 		$data = isset($_GET['data']) ? '.'.$_GET['data'] : null;
 		echo '{'.$ident.$data.'}';
 		utopia::Finish();
 	}
 
-	public function getCompressed() {
+	public static function getCompressed() {
 		ob_end_clean();
 		header('Content-Encoding: none');
 		
@@ -61,7 +60,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 		die($contents);
 	}
 
-	public function getUpload() {
+	public static function getUpload() {
 		//$module = utopia::UUIDExists($_GET['uuid']);
 		//print_r($module);
 		$obj = utopia::GetInstance(utopia::GetCurrentModule());
@@ -88,7 +87,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 
 		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
 	}
-	public function getFile() {
+	public static function getFile() {
 		$last_load    =  isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime(trim($_SERVER['HTTP_IF_MODIFIED_SINCE'])) : false;
 		if ($last_load) {
 			header('HTTP/1.0 304 Not Modified', true, 304); die();
@@ -104,7 +103,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 		echo utopia::Cache_Output($data, sha1($data), $type, $name, NULL, 86400, $_GET['a']);
 	}
 
-	public function getImage() {
+	public static function getImage() {
 		$qry = "SELECT ".mysql_real_escape_string($_GET['f'])." as img FROM ".mysql_real_escape_string($_GET['t'])." WHERE ".mysql_real_escape_string($_GET['k'])." = ".mysql_real_escape_string($_GET['p']);
 		$data = '';
 		try {
@@ -138,11 +137,11 @@ class internalmodule_StaticAjax extends uBasicModule {
 		utopia::Cache_Output($c,$etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 	}
 
-	public function showQueries() {
+	public static function showQueries() {
 		print_r($GLOBALS['sql_queries']);
 	}
 
-	public function FilterText() {
+	public static function FilterText() {
 		$font   = 2;
 		$width  = ImageFontWidth($font) * strlen($_GET['t']);
 		$height = ImageFontHeight($font);
@@ -186,7 +185,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 		 die();*/
 	}
 
-	public function UpdateField() {
+	public static function UpdateField() {
 		ignore_user_abort(true);
 		$filter = '';
 		$pkVal = NULL;
@@ -195,42 +194,49 @@ class internalmodule_StaticAjax extends uBasicModule {
 
 		if (!empty($_FILES)) { // process file upload
 			$files = array();
-			foreach ($_FILES['sql']['name'] as $function => $funcArr) {
-				foreach ($funcArr as $id => $fileName) {
-					$files[$id] = array('name'=>$fileName,
-						'function'=>$function,
-						'type'=>$_FILES['sql']['type'][$function][$id],
-						'tmp_name'=>$_FILES['sql']['tmp_name'][$function][$id],
-						'size'=>$_FILES['sql']['size'][$function][$id]
-					);
+			foreach ($_FILES as $name => $info) {
+				if (!preg_match('/^usql\-(.+)/',$name,$match)) continue;
+				$infoArr = array();
+				if (is_array($info['name'])) {
+					foreach ($info['name'] as $id => $val) {
+						$infoArr[] = array(
+							'name'=>$_FILES['name'][$id],
+							'type'=>$_FILES['type'][$id],
+							'tmp_name'=>$_FILES['tmp_name'][$id],
+							'error'=>$_FILES['error'][$id],
+							'size'=>$_FILES['size'][$id],
+						);
+					}
+				} else { // multiple
+					$infoArr[] = $info;
 				}
-			}
-
-			foreach ($files as $enc_name => $fileInfo) {
-				$string = cbase64_decode($enc_name);
-
-				InterpretSqlString($string, $module, $field, $pkVal);
-				$obj = utopia::GetInstance($module);
-				$obj->ProcessUpdates($fileInfo['function'],$enc_name,$field,$fileInfo,$pkVal);
-			}
-		}
-
-		if (array_key_exists('sql',$_POST)) {
-			foreach ($_POST['sql'] as $function => $vars) {
-				$pkVal = NULL;
-				foreach ($vars as $enc_name => $value) {
-					$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
-					//$value = cbase64_decode($value);
+				
+				foreach ($infoArr as $fileInfo) {
+					$enc_name = $match[1];
+					$string = cbase64_decode($enc_name);
 
 					InterpretSqlString($string, $module, $field, $pkVal);
 					$obj = utopia::GetInstance($module);
-					$obj->ProcessUpdates($function,$enc_name,$field,$value,$pkVal);
+					$obj->ProcessUpdates($enc_name,$field,$fileInfo,$pkVal,true);
 				}
+			}
+		}
+
+		if (!empty($_POST)) {
+			foreach ($_POST as $name => $value) {
+				if (!preg_match('/^usql\-(.+)/',$name,$match)) continue;
+				$enc_name = $match[1];
+				$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
+				
+				$pkVal = NULL;
+				InterpretSqlString($string, $module, $field, $pkVal);
+				$obj = utopia::GetInstance($module);
+				$obj->ProcessUpdates($enc_name,$field,$value,$pkVal);
 			}
 		}
 	}
 
-	public function getComboVals() {
+	public static function getComboVals() {
 		if (!array_key_exists('term',$_GET)) die('[]');
 		if (!array_key_exists('gv',$_GET)) die('[]');
 

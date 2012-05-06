@@ -853,17 +853,16 @@ FIN;
 		return cbase64_encode(get_class($this).":$field$pk");
 	}
 
-	public function CreateSqlField($field,$pkValue,$prefix=NULL) {
-		if ($prefix == NULL) $prefix = 'add';
-		return "sql[{$prefix}][".$this->GetEncodedFieldName($field,$pkValue)."]";
+	public function CreateSqlField($field,$pkValue) {
+		return "usql-".$this->GetEncodedFieldName($field,$pkValue);
 	}
 
   
   public function GetDeleteButton($pk,$btnText = NULL,$title = NULL) {
     $title = $title ? "Delete '$title'" : 'Delete Record';
     if ($btnText)
-      return '<a name="'.$this->CreateSqlField('del',$pk,'del').'" class="btn redbg" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'">'.$btnText.'</a>';
-    return '<a class="btn btn-del" name="'.$this->CreateSqlField('del',$pk,'del').'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'"></a>';
+      return '<a name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" class="btn redbg" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'">'.$btnText.'</a>';
+    return '<a class="btn btn-del" name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'"></a>';
   }
 //	public function CreateSqlDeleteField($where) {
 //		$prefix = 'del';
@@ -911,7 +910,7 @@ FIN;
 		if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
 		$attributes['class'] .= ' uf';
 
-		$fieldName = $this->CreateSqlField($field,$pkValue,$prefix);
+		$fieldName = $this->CreateSqlField($field,$pkValue);
 		if ($inputType == itFILE) $attributes['id'] = $fieldName;
 		return utopia::DrawInput($fieldName,$inputType,$defaultValue,$values,$attributes);
 	}
@@ -2390,11 +2389,15 @@ FIN;
 		return '<span '.$spanAttr.'>'.$pre.utopia::DrawInput('_f_'.$filterInfo['uid'],$filterInfo['it'],$default,$vals,$attributes,false).'</span>';
 	}
 
-	public function ProcessUpdates($function,$sendingField,$fieldAlias,$value,&$pkVal = NULL) {
+	public function ProcessUpdates($sendingField,$fieldAlias,$value,&$pkVal=NULL,$isFile=false) {
 		$this->_SetupFields();
 
-		$func = 'ProcessUpdates_'.$function;
-		$this->$func($sendingField,$fieldAlias,$value,$pkVal);
+		if ($fieldAlias === '__u_delete_record__')
+			$this->DeleteRecord($pkVal);
+		elseif ($isFile)
+			$this->UploadFile($fieldName,$value,$pkVal);
+		else
+			$this->UpdateField($fieldAlias,$value,$pkVal);
     
 		// reset all fields.
 		$this->ResetField($fieldAlias,$pkVal);
@@ -2403,34 +2406,14 @@ FIN;
 		}
 	}
 
-	public function ProcessUpdates_add($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { throw new Exception('Module does not allow record editing.'); }
-		$this->UpdateField($fieldAlias,$value,$pkVal);
-	}
-
-	function ProcessUpdates_md5($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		if (empty($value)) return FALSE;
-		return $this->UpdateField($fieldAlias,$value,$pkVal);
-	}
-
-	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		AjaxEcho('//'.get_class($this)."@ProcessUpdates_del($fieldAlias,$value,$pkVal)");
-		
-		return $this->DeleteRecord($pkVal);
-	}
-	
 	public function DeleteRecord($pkVal) {
+		AjaxEcho('//'.get_class($this)."@DeleteRecord($pkVal)");
 		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
 		
 		$table = TABLE_PREFIX.$this->GetTabledef();
 		sql_query("DELETE FROM $table WHERE `{$this->GetPrimaryKey()}` = '$pkVal';");
 		
 		return TRUE;
-	}
-
-	public function ProcessUpdates_file($sendingField,$fieldName,$value,&$pkVal = NULL) {
-		$this->UploadFile($fieldName,$value,$pkVal);
-		//$this->ResetField($fieldName,$pkVal);
 	}
 
 	public function UploadFile($fieldAlias,$fileInfo,&$pkVal = NULL) {
@@ -2462,6 +2445,8 @@ FIN;
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
+		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { throw new Exception('Module does not allow record editing.'); }
+
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
@@ -2482,7 +2467,10 @@ FIN;
 			$srch = array_search($newValue, $valSearch);
 			if ($srch !== FALSE) $newValue = $srch;
 		}
-		if ($this->fields[$fieldAlias]['inputtype'] == itMD5 || $this->fields[$fieldAlias]['inputtype'] == itPASSWORD) $newValue = md5($newValue);
+		if ($this->fields[$fieldAlias]['inputtype'] == itMD5 || $this->fields[$fieldAlias]['inputtype'] == itPASSWORD) {
+			if (empty($newValue)) return FALSE;
+			$newValue = md5($newValue);
+		}
 		$originalValue = $newValue;
 
 		$field = $this->fields[$fieldAlias]['field'];
@@ -2785,26 +2773,6 @@ abstract class uListDataModule extends uDataModule {
 	//public function SetMaxRecords($value) {
 //		$this->maxRecs = $value;
 //	}
-	public function GetMaxRows() {
-		return NULL;//$this->maxRecs;
-	}
-
-	public function ProcessUpdates_add($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		parent::ProcessUpdates_add($sendingField,$fieldAlias,$value,$pkVal);
-
-		//AjaxEcho("$('TABLE.datalist').trigger('applyWidgets');\n");
-	}
-
-	public function ResetField($fieldAlias,$pkVal = NULL) {
-		// reset the field.
-		//AjaxEcho("// reset field: $fieldAlias\n");
-		if ($pkVal && !$this->LookupRecord($pkVal)) {
-			$enc_name = $this->GetEncodedFieldName($fieldAlias,$pkVal);
-			$this->SendHideRowWithField($enc_name);
-			return;
-		}
-		parent::ResetField($fieldAlias,$pkVal);
-	}
 
 	public function UpdateField($fieldAlias,$newValue,&$pkVal = NULL) {
 		$isNew = ($pkVal === NULL);
@@ -2829,10 +2797,25 @@ abstract class uListDataModule extends uDataModule {
 		return $ret;
 	}
 
-	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		parent::ProcessUpdates_del($sendingField,$fieldAlias,$value,$pkVal);
-		$this->SendHideRowWithField($sendingField);
+	public function ResetField($fieldAlias,$pkVal = NULL) {
+		// reset the field.
+		if ($pkVal && !$this->LookupRecord($pkVal)) {
+			$enc_name = $this->GetEncodedFieldName($fieldAlias,$pkVal);
+			$this->SendHideRow($pkVal);
+			return;
+		}
+		parent::ResetField($fieldAlias,$pkVal);
+	}
+
+	public function DeleteRecord($pkVal) {
+		parent::DeleteRecord($pkVal);
+		$this->SendHideRow($pkVal);
 		$this->CheckMaxRows();
+	}
+
+	public function SendHideRow($pk) {
+		$rowclass = cbase64_encode(get_class($this).':'.$pk);
+		AjaxEcho("$('tr.$rowclass').hide();");
 	}
 
 	public function CheckMaxRows($mod = 0) {
@@ -2847,17 +2830,11 @@ abstract class uListDataModule extends uDataModule {
 		if ($rows + $mod == $this->GetMaxRows()) return TRUE;
 		return FALSE;
 	}
-
-	public function SendHideRowWithField($fieldName) {
-		AjaxEcho(<<<SCR_END
-ele = $('*[name*=$fieldName]');
-// hide row - seems to be within a datalist
-ele.parents('TR:eq(0)').remove();
-ele.parents("TABLE.datalist").trigger('applyWidgets');
-SCR_END
-		);
+	
+	public function GetMaxRows() {
+		return NULL;//$this->maxRecs;
 	}
-
+	
 	public function ShowData($rows = null, $tabTitle = null,$tabOrder = null) {
 		//	echo "showdata ".get_class($this)."\n";
 
@@ -3119,7 +3096,7 @@ SCR_END
 
 	function DrawRow($row) {
 		$pk = $row[$this->GetPrimaryKey()];
-		$body = "<tr rel=\"$pk\">";
+		$body = '<tr class="'.cbase64_encode(get_class($this).':'.$pk).'">';
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) {
 			//$delbtn = utopia::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'btn redbg','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
 			$delbtn = $this->GetDeleteButton($row[$this->GetPrimaryKey()]);
@@ -3157,8 +3134,8 @@ abstract class uSingleDataModule extends uDataModule {
 
 		//		parent::CreateParentNavButtons();
 		}*/
-	public function ProcessUpdates_del($sendingField,$fieldAlias,$value,&$pkVal = NULL) {
-		parent::ProcessUpdates_del($sendingField,$fieldAlias,$value,$pkVal);
+	public function DeleteRecord($pkVal) {
+		parent::DeleteRecord($pkVal);
 		AjaxEcho('history.go(-1);');
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
