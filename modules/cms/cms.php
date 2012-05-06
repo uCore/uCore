@@ -449,7 +449,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->ShowData();
 		$c = ob_get_contents();
 		ob_end_clean();
-		$pubCell = '<span class="left">'.$this->GetCell('publishing',$rec).'</span>';
+		$pubCell = '<span class="left" style="padding-left:10px">'.$this->GetCell('publishing',$rec).'</span>';
 
 		
 		$obj = utopia::GetInstance('uCMS_View');
