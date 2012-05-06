@@ -2395,7 +2395,7 @@ FIN;
 		if ($fieldAlias === '__u_delete_record__')
 			$this->DeleteRecord($pkVal);
 		elseif ($isFile)
-			$this->UploadFile($fieldName,$value,$pkVal);
+			$this->UploadFile($fieldAlias,$value,$pkVal);
 		else
 			$this->UpdateField($fieldAlias,$value,$pkVal);
     
