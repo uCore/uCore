@@ -170,16 +170,37 @@ function RefreshTables() {
 
 function UpdateSelectedLinks() {
 	var uuid = getParameterByName('uuid');
+	var queryArgs = window.location.search.substring(1).split('&');
 	$('a').each(function() {
 		if (!$(this).attr('href')) return;
 		var _href = $(this).attr('href');
+		var _hrefArr = _href.split('?');
+		var _hrefPath = _hrefArr[0];
+		var _hrefArgs = _hrefArr[1] ? _hrefArr[1].split('&') : [];
 
+		var classname = '';
 		if (uuid) {
 			var linkUUID = getParameterByName('uuid',_href);
-			var classname = (uuid == linkUUID) ? 'active-link' : '';
+			classname = (uuid == linkUUID) ? 'active-link' : '';
 		} else {
-			if ((_href != window.location.pathname) && (_href != window.location.pathname+window.location.search) && (_href == PATH_REL_ROOT || window.location.pathname.indexOf(_href) != 0)) return;
-			var classname = (_href == window.location.pathname) || (_href == window.location.pathname+window.location.search) ? 'active-link' : 'active-link-parent';
+			if (_href == PATH_REL_ROOT) return;
+			if (window.location.pathname.indexOf(_hrefPath) != 0) return;
+			var exact = true;
+			if (_hrefPath == window.location.pathname) {
+				for (var i=0;i<queryArgs.length;i++) {
+					if (!queryArgs[i]) continue;
+					var item = queryArgs[i].split('=');
+					var v = getParameterByName(item[0],_href);
+					if (v != item[1]) exact = false;
+				}
+				for (var i=0;i<_hrefArgs.length;i++) {
+					if (!_hrefArgs[i]) continue;
+					var item = _hrefArgs[i].split('=');
+					var v = getParameterByName(item[0]);
+					if (v != item[1]) exact = false;
+				}
+			}
+			classname = ((_hrefPath == window.location.pathname) && exact) ? 'active-link' : 'active-link-parent';
 		}
 		if (!classname) return;
 		
