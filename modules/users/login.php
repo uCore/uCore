@@ -154,7 +154,7 @@ class uUserLogin extends uDataModule {
 class uResetPassword extends uDataModule {
 	public function GetTitle() { return 'Reset Password'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
-	public function GetOptions() { return PERSISTENT; }
+	public function GetOptions() { return PERSISTENT | ALLOW_EDIT; }
 
 	public function GetUUID() { return 'reset-password'; }
 
