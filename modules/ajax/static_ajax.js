@@ -177,10 +177,10 @@ function UpdateSelectedLinks() {
 		var _hrefArr = _href.split('?');
 		var _hrefPath = _hrefArr[0];
 		var _hrefArgs = _hrefArr[1] ? _hrefArr[1].split('&') : [];
+		var linkUUID = getParameterByName('uuid',_href);
 
 		var classname = '';
-		if (uuid) {
-			var linkUUID = getParameterByName('uuid',_href);
+		if (uuid || linkUUID) {
 			classname = (uuid == linkUUID) ? 'active-link' : '';
 		} else {
 			if (_href == PATH_REL_ROOT) return;
