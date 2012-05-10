@@ -484,7 +484,7 @@ class uCMS_View extends uSingleDataModule {
 		$page = self::findPage();
 		return $page['updated'];
 	}
-	public function assertContent() { if (utopia::GetCurrentModule() !== __CLASS__ && self::findPage()) echo '{content}'; }
+	public function assertContent() { if (utopia::GetCurrentModule() !== __CLASS__ && $rec = self::findPage()) { echo '{content}'; utopia::UseTemplate(self::GetTemplate($rec['cms_id'])); } }
 	static function templateParser($id) {
 		$obj = utopia::GetInstance('uCMS_View');
 		$rec = $obj->LookupRecord($id);
