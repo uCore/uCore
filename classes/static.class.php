@@ -1214,18 +1214,26 @@ class utopia {
 		echo '<ul class="pagination">';
 		if ($page > 0) {
 			$args[$pageKey] = $page -1;
+			$rel = array('prev');
 			if (!$args[$pageKey]) unset($args[$pageKey]);
-			echo '<li><a class="btn" href="'.$obj->GetURL($args).'">&lt; Previous</a></li>';
+			if ($page-1 == 0) $rel[] = 'first';
+			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$obj->GetURL($args).'">&lt; Previous</a></li>';
 		}
 		for ($i = 0; $i<$pages; $i++) {
 			$args[$pageKey] = $i;
+			$rel = array();
 			if (!$args[$pageKey]) unset($args[$pageKey]);
-			$url = $obj->GetURL($args);
-			echo '<li><a class="btn" href="'.$url.'">'.($i+1).'</a></li>';
+			if ($i == $page-1) $rel[] = 'prev';
+			if ($i == $page+1) $rel[] = 'next';
+			if ($i == 0) $rel[] = 'first';
+			if ($i == $pages-1) $rel[] = 'last';
+			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$obj->GetURL($args).'">'.($i+1).'</a></li>';
 		}
 		if ($page < $pages-1) {
 			$args[$pageKey] = $page +1;
-			echo '<li><a class="btn" href="'.$obj->GetURL($args).'">Next &gt;</a></li>';
+			$rel = array('next');
+			if ($page+1 == $pages-1) $rel[] = 'last';
+			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$obj->GetURL($args).'">Next &gt;</a></li>';
 		}
 		echo '</ul>';
 	}
