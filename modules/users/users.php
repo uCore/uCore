@@ -147,7 +147,7 @@ class uAssertAdminUser extends uBasicModule {
 }
 
 class uRegisterUser extends uDataModule {
-	public function GetOptions() { return ALLOW_ADD; }
+	public function GetOptions() { return ALLOW_ADD | ALLOW_EDIT; }
 	public function GetTitle() { return 'User Registration'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function SetupFields() {
