@@ -373,12 +373,13 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 		$this->AddParent('uCMS_List','cms_id');
 		$this->AddChild('uCMS_View','cms_id','link');
-		$this->AddParentCallback('uCMS_View',array($this,'editPageCallback'));
 	}
 	public function getEditor($id = '') {
+		$this->editPageCallback();
 		$canEdit = uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE;
 		// get content
 		$rec = uCMS_View::findPage();
+		if(!$rec) return; // page not found
 		
 		$content = $rec['content_published'];
 		if ($rec['content_time'] == 0)
@@ -417,10 +418,14 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		}
 		return parent::ResetField($fieldAlias,$pkVal);
 	}
-	public function editPageCallback($parent) {
+	static $editCallbackDone = false;
+	public function editPageCallback() {
 		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return;
+		if (self::$editCallbackDone) return;
+		self::$editCallbackDone = true;
 
 		$rec = uCMS_View::findPage();
+		if (!$rec) return;
 		if (!isset($_GET['edit'])) {
 			$obj = utopia::GetInstance('uCMS_View');
 			$editURL = $obj->GetURL(array('cms_id'=>$rec['cms_id'],'edit'=>1));
@@ -457,10 +462,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 
 		uAdminBar::AddItem('<span class="left">Edit Page Information</span>'.$pubCell,$c);
 		uAdminBar::AddItem('<a href="'.$url.'">Stop Editing</a>');
-
-		// clear output
-		//utopia::SetVar('content',$this->GetCell('content',$rec,'',itHTML));
-		//utopia::SetVar('content','{content}');
 	}
 	public function RunModule() {
 		$this->ShowData();
@@ -474,15 +475,16 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 }
 
 utopia::AddTemplateParser('cms','uCMS_View::templateParser');
+uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'));
 class uCMS_View extends uSingleDataModule {
 	public function GetOptions() { return ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
 	public function GetUUID() { return 'cms'; }
-
 	static function last_updated() {
 		$page = self::findPage();
 		return $page['updated'];
 	}
+	public function assertContent() { if (utopia::GetCurrentModule() !== __CLASS__ && self::findPage()) echo '{content}'; }
 	static function templateParser($id) {
 		$obj = utopia::GetInstance('uCMS_View');
 		$rec = $obj->LookupRecord($id);
@@ -623,6 +625,16 @@ class uCMS_View extends uSingleDataModule {
 		if (array_key_exists(1,$matches)) {
 			$obj = utopia::GetInstance('uCMS_View');
 			$row = $obj->LookupRecord($matches[1]);
+			if ($row) {
+				self::$currentPage = $row;
+				return $row;
+			}
+		}
+		
+		$cm = utopia::GetCurrentModule();
+		if ($cm && $cm !== __CLASS__) {
+			$o = utopia::GetInstance(utopia::GetCurrentModule());
+			$row = $obj->LookupRecord($o->GetUUID());
 			if ($row) {
 				self::$currentPage = $row;
 				return $row;
