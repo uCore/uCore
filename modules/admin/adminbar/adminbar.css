@@ -1,10 +1,9 @@
-.admin-bar { position:fixed;right:0;top:0;left:0; font-family: Arial; font-size:12px; z-index:99999; }
+.admin-bar, .admin-bar * { font-family: Arial; font-size:12px; }
+.admin-bar { position:fixed;right:0;top:0;left:0; z-index:99999; }
 .admin-bar .admin-menu {
 	position:relative;
 	z-index:99999;
 	background-color:#333;
-	border-bottom-right-radius: 5px;
-	border-bottom-left-radius: 5px;
 }
 .admin-bar .admin-menu {
 	line-height:25px;
@@ -38,7 +37,7 @@
 }
 .admin-bar .admin-menu .btn { margin-top:0; margin-bottom:0; }
 .admin-bar .admin-body {
-	background-color:#ccc; color: #333;
+	background-color:#ccc; color: #333; border-bottom:1px solid #333;
 }
 .admin-bar .admin-body-item {
 	display:none;
