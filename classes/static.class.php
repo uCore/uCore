@@ -939,7 +939,7 @@ class utopia {
 
 		if ($match === '.*') $ident .= '(?:\.('.$match.'))?';
 		elseif ($match) $ident .= '\.('.$match.')';
-		if (isset(self::$templateParsers[$ident])) { error_log("$ident is already defined as a template parser."); return; }
+		if (isset(self::$templateParsers[$ident])) { throw new Exception("$ident is already defined as a template parser."); }
 		//self::$templateParsers[$ident] = $function;
 		//if (array_key_exists($ident,self::$templateParsers)) { error_log("$ident is already defined as a template parser."); return; }
 		//if (!is_callable($function)) { error_log("Function for template parser ($ident) is not callable."); return; }
