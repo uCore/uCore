@@ -63,8 +63,10 @@ abstract class uTableDef implements iUtopiaModule {
 	public function _SetupFields() {
 		if ($this->fieldsSetup == TRUE) return;
 		$this->fieldsSetup = TRUE;
-
+		
+		uEvents::TriggerEvent('BeforeSetupFields',$this);
 		$this->SetupFields();
+		uEvents::TriggerEvent('AfterSetupFields',$this);
 	}
 
 	public function SetPrimaryKey($name, $auto_increment = true) {
