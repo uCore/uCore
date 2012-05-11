@@ -369,7 +369,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		return '<span class="btn" onclick="ChooseWidget()">Insert Widget</span>';
 	}
 	public function SetupParents() {
-		utopia::AddTemplateParser('content',array($this,'getEditor'),'.*');
 		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 		$this->AddParent('uCMS_List','cms_id');
 		$this->AddChild('uCMS_View','cms_id','link');
@@ -473,6 +472,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		echo '<!-- /NoProcess -->';
 	}
 }
+utopia::AddTemplateParser('content',array(utopia::GetInstance('uCMS_Edit'),'getEditor'),'.*');
 
 utopia::AddTemplateParser('cms','uCMS_View::templateParser');
 uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'));
