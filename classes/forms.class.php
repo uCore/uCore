@@ -2422,7 +2422,8 @@ FIN;
 	public function UploadFile($fieldAlias,$fileInfo,&$pkVal = NULL) {
 		//$allowedTypes = $this->GetFieldProperty($fieldAlias, 'allowed');
 		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); return; }
-		if ($this->GetFieldType($fieldAlias) !== ftFILE) {
+		$type = getSqlTypeFromFieldType($this->GetFieldType($fieldAlias));
+		if (strpos($type,'blob') === FALSE && strpos($type,'text') === FALSE) {
 			$targetFile = get_class($this).'/'.date('Y-m-d').'/'.$pkVal.'/'.time().'_'.$fileInfo['name'];
 			$filename = uUploads::UploadFile($fileInfo,$targetFile);
 			if (!$filename) return;
