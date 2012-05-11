@@ -21,7 +21,13 @@ function moveMceToolbars(event,ed) {
 		span.parentsUntil('body').each(function () {
 			body.addClass($(this)[0].className);
 		});
-		body.css({margin:0,padding:0,'float':'none'});
+		body.css({margin:0,padding:0,'float':'none',
+			'-moz-transform':'none',
+			'-webkit-transform':'none',
+			'-o-transform':'none',
+			'-ms-transform':'none',
+			'transform':'none'
+		});
 		
 		// wake up the autoresize plugin
 		setTimeout(function(){ed.execCommand('mceAutoResize');},1);
