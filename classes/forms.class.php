@@ -2279,8 +2279,10 @@ FIN;
 				break;
 			case ftIMAGE:
 				if (!$value) break;
-				$size = $this->GetFieldProperty($fieldName,'length');
-				$value = $this->DrawSqlImage($fieldName,$rec,$size,$size);
+				$style = $this->FieldStyles_Get($fieldName);
+				$w = isset($style['width']) ? $style['width'] : null;
+				$h = isset($style['height']) ? $style['height'] : null;
+				$value = $this->DrawSqlImage($fieldName,$rec,$w,$h);
 				break;
 			case ftCURRENCY:
 				$dp = $this->GetFieldProperty($fieldName,'length');

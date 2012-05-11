@@ -275,12 +275,6 @@ class utopia {
 		if (isset($attributes['class'])) $attributes['class'] .= ' inputtype-'.$inputType;
 		else $attributes['class'] = 'inputtype-'.$inputType;
 
-		if (isset($attributes['style']) && is_array($attributes['style'])) {
-			$style = array();
-			foreach ($attributes['style'] as $key=>$val) $style[] = "$key:$val";
-			$attributes['style'] = join(';',$style);
-		}
-
 		$defaultValue = utopia::jsonTryDecode($defaultValue);
 		
 		//print_r($attributes);
@@ -416,6 +410,8 @@ class utopia {
 			case itFILE:
 				//$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
 				//$defaultValue = htmlentities($defaultValue);
+				unset($attributes['style']['height']);
+				$attr = BuildAttrString($attributes);
 				$out .= "$defaultValue<input type=\"file\" $attr/>";
 				break;
 			case itDATE:

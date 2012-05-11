@@ -240,10 +240,17 @@ function BuildAttrString($attrArray) {
 	$attrStrings = array();
 	foreach ($attrArray as $name => $val) {
 		if (!$val) continue;
+		if (is_array($val)) {
+			if (is_assoc($val)) {
+				$style = array();
+				foreach ($val as $key=>$val) $style[] = "$key:$val";
+				$val = implode(';',$style);
+			} else $val = implode(' ',$val);
+		}
 		$attrStrings[] = "$name=\"$val\"";
 	}
 
-	return ' '.join(' ',$attrStrings);
+	return ' '.implode(' ',$attrStrings);
 }
 
 function GetQSPairs($url) {
