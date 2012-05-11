@@ -190,12 +190,13 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function _RunModule() {
 		$this->AssertURL();
 		
-		if ($this instanceof iAdminModule && utopia::UsingTemplate()) utopia::UseTemplate(TEMPLATE_ADMIN);
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
 		if (uEvents::TriggerEvent('BeforeRunModule',$this) === FALSE) return FALSE;
 		$lc = $this->LoadChildren(0);
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
+		
+		if ($this instanceof iAdminModule && utopia::UsingTemplate()) utopia::UseTemplate(TEMPLATE_ADMIN);
 
 		timer_start('Run Module');
 		ob_start();
