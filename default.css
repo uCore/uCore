@@ -5,8 +5,11 @@ div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:le
 .cl { clear:left } .cr { clear:right } .cb { clear:both }
 .aw { width:auto }
 
-.datalist th { vertical-align: top; background-color:#DDDDDD; border: 1px solid #BBBBBB; padding: 2px 5px;
-  border-radius: 15px 15px 0px 0px; -moz-border-radius: 15px 15px 0px 0px; -webkit-border-bottom-right-radius: 0px; -webkit-border-bottom-left-radius: 0px; }
+.datalist th {
+	vertical-align: top; background-color:#DDDDDD; border: 1px solid #BBBBBB; padding: 6px 4px; font-size:1.2em;
+	border-radius: 5px 5px 0px 0px;
+}
+.datalist th.light { background-color:#eee;border-color:#DDD }
 .datalist th .uFilter { float:left; margin:2px;}
 td { vertical-align: top }
 
@@ -51,9 +54,8 @@ ul.pagination li { list-style:none; float:left; }
 	display: inline;
 }
 
-.layoutListSection td { vertical-align:middle }
+.layoutListSection td { vertical-align:middle; padding:4px; }
 .layoutDetailSection,.layoutListSection {
-	width: 100%;
 	/*margin: 10px;*/
 	padding: 5px;
 	vertical-align: top;
@@ -63,7 +65,7 @@ ul.pagination li { list-style:none; float:left; }
 	font-size: 1em;
 }
 
-.layoutDetailSection TR TH {
+.layoutDetailSection tr th {
 	font-size: 1.1em !important;
 	color: #FFFFFF;
 	padding-left: 5px;
@@ -110,16 +112,6 @@ ul.pagination li { list-style:none; float:left; }
 	background-color: #c00;
 	color: #eee;
 }
-
-#adminSlave {z-index:100001; position:absolute; top:0; left:0; font-size:14px; white-space:nowrap; text-align:left;
-			display:none;background-color:#EFEFEF; border:2px groove #CCCCCC; padding:5px;}
-#adminSlave form { margin:0 }
-#adminClose {float:right; width:10px; height:10px;font-size:10px; top:2px; right:2px; cursor:pointer; background-image:url('images/utopia-close.png'); }
-			
-#utopiaImg {z-index:100000; position:absolute; top:0; left:0; background-image:url("images/utopia-systems.png");width:20px;height:20px;margin:2px;}
-#utopiaImg:hover {background-image:url("images/utopia-systems-hover.png"); cursor:pointer}
-#adminSlave a, #adminSlave a:link, #adminSlave a:visited { color:#996; }
-#adminSlave a:hover { color:#774; }
 
 .uSearch .searchResult a { padding-bottom: 5px; font-size:1.1em }
 .uSearch .searchResult { margin-bottom: 30px; }

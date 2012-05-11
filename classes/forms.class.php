@@ -2620,7 +2620,7 @@ FIN;
 			$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 		} else {
 			//possible problems where value contains html? (html will be displayed in full)
-			if (empty($url) || ($value != '' && $value[0] == '<'))
+			if (empty($url) || ($value != '' && $value[0] == '<' && substr($value,0,4) != '<img'))
 				$ret = $value;
 			else {
 				$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
@@ -2947,9 +2947,11 @@ abstract class uListDataModule extends uDataModule {
 				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
 				//			$attr = $this->GetFieldType($fieldName) == ftCURRENCY ? ' style="text-align:\'.\'"' : '';
  */
-				echo '<th class="sortable" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
-				echo nl2br(htmlentities_skip($fieldData['visiblename'],'<>"')).'<br/>';
+				$colTitle = nl2br(htmlentities_skip($fieldData['visiblename'],'<>"'));
+				echo '<th class="sortable'.($colTitle?'':' light').'" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
+				echo $colTitle;
 				if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
+					echo '<br/>';
 					foreach ($this->filters as $fType) {
 						foreach ($fType as $filterset) { //flag_is_set($fieldData['options'],ALLOW_FILTER)) {
 							foreach ($filterset as $filterInfo) {
@@ -3239,7 +3241,7 @@ abstract class uSingleDataModule extends uDataModule {
 
 				$out .= "<tr>";
 
-				if ($hasFieldHeaders && $fieldCount !== 1)
+				if ($hasFieldHeaders)
 					$out .= "<td class=\"fld\">".$fieldData['visiblename']."</td>";
 				$out .= '<td>'.$this->GetCell($fieldName,$row,$targetUrl).'</td>';
 
