@@ -35,7 +35,7 @@ uEvents::AddCallback('BeforeRunModule','uUserLogin::CheckAccess');
 utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
 utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
 utopia::AddTemplateParser('login_status','uUserLogin::GetLoginStatus','');
-utopia::AddTemplateParser('login',array(utopia::GetInstance('uUserLogin'),'RunModule'),'',true);
+utopia::AddTemplateParser('login','uUserLogin::LoginForm','',true);
 class uUserLogin extends uDataModule {
 	public static function CheckAccess($object) {
 		$ret = uEvents::TriggerEvent('CanAccessModule',$object);
@@ -136,6 +136,10 @@ class uUserLogin extends uDataModule {
 			echo '<p>You are already logged in.</p>';
 			return;
 		}
+		self::LoginForm();
+	}
+	public static function LoginForm() {
+		if (self::IsLoggedIn()) return;
 		echo '<h1>Please log in</h1>';
 		echo '<form id="loginForm" action="" method="POST"><table>';
 		echo '<tr><td align="right">Email:</td><td>{login_user}</td></tr>';
