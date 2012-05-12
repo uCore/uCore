@@ -619,7 +619,8 @@ class uCMS_View extends uSingleDataModule {
 		$uri = $_SERVER['REQUEST_URI'];
 		$uri = preg_replace('/(\?.*)?/','',$uri);
 
-		if ($uri === PATH_REL_ROOT) return self::GetHomepage();    
+		if ($uri === PATH_REL_ROOT) return self::GetHomepage();
+		if (strpos($uri,PATH_REL_CORE.'index.php') === 0) return FALSE;
 
 		preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
 		if (array_key_exists(1,$matches)) {
