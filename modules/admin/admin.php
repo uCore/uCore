@@ -27,6 +27,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		return PATH_REL_CORE.'index.php'.$qs;
 	}
 	public function SetupParents() {
+		uUserRoles::NoRole(__CLASS__);
 		$this->AddParent('/');
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->UpdateHtaccess();
