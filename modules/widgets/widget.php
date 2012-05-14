@@ -223,7 +223,7 @@ class uCustomWidget implements iWidget {
 				$c = $repeatable;
 				foreach ($searchArr as $k => $search) {
 					$field = $varsArr[$k];
-					if (!isset($row[$field])) continue;
+					if (!array_key_exists($field,$row)) continue;
 					switch ($typeArr[$k]) {
 						case 'u':
 							$replace = $obj->PreProcess($field,$row[$field],$row);
