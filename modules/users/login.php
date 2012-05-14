@@ -114,6 +114,7 @@ class uUserLogin extends uDataModule {
 	public function checkLogin($object) {
 		if (self::IsLoggedIn()) return;
 		if (flag_is_set($object->GetOptions(), PERSISTENT)) return;
+		if (uEvents::TriggerEvent('CanAccessModule',$object) !== FALSE) return;
 
 		$parent = get_class($object);
 
