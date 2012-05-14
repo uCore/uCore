@@ -54,11 +54,11 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$nTemplates = utopia::GetTemplates(false,true);
 		$dTemplate = '/'.basename(PATH_REL_CORE).'/styles/default';
 		modOpts::AddOption('default_template','Default Template',NULL,$dTemplate,itCOMBO,$nTemplates);
-		$o = modOpts::GetOption('default_template');
-		//if (array_search($o,$nTemplates)===FALSE) modOpts::SetOption('default_template','/'.basename(PATH_REL_CORE).'/styles/default');
 
 		$this->AddParent('/');
 		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
+		
+		uUserRoles::LinkRoles('Page Editor',array('uCMS_List','uCMS_Edit'));
 	}
 	public function DeleteRecord($pkVal) {
 		parent::DeleteRecord($pkVal);
