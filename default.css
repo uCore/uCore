@@ -41,6 +41,8 @@ img { border: none }
 ul.pagination { overflow:hidden; padding:0; }
 ul.pagination li { list-style:none; float:left; }
 
+.mr10 { margin-right:10px }
+.ml10 { margin-left:10px }
 
 .linklist { padding-left:0 }
 

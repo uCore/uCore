@@ -299,7 +299,7 @@ class utopia {
 			case itCHECKBOX:
 				if (is_array($possibleValues)) foreach ($possibleValues as $name => $val) {
 					$checked = ($val === $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
-					$out .= "<input$attr type=\"checkbox\"$checked value=\"$val\"/> $name<br>";
+					$out .= "<div class=\"left mr10\"><input$attr type=\"checkbox\"$checked value=\"$val\"/>$name</div>";
 				} else {
 					$checked = ($defaultValue == 1) ? ' checked="checked"': '';
 					$out .= "<input$attr type=\"checkbox\"$checked value=\"1\"/>";
