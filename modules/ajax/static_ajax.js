@@ -503,6 +503,7 @@ function ReloadWithItems(items, ignoreCurrent) {
       newQS = newQS + i + '=' + items[i] + '&';
   }
   if (newQS != '') newQS = '?' + newQS;
+  newQS = newQS.replace(/&$/,'');
   window.location.assign(window.location.pathname+newQS+window.location.hash);
 }
 
