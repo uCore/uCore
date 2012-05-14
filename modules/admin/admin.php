@@ -27,13 +27,13 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		return PATH_REL_CORE.'index.php'.$qs;
 	}
 	public function SetupParents() {
+		if (uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE)
+			uAdminBar::AddItem('<a class="dashboard-link" href="'.PATH_REL_CORE.'">Dashboard</a>',FALSE,-100);
+			
 		uUserRoles::NoRole(__CLASS__);
 		$this->AddParent('/');
 		$this->RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->UpdateHtaccess();
-
-		if (uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE)
-			uAdminBar::AddItem('<a class="dashboard-link" href="'.PATH_REL_CORE.'">Dashboard</a>',FALSE,-100);
 	}
 	public function optimizeTables() {
 		echo '<h3>Optimise Tables</h3>';
