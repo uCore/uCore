@@ -18,19 +18,11 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT | PERSISTENT; }
 
 	public function GetTabledef() { return 'tabledef_UserRoles'; }
-	public function SetupFields() {
+	public function SetupFields() {	
+		self::InitModules();
 		$this->CreateTable('roles');
-		
-		$modules = utopia::GetModules();
-		foreach ($modules as $k => $v) {
-			$o = utopia::GetInstance($k);
-			if (!($o instanceof iAdminModule)) unset($modules[$k]);
-			else $modules[$k] = $o->GetTitle();
-		}
-		$modules = array_flip($modules);
-		
 		$this->AddField('name','name','roles','Name',itTEXT);
-		$this->AddField('allow','allow','roles','Allowed Modules',itCHECKBOX,$modules);
+		$this->AddField('allow','allow','roles','Allowed Modules',itCHECKBOX,&self::$modules);
 		
 		$this->AddFilter('role_id',ctNOTEQ,itNONE,-1);
 	}
@@ -63,23 +55,71 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		}
 		return self::$roleCache;
 	}
+	private static $modules = array();
+	private static function InitModules() {
+		if (self::$modules) return;
+		$modules = utopia::GetModules();
+		foreach ($modules as $k => $v) {
+			$o = utopia::GetInstance($k);
+			if (!($o instanceof iAdminModule)) unset($modules[$k]);
+			else $modules[$k] = $o->GetTitle();
+		}
+		self::$modules = array_flip($modules);
+	}
+	private static $linked = array();
+	public static function LinkRoles($id,$modules) {
+		self::InitModules();
+		if (!is_array($modules)) $modules = array($modules);
+		$modules = array_filter($modules);
+		if (!$modules) return;
+		
+		foreach (self::$modules as $t => $mod) {
+			if (array_search($mod,$modules) !== FALSE) unset(self::$modules[$t]);
+		}
+		self::$modules[$id] = $id;
+		
+		if (!isset(self::$linked[$id])) self::$linked[$id] = array();
+		self::$linked[$id] = array_merge(self::$linked[$id],$modules);
+	}
+	private static $customRoles = array();
+	public static function SetCustom($module,$callback) {
+		if (isset(self::$customRoles[$module])) throw new Exception('Custom role for '.$module.' already exsits.');
+		self::$customRoles[$module] = $callback;
+	}
 	
 	public static function checkPermission($object) {
 		if (!($object instanceof iAdminModule)) return true;
+		self::InitModules();
 		$parent = get_class($object);
 
 		$role = self::GetUserRole();
 		if ($role) {
-			if ($role[0] === '-1') return true; // site admin
+			// site admin
+			if ($role[0] === '-1') return true;
+			
+			// custom permission
+			if (isset(self::$customRoles[$parent]) && is_callable(self::$customRoles[$parent])) return call_user_func_array(self::$customRoles[$parent],array($parent));
+			
+			if (!is_array($role[1])) $role[1] = array($role[1]);
 			foreach ($role[1] as $r) { // iterate role permissions
+				if (isset(self::$linked[$r]) && array_search($parent,self::$linked[$r])!==FALSE) return true;
 				if ($r === $parent) return true;
 			}
 		}
 		return false;
+	}
+	public static function NoRole($module) {
+		self::InitModules();
+		foreach (self::$modules as $t => $mod) {
+			if ($mod === $module) unset(self::$modules[$t]);
+		}
+		self::SetCustom($module,'uUserRoles::RetTrue');
+	}
+	private static function RetTrue() {
+		return true;
 	}
 	
 	public function RunModule() {
 		$this->ShowData();
 	}
 }
-
