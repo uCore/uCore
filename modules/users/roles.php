@@ -85,24 +85,27 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		self::$linked[$id] = array_merge(self::$linked[$id],$modules);
 	}
 	private static $customRoles = array();
-	public static function SetCustom($module,$callback) {
+	public static function AddCustomRole($module,$callback) {
 		if (isset(self::$customRoles[$module])) throw new Exception('Custom role for '.$module.' already exsits.');
 		self::$customRoles[$module] = $callback;
 	}
 	
 	public static function checkPermission($object) {
-		if (!($object instanceof iAdminModule)) return true;
-		self::InitModules();
+		// site admin
+		$role = self::GetUserRole();
+		if ($role && $role[0] === '-1') return true;
+
 		$parent = get_class($object);
 
-		$role = self::GetUserRole();
+		// custom permission
+		if (isset(self::$customRoles[$parent]) && is_callable(self::$customRoles[$parent])) return call_user_func_array(self::$customRoles[$parent],array($parent));
+
+		// only valid for custom and admin modules
+		if (!($object instanceof iAdminModule)) return true;
+		
+		self::InitModules();
+		
 		if ($role) {
-			// site admin
-			if ($role[0] === '-1') return true;
-			
-			// custom permission
-			if (isset(self::$customRoles[$parent]) && is_callable(self::$customRoles[$parent])) return call_user_func_array(self::$customRoles[$parent],array($parent));
-			
 			if (!is_array($role[1])) $role[1] = array($role[1]);
 			foreach ($role[1] as $r) { // iterate role permissions
 				if (isset(self::$linked[$r]) && array_search($parent,self::$linked[$r])!==FALSE) return true;
@@ -116,7 +119,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		foreach (self::$modules as $t => $mod) {
 			if ($mod === $module) unset(self::$modules[$t]);
 		}
-		self::SetCustom($module,'uUserRoles::RetTrue');
+		self::AddCustomRole($module,'uUserRoles::RetTrue');
 	}
 	private static function RetTrue() {
 		return true;
