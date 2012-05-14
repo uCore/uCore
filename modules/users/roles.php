@@ -22,7 +22,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		self::InitModules();
 		$this->CreateTable('roles');
 		$this->AddField('name','name','roles','Name',itTEXT);
-		$this->AddField('allow','allow','roles','Allowed Modules',itCHECKBOX,&self::$modules);
+		$this->AddField('allow','allow','roles','Allowed Modules',itCHECKBOX,self::$modules);
 		
 		$this->AddFilter('role_id',ctNOTEQ,itNONE,-1);
 	}
@@ -68,7 +68,8 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	}
 	private static $linked = array();
 	public static function LinkRoles($id,$modules) {
-		self::InitModules();
+		$o = utopia::GetInstance(__CLASS__);
+		$o->_SetupFields();
 		if (!is_array($modules)) $modules = array($modules);
 		$modules = array_filter($modules);
 		if (!$modules) return;
@@ -77,6 +78,8 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 			if (array_search($mod,$modules) !== FALSE) unset(self::$modules[$t]);
 		}
 		self::$modules[$id] = $id;
+		
+		$o->SetValuesCache('allow',self::$modules);
 		
 		if (!isset(self::$linked[$id])) self::$linked[$id] = array();
 		self::$linked[$id] = array_merge(self::$linked[$id],$modules);
