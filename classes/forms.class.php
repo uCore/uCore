@@ -1525,18 +1525,22 @@ FIN;
 
 	// private - must use addfilter or addfilterwhere.
 	private function &AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) {
-		if (($fltr = $this->FindFilter($fieldName,$compareType,$inputType,$filterType))) return $fltr;
+		if (!($fieldData =& $this->FindFilter($fieldName,$compareType,$inputType,$filterType))) {
+			$uid = $this->GetNewUID($fieldName);
+
+			if ($filterType == NULL) // by default, filters are HAVING unless otherwise specified
+			$filterset =& $this->filters[FILTER_HAVING];
+			else
+			$filterset =& $this->filters[$filterType];
+
+			if ($filterset == NULL) $filterset = array();  // - now manually called NewFilterset####()
+
+
+			$fieldData = array();
+			$fieldData['uid'] = $uid;
+			$filterset[count($filterset)-1][] =& $fieldData;
+		}
 		
-		$uid = $this->GetNewUID($fieldName);
-		$value = $dvalue;
-
-		if ($filterType == NULL) // by default, filters are HAVING unless otherwise specified
-		$filterset =& $this->filters[FILTER_HAVING];
-		else
-		$filterset =& $this->filters[$filterType];
-
-		if ($filterset == NULL) $filterset = array();  // - now manually called NewFilterset####()
-
 		if ($values === NULL) switch ($inputType) {
 			case itCOMBO:
 			case itOPTION:
@@ -1551,60 +1555,16 @@ FIN;
 		if (is_string($values)) {
 			$values = $this->FindValues($fieldName,$values);
 		}
-		//$vals = $this->FindValues($fieldName,$values,!is_array($values));
-		//if ($value !== NULL && is_array($vals) && !array_key_exists($value,$vals)) {
-		//	$checkVals = $this->FindValues($fieldName,$values);
-		//	if (!array_key_exists($value,$checkVals)) $checkVals = array_flip($checkVals);
-		//	if (array_key_exists($value,$checkVals)) $value = $checkVals[$value];
-		//}
 
-
-		/*		if ($inputType == itCOMBO) {
-			$flipValues = FALSE;
-			if ($values !== NULL) {
-			if (is_string($values)) {
-			$values = $this->FindValues($fieldName,$values);
-			$flipValues = TRUE;
-			} else if (is_array($values)) {
-			$gotStr = false;
-			foreach ($values as $key => $val)
-			if (!is_int($key)) { $gotStr = true; break;}
-
-			if (!$gotStr) { // assume we want the key = val
-			foreach ($values as $key => $val) {
-			$values[$val] = $val;
-			unset($values[$key]);
-			}
-			}
-			}
-			} else {
-			if (array_key_exists($fieldName,$this->fields) && array_key_exists('values',$this->fields[$fieldName]))
-			$values = $this->fields[$fieldName]['values'];
-			else
-			$values = $this->FindValues($fieldName);
-			$flipValues = TRUE;
-			}
-
-			if ($flipValues && $filterset == $this->filters[FILTER_HAVING]) {
-			// values for the filter are repopulated using key => key - this is because Having filters are always on the end result (the text) and not the lookup value
-			$valFlip = array_flip($values); if (array_key_exists($value,$valFlip)) $value = $valFlip[$value];
-			if (is_array($values) && !empty($values) && !isset($this->fields[$fieldName]['customValues'])) {
-			foreach ($values as $key => $val)
-			$values[$key] = $key;
-			}
-			}
-			}*/
-
+		$value = $dvalue;
 		if ($inputType == itNONE && !$value && array_key_exists($fieldName,$_GET))
 			$value = $_GET[$fieldName];
-
-		$fieldData = array();
+		
 		$fieldData['fieldName'] = $fieldName;
 		$fieldData['type'] = $filterType;
 
 		$fieldData['ct'] = $compareType;
 		$fieldData['it'] = $inputType;
-		$fieldData['uid'] = $uid;
 
 		$fieldData['title']= $title;
 		$fieldData['values']= $values;
@@ -1613,7 +1573,6 @@ FIN;
 
 		if ($inputType != itNONE) $this->hasEditableFilters = true;
 
-		$filterset[count($filterset)-1][] =& $fieldData;
 		return $fieldData;//['uid'];
 	}
 
