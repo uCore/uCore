@@ -2458,7 +2458,7 @@ FIN;
 		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
 
 		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return FALSE;
-		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,$pkVal)) === FALSE) return FALSE;
 		
 		$oldPkVal = $pkVal;
 		$fieldPK = $this->GetPrimaryKey($fieldAlias);
@@ -2569,7 +2569,7 @@ FIN;
 		$this->ResetField($fieldAlias,$pkVal);
 		if ($oldPkVal !== $pkVal) $this->ResetField($fieldAlias,$oldPkVal);
 		
-		if (uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldAlias)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldAlias,$newValue,$pkVal)) === FALSE) return FALSE;
 
 		return $ret;
 	}
