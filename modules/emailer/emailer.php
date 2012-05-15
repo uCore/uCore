@@ -29,7 +29,7 @@ class tabledef_EmailTemplateAttachments extends uTableDef {
 
 class uEmailTemplateList extends uListDataModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'Email Templates'; } //$row = $this->GetRecord($this->GetDataset(),0); return $row['name']; }
+	public function GetTitle() { return 'Email Templates'; }
 	public function GetOptions() { return ALLOW_FILTER | ALLOW_DELETE; }
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 
@@ -50,7 +50,7 @@ class uEmailTemplateList extends uListDataModule implements iAdminModule {
 }
 class uEmailTemplateDetails extends uSingleDataModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'Edit Email Template'; } //$row = $this->GetRecord($this->GetDataset(),0); return $row['name']; }
+	public function GetTitle() { return 'Edit Email Template'; }
 	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 
@@ -107,7 +107,7 @@ class uEmailTemplateAttachmentList extends uListDataModule implements iAdminModu
 }
 class uEmailer extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return ''; } //$row = $this->GetRecord($this->GetDataset(),0); return $row['name']; }
+	public function GetTitle() { return ''; }
 	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 

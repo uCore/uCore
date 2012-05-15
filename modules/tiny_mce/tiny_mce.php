@@ -3,7 +3,7 @@ define('itRICHTEXT' ,'richtext');
 define('itHTML' ,'html');
 class module_TinyMCE extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return ''; } //$row = $this->GetRecord($this->GetDataset(),0); return $row['name']; }
+	public function GetTitle() { return ''; }
 	public function GetOptions() { return ALLOW_FILTER; }
 
 	public function SetupParents() {

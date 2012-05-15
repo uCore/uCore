@@ -47,9 +47,9 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		if (!self::$roleCache) {
 			$obj = utopia::GetInstance('uUsersList');
 			$user = $obj->LookupRecord(array('user_id'=>$_SESSION['current_user']));
-			$obj = utopia::GetInstance('uUserRoles');
 			if ($user['_roles_pk'] === NULL) return FALSE;
 
+			$obj = utopia::GetInstance('uUserRoles');
 			$role = $obj->LookupRecord($user['_roles_pk'],true); // clear fixed filters
 			self::$roleCache = array($role['role_id'],utopia::jsonTryDecode($role['allow']));
 		}

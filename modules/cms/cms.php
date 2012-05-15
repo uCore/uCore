@@ -524,7 +524,7 @@ class uCMS_View extends uSingleDataModule {
 	public function GetTitle() {
 		$rec = self::findPage();
 		if (!$rec) $rec = self::GetHomepage();
-		if (!$rec) $rec = $this->GetRecord($this->GetDataset(),0);
+		if (!$rec) $rec = $this->LookupRecord();
 		if (isset($_GET['preview']) && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') !== FALSE)
 			return $rec['title'].' (Preview)';
 		return $rec['title'];
@@ -547,7 +547,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
-		$this->AddFilter('cms_id',ctEQ);
+		//$this->AddFilter('cms_id',ctEQ);
 	}
 
 	public function SetupParents() {
@@ -583,7 +583,7 @@ class uCMS_View extends uSingleDataModule {
 		}
 	}
 	function InitSitemap() {
-		$rows = $this->GetRows();
+		$rows = $this->GetRows(NULL,true);
 
 		foreach ($rows as $row) {
 			// is published
@@ -607,7 +607,7 @@ class uCMS_View extends uSingleDataModule {
 
 	static function GetHomepage() {
 		$obj = utopia::GetInstance('uCMS_View');
-		$row = $obj->LookupRecord(array('is_home'=>'1'));
+		$row = $obj->LookupRecord(array('is_home'=>'1'),true);
 		if (!$row) $row = $obj->LookupRecord();
 		if ($row) return $row;
 		return FALSE;

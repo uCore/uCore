@@ -163,7 +163,7 @@ class uCustomWidget implements iWidget {
 
 		if (!$meta['module'] || !class_exists($meta['module'])) return '';
 
-		if (($instance = utopia::GetInstance($meta['module']))) {
+		if (($instance = utopia::GetInstance($meta['module'],false))) {
 			foreach ($instance->fields as $fieldName => $fieldInfo) {
 				if (isset($fieldInfo['ismetadata']) && !isset($meta[$fieldName])) $meta[$fieldName] = null;
 			}
@@ -184,8 +184,7 @@ class uCustomWidget implements iWidget {
 			// get rows
 			$rows = array();
 			try {
-				$dataset = $instance->GetDataset(NULL);
-				$rows = GetRows($dataset);
+				$rows = $instance->GetRows();
 			} catch (Exception $e) {
 				uNotices::AddNotice('<p>There was a problem accessing the records, please check your filter and sorting options for invalid fields.</p>',NOTICE_TYPE_WARNING);
 			}

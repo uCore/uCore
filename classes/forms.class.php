@@ -2031,10 +2031,9 @@ FIN;
 	private $explainQuery = false;
 	/**
 	 * Get a dataset based on setup.
-	 * @param (bool|null) NULL to return a fresh dataset, TRUE to refresh the internal dataset, FALSE to return the cached dataset.
 	 * @returns MySQL Dataset
 	 */
-	public function &GetDataset($refresh = FALSE) {
+	public function &GetDataset() {
 		$this->_SetupFields();
 
 		// GET SELECT
@@ -2074,10 +2073,6 @@ FIN;
 		if (empty($this->limit) && isset($_GET[$limitKey])) $this->limit = $_GET[$limitKey];
 		if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
 
-		$checksum = sha1(print_r($query,true));
-		if ($this->queryChecksum === $checksum && $this->dataset !== NULL && $refresh === FALSE) return $this->dataset;
-		$this->queryChecksum = $checksum;
-
 		if ($this->explainQuery) print_r(GetRows(sql_query("EXPLAIN EXTENDED $query")));
 
 		$this->dataset = sql_query($query);
@@ -2090,56 +2085,11 @@ FIN;
 		$this->rowcount = true;
 		$old_limit = $this->limit;
 		$this->limit = 1;
-		$result = $this->GetDataset(true);
+		$result = $this->GetDataset();
 		$row = mysql_fetch_assoc($result);
 		$this->limit = $old_limit;
 		$this->rowcount = false;
 		return $row['row_count'];
-	}
-
-	private $lastRowNum = array();
-	public function GetLastRowNum() { return $this->lastRowNum; }
-	/**
-	 * Get a record from a specified dataset.
-	 * @param resource Dataset from which to get a record
-	 * @param int Row number to retrieve
-	 * @returns Array containing Field=>Value key pairs
-	 */
-	public function GetRecord($dataset, $rowNum) {
-	  //static $aaaa = 0; $aaaa++;
-		//		ErrorLog(get_class($this).".GetRecord($rowNum)");
-		//        if (is_bool($refresh)) {
-		//
-		//            $dataset = $this->GetDataset($refresh);
-		//        } else
-		//            $dataset = $refresh;
-
-		if (!is_resource($dataset)) return NULL;
-		if ($dataset === $this->dataset && $this->IsNewRecord()) return NULL;
-		$num_rows = mysql_num_rows($dataset);
-		//        if ($rowNum === NULL) {
-		//			$rowNum = $this->internalRowNum;
-		//			$this->internalRowNum++;
-		//		}
-		if ($rowNum < 0) { // negative rowNum means find record from end of the set (-1 = last record)
-			$rowNum = $num_rows + $rowNum;
-		}
-
-		if ($rowNum > $num_rows-1 || $rowNum < 0 || $num_rows == 0) { // requested row is greater than total rows or less than 0 or no rows exist
-			$row = NULL;
-		} else {
-			//mysql_data_seek($dataset,$rowNum);
-    //timer_start('zz'.$aaaa);
-			$row = GetRow($dataset,$rowNum);
-    //timer_end('zz'.$aaaa);
-		}
-
-		if ($dataset === $this->dataset) {
-			$this->currentRecord = $row;//mysql_fetch_assoc($dataset);
-			$this->lastRowNum = $rowNum;
-			//$_SESSION['datastore'][get_class($this)] = $this->currentRecord;
-		}
-		return $row;
 	}
 
 	public function GetCurrentRecord($refresh = FALSE) {
@@ -2152,42 +2102,36 @@ FIN;
 	}
 
 	public function GetRows($filter=NULL,$clearFilters=false) {
-		//if (is_null($filter)) return NULL;
-		if (!$filter) $filter = array();
+		$this->_SetupParents();
+		$this->_SetupFields();
+		if ($filter===NULL) $filter = array();
 		if (!is_array($filter)) $filter = array($this->GetPrimaryKey()=>$filter);
-		$class = get_class($this);
-		$instance = new $class();
-		$instance->_SetupParents();
-		$instance->_SetupFields();
-		if ($clearFilters) $instance->ClearFilters();
+		$fltrs = $this->filters;
+		if ($clearFilters) $this->ClearFilters();
 		foreach ($filter as $field => $val) {
 			// does filter exist already?
-			if ($fltr =& $instance->FindFilter($field,ctEQ)) {
-				$fltr['value'] = $val;
-			} else {
-				if (!is_numeric($field))
-					$instance->AddFilter($field,ctEQ,itNONE,$val);
-				else
-					$instance->AddFilter($val,ctCUSTOM);
-			}
+			if (!is_numeric($field))
+				$this->AddFilter($field,ctEQ,itNONE,$val);
+			else
+				$this->AddFilter($val,ctCUSTOM);
 		}
-		$dataset = $instance->GetDataset(NULL);
+		$dataset = $this->GetDataset();
 
 		$rows = array();
-
-		$i = 0;
-		while (($row = $this->GetRecord($dataset,$i))) {
+		while (($row = mysql_fetch_assoc($dataset))) {
 			$rows[] = $row;
-			$i++;
 		}
+		$this->filters = $fltrs;
 
 		return $rows;
 	}
 
 	public function LookupRecord($filter=NULL,$clearFilters=false) {
 		$rows = $this->GetRows($filter,$clearFilters);
-		if (is_array($rows)) return reset($rows);
-		return NULL;
+		if (!$rows) return NULL;
+		$row = reset($rows);
+		if ($filter===NULL && $clearFilters === FALSE) $this->currentRecord = $row;
+		return $row;
 	}
 
 	public function GetRowWhere($pkValue = NULL) {
@@ -2782,7 +2726,6 @@ abstract class uListDataModule extends uDataModule {
 	}
 
 	public function CheckMaxRows($mod = 0) {
-		//$ds = $this->GetDataset(true);
 		AjaxEcho('// max recs: '.$this->GetMaxRows());
 		$rows = $this->GetRowCount();
 		if (!$this->GetMaxRows() || $rows + $mod < $this->GetMaxRows()) {
@@ -2933,7 +2876,7 @@ abstract class uListDataModule extends uDataModule {
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows.' (Max 150 shown)';
 			echo '<tr><td colspan="'.$colcount.'">'.$pager.'<b>{list.'.get_class($this).'}'.$records.'</b></td></tr>';
 
-			echo $c;
+			if ($num_rows > 0) echo $c;
 
 			echo "</thead>\n";
 		}
@@ -3121,20 +3064,13 @@ abstract class uSingleDataModule extends uDataModule {
 		//	echo "showdata ".get_class($this)."\n";
 		//check pk and ptable are set up
 		if (is_empty($this->GetTabledef())) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
-		//		$fullfilters = $this->GetFullFilters($filter);
-
-		//		echo "looking for ".$this->GetPrimaryKey().'in';
-		//		print_r($fullfilters);
-		//		$newRec = ($this->HasFilter($this->GetPrimaryKey()) === FALSE);
-		//		$result = $this->GetCurrentRecord();
-		//		$row == NULL;
 
 		$row = NULL;
 		if (!$this->IsNewRecord()) { // records exist, lets get the first.
-			$dataset = $this->GetDataset(TRUE);
-			$row = $this->GetRecord($dataset,0);
+			$dataset = $this->GetDataset();
+			$row = $this->LookupRecord();
 			if (!$row) {
-				//echo "The record you requested is not available.";
+				echo "The record you requested is not available.";
 				return;
 			}
 			// TODO: pagination for single record display
@@ -3157,7 +3093,6 @@ abstract class uSingleDataModule extends uDataModule {
 		//			if (mysql_num_rows($result) > 1) {
 		// multiple records exist in this set, sort out pagination
 		//			}
-		//			$row = $this->GetRecord(0);
 		//		}
 
 		$order = $this->GetSortOrder();

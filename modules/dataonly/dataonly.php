@@ -101,7 +101,8 @@ class uDataOnly extends uBasicModule {
 		$pk = $obj->GetPrimaryKey();
 
 		$i = 0;
-		while (($row = $obj->GetRecord($dataset,$i))) {
+		$rows = $obj->GetRows();
+		foreach ($rows as $row) {
 			$i++;
 			$out = array();
 			foreach ($fields as $fieldAlias => $fieldData) {
