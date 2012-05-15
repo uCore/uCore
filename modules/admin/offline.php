@@ -26,8 +26,7 @@ class module_Offline extends uBasicModule {
 
 		if (modOpts::GetOption('site_online')) return;
 
-		$role = uUserRoles::GetUserRole();
-		if ($role && $role[0] === '-1') return; // site admin
+		if (uUserRoles::IsAdmin()) return; // site admin
 			
 		$obj = utopia::GetInstance($parent);
 		if ($obj instanceof iAdminModule) return;

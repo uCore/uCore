@@ -55,6 +55,11 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		}
 		return self::$roleCache;
 	}
+	public static function IsAdmin() {
+		$role = self::GetUserRole();
+		return ($role && $role[0] === '-1');
+	}
+	
 	private static $modules = array();
 	private static function InitModules() {
 		if (self::$modules) return;
@@ -92,8 +97,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	
 	public static function checkPermission($object) {
 		// site admin
-		$role = self::GetUserRole();
-		if ($role && $role[0] === '-1') return true;
+		if (self::IsAdmin()) return true;
 
 		$parent = get_class($object);
 
@@ -105,6 +109,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		
 		self::InitModules();
 		
+		$role = self::GetUserRole();
 		if ($role) {
 			if (!is_array($role[1])) $role[1] = array($role[1]);
 			foreach ($role[1] as $r) { // iterate role permissions
