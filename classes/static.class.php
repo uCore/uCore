@@ -1178,7 +1178,8 @@ class utopia {
 		return 0;
 	}
 	static function jsonTryDecode($value, $assoc = true) {
-		if (!is_string($value)) return $value;
+		if (!is_string($value) || !strlen($value)) return $value;
+		if (!preg_match('/(^\[.*\]$)|(^\{.*\}$)/',$value)) return $value;
 		$originalValue = $value;
 		$value = json_decode($value,$assoc);
 		if ($value === NULL) $value = $originalValue;
