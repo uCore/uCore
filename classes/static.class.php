@@ -1197,8 +1197,11 @@ class utopia {
 		return $cType;
 	}
 	
-	static function OutputPagination($obj,$pages,$args = array(),$pageKey = 'page') {
+	static function OutputPagination($pages,$pageKey = 'page') {
+		//$pages $pageKey
 		if ($pages <= 1) return;
+		$parsed = parse_url($_SERVER['REQUEST_URI']);
+		$args = isset($parsed['query']) ? $parsed['query'] : '';
 		if (is_string($args)) parse_str($args,$args);
 
 		$page = isset($args[$pageKey]) ? $args[$pageKey] : 0;
@@ -1208,7 +1211,7 @@ class utopia {
 			$rel = array('prev');
 			if (!$args[$pageKey]) unset($args[$pageKey]);
 			if ($page-1 == 0) $rel[] = 'first';
-			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$obj->GetURL($args).'">&lt; Previous</a></li>';
+			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">&lt; Previous</a></li>';
 		}
 		for ($i = 0; $i<$pages; $i++) {
 			$args[$pageKey] = $i;
@@ -1218,13 +1221,13 @@ class utopia {
 			if ($i == $page+1) $rel[] = 'next';
 			if ($i == 0) $rel[] = 'first';
 			if ($i == $pages-1) $rel[] = 'last';
-			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$obj->GetURL($args).'">'.($i+1).'</a></li>';
+			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">'.($i+1).'</a></li>';
 		}
 		if ($page < $pages-1) {
 			$args[$pageKey] = $page +1;
 			$rel = array('next');
 			if ($page+1 == $pages-1) $rel[] = 'last';
-			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$obj->GetURL($args).'">Next &gt;</a></li>';
+			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Next &gt;</a></li>';
 		}
 		echo '</ul>';
 	}
