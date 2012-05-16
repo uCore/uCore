@@ -848,7 +848,8 @@ class utopia {
 			// add HEAD children
 			$head = $doc->getElementsByTagName('head')->item(0);
 			
-			$node = $doc->createElement('title',utopia::GetTitle(true));
+			$node = $doc->createElement('title');
+			$node->appendChild($doc->createTextNode(utopia::GetTitle(true)));
 			$head->appendChild($node);
 			if (utopia::GetDescription(true)) {
 				$node = $doc->createElement('meta'); $node->setAttribute('name','description'); $node->setAttribute('content',utopia::GetDescription(true));
