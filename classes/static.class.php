@@ -742,49 +742,40 @@ class utopia {
 		uEvents::TriggerEvent('BeforeOutputTemplate');
 		$template = '';
 		if (self::UsingTemplate()) {
-			self::SetVar('templatedir',utopia::GetTemplateDir(true));
-
-			$templateDir = self::GetTemplateDir();
-
-			if (!self::$doneCSS) {
-				$css = self::GetTemplateCSS();
-				foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
-				self::$doneCSS = true;
-			}
-
-			if (utopia::IsMobile() && file_exists($templateDir.'mobile.php')) {
-				$templatePath = $templateDir.'mobile.php';
-			} else {
-				$templatePath = $templateDir.'template.php';
-			}
-
-			$inifile = $templateDir.'template.ini';
-			if (file_exists($inifile)) {
-				$inifile = parse_ini_file($inifile);
-				if (isset($inifile['parent'])) { // this templates ini file specifies parent, so read in the current template, and put the result into the content var
-					if (file_exists($templatePath)) {
-						$template = get_include_contents($templatePath);
-						while (self::MergeVars($template));
-						self::SetVar('content',$template);
-					}
-
-					$nextTemplate = null;
-					if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {
-						$nextTemplate = $inifile['parent'];
-					} else {
-						$nextTemplate = str_replace(PATH_ABS_ROOT,'',$templateDir);
-						$nextTemplate = dirname($nextTemplate).'/'.$inifile['parent'];
-					}
-
-					if ($nextTemplate) {
-						self::UseTemplate($nextTemplate);
-						self::OutputTemplate();
-						return;
-					}
+			$css = self::GetTemplateCSS();
+			foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
+				
+			// first get list of parents
+			$templates = array();
+			$templateDir = utopia::GetTemplateDir(true);
+			if (!file_exists($templateDir)) $templateDir = utopia::GetAbsolutePath($templateDir);
+			$templates[] = $templateDir;
+			while (file_exists($templateDir.'/template.ini')) {
+				$inifile = parse_ini_file($templateDir.'/template.ini');
+				if (!isset($inifile['parent'])) break;
+				if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {
+					$templateDir = PATH_ABS_ROOT.$inifile['parent'];
+				} else {
+					$templateDir = dirname($templateDir).'/'.$inifile['parent'];
 				}
+				$templates[] = $templateDir;
 			}
-
-			$template = get_include_contents($templatePath);
+			
+			foreach ($templates as $templateDir) {
+				// set templatedir
+				self::SetVar('templatedir',self::GetRelativePath($templateDir));
+				// read template (mobile?)
+				if (utopia::IsMobile() && file_exists($templateDir.'/mobile.php')) {
+					$templatePath = $templateDir.'/mobile.php';
+				} else {
+					$templatePath = $templateDir.'/template.php';
+				}
+				$template = get_include_contents($templatePath);
+				// mergevars
+				while (self::MergeVars($template));
+				// setvar
+				self::SetVar('content',$template);
+			}
 		}
 		if (!$template) $template = '{utopia.content}';
 		ob_end_clean();
