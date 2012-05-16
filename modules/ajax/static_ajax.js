@@ -577,9 +577,10 @@ function _uf(ele,hourglass) {
 		eleVal = forcedValue;
 	} else {
 		var eleVal = [];
-		$(ele).siblings('[name*="'+eleName+'"]').andSelf().each(function () {
+		var n = eleName.replace('usql-','');
+		$(ele).closest('span.'+n).find('[name="'+eleName+'"]').each(function () {
 			if (this.tagName == 'INPUT' && $(this).is(':checkbox')) {
-				if ($(this).is(':checked')) eleVal.push($(this).val());// else eleVal.push('');
+				if ($(this).is(':checked')) eleVal.push($(this).val());
 			} else {
 				eleVal.push($(this).val());
 			}
