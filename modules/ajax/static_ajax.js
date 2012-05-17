@@ -178,7 +178,12 @@ function UpdateSelectedLinks() {
 		var _hrefPath = _hrefArr[0];
 		var _hrefArgs = _hrefArr[1] ? _hrefArr[1].split('&') : [];
 		var linkUUID = getParameterByName('uuid',_href);
+		var rel = $(this).attr('rel'); if (!rel) rel = '';
+		
+		// assign rel tag
+		if (_href == PATH_REL_ROOT) $(this).attr('rel',$.trim(rel+' home'));
 
+		// assign current link trail
 		var classname = '';
 		if (uuid || linkUUID) {
 			classname = (uuid == linkUUID) ? 'active-link' : '';

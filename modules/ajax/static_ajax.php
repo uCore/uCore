@@ -88,11 +88,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
 	}
 	public static function getFile() {
-		$last_load    =  isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime(trim($_SERVER['HTTP_IF_MODIFIED_SINCE'])) : false;
-		if ($last_load) {
-			header('HTTP/1.0 304 Not Modified', true, 304); die();
-		}
-
 		$qry = "SELECT ".mysql_real_escape_string($_GET['f'])." as file, ".mysql_real_escape_string($_GET['f'])."_filetype as filetype, ".mysql_real_escape_string($_GET['f'])."_filename as filename FROM ".mysql_real_escape_string($_GET['t'])." WHERE ".mysql_real_escape_string($_GET['k'])." = ".mysql_real_escape_string($_GET['p']);
 		$result = sql_query($qry);
 		if ($result === FALSE || mysql_num_rows($result) <= 0) { die('No File Found.'); }
@@ -117,7 +112,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 			utopia::PageNotFound();
 		}
 
-		$etag = sha1($_SERVER['REQUEST_URI'].'-'.strlen($data));
+		$etag = sha1($_SERVER['REQUEST_URI'].'-'.$data);
 		utopia::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 
 		$src = imagecreatefromstring($data);

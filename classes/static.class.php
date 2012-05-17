@@ -410,9 +410,7 @@ class utopia {
 			case itFILE:
 				//$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
 				//$defaultValue = htmlentities($defaultValue);
-				unset($attributes['style']['height']);
-				$attr = BuildAttrString($attributes);
-				$out .= "$defaultValue<input type=\"file\" $attr/>";
+				$out .= "<input type=\"file\" $attr/>";
 				break;
 			case itDATE:
 				//$formattedVal = ($defaultValue === SQL_FORMAT_EMPTY_TIMESTAMP) || ($defaultValue === SQL_FORMAT_EMPTY_DATE) || ($defaultValue === NULL) || ($defaultValue === '') ? '' : $defaultValue;//date('d/m/Y',strptime($defaultValue,'d/m/Y'));
@@ -1064,7 +1062,7 @@ class utopia {
 		$etag = '"'.$etag.'"';
 		header("ETag: $etag",true);
 		header("Expires: ".gmdate("D, d M Y H:i:s",time()+$age) . " GMT",true);
-		header("Cache-Control: public, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=$filename";
+		header("Cache-Control: public, max-age=$age",true);		$fn = empty($filename) ? '' : "; filename=\"$filename\"";
 		header("Content-Disposition: ".$disposition.$fn,true);
 
 		if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag) {

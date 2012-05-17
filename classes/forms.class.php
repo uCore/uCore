@@ -2176,7 +2176,7 @@ FIN;
 			case ftFILE:
 				$filename = '';
 				$link = $this->GetFileFromTable($fieldName,$this->fields[$fieldName]['vtable']['table'],$this->fields[$fieldName]['vtable']['pk'],$rec['_'.$this->fields[$fieldName]['vtable']['alias'].'_pk']);
-				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
+				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a target="_blank" href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
 				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
 				break;
@@ -2444,7 +2444,7 @@ FIN;
 				foreach ($this->fields as $dalias => $fieldData) {
 					if ($fieldAlias == $dalias) continue; // dont update the default for the field which is being set.
 					$default = $this->GetDefaultValue($dalias);
-					//echo "//getting value of $dalias : $default \n";
+					echo "//getting value of $dalias : $default \n";
 					if (!empty($default)) {
 						//echo "//setting default for $dalias to $default PK $pkVal\n";
 						$this->UpdateField($dalias,$default,$pkVal);
