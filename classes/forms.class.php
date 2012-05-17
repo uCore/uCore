@@ -2324,6 +2324,8 @@ FIN;
 
 	public function UploadFile($fieldAlias,$fileInfo,&$pkVal = NULL) {
 		//$allowedTypes = $this->GetFieldProperty($fieldAlias, 'allowed');
+		if (uEvents::TriggerEvent('BeforeUploadFile',$this,array($fieldAlias,$fileInfo,$pkVal)) === FALSE) return FALSE;
+		
 		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); return; }
 		$type = getSqlTypeFromFieldType($this->GetFieldType($fieldAlias));
 		if (strpos($type,'blob') === FALSE && strpos($type,'text') === FALSE) {
@@ -2337,6 +2339,8 @@ FIN;
 			$this->UpdateField($fieldAlias.'_filetype',$fileInfo['type'],$pkVal);
 			$this->UpdateField($fieldAlias,$value,$pkVal);
 		}
+		
+		if (uEvents::TriggerEvent('AfterUploadFile',$this,array($fieldAlias,$fileInfo,$pkVal)) === FALSE) return FALSE;
 	}
 
 	public function OnNewRecord($pkValue) {}
