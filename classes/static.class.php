@@ -927,15 +927,11 @@ class utopia {
 	static function AddTemplateParser($ident,$function,$match='.+',$catchOutput = false) {
 		if (is_string($function) && strpos($function,'::') !== FALSE) {
 			$function = explode('::',$function);
-			//$function = array($class,$fn);
 		}
-
+		$ident = preg_quote($ident);
 		if ($match === '.*') $ident .= '(?:\.('.$match.'))?';
 		elseif ($match) $ident .= '\.('.$match.')';
 		if (isset(self::$templateParsers[$ident])) { throw new Exception("$ident is already defined as a template parser."); }
-		//self::$templateParsers[$ident] = $function;
-		//if (array_key_exists($ident,self::$templateParsers)) { error_log("$ident is already defined as a template parser."); return; }
-		//if (!is_callable($function)) { error_log("Function for template parser ($ident) is not callable."); return; }
 		self::$templateParsers[$ident] = array($function,$catchOutput);
 	}
 	static function RunTemplateParser($ident,$data=null) {
