@@ -2448,7 +2448,6 @@ FIN;
 				foreach ($this->fields as $dalias => $fieldData) {
 					if ($fieldAlias == $dalias) continue; // dont update the default for the field which is being set.
 					$default = $this->GetDefaultValue($dalias);
-					echo "//getting value of $dalias : $default \n";
 					if (!empty($default)) {
 						//echo "//setting default for $dalias to $default PK $pkVal\n";
 						$this->UpdateField($dalias,$default,$pkVal);
