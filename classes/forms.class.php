@@ -382,7 +382,15 @@ abstract class uBasicModule implements iUtopiaModule {
 	public $rewriteMapping=NULL;
 	public $rewriteURLReadable=NULL;
 	public $rewritePersistPath=FALSE;
-	public function HasRewrite() { return $this->rewriteMapping !== NULL; }
+	public function HasRewrite($field = NULL) {
+		if ($this->rewriteMapping === NULL) return false;
+		if ($field === NULL) return $this->rewriteMapping !== NULL;
+
+		foreach ($this->rewriteMapping as $key => $map) {
+			if (strpos($map,'{'.$field.'}') !== FALSE) return true;
+		}
+		return false;
+	}
 
 	
 	/**
@@ -694,6 +702,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function ParseRewrite($caseSensative = false) {
+		$this->_SetupFields();
 		$parsed = parent::ParseRewrite($caseSensative);
 		if (!$parsed) return FALSE;
 		foreach ($parsed as $key => $val) {
@@ -746,10 +755,15 @@ abstract class uDataModule extends uBasicModule {
 		$this->RewriteFilters($filters);
 
 		$filArr = array();
+		if (is_array($filters)) foreach ($filters as $fieldName => $val) {
+			$filArr[$fieldName] = $val;
+		}
+
 		foreach ($this->filters as $filterType) {
 			foreach ($filterType as $filterSet) {
 				foreach ($filterSet as $filter) {
 					$val = $this->GetFilterValue($filter['uid']);
+					if (isset($filters[$filter['fieldName']])) $val = $filters[$filter['fieldName']];
 					
 					if (!empty($filter['default']) && $val == $filter['default']) {
 						unset($filters[$filter['fieldName']]);
@@ -757,35 +771,17 @@ abstract class uDataModule extends uBasicModule {
 						continue;
 					}
 
-					if ($val) {
-						$s = $this->HasRewrite() ? $filter['fieldName'] : '_f_'.$filter['uid'];
-						$filArr[$s] = $val;
+					if (!$val) continue;
+					if ($this->HasRewrite($filter['fieldName'])) {
+						if (isset($filters[$filter['fieldName']])) continue;
+						$filArr[$filter['fieldName']] = $val;
 						continue;
 					}
-					
-			/*		if (is_array($filters)) {
-						if (array_key_exists($filter['fieldName'],$filters)) {
-							$filArr['_f_'.$filter['uid']] = $filters[$filter['fieldName']];
-							unset($filters[$filter['fieldName']]);
-							continue;
-						}
-						if (array_key_exists('_f_'.$filter['uid'],$filters)) {
-							$filArr['_f_'.$filter['uid']] = $filters['_f_'.$filter['uid']];
-							unset($filters[$filter['fieldName']]);
-							continue;
-						}
-					}*/
+					$filArr['_f_'.$filter['uid']] = $val;
+					unset($filArr[$filter['fieldName']]);
 				}
 			}
 		}
-		
-		
-		if (is_array($filters)) {
-			foreach ($filters as $fieldName => $val) {
-				$filArr[$fieldName] = $val;
-			}
-		}
-
 		return parent::GetURL($filArr,$encodeAmp);
 	}
 
