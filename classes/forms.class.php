@@ -1525,21 +1525,19 @@ FIN;
 
 	// private - must use addfilter or addfilterwhere.
 	private function &AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) {
-		if (!($fieldData =& $this->FindFilter($fieldName,$compareType,$inputType,$filterType))) {
-			$uid = $this->GetNewUID($fieldName);
+		$uid = $this->GetNewUID($fieldName);
 
-			if ($filterType == NULL) // by default, filters are HAVING unless otherwise specified
-			$filterset =& $this->filters[FILTER_HAVING];
-			else
-			$filterset =& $this->filters[$filterType];
+		if ($filterType == NULL) // by default, filters are HAVING unless otherwise specified
+		$filterset =& $this->filters[FILTER_HAVING];
+		else
+		$filterset =& $this->filters[$filterType];
 
-			if ($filterset == NULL) $filterset = array();  // - now manually called NewFilterset####()
+		if ($filterset == NULL) $filterset = array();  // - now manually called NewFilterset####()
 
 
-			$fieldData = array();
-			$fieldData['uid'] = $uid;
-			$filterset[count($filterset)-1][] =& $fieldData;
-		}
+		$fieldData = array();
+		$fieldData['uid'] = $uid;
+		$filterset[count($filterset)-1][] =& $fieldData;
 		
 		if ($values === NULL) switch ($inputType) {
 			case itCOMBO:
