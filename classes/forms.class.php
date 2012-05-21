@@ -2295,8 +2295,7 @@ FIN;
 		$this->_SetupFields();
 		
 		// can we access this field?
-		$rec = $this->LookupRecord($pkVal);
-		if (!$rec) return false;
+		if ($pkVal !== NULL && !$this->LookupRecord($pkVal)) return false;
 
 		if ($fieldAlias === '__u_delete_record__')
 			$this->DeleteRecord($pkVal);
