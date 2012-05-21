@@ -2295,6 +2295,10 @@ FIN;
 
 	public function ProcessUpdates($sendingField,$fieldAlias,$value,&$pkVal=NULL,$isFile=false) {
 		$this->_SetupFields();
+		
+		// can we access this field?
+		$rec = $this->LookupRecord($pkVal);
+		if (!$rec) return false;
 
 		if ($fieldAlias === '__u_delete_record__')
 			$this->DeleteRecord($pkVal);
