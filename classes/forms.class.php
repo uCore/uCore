@@ -857,16 +857,11 @@ FIN;
 	}
 
   
-  public function GetDeleteButton($pk,$btnText = NULL,$title = NULL) {
-    $title = $title ? "Delete '$title'" : 'Delete Record';
-    if ($btnText)
-      return '<a name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" class="btn redbg" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'">'.$btnText.'</a>';
-    return '<a class="btn btn-del" name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'"></a>';
-  }
-//	public function CreateSqlDeleteField($where) {
-//		$prefix = 'del';
-//		return "sql[{$prefix}][".cbase64_encode(get_class($this).":".$this->GetPrimaryTable()."($where)")."]";
-//	}
+	public function GetDeleteButton($pk,$btnText = NULL,$title = NULL) {
+		$title = $title ? "Delete '$title'" : 'Delete Record';
+		if ($btnText) return '<a name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" class="btn redbg" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'">'.$btnText.'</a>';
+		return '<a class="btn btn-del" name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'"></a>';
+	}
 
 	public function DrawSqlInput($field,$defaultValue='',$pkValue=NULL,$attributes=NULL,$inputTypeOverride=NULL,$valuesOverride=NULL) {
 		if ($attributes==NULL) $attributes = array();
