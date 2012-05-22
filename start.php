@@ -16,13 +16,6 @@ function runtimeHeader($startTime) {
 $startTime = microtime(true);
 register_shutdown_function('runtimeHeader',$startTime);
 
-session_cache_limiter(false);
-session_set_cookie_params(0,'/');
-session_name('ucore');
-session_start();
-
-include('error.php');
-
 date_default_timezone_set('GMT');
 
 function fix_path($path,$slash = '') {
@@ -48,6 +41,12 @@ define('PATH_ABS_CONFIG',fix_path(PATH_ABS_ROOT.'uConfig.php'));
 define('PATH_ABS_MODULES',fix_path(PATH_ABS_ROOT.'uModules').'/');
 define('PATH_ABS_TEMPLATES',fix_path(PATH_ABS_ROOT.'uTemplates').'/');
 
+session_cache_limiter(false);
+session_set_cookie_params(0,PATH_REL_ROOT);
+session_name('ucore');
+session_start();
+
+include('error.php');
 
 // glob and load all functs files
 foreach (glob(PATH_ABS_CORE.'interfaces/*.php') as $fn) include($fn);
