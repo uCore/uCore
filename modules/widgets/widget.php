@@ -179,6 +179,7 @@ class uCustomWidget implements iWidget {
 			$instance->ordering = $meta['order'];
 
 			// init limit
+			utopia::MergeVars($meta['limit']);
 			$instance->limit = $meta['limit'];
 
 			// get rows
