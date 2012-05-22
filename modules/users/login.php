@@ -88,7 +88,7 @@ class uUserLogin extends uDataModule {
 		if ($rec) {
 			$_SESSION['current_user'] = $rec['user_id'];
 			if (isset($_REQUEST['remember_me'])) {
-				session_set_cookie_params(604800,'/');
+				session_set_cookie_params(604800,PATH_REL_ROOT);
 				session_regenerate_id(true);
 			}
 		} else {
