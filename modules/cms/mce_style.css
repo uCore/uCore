@@ -4,3 +4,5 @@
 
 .mceEditor.defaultSkin table.mceLayout { border: 0; }
 .mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }
+
+.mce_formatPreview a span { color: black !important; background-color:white !important; }
