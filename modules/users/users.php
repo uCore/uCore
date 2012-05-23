@@ -262,6 +262,7 @@ class uRegisterUser extends uDataModule {
 class uVerifyEmail extends uDataModule {
 	public function GetTitle() { return 'Verify'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
+	public function GetOptions() { ALLOW_EDIT; }
 
 	public function GetUUID() { return 'verify-email'; }
 
