@@ -2351,7 +2351,8 @@ FIN;
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
-		if (!flag_is_set($this->GetOptions(),ALLOW_EDIT)) { throw new Exception('Module does not allow record editing.'); }
+		if ($pkVal === NULL && !flag_is_set($this->GetOptions(),ALLOW_ADD)) { throw new Exception('Module does not allow adding records.'); }
+		if ($pkVal !== NULL && !flag_is_set($this->GetOptions(),ALLOW_EDIT)) { throw new Exception('Module does not allow editing records.'); }
 
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
