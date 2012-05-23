@@ -37,7 +37,6 @@ class module_TinyMCE extends uBasicModule {
 			$options['theme_advanced_toolbar_align'] = "left";
 			$options['theme_advanced_statusbar_location'] = "bottom";
 			$options['theme_advanced_resizing'] = true;
-			$options['theme_advanced_resize_horizontal'] = false;
 			$options['forced_root_block'] = false;
 			$options['preformatted'] = true;
 			$options['content_css'] = PATH_REL_CORE.'default.css';
@@ -46,8 +45,8 @@ class module_TinyMCE extends uBasicModule {
 			$options['save_enablewhendirty'] = true;
 
 			$richOpts = array();
-			$richOpts['plugins'] = "inlinepopups,spellchecker,save";
-			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p';
+			$richOpts['plugins'] = "paste,inlinepopups,spellchecker,save";
+			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p,br';
 			$richOpts['theme_advanced_buttons1'] = "save,|,bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
 			$richOpts['theme_advanced_buttons3'] = "";
@@ -57,7 +56,7 @@ class module_TinyMCE extends uBasicModule {
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 
-			$htmlOpts['plugins'] = "inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,save,autoresize";
+			$htmlOpts['plugins'] = "paste,inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,save,autoresize";
 			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor';
 			$htmlOpts['theme_advanced_buttons1_add_before'] = "save,|,";
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media,|,insertlayer,moveforward,movebackward,absolute';
