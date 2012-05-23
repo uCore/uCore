@@ -176,7 +176,7 @@ class uCustomWidget implements iWidget {
 
 			// add Order
 			utopia::MergeVars($meta['order']);
-			$instance->ordering = $meta['order'];
+			if ($meta['order']) $instance->AddOrderBy($meta['order']);
 
 			// init limit
 			utopia::MergeVars($meta['limit']);
