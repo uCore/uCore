@@ -16,7 +16,7 @@ class tabledef_ModOpts extends uTableDef {
 class modOpts extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Options'; }
 	public function GetSortOrder() { return -9999.5; }
-	public function GetOptions() { return ALLOW_FILTER | ALLOW_EDIT | ALLOW_DELETE; }
+	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE; }
 	public function GetTabledef() { return 'tabledef_ModOpts'; }
 	public function SetupFields() {
 		$this->CreateTable('opts');

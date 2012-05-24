@@ -28,7 +28,7 @@ class uMODULENAME_List extends uListDataModule implements iAdminModule {
 
 class uMODULENAME_Edit extends uSingleDataModule implements iAdminModule {
 	public function GetTitle() { return 'Edit My Record'; }
-	public function GetOptions() { return ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE | ALLOW_FILTER; }
+	public function GetOptions() { return ALLOW_ADD | ALLOW_EDIT | ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_MYTABLE'; }
 	public function SetupFields() {
 		$this->CreateTable('mytable');

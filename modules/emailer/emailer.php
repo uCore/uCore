@@ -108,7 +108,7 @@ class uEmailTemplateAttachmentList extends uListDataModule implements iAdminModu
 class uEmailer extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return ''; }
-	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_FILTER | ALLOW_EDIT; }
+	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 
 	public function SetupParents() {
