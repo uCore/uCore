@@ -819,6 +819,9 @@ class utopia {
 			
 			// no html tag?  break out.
 			if (!$doc->getElementsByTagName('html')->length) break;
+
+			// remove multiple xmlns attributes
+			$doc->documentElement->removeAttributeNS(NULL,'xmlns');
 			
 			// assert BODY tag
 			if (!$doc->getElementsByTagName('body')->length) {
