@@ -868,8 +868,19 @@ class utopia {
 			$doc->normalizeDocument();
 			if (strpos(strtolower($doc->doctype->publicId),' xhtml '))
 				$template = $doc->saveXML();
-			else
+			else {
+				$ctNode = null;
+				foreach ($head->getElementsByTagName('meta') as $meta) {
+					if ($meta->hasAttribute('http-equiv') && $meta->getAttribute('http-equiv') == 'content-type') { $ctNode = $meta; break; }
+				}
+				if (!$ctNode) {
+					$ctNode = $doc->createElement('meta');
+					$ctNode->setAttribute('http-equiv','Content-type'); $ctNode->setAttribute('content','text/html;charset='.CHARSET_ENCODING);
+					$head->appendChild($ctNode);
+				}
+				$head->insertBefore($ctNode,$head->firstChild);
 				$template = $doc->saveHTML();
+			}
 		} while (false);
 		
 		while (self::MergeVars($template));
