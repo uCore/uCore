@@ -87,7 +87,7 @@ class utopia {
 		return '<meta name="keywords" content="'.$content.'" />'."\n";
 	}
 	static function AddMetaTag($name,$content) {
-		$nifunc = create_function('$event,$obj,$doc','
+		$nifunc = create_function('$obj,$event,$doc','
 			$head = $doc->getElementsByTagName("head")->item(0);
 			$node = $doc->createElement("meta");
 			$node->setAttribute("name","'.$name.'"); $node->setAttribute("content","'.$content.'");

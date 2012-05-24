@@ -2,7 +2,7 @@
 
 uEvents::AddCallback('ProcessDomDocument','uFavicon::LinkFavicon');
 class uFavicon {
-	public static function LinkFavicon($event,$obj,$templateDoc) {
+	public static function LinkFavicon($obj,$event,$templateDoc) {
 		// first check template, then check root.
 		$iconPaths = array();
 		$iconPaths[] = utopia::GetTemplateDir(false).'favicon.ico';

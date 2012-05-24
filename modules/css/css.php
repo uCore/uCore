@@ -4,7 +4,7 @@ uCSS::IncludeFile(PATH_REL_CORE.'default.css');
 uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
 uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument','',99999);
 class uCSS extends uBasicModule {
-	static function LinkToDocument($event,$obj,$templateDoc) {
+	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		array_sort_subkey(self::$linkFiles,'order');
 		foreach (self::$linkFiles as $path) {
@@ -13,7 +13,7 @@ class uCSS extends uBasicModule {
 			$head->appendChild($node);
 		}
 	}
-	static function ProcessDomDocument($event,$obj,$doc) {
+	static function ProcessDomDocument($obj,$event,$doc) {
 		$styles = $doc->getElementsByTagName('style');
 		for ($i = 0; $i < $styles->length; $i++) { // now loop through all scripts, and ensure correct format
 			$style = $styles->item($i);

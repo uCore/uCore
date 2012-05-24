@@ -3,7 +3,7 @@
 uEvents::AddCallback('ProcessDomDocument','uJavascript::LinkToDocument');
 uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument','',99999);
 class uJavascript extends uBasicModule {
-	static function LinkToDocument($event,$obj,$templateDoc) {
+	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		array_sort_subkey(self::$linkFiles,'order');
 		foreach (self::$linkFiles as $path) {
@@ -18,7 +18,7 @@ class uJavascript extends uBasicModule {
 			$head->appendChild($node);
 		}
 	}
-	static function ProcessDomDocument($event,$obj,$doc) {
+	static function ProcessDomDocument($obj,$event,$doc) {
 		$scripts = $doc->getElementsByTagName('script');
 		for ($i = 0; $i < $scripts->length; $i++) { // now loop through all scripts, and ensure correct format
 			$script = $scripts->item($i);

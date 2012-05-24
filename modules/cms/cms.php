@@ -557,7 +557,7 @@ class uCMS_View extends uSingleDataModule {
 		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');
 		$this->SetRewrite(true);
 	}
-	static function ProcessDomDocument($event,$obj,$templateDoc) {
+	static function ProcessDomDocument($obj,$event,$templateDoc) {
 		$page = self::findPage();
 		
 		// set body class to cms_id

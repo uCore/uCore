@@ -36,7 +36,7 @@ class uAdminBar {
 
 		return '<div class="admin-bar"><ul class="admin-menu">'.implode('',$arr).'</ul><div class="admin-body">'.implode('',$body).'</div></div>';
 	}
-	static function ProcessDomDocument($event,$obj,$templateDoc) {
+	static function ProcessDomDocument($obj,$event,$templateDoc) {
 		$html = self::DrawAdminBar();
 		if (!$html) return;
 		$body = $templateDoc->getElementsByTagName('body')->item(0);
