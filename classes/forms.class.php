@@ -1450,30 +1450,14 @@ FIN;
 	}
 
 	public $ordering = NULL;
-	public function AddOrderBy($alias,$direction = 'ASC') {
+	public function AddOrderBy($fieldName,$direction = 'ASC') {
 		if ($this->ordering === NULL) $this->ordering = array();
-		/*
-		 switch ($this->GetFieldType($alias)) {
-			case 'date': $field = "STR_TO_DATE($alias,'".FORMAT_DATE."')"; break;
-			case 'time': $field = "STR_TO_DATE($alias,'".FORMAT_TIME."')"; break;
-			case 'datetime':
-			case 'timestamp': $field = "STR_TO_DATE($alias,'".FORMAT_DATETIME."')"; break;
-			default: $field = $alias; break;
-			}*/
-
-		$fieldName = $alias;
-		if ($this->FieldExists($alias))
-			$fieldName = "`$alias`";
-
-//		switch ($this->GetFieldType($alias)) {
-//			case ftDATE: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_DATE."')"; break;
-//			case ftTIME: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_TIME."')"; break;
-//			case ftDATETIME:
-//			case ftTIMESTAMP: $fieldName = "STR_TO_DATE($fieldName,'".FORMAT_DATETIME."')"; break;
-//			default: $fieldName = $fld;
-//		}
-
-		$this->ordering[] = "$fieldName $direction";
+		
+		if ($this->FieldExists($fieldName)) $fieldName = "`$fieldName`";
+		if (strpos($fieldName,' ') !== FALSE)
+			$this->ordering[] = "$fieldName";
+		else
+			$this->ordering[] = "$fieldName $direction";
 	}
 
 	/*  FILTERS */
