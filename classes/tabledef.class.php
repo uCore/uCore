@@ -108,7 +108,7 @@ abstract class uTableDef implements iUtopiaModule {
 			$this->fields[$name][$key] = $val;
 	}
 
-	public function AddField($name, $type, $length=NULL, $collation=SQL_COLLATION, $attributes=NULL, $null=SQL_NULL, $default=NULL, $extra=NULL, $comments=NULL) {
+	public function AddField($name, $type, $length=NULL, $default=NULL, $null=SQL_NULL, $collation=SQL_COLLATION, $extra=NULL, $comments=NULL) {
 		//$name = strtolower($name);
 		$this->fields[$name] = array();
 		$field =& $this->fields[$name];
@@ -119,7 +119,6 @@ abstract class uTableDef implements iUtopiaModule {
 		$sqltype = getSqlTypeFromFieldType($type);
 		$field['length'] = $length;
 		$field['collation'] = (!stristr($sqltype, 'binary') && !stristr($sqltype, 'blob')) ? $collation : NULL;
-		$field['attributes'] = $attributes;
 		$field['null'] = $null;
 
 		$zeroIfNull = array_flip(array(ftNUMBER,ftBOOL,ftDECIMAL,ftPERCENT,ftCURRENCY,ftTIMESTAMP,ftTIME));
@@ -191,7 +190,7 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($fieldData['type'] == ftTEXT || $fieldData['type'] == ftVARCHAR) $len = "({$fieldData['length']})";
 
 
-		return "`$fieldName` $type$length {$fieldData['null']} {$fieldData['attributes']} $default {$fieldData['extra']} $comments $collate";
+		return "`$fieldName` $type$length {$fieldData['null']} $default {$fieldData['extra']} $comments $collate";
 	}
 
 	public function Initialise() {
