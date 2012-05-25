@@ -1829,7 +1829,7 @@ FIN;
 			if (array_key_exists($fieldName,$this->fields)) {
 				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0)
 					$fieldToCompare = '`'.$this->fields[$fieldName]['tablename'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`'; // PRAGMA,  use tables PK
-				elseif (isset($this->fields[$fieldName]['vtable']['parent'])) {
+				elseif (isset($this->fields[$fieldName]['vtable']['parent']) && isset($this->fields[$fieldName]['values'])) {
 					$tbl = $this->fields[$fieldName]['vtable'];
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`';
 				} else
