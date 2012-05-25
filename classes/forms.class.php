@@ -1841,7 +1841,7 @@ FIN;
 
 		$value = $this->GetFilterValue($uid);//$filterData['value'];
 		//echo "$uid::$value<br/>";
-		if ($value === NULL && (!isset($filterData['linkFrom']) || !$filterData['linkFrom'] || (isset($filterData['allow_empty'])))) return '';
+		if ($value === NULL && (!isset($filterData['linkFrom']) || !$filterData['linkFrom'] || (!isset($_REQUEST['_f_'.$uid])))) return '';
 		// set filter VALUE
 		if ($compareType == ctLIKE && strpos($value,'%') === FALSE ) $value = "%$value%";
 
