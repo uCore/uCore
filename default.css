@@ -85,35 +85,5 @@ ul.pagination li { list-style:none; float:left; }
 	color: #f00
 }
 
-.btn.bluebg span {
-	background-color: #00f;
-	color: #eee;
-}
-
-.btn.bluebg:hover span {
-	background-color: #66f;
-	color: #000;
-}
-
-.btn.greenbg span {
-	background-color: #339900;
-	color: #eee;
-}
-
-.btn.greenbg:hover span {
-	background-color: #228800;
-	color: #000;
-}
-
-.btn.redbg span {
-	background-color: #f00;
-	color: #000;
-}
-
-.btn.redbg:hover span {
-	background-color: #c00;
-	color: #eee;
-}
-
 .uSearch .searchResult a { padding-bottom: 5px; font-size:1.1em }
 .uSearch .searchResult { margin-bottom: 30px; }

@@ -855,7 +855,7 @@ FIN;
   
 	public function GetDeleteButton($pk,$btnText = NULL,$title = NULL) {
 		$title = $title ? "Delete '$title'" : 'Delete Record';
-		if ($btnText) return '<a name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" class="btn redbg" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'">'.$btnText.'</a>';
+		if ($btnText) return '<a name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" class="btn btn-del" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'">'.$btnText.'</a>';
 		return '<a class="btn btn-del" name="'.$this->CreateSqlField('__u_delete_record__',$pk).'" href="#" onclick="if (confirm(\'Are you sure you wish to delete this record?\')) uf(this); return false;" title="'.$title.'"></a>';
 	}
 
@@ -2743,7 +2743,7 @@ abstract class uListDataModule extends uDataModule {
 						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'uSingleDataModule')) {
 					$url = $obj->GetURL();
-					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'greenbg')),1);
+					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'btn-new')),1);
 				}
 			}
 		}
@@ -2989,7 +2989,7 @@ abstract class uListDataModule extends uDataModule {
 		$pk = $row[$this->GetPrimaryKey()];
 		$body = '<tr class="'.cbase64_encode(get_class($this).':'.$pk).'">';
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) {
-			//$delbtn = utopia::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'btn redbg','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
+			//$delbtn = utopia::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'btn btn-del','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
 			$delbtn = $this->GetDeleteButton($row[$this->GetPrimaryKey()]);
 			$body .= '<td style="width:1px">'.$delbtn.'</td>';
 		}
@@ -3018,7 +3018,7 @@ abstract class uSingleDataModule extends uDataModule {
 		if ($linkInfo['parentField'] !== NULL) continue; // is linked to fields in the list, skip it
 		if (flag_is_set($this->GetOptions(),ALLOW_ADD)) { // create an addition button  --  && utopia::GetCurrentModule() == get_class($this)
 		$filters = array('newrec'=>1); // set this filter so that the primary key is negative, this will force no policy to be found, and show a new form
-		utopia::AppendVar('footer_left',CreateNavButton('New Record',$this->GetURL($filters),NULL,array('class'=>'btn greenbg')));
+		utopia::AppendVar('footer_left',CreateNavButton('New Record',$this->GetURL($filters),NULL,array('class'=>'btn btn-new')));
 		}
 		}
 		}

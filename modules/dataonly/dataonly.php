@@ -20,10 +20,10 @@ class uDataOnly extends uBasicModule {
 		if (!is_subclass_of($parent,'uListDataModule')) return;
 		$obj = utopia::GetInstance($parent);
 		$url = $obj->GetURL(array_merge($_GET,array('__ajax'=>'excel')));
-		utopia::LinkList_Add('list_functions:'.$parent,'Export to Excel',$url,10,NULL,array('class'=>'btn bluebg'));
+		utopia::LinkList_Add('list_functions:'.$parent,'Export to Excel',$url,10,NULL,array('class'=>'btn btn-csv'));
 
 		$url = $obj->GetURL(array_merge($_GET,array('__ajax'=>'print')));
-		utopia::LinkList_Add('list_functions:'.$parent,'Print',$url,10,NULL,array('class'=>'btn bluebg','target'=>'_blank'));
+		utopia::LinkList_Add('list_functions:'.$parent,'Print',$url,10,NULL,array('class'=>'btn btn-print','target'=>'_blank'));
 	}
 	
 	public function rawOutput() {
