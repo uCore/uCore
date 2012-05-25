@@ -181,6 +181,7 @@ abstract class uBasicModule implements iUtopiaModule {
 					if ($this->isSecurePage) $layer .= 's';
 					$abs = $layer.'://'.utopia::GetDomainName();
 				}
+				header('Cache-Control: no-store, no-cache, must-revalidate'); // don't cache redirects
 				header('Location: '.$abs.$url,true,$http_response_code); die();
 			}
 		}
