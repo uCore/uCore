@@ -1101,6 +1101,10 @@ FIN;
 
 		return $row[$alias];
 	}
+	
+	public function TableExists($alias) {
+		return array_key_exists($alias,$this->sqlTableSetupFlat);
+	}
 
 	// fromField is localField, toField is parentField -- pending global rename
 	//	public function CreateTable($alias, $tableModule=NULL, $parent=NULL, $fromField=NULL, $toField=NULL, $joinType='LEFT JOIN') {
@@ -1114,7 +1118,7 @@ FIN;
 		//		$fromField = strtolower($fromField);
 		//		$toField = strtolower($toField);
 		if (!$this->sqlTableSetupFlat) $this->sqlTableSetupFlat = array();
-		if (array_key_exists($alias,$this->sqlTableSetupFlat)) { ErrorLog("Cannot create table with alias ($alias).  A table with this alias already exists."); return; }
+		if ($this->TableExists($alias)) { throw new Exception("Table with alias '$alias' already exists."); return; }
 
 		$tableObj = utopia::GetInstance($tableModule);
 
@@ -1831,7 +1835,6 @@ FIN;
 				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0)
 					$fieldToCompare = '`'.$this->fields[$fieldName]['tablename'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`'; // PRAGMA,  use tables PK
 				elseif (isset($this->fields[$fieldName]['vtable']['parent']) && isset($this->fields[$fieldName]['values'])) {
-					$tbl = $this->fields[$fieldName]['vtable'];
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`';
 				} else
 					$fieldToCompare = '`'.$this->fields[$fieldName]['tablename'].'`.`'.$this->fields[$fieldName]['field'].'`'; // NOT PRAGMA, use field
