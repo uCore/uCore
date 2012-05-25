@@ -1341,34 +1341,34 @@ FIN;
 		
 		$this->fields[$aliasName] = array(
 		  'alias'       => $aliasName,
-      'tablename'   => $tableAlias,
-      'visiblename' => $visiblename,
-      'inputtype'   => $inputtype,
-      'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
-      'field'       => $fieldName,
-    );
-    if (is_array($fieldName)) {
-      $this->fields[$aliasName]['field'] = "";
-      $this->AddPreProcessCallback($aliasName, $fieldName);
-    }
-    if ($tableAlias) $this->fields[$aliasName]['vtable'] = $this->sqlTableSetupFlat[$tableAlias];
+			'tablename'   => $tableAlias,
+			'visiblename' => $visiblename,
+			'inputtype'   => $inputtype,
+			'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
+			'field'       => $fieldName,
+		);
+		if (is_array($fieldName)) {
+			$this->fields[$aliasName]['field'] = "";
+			$this->AddPreProcessCallback($aliasName, $fieldName);
+		}
+		if ($tableAlias) $this->fields[$aliasName]['vtable'] = $this->sqlTableSetupFlat[$tableAlias];
 
-	switch ($this->GetFieldType($aliasName)) {
-		case ftFILE:
-		case ftIMAGE:
-			$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
-			$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
-			break;
-		case ftDATE:
-			$this->AddPreProcessCallback($aliasName,array('utopia','convDate'));
-			break;
-		case ftTIME:
-			$this->AddPreProcessCallback($aliasName,array('utopia','convTime'));
-			break;
-		case ftDATETIME:
-			$this->AddPreProcessCallback($aliasName,array('utopia','convDateTime'));
-			break;
-	}
+		switch ($this->GetFieldType($aliasName)) {
+			case ftFILE:
+			case ftIMAGE:
+				$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
+				$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
+				break;
+			case ftDATE:
+				$this->AddPreProcessCallback($aliasName,array('utopia','convDate'));
+				break;
+			case ftTIME:
+				$this->AddPreProcessCallback($aliasName,array('utopia','convTime'));
+				break;
+			case ftDATETIME:
+				$this->AddPreProcessCallback($aliasName,array('utopia','convDateTime'));
+				break;
+		}
 		// values here
 		if ($values === NULL) switch ($inputtype) {
 			case itCOMBO:
