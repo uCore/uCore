@@ -281,7 +281,7 @@ class utopia {
 		$attr = BuildAttrString($attributes);
 
 		if (isset(self::$customInputs[$inputType]))
-		return call_user_func_array(self::$customInputs[$inputType],array($fieldName,$inputType,$defaultValue,$possibleValues,$attributes,$noSubmit));
+			return call_user_func_array(self::$customInputs[$inputType],array($fieldName,$inputType,$defaultValue,$possibleValues,$attributes,$noSubmit));
 
 		switch ($inputType) {
 			case itNONE: $out .= $defaultValue; break;
@@ -778,7 +778,6 @@ class utopia {
 		if (!$template) $template = '{utopia.content}';
 		ob_end_clean();
 
-
 		while (self::MergeVars($template));
 
 		$contentType = 'text/html';
@@ -813,8 +812,9 @@ class utopia {
 			$doc->formatOutput = true;
 			$doc->preserveWhiteSpace = false;
 			$doc->validateOnParse = true;
+
 			try {
-				if (!$doc->loadHTML(utf8_decode($template))) break;
+				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.$template)) break;
 			} catch (Exception $e) { }
 			
 			// no html tag?  break out.
@@ -919,8 +919,10 @@ class utopia {
 						}
 						//if (self::IsInsideNoProcess($string,$pos)) { $offset = $pos + $searchLen; continue; }
 
-						$replace = self::RunTemplateParser($ident,$varsArr?$varsArr[$k]:null);
-
+						try {
+							$replace = self::RunTemplateParser($ident,$varsArr?$varsArr[$k]:null);
+						} catch (Exception $e) { $replace = uErrorHandler::EchoException($e); }
+					
 						if ($replace === NULL || $replace === FALSE) {
 							$offset = $pos + $searchLen;
 							continue;
