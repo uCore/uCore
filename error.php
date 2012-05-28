@@ -1,31 +1,25 @@
 <?php
+error_reporting(-1);
 ini_set('display_errors','On');
 set_error_handler('uErrorHandler::ThrowException');
 set_exception_handler('uErrorHandler::exception_handler');
-register_shutdown_function('uErrorHandler::fatalErrorShutdownHandler');
 
 class uErrorHandler {
-	static function ThrowException($code, $message, $file, $line, $args=NULL) {
+	static function ThrowException($code, $message, $file=null, $line=null, $errcontext=null) {
 		// Convert Errors to Exceptions
 		throw new ErrorException($message, $code, 0, $file, $line);
 	}
 	static function exception_handler($e) {
-	        self::EchoException($e);
-	}
-	static function fatalErrorShutdownHandler()
-	{
-		$last_error = error_get_last();
-		if ($last_error['type'] !== E_PARSE) return;
-//		while (ob_get_level()>1) ob_end_clean();
-		throw new ErrorException($last_error['message'], $last_error['type'], 0, $last_error['file'], $last_error['line']);
+		self::EchoException($e);
 	}
 	static function EchoException($e) {
-		$fullError = sprintf("<b>ERROR</b> [%s] %s<br />\n  Error on line %s in file %s<br />\n%s",$e->getCode(),$e->getMessage(),$e->getLine(),$e->getFile(),nl2br($e->getTraceAsString()));
+		$fullError = sprintf("<b>ERROR</b> [%s] %s<br />\n  Error on line %s in file %s<br />\n%s",$e->getCode(),$e->getMessage(),$e->getLine(),$e->getFile(),nl2br(htmlentities($e->getTraceAsString())));
 		DebugMail('Server Error: '.$e->getCode(),$fullError);
 
 		$role = null;
 		if (class_exists('uUserRoles') && !uUserRoles::IsAdmin()) $fullError = 'An error occurred. The site administrator has been notified.';
 		if (!AjaxEcho('alert("'.$fullError.'")')) echo $fullError;
+		return $fullError;
 	}
 }
 
