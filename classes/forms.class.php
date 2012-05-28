@@ -792,30 +792,6 @@ abstract class uDataModule extends uBasicModule {
 		return true;
 	}
 
-	public $forceNewRec = false;
-	public function ForceNewRecord() {
-		$this->forceNewRec = true;
-	}
-
-	public function IsNewRecord() {
-		if ($this->forceNewRec === TRUE) return true;
-		
-		$pk = $this->GetPrimaryKey();
-		foreach ($this->fields as $fieldname => $info) {
-			if ($info['field'] != $pk) continue;
-			$fltr = $this->FindFilter($fieldname,ctEQ,itNONE);
-			if ($this->GetFilterValue($fltr['uid'])) return false;
-		}
-		
-		if (!$this->GetCurrentRecord() && flag_is_set($this->GetOptions(),ALLOW_ADD)) return true;
-		
-		return false;
-	}
-
-	public function EnforceNewRec() {
-		return;
-	}
-
 	public function _RunModule() {
 		parent::_RunModule();
 		if ($this->makeSortable) {
@@ -2059,7 +2035,6 @@ FIN;
 		if ($this->explainQuery) print_r(GetRows(sql_query("EXPLAIN EXTENDED $query")));
 
 		$this->dataset = sql_query($query);
-		$this->EnforceNewRec();
 
 		return $this->dataset;
 	}
@@ -3048,8 +3023,13 @@ abstract class uSingleDataModule extends uDataModule {
 		//check pk and ptable are set up
 		if (is_empty($this->GetTabledef())) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
+		// new rec?
+		$pk = $this->GetPrimaryKey();
+		$fltr = $this->FindFilter($pk,ctEQ,itNONE);
+		$fltrVal = $this->GetFilterValue($fltr['uid']);
+		
 		$row = NULL;
-		if (!$this->IsNewRecord()) { // records exist, lets get the first.
+		if ($fltrVal) { // records exist, lets get the first.
 			$dataset = $this->GetDataset();
 			$row = $this->LookupRecord();
 			if (!$row) {
@@ -3065,7 +3045,7 @@ abstract class uSingleDataModule extends uDataModule {
 
 		TriggerEvent('OnShowDataDetail');
 
-		if (flag_is_set($this->GetOptions(),ALLOW_DELETE) && !$this->IsNewRecord()) {
+		if (flag_is_set($this->GetOptions(),ALLOW_DELETE) && $row) {
 			$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
 			$delbtn = $this->GetDeleteButton($this->GetFilterValue($fltr['uid']),'Delete Record');
 			utopia::AppendVar('footer_left',$delbtn);
