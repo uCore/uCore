@@ -318,6 +318,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			$rec = $this->LookupRecord($pkVal);
 			$this->UpdateField('content',$rec['content_published'],$pkVal);
 			$this->UpdateField('is_published',1,$pkVal);
+			AjaxEcho('window.location.reload();');
 			return;
 		}
 		if ($fieldAlias == 'publish') {
@@ -400,21 +401,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		return $content[$id];
 	}
 	public function ResetField($fieldAlias,$pkVal = NULL) {
-		if ($fieldAlias == 'content' && $pkVal) {
-			$canEdit = uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE;
-			$rec = $this->LookupRecord($pkVal);
-			$content = utopia::jsonTryDecode($rec['content']);
-			if (is_array($content)) {
-				foreach ($content as $id=>$v) {
-					$rec['content:'.$id] = $v;
-					$enc_name = $this->GetEncodedFieldName('content:'.$id,$pkVal);
-					$data = $this->GetCellData('content:'.$id,$rec);
-					
-					utopia::AjaxUpdateElement($enc_name,$data);
-				}
-				return;
-			}
-		}
+		if ($fieldAlias == 'content' && $pkVal) return false; // dont resetfield for content
 		return parent::ResetField($fieldAlias,$pkVal);
 	}
 	static $editCallbackDone = false;
