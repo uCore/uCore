@@ -3024,8 +3024,7 @@ abstract class uSingleDataModule extends uDataModule {
 		if (is_empty($this->GetTabledef())) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
 		// new rec?
-		$pk = $this->GetPrimaryKey();
-		$fltr = $this->FindFilter($pk,ctEQ,itNONE);
+		$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
 		$fltrVal = $this->GetFilterValue($fltr['uid']);
 		
 		$row = NULL;

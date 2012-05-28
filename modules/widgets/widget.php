@@ -285,8 +285,12 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		return $ret;
 	}
 	public function RunModule() {
-		$rec = $this->LookupRecord();
-		$this->InitInstance($rec['block_type']);
+		$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
+		$v = $this->GetFilterValue($fltr['uid']);
+		if ($v) {
+			$rec = $this->LookupRecord();
+			$this->InitInstance($rec['block_type']);
+		}
 
 		$this->ShowData();
 	}
