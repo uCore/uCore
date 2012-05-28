@@ -225,7 +225,7 @@ function GetPossibleValues($table,$pkName,$field,$where = '') {
 	//echo "GetPossibleValues($table,$pkName,$field,$where)";
 	if (!empty($where)) $where = " WHERE $where";
 	$fns = CreateConcatString($field,$table);
-	$lRes = sql_query("SELECT {$fns} as v, {$pkName} as d FROM {$table}{$where} ORDER BY {$fns}");
+	$lRes = sql_query("SELECT {$fns} as d, {$pkName} as v FROM {$table}{$where} ORDER BY {$fns}");
 	$lv = array();
 	while (($row = GetRow($lRes))) {
 		$lv[$row['v']] = $row['d'];

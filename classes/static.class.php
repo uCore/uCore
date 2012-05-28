@@ -348,19 +348,18 @@ class utopia {
 			case itCOMBO:
 				if (empty($possibleValues)) $possibleValues = array();
 				$defaultExists = false;
-				$blankKey = array_search('',$possibleValues);
-				if ($blankKey === FALSE) $blankKey = '&nbsp;';
-				$out .= "<select $attr><option value=\"\">$blankKey</option>";
-				if (is_array($possibleValues)) foreach ($possibleValues as $name => $val) {
-					if ($val === '') continue;
+				$blankVal = isset($possibleValues['']) ? $possibleValues[''] : FALSE;
+				if ($blankVal === FALSE) $blankVal = '&nbsp;';
+				$out .= "<select $attr><option value=\"\">$blankVal</option>";
+				if (is_array($possibleValues)) foreach ($possibleValues as $key => $val) {
+					if ($key === '') continue;
 					$selected = '';
-					if ($val == $defaultValue || $name == $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) {
+					if ($defaultValue !== '' && ($key == $defaultValue || $val == $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue)))) {
 						$defaultExists = true;
 						$selected = ' selected="selected"';
 					}
-					$valOutput = $val !== $name ? " value=\"$val\"" : '';
-					//AA $name = htmlentities($name,ENT_QUOTES,CHARSET_ENCODING);
-					$out .= "<option$valOutput$selected>$name</option>";
+					$valOutput = $key !== $val ? " value=\"$key\"" : '';
+					$out .= "<option$valOutput$selected>$val</option>";
 				}
 				if (!$defaultExists && ($defaultValue != '')) {
 					$out .= "<optgroup label=\"No longer available\"><option selected=\"selected\">$defaultValue</option></optgroup>";

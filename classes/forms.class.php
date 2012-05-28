@@ -1188,12 +1188,10 @@ FIN;
 
 	public function FindValues($aliasName,$values,$stringify = FALSE) {
 		$arr = NULL;
-		$sort = true;
 
 		if (is_array($values)) {
 			if (!is_assoc($values)) { // assume we want the key = val
 				$values = array_flip($values);
-				$sort = false;
 			}
 			$arr = $values;
 		} elseif (IsSelectStatement($values)) {
@@ -1209,22 +1207,22 @@ FIN;
 				}
 				$arr = $r;
 			}
+			$arr = ksort($arr);
 		} elseif (($values===true || is_string($values)) && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$obj = utopia::GetInstance($tbl['tModule']);
 			$pk = $obj->GetPrimaryKey();
 			$table = $tbl['table'];
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
-			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) $arr = array_combine(array_keys($arr),array_keys($arr));
+			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) {
+				$arr = array_combine(array_values($arr),array_values($arr));
+			}
+			asort($arr);
 		}
 		
 		if ($stringify && is_array($arr) && $arr) {
-			//if (!is_assoc($arr)) //array_flip($arr);
-//				$arr = array_combine(array_values($arr),array_values($arr));
-//			else
-				$arr = array_combine(array_keys($arr),array_keys($arr));
+			$arr = array_combine(array_values($arr),array_values($arr));
 		}
-		if (is_array($arr) && $sort) ksort($arr);
 		return $arr;
 	}
 
