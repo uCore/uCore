@@ -321,28 +321,16 @@ class utopia {
 			case itMD5:
 			case itPASSWORD:
 			case itPLAINPASSWORD:
-				//				settype($possibleValues,'integer');
-				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " maxlength=\"$possibleValues\" size=\"".floor($possibleValues*0.75)."\"" : "";
-				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " size=\"".floor($possibleValues*0.75)."\"" : "";
 				$out .= "<input type=\"password\" $attr value=\"\"/>";
 				break;
 			case itTEXT:
-				//			echo "MOO:$defaultValue";
-				//				$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
-				//			echo "FARK:$defaultValue";
-				//				settype($possibleValues,'integer');
-				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " maxlength=\"$possibleValues\" size=\"".floor($possibleValues*0.75)."\"" : "";
-				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " size=\"".floor($possibleValues*0.75)."\"" : "";
 				$val = $defaultValue;
-				//AA $val = htmlentities($val,ENT_QUOTES,CHARSET_ENCODING);
 				$out .= "<input type=\"text\" $attr value=\"$val\"/>";
 				break;
 			case itTEXTAREA:
 				//sanitise value.
 				if (!utopia::SanitiseValue($defaultValue,'string') && !utopia::SanitiseValue($defaultValue,'NULL')) $defaultValue = 'Value has been sanitised: '.var_export($defaultValue,true);
 				$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
-				//				settype($possibleValues,'integer');
-				//				$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " cols=\"$possibleValues\" rows=\"".floor($possibleValues*0.08)."\"" : "";
 				$out .= "<textarea $attr>$defaultValue</textarea>";
 				break;
 			case itCOMBO:
