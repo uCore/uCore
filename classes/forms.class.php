@@ -2609,6 +2609,7 @@ FIN;
 
 	public function ResetField($fieldAlias,$pkVal = NULL) {
 		if (!$this->FieldExists($fieldAlias)) return;
+		if (uEvents::TriggerEvent('BeforeResetField',$this,$fieldAlias) === FALSE) return FALSE;
 		//AjaxEcho("//".get_class($this)."@ResetField($fieldAlias~$pkVal)\n");
 		// reset the field.
 

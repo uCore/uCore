@@ -129,4 +129,9 @@ FIN
 	}
 	public function RunModule() {
 	}
+	public static function CanResetField($o,$e,$fieldAlias) {
+		if ($o->fields[$fieldAlias]['inputtype'] == itHTML) return FALSE;
+		if ($o->fields[$fieldAlias]['inputtype'] == itRICHTEXT) return FALSE;
+	}
 }
+uEvents::AddCallback('BeforeResetField','module_TinyMCE::CanResetField');
