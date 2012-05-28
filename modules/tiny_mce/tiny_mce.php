@@ -42,7 +42,6 @@ class module_TinyMCE extends uBasicModule {
 			$options['content_css'] = PATH_REL_CORE.'default.css';
 			$options['setup'] = 'tinyMceSetup';
 			$options['save_onsavecallback'] = 'onSave';
-			$options['save_enablewhendirty'] = true;
 
 			$richOpts = array();
 			$richOpts['plugins'] = "paste,inlinepopups,spellchecker,save";
