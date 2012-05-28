@@ -136,6 +136,9 @@ abstract class uTableDef implements iUtopiaModule {
 			$this->AddField($name.'_filename', ftVARCHAR, 255);
 			$this->AddField($name.'_filetype', ftVARCHAR, 255);
 		}
+		if ($type == ftCURRENCY) {
+			$this->AddField($name.'_locale', ftVARCHAR, 25, DEFAULT_LOCALE);
+		}
 	}
 
 	public function FieldExists($fieldName) {

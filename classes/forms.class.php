@@ -1357,6 +1357,11 @@ FIN;
 				$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
 				$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 				break;
+			case ftCURRENCY:
+				$this->AddField($aliasName.'_locale', $fieldName.'_locale', $tableAlias,NULL,itCOMBO,uLocale::ListLocale('%i (%l, %t)'));
+				$this->SetDefaultValue($aliasName.'_locale',DEFAULT_LOCALE);
+				$this->AddPreProcessCallback($aliasName,array('utopia','convCurrency'));
+				break;
 			case ftDATE:
 				$this->AddPreProcessCallback($aliasName,array('utopia','convDate'));
 				break;
@@ -2164,13 +2169,6 @@ FIN;
 				$w = isset($style['width']) ? $style['width'] : null;
 				$h = isset($style['height']) ? $style['height'] : null;
 				$value = $this->DrawSqlImage($fieldName,$rec,$w,$h);
-				break;
-			case ftCURRENCY:
-				$dp = $this->GetFieldProperty($fieldName,'length');
-				if (strpos($dp,',') != FALSE) $dp = substr($dp,strpos($dp,',')+1);
-				else $dp = 2;
-				if (is_numeric($value))
-					$value = DEFAULT_CURRENCY.number_format($value,$dp);
 				break;
 			case ftPERCENT:
 				$dp = $this->GetFieldProperty($fieldName,'length');

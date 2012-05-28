@@ -1161,6 +1161,46 @@ class utopia {
 		$t = strtotime( $originalValue );
 		return strftime(FORMAT_DATETIME,$t);
 	}
+	static function convCurrency($originalValue,$pkVal,$processedVal,$rec,$fieldName) {
+		$locale = DEFAULT_LOCALE;
+		if ($rec && $rec[$fieldName.'_locale']) $locale=$rec[$fieldName.'_locale'];
+		return self::money_format($originalValue,$locale);
+	}
+	static function money_format($originalValue,$locale=DEFAULT_LOCALE) {
+		if (!$locale) $locale = DEFAULT_LOCALE;
+		$locales = uLocale::ListLocale();
+		$c = null;
+		if (isset($locales[$locale])) $c = $locales[$locale];
+		else {
+			foreach ($locales as $l) {
+				foreach ($l as $v) if ($v === $locale) {
+					$c = $l; break 2;
+				}
+			}
+		}
+		if (!$c) return $originalValue;
+		$dp = $originalValue - floor($originalValue) > 0 ? 2 : 0;
+		$value = number_format($originalValue,$dp,$c['mon_decimal_point'],$c['mon_thousands_sep']);
+		
+		if ($originalValue >= 0) {
+			if ($c['p_cs_precedes']) {
+				if ($c['p_sep_by_space']) $value = ' '.$value;
+				$value = $c['currency_symbol'].$value;
+			} else {
+				if ($c['p_sep_by_space']) $value .= ' ';
+				$value .= $c['currency_symbol'];
+			}
+		} else {
+			if ($c['n_cs_precedes']) {
+				if ($c['n_sep_by_space']) $value = ' '.$value;
+				$value = $c['currency_symbol'].$value;
+			} else {
+				if ($c['n_sep_by_space']) $value .= ' ';
+				$value .= $c['currency_symbol'];
+			}
+		}
+		return $value;
+	}
 
 	static function stripslashes_deep($value) {
 		$value = is_array($value) ?
