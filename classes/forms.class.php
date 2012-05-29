@@ -566,15 +566,16 @@ abstract class uBasicModule implements iUtopiaModule {
 		return "<a$linkAttr href=\"$linkUrl\" target=\"_blank\"><img$attr src=\"$url\"></a>";
 	}
 
-        public function GetImageLink($fieldAlias,$pkVal,$width=NULL,$height=NULL) {
-                if ($pkVal == NULL) return '';
-                $field = $this->GetFieldProperty($fieldAlias ,'field');
-                $setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
+	public function GetImageLink($fieldAlias,$pkVal,$width=NULL,$height=NULL) {
+		if ($pkVal == NULL) return '';
+		$field = $this->GetFieldProperty($fieldAlias ,'field');
+		$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
+		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
 
-                $table = $setup['table'];
-                $key = $setup['pk'];
+		$table = $setup['table'];
+		$key = $setup['pk'];
 		return $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$width,$height);
-        }
+	}
 
 	public function DrawSqlImage($fieldAlias,$rec,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE,$linkAttr=NULL) {
 		if ($rec == NULL) return '';
