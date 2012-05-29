@@ -642,7 +642,7 @@ class utopia {
 		$userTemplates = glob(PATH_ABS_TEMPLATES.'*'); // find all user templates
 		$adminTemplates = glob(PATH_ABS_CORE.'styles/*'); // find all admin templates
 		$nTemplates = array();
-		if ($includeDefault) $nTemplates['Default Template'] = TEMPLATE_DEFAULT;
+		if ($includeDefault) $nTemplates[''] = 'Default Template';
 
 		if (is_array($adminTemplates)) foreach ($adminTemplates as $k => $v) {
 			if ($v == '.' || $v == '..' || !is_dir($v)) continue;
