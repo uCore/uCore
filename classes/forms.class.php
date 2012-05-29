@@ -553,7 +553,7 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {
 		if (!is_array($attr)) $attr = array();
 		if (!array_key_exists('alt',$attr)) $attr['alt'] = '';
-		$attr['width'] = $width; $attr['height'] = $height;
+		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
 		$attr = BuildAttrString($attr);
 
 		$url = $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$width,$height);
@@ -580,6 +580,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($rec == NULL) return '';
 		$field = $this->GetFieldProperty($fieldAlias ,'field');
 		$tableAlias = $this->GetFieldProperty($fieldAlias ,'tablename');
+		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
 		$setup = $this->GetFieldProperty($fieldAlias ,'vtable');
 		$table = $setup['table'];
 
@@ -1264,6 +1265,11 @@ FIN;
 
 		$styles = array_merge($defaultStyles,$specificStyles,$conditionalStyles);
 		if ($inputType == itDATE && !array_key_exists('width',$styles)) $styles['width'] = '8.5em';
+		
+		// if width/height has no delimiter, append 'px'
+		if (isset($styles['width']) && $styles['width'] == intval($styles['width'])) $styles['width'] = $styles['width'].'px';
+		if (isset($styles['height']) && $styles['height'] == intval($styles['height'])) $styles['height'] = $styles['height'].'px';
+		
 		return $styles;
 	}
 
@@ -2141,9 +2147,9 @@ FIN;
 			case ftIMAGE:
 				if (!$value) break;
 				$style = $this->FieldStyles_Get($fieldName);
-				$w = isset($style['width']) ? $style['width'] : null;
-				$h = isset($style['height']) ? $style['height'] : null;
-				$value = $this->DrawSqlImage($fieldName,$rec,$w,$h);
+				$w = isset($style['width']) ? intval($style['width']) : null;
+				$h = isset($style['height']) ? intval($style['height']) : null;
+				$value = $this->DrawSqlImage($fieldName,$rec,$w,$h,array('style'=>$style));
 				break;
 			case ftPERCENT:
 				$dp = $this->GetFieldProperty($fieldName,'length');
