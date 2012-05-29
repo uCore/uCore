@@ -238,7 +238,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('title','title','cms','Page Title',itTEXT);
 		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
 		$templates = utopia::GetTemplates(true);
-		$templates['Default Template'] = '';
 		$this->AddField('template','template','cms','Template',itCOMBO,$templates);
 //		$this->AddField('position','position','cms','Navigation Position',itTEXT);
 		$this->AddField('hide','hide','cms','Hide from Menus',itCHECKBOX);
