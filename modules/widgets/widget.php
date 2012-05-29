@@ -227,7 +227,7 @@ class uCustomWidget implements iWidget {
 					if (strpos($field,'?') !== FALSE) list($field,$qs) = explode('?',$field,2);
 					if (!array_key_exists($field,$row)) continue;
 					if ($qs) {
-						parse_str($qs,$qs);
+						parse_str(html_entity_decode($qs),$qs);
 						$obj->FieldStyles_Add($field,$qs);
 					}
 					switch ($typeArr[$k]) {
