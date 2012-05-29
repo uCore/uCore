@@ -1302,7 +1302,6 @@ FIN;
 			$metadata[$fieldAlias] = $newValue;
 			$newValue = json_encode($metadata);
 		}
-		AjaxEcho('//'.$newValue);
 		return $this->UpdateField('__metadata',$newValue,$pkVal);
 	}
 
