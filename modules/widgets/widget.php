@@ -146,9 +146,10 @@ class uCustomWidget implements iWidget {
 		if (!$obj) return '';
 		$fields = $obj->fields;
 		$ret = '';
-		$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">_module_url</span>";
+		$ret .= '<span data-fieldname="_module_url" class="btn widget-field">Module URL</span>';
 		foreach ($fields as $field) {
-			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'{field.'+$(this).text()+'}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn\">{$field['alias']}</span>";
+			$visname = $field['visiblename'] ? $field['visiblename'] : $field['alias'];
+			$ret .= '<span data-fieldname="'.$field['alias'].'" class="btn widget-field">'.$visname.'</span>';
 		}
 		return trim($ret);
 	}
@@ -212,6 +213,7 @@ class uCustomWidget implements iWidget {
 		}
 	
 		$obj = utopia::GetInstance($meta['module']);
+		$fields = $obj->fields;
 		if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$repeatable,$matches,PREG_PATTERN_ORDER)) {
 			$searchArr = $matches[0];
 			$typeArr = isset($matches[1]) ? $matches[1] : false;
@@ -221,7 +223,13 @@ class uCustomWidget implements iWidget {
 				$c = $repeatable;
 				foreach ($searchArr as $k => $search) {
 					$field = $varsArr[$k];
+					$qs = null;
+					if (strpos($field,'?') !== FALSE) list($field,$qs) = explode('?',$field,2);
 					if (!array_key_exists($field,$row)) continue;
+					if ($qs) {
+						parse_str($qs,$qs);
+						$obj->FieldStyles_Add($field,$qs);
+					}
 					switch ($typeArr[$k]) {
 						case 'u':
 							$replace = $obj->PreProcess($field,$row[$field],$row);
@@ -239,6 +247,7 @@ class uCustomWidget implements iWidget {
 				$content .= $c;
 			}
 		}
+		$obj->fields = $fields;
 
 		$ret = $append.$content.$prepend;
 		while (utopia::MergeVars($ret));
