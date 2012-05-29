@@ -1268,8 +1268,8 @@ FIN;
 		if ($inputType == itDATE && !array_key_exists('width',$styles)) $styles['width'] = '8.5em';
 		
 		// if width/height has no delimiter, append 'px'
-		if (isset($styles['width']) && $styles['width'] == intval($styles['width'])) $styles['width'] = $styles['width'].'px';
-		if (isset($styles['height']) && $styles['height'] == intval($styles['height'])) $styles['height'] = $styles['height'].'px';
+		if (isset($styles['width']) && is_numeric($styles['width'])) $styles['width'] = $styles['width'].'px';
+		if (isset($styles['height']) && is_numeric($styles['height'])) $styles['height'] = $styles['height'].'px';
 		
 		return $styles;
 	}
