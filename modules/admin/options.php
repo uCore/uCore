@@ -27,6 +27,7 @@ class modOpts extends uListDataModule implements iAdminModule {
 	}
 	public function SetupParents() {
 		$this->AddParent('/');
+		self::AddOption('site_name','Site Name',NULL);
 	}
 	public function GetRows($filter=NULL,$clearFilters=false) {
 		$rows = parent::GetRows($filter,$clearFilters);
