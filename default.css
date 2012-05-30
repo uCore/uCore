@@ -1,7 +1,8 @@
 body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 
-input, select, textarea { box-sizing: border-box; margin:2px; }
+input, select, textarea { margin:2px;
+	box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; }
 
 
 .left { float:left } .right { float:right } .oh { overflow:hidden }
