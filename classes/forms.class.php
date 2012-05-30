@@ -2841,7 +2841,7 @@ abstract class uListDataModule extends uDataModule {
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows.' (Max 150 shown)';
 			echo '<tr><td colspan="'.$colcount.'">'.$pager.'<b>{list.'.get_class($this).'}'.$records.'</b></td></tr>';
 
-			if ($num_rows > 0) echo $c;
+			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD)) echo $c;
 
 			echo "</thead>\n";
 		}
