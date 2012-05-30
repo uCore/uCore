@@ -843,7 +843,9 @@ class utopia {
 			$head->appendChild($node);
 			
 			// template is all done, now lets run a post process event
-			uEvents::TriggerEvent('ProcessDomDocument',null,array(&$doc));
+			try {
+				uEvents::TriggerEvent('ProcessDomDocument',null,array(&$doc));
+			} catch (Exception $e) { uErrorHandler::EchoException($e); }
 			
 			// move all LINK end of HEAD
 			$links = $head->getElementsByTagName('link');
