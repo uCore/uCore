@@ -868,6 +868,7 @@ class utopia {
 				$head->insertBefore($ctNode,$head->firstChild);
 				$template = $doc->saveHTML();
 			}
+			$template = str_replace('<?xml encoding="UTF-8">','',$template);
 		} while (false);
 		
 		while (self::MergeVars($template));
