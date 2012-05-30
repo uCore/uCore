@@ -1,4 +1,6 @@
 <?php
+utopia::SetVar('cms_root_id','_NO_ID_');
+utopia::SetVar('cms_id','_NO_ID_');
 
 class tabledef_CMS extends uTableDef {
 	public function SetupFields() {
