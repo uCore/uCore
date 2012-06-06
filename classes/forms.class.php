@@ -1453,12 +1453,14 @@ FIN;
 			}
 			return;
 		}
+		if (strpos($fieldName,' ') !== FALSE) {
+			list($fieldName,$direction) = explode(' ',$fieldName);
+			$fieldName = trim($fieldName);
+			$direction = trim($direction);
+		}
 		
 		if ($this->FieldExists($fieldName)) $fieldName = "`$fieldName`";
-		if (strpos($fieldName,' ') !== FALSE)
-			$this->ordering[] = "$fieldName";
-		else
-			$this->ordering[] = "$fieldName $direction";
+		$this->ordering[] = "$fieldName $direction";
 	}
 
 	/*  FILTERS */
