@@ -803,6 +803,7 @@ class utopia {
 			try {
 				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.$template)) break;
 			} catch (Exception $e) { }
+			$doc->encoding = 'UTF-8';
 			
 			// no html tag?  break out.
 			if (!$doc->getElementsByTagName('html')->length) break;
