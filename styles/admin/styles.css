@@ -8,8 +8,6 @@ body { text-align:left !important; text-align:center; margin:0; font-family: Ari
 a, a:link, a:visited { color: #333; text-decoration:none }
 a:hover { color: #8CC63F }
 
-a.btn, a.btn:link, a.btn:visited, a.btn:hover {color:white}
-
 #header { background: url(images/header-grad-bg.gif) top center repeat-x #F0F0F0; }
 #innerheader { min-height:98px; height: auto !important; height: 98px; position:relative;
 	background:url(images/top-swoosh.gif) top left no-repeat; border-bottom:1px solid #8CC63F;
