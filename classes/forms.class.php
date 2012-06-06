@@ -2805,24 +2805,24 @@ abstract class uListDataModule extends uDataModule {
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$colcount++;
+				echo '<th class="ui-state-default ui-corner-top sortable" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
 
-/*				$classes = array();
-				switch ($this->GetFieldType($fieldName)) {
-					case 'date':
-					case 'time':
-					case 'datetime':
-					case 'timestamp':
-						$classes[] = '{sorter: \'datetime\'}';
+				// sort?
+				$o = $this->GetOrderBy(true);
+				if (is_array($o)) foreach ($o as $order) {
+					if (strpos($order,'`'.$fieldName.'`') !== FALSE) {
+						$icon = 'ui-icon-triangle-1-s';
+						if (stripos($order,'desc') !== FALSE) $icon = 'ui-icon-triangle-1-n';
+						echo '<span class="ui-icon '.$icon.' left"></span>';
+						break;
+					}
 				}
-				//			if ($fieldData['inputtype'] == itCOMBO && flag_is_set($fieldData['options'],ALLOW_EDIT))
-				//				$classes[] = '{textExtraction: \'selectbox\'}';
-				//if (array_key_exists($fieldName,$this->firsts)) $classes[] = 'sectionFirst';
-				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
-				//			$attr = $this->GetFieldType($fieldName) == ftCURRENCY ? ' style="text-align:\'.\'"' : '';
- */
-				$colTitle = nl2br(htmlentities_skip($fieldData['visiblename'],'<>"'));
-				echo '<th class="ui-state-default ui-corner-top sortable'.($colTitle?'':' light').'" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
-				echo $colTitle.'<br/>'; // break for filter boxes on new line
+
+				// title
+				echo nl2br(htmlentities_skip($fieldData['visiblename'],'<>"'));
+
+				// filters
+				ob_start();
 				if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
 					foreach ($this->filters as $fType) {
 						foreach ($fType as $filterset) { //flag_is_set($fieldData['options'],ALLOW_FILTER)) {
@@ -2830,11 +2830,14 @@ abstract class uListDataModule extends uDataModule {
 								if ($fieldName != $filterInfo['fieldName']) continue;
 								if ($filterInfo['it'] === itNONE) continue;
 								echo $this->GetFilterBox($filterInfo);
-								//break 2;
 							}
 						}
 					}
 				}
+				$c = ob_get_contents();
+				ob_end_clean();
+				if ($c) echo '<div class="cb">'.$c.'</div>';
+
 				echo "</th>";
 			}
 			echo '</tr>'; // close column headers
