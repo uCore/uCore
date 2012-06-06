@@ -59,6 +59,7 @@ ul.pagination li { list-style:none; float:left; }
 	vertical-align:top; padding:.5em 1em;
 }
 .layoutListSection td { vertical-align:middle; padding:4px; }
+.layoutListSection tr.ui-widget-header { font-weight:normal; }
 .layoutDetailSection,.layoutListSection {
 	/*margin: 10px;*/
 	padding: 5px;
