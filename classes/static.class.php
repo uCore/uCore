@@ -854,9 +854,9 @@ class utopia {
 			// move all SCRIPT end of HEAD (after LINK)
 			$scripts = $head->getElementsByTagName('script');
 			for ($i = 0; $i < $scripts->length; $i++) { $head->appendChild($scripts->item(0)); }
-			// move all SCRIPT end of HEAD (after LINK)
-			$scripts = $head->getElementsByTagName('style');
-			for ($i = 0; $i < $scripts->length; $i++) { $head->appendChild($scripts->item(0)); }
+			// move all STYLE end of HEAD
+			$styles = $doc->getElementsByTagName('style');
+			for ($i = 0; $i < $styles->length; $i++) { $head->appendChild($styles->item(0)); }
 			
 			$doc->normalizeDocument();
 			if (strpos(strtolower($doc->doctype->publicId),' xhtml '))
