@@ -2757,16 +2757,14 @@ abstract class uListDataModule extends uDataModule {
 		$sectionFieldTitles = array();
 		// TODO: pagination for list record display
 		if (!flag_is_set($this->GetOptions(),LIST_HIDE_HEADER)) {
-			echo "<thead style=\"font-weight: bold\">";
+			echo '<thead class="ui-tabs ui-widget-content ui-corner-all">';
 
 			ob_start();
-			echo '<tr>';
-			// need first 'empty' column for buttons?
-			$colcount = 0;
 			// start of SECTION headers
-			//$this->firsts = array();
 			if (count($this->layoutSections) > 1) {
-				if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo "<td class=\"{sorter: false}\">&nbsp;</td>"; $colcount++; }
+				echo '<tr>';
+				// need first 'empty' column for buttons?
+				if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo "<td>&nbsp;</td>"; }
 				$sectionCount = 0;
 				$sectionID = NULL;
 				$keys = array_keys($this->fields);
@@ -2794,8 +2792,9 @@ abstract class uListDataModule extends uDataModule {
 			}
 
 			// start of FIELD headers
-			echo '<tr>';
-			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo '<td></td>'; $colcount++; }
+			$colcount = 0;
+			echo '<tr class="ui-tabs-nav ui-helper-reset ui-widget-header ui-corner-all">';
+			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo '<th class="ui-corner-top"></th>'; $colcount++; }
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$colcount++;
@@ -2815,10 +2814,9 @@ abstract class uListDataModule extends uDataModule {
 				//			$attr = $this->GetFieldType($fieldName) == ftCURRENCY ? ' style="text-align:\'.\'"' : '';
  */
 				$colTitle = nl2br(htmlentities_skip($fieldData['visiblename'],'<>"'));
-				echo '<th class="sortable'.($colTitle?'':' light').'" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
-				echo $colTitle;
+				echo '<th class="ui-state-default ui-corner-top sortable'.($colTitle?'':' light').'" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
+				echo $colTitle.'<br/>'; // break for filter boxes on new line
 				if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
-					echo '<br/>';
 					foreach ($this->filters as $fType) {
 						foreach ($fType as $filterset) { //flag_is_set($fieldData['options'],ALLOW_FILTER)) {
 							foreach ($filterset as $filterInfo) {

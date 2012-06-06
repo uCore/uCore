@@ -164,8 +164,8 @@ function RefreshTableSorters() {
 }
 
 function RefreshTables() {
-	$('.datalist TBODY TR:even').removeClass('shadeRow');
-	$('.datalist TBODY TR:odd').addClass('shadeRow');
+	$('.datalist TBODY TR:even').removeClass('ui-widget-content');
+	$('.datalist TBODY TR:odd').addClass('ui-widget-content');
 }
 
 function UpdateSelectedLinks() {
