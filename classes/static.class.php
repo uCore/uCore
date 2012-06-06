@@ -767,28 +767,6 @@ class utopia {
 
 		while (self::MergeVars($template));
 
-		$contentType = 'text/html';
-		foreach (headers_list() as $header) if (stripos($header,'Content-Type') !== FALSE) $contentType = $header;
-		if ($contentType === null || stripos($contentType,'html') !== FALSE) {
-			$dom = str_get_html($template,true,true,DEFAULT_TARGET_CHARSET,false);
-			if ($dom) {
-				foreach (self::$globalVariables as $key => $val) {
-					if (!preg_match('/^\<(\/?)([a-z]+)\>$/i',$key,$matches)) continue;
-					$tag = $matches[2];
-					$append = $matches[1] != '';
-					foreach ($dom->find($tag) as $ele) {
-						if ($append) {
-							$ele->innertext = $ele->innertext.$val;
-						} else {
-							$ele->innertext = $val.$ele->innertext;
-						}
-					}
-				}
-				$template = $dom;
-			}
-			while (self::MergeVars($template));
-		}
-
 		// Make all resources secure
 		if (self::IsRequestSecure()) {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
