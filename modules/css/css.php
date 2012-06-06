@@ -7,10 +7,14 @@ class uCSS extends uBasicModule {
 	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		array_sort_subkey(self::$linkFiles,'order');
+		
+		$beforeRef = $head->getElementsByTagName('link')->length ? $head->getElementsByTagName('link')->item(0) : null;
 		foreach (self::$linkFiles as $path) {
 			$node = $templateDoc->createElement('link');
 			$node->setAttribute('type','text/css'); $node->setAttribute('rel','stylesheet'); $node->setAttribute('href',$path['path']);
-			$head->appendChild($node);
+			
+			if ($beforeRef) $head->insertBefore($node,$beforeRef);
+			else $head->appendChild($node);
 		}
 	}
 	static function ProcessDomDocument($obj,$event,$doc) {

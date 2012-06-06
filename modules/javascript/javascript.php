@@ -6,10 +6,14 @@ class uJavascript extends uBasicModule {
 	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		array_sort_subkey(self::$linkFiles,'order');
+		
+		$beforeRef = $head->getElementsByTagName('script')->length ? $head->getElementsByTagName('script')->item(0) : null;
 		foreach (self::$linkFiles as $path) {
 			$node = $templateDoc->createElement('script');
 			$node->setAttribute('type','text/javascript'); $node->setAttribute('src',$path['path']);
-			$head->appendChild($node);
+			
+			if ($beforeRef) $head->insertBefore($node,$beforeRef);
+			else $head->appendChild($node);
 		}
 			
 		if (self::$script_include) {
