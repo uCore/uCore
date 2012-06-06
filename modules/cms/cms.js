@@ -26,7 +26,8 @@ function moveMceToolbars(event,ed) {
 			'-webkit-transform':'none',
 			'-o-transform':'none',
 			'-ms-transform':'none',
-			'transform':'none'
+			'transform':'none',
+			'min-width':0
 		});
 		
 		// wake up the autoresize plugin
