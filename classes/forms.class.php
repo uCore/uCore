@@ -1441,7 +1441,18 @@ FIN;
 
 	public $ordering = NULL;
 	public function AddOrderBy($fieldName,$direction = 'ASC') {
+		$fieldName = trim($fieldName);
 		if ($this->ordering === NULL) $this->ordering = array();
+
+		if (strpos($fieldName,',') !== FALSE) {
+			foreach(explode(',',$fieldName) as $f) {
+				$f = trim($f);
+				$dir = 'ASC';
+				if (strpos($f,' ') !== FALSE) list($f,$dir) = explode(' ',$f);
+				$this->AddOrderBy($f,$dir);
+			}
+			return;
+		}
 		
 		if ($this->FieldExists($fieldName)) $fieldName = "`$fieldName`";
 		if (strpos($fieldName,' ') !== FALSE)
@@ -1968,18 +1979,14 @@ FIN;
 		return $ret;
 	}
 
-	public function GetOrderBy() {
+	public function GetOrderBy($as_array=false) {
 		$sortKey = '_s_'.$this->GetModuleId();
-		if (isset($_GET[$sortKey])) {
+		if (isset($_GET[$sortKey])) {			
 			$this->ordering = NULL;
-			$arr = explode(',',$_GET[$sortKey]);
-			foreach ($arr as $sorter) {
-				$s = explode(' ',$sorter);
-				$this->AddOrderBy($s[0],isset($s[1]) ? $s[1] : NULL);
-			}
+			$this->AddOrderBy($_GET[$sortKey]);
 		}
 		if (empty($this->ordering)) return 'NULL';
-		if (is_array($this->ordering)) return join(', ',$this->ordering);
+		if (is_array($this->ordering) && !$as_array) return join(', ',$this->ordering);
 
 		return $this->ordering;
 	}
