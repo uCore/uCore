@@ -362,10 +362,7 @@ abstract class uTableDef implements iUtopiaModule {
 			}
 		}
 
-		$newPk = false;
 		$updateQry = array();
-
-		if ($fieldName == $this->GetPrimaryKey()) $newPk = $newValue;
 
 		if ($pkVal === NULL) {
 			$query = 'INSERT INTO `'.$this->tablename.'` (`'.$fieldName.'`) VALUES ('.$newValue.')';
@@ -374,9 +371,9 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 		
 		sql_query($query);
-		if ($newPk) {
+		if ($fieldName == $this->GetPrimaryKey()) {
 			// this allows us to get the real evaluated value of the new primary key
-			$row = GetRow(sql_query('SELECT '.$newPk.' AS new_pk'));
+			$row = GetRow(sql_query('SELECT '.$newValue.' AS new_pk'));
 			$pkVal = $row['new_pk'];
 		}
 		elseif ($pkVal === NULL) $pkVal = mysql_insert_id();

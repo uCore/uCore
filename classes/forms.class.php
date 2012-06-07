@@ -2408,8 +2408,7 @@ FIN;
 				default: throw $e;
 			}
 		}
-		if ($oldPkVal !== NULL && $pkVal !== $oldPkVal) $pkVal = $oldPkVal;
-
+		
 		if ($oldPkVal === NULL) {
 			// new record added
 			// update default values
