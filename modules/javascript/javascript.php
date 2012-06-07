@@ -11,6 +11,7 @@ class uJavascript extends uBasicModule {
 		foreach (self::$linkFiles as $path) {
 			$node = $templateDoc->createElement('script');
 			$node->setAttribute('type','text/javascript'); $node->setAttribute('src',$path['path']);
+			foreach ($path['attr'] as $k=>$v) $node->setAttribute($k,$v);
 			
 			if ($beforeRef) $head->insertBefore($node,$beforeRef);
 			else $head->appendChild($node);
@@ -56,11 +57,11 @@ class uJavascript extends uBasicModule {
 	}
 	public function GetOptions() { return PERSISTENT; }
 	private static $linkFiles = array();
-	public static function LinkFile($path,$order=null) {
+	public static function LinkFile($path,$order=null,$attr=array()) {
 		if ($order === null) $order = count(self::$linkFiles);
 		if (file_exists($path)) $path = utopia::GetRelativePath($path);
 		foreach (self::$linkFiles as $link) if ($link['path'] == $path) return;
-		self::$linkFiles[] = array('path'=>$path,'order'=>$order);
+		self::$linkFiles[] = array('path'=>$path,'order'=>$order,'attr'=>$attr);
 	}
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
