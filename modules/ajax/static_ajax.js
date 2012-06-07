@@ -189,7 +189,7 @@ function UpdateSelectedLinks() {
 			classname = (uuid == linkUUID) ? 'active-link' : '';
 		} else {
 			if (_href == PATH_REL_ROOT && _href != window.location.pathname) return;
-			if (window.location.pathname.indexOf(_hrefPath) != 0) return;
+			if ((window.location.pathname+'/').indexOf(_hrefPath+'/') != 0) return;
 			var exact = true;
 			if (_hrefPath == window.location.pathname) {
 				for (var i=0;i<queryArgs.length;i++) {
