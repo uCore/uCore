@@ -294,6 +294,7 @@ abstract class uTableDef implements iUtopiaModule {
 			if ($indexRow['Key_name'] === 'PRIMARY') continue;
 			array_unshift($alterArray,"\nDROP INDEX `".$indexRow['Key_name']."`");
 		}
+		$alterArray = array_unique($alterArray);
 
 		$alterArray[] = ' DROP PRIMARY KEY, ADD PRIMARY KEY (`'.implode('`,`',$this->primary).'`)';
 		if ($this->index) $alterArray[] = ' ADD INDEX (`'.implode('`,`',$this->index).'`)';
