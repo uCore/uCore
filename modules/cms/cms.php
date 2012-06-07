@@ -357,7 +357,14 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			$this->UpdateField('is_published',1,$pkVal);
 		}
 
+		$oPk = $pkVal;
 		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
+		
+		if ($pkVal !== $oPk) {
+			$o = utopia::GetInstance('uCMS_View');
+			$url = $o->GetURL(array('cms_id'=>$pkVal,'edit'=>1));
+			AjaxEcho("window.location.replace('$url');");
+		}
 
 		// update cms list to reflect published status
 		uCMS_List::RefreshList();
