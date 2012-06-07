@@ -31,7 +31,7 @@ function moveMceToolbars(event,ed) {
 		});
 		
 		// wake up the autoresize plugin
-		setTimeout(function(){ed.execCommand('mceAutoResize');},1);
+		setTimeout(function(){ed.execCommand('mceAutoResize', false, undefined, {skip_focus: true, skip_undo: true});},1);
 	});
 };
 $(document).on('tinyMceSetup',moveMceToolbars);
