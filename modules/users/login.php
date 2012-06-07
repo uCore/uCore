@@ -78,10 +78,10 @@ class uUserLogin extends uDataModule {
 	}
 	public static function TryLogin() {
 		// login not attempted.
-		if (!array_key_exists('__login_u',$_REQUEST)) return;
+		if (!array_key_exists('__login_u',$_POST)) return;
 
-		$un = $_REQUEST['__login_u']; $pw = $_REQUEST['__login_p'];
-		unset($_REQUEST['__login_u']); unset($_REQUEST['__login_p']);
+		$un = $_POST['__login_u']; $pw = $_POST['__login_p'];
+		unset($_POST['__login_u']); unset($_POST['__login_p']);
 
 		$obj = utopia::GetInstance(__CLASS__);
 		$rec = $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)));
