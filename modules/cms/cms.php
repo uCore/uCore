@@ -650,6 +650,7 @@ class uCMS_View extends uSingleDataModule {
 		//breadcrumb::ShowHome(false);
 		$rec = self::findPage();
 		if (empty($rec)) utopia::PageNotFound();
+		if (!$rec['is_published'] && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') === FALSE) utopia::PageNotFound();
 
 		utopia::SetVar('cms_id',$rec['cms_id']);
 		utopia::SetVar('cms_parent_id',$rec['parent']);
