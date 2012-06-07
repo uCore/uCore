@@ -44,6 +44,13 @@ $(document).on('click','.page-publish',function(event) {
 		return false;
 	}
 });
+$(document).on('click','.page-unpublish',function(event) {
+	if (!confirm('This page will become hidden from the public and become draft.  Do you wish to continue?')) {
+		event.stopImmediatePropagation();
+		event.preventDefault();
+		return false;
+	}
+});
 $(document).on('click','.page-revert',function(event) {
 	if (!confirm('Reverting this page will reset all of your changes to the last published version.  Do you wish to continue?')) {
 		event.stopImmediatePropagation();

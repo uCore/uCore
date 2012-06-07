@@ -264,8 +264,9 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddFilter('cms_id',ctEQ);
 	}
 	public function publishLinks($field,$pkVal,$v,$rec) {
-		if ($rec['is_published'])
-			return utopia::DrawInput('published',itBUTTON,'Published');
+		if ($rec['is_published']) {
+			return utopia::DrawInput('published',itBUTTON,'Published').$this->DrawSqlInput('unpublish','Unpublish',$pkVal,array('title'=>'Remove this page from public view','class'=>'page-unpublish'),itBUTTON);
+		}
 
 		// preview, publish, revert (red)
 		$obj = utopia::GetInstance('uCMS_View');
@@ -325,6 +326,10 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		if ($fieldAlias == 'publish') {
 			$rec = $this->LookupRecord($pkVal);
 			$this->UpdateField('content_published',$rec['content'],$pkVal);
+			return;
+		}
+		if ($fieldAlias == 'unpublish') {
+			$this->UpdateField('is_published',0,$pkVal);
 			return;
 		}
 		if ($fieldAlias == 'cms_id') $newValue = UrlReadable($newValue);
