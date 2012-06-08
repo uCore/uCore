@@ -140,16 +140,22 @@ class uCustomWidget implements iWidget {
 	}
 	public static function getPossibleFields($originalVal,$pk,$processedVal,$rec) {
 		$meta = json_decode($rec['__metadata'],true);
-		if (!$meta || !isset($meta['module']) || !$meta['module']) return 'Please select a module.';
-		if (!class_exists($meta['module'])) return 'Widget type does not exist';
+		if (!$meta || !isset($meta['module']) || !$meta['module']) return 'Please select a Data Source.';
+		if (!class_exists($meta['module'])) return 'Data Source does not exist';
 		$obj = utopia::GetInstance($meta['module']);
 		if (!$obj) return '';
 		$fields = $obj->fields;
 		$ret = '';
-		$ret .= '<span data-fieldname="_module_url" class="btn widget-field">Module URL</span>';
+		$ret .= '<span data-fieldname="total" class="btn widget-field">Total Records</span>';
+		if ($meta['limit'] && strpos($meta['limit'],',')===FALSE && stripos($meta['content'],'{pagination}') !== FALSE) {
+			$ret .= '<span data-fieldname="pages" class="btn widget-field">Total Pages</span>';
+			$ret .= '<span data-fieldname="current_page" class="btn widget-field">Current Page</span>';
+			$ret .= '<span data-fieldname="pagination" class="btn widget-field">Pagination</span>';
+		}
+		$ret .= '<span data-fieldname="field._module_url" class="btn widget-field">Module URL</span>';
 		foreach ($fields as $field) {
 			$visname = $field['visiblename'] ? $field['visiblename'] : $field['alias'];
-			$ret .= '<span data-fieldname="'.$field['alias'].'" class="btn widget-field">'.$visname.'</span>';
+			$ret .= '<span data-fieldname="field.'.$field['alias'].'" class="btn widget-field">'.$visname.'</span>';
 		}
 		return trim($ret);
 	}
@@ -164,32 +170,11 @@ class uCustomWidget implements iWidget {
 
 		if (!$meta['module'] || !class_exists($meta['module'])) return '';
 
-		if (($instance = utopia::GetInstance($meta['module'],false))) {
-			foreach ($instance->fields as $fieldName => $fieldInfo) {
-				if (isset($fieldInfo['ismetadata']) && !isset($meta[$fieldName])) $meta[$fieldName] = null;
-			}
-			
-			// add filters
-			utopia::MergeVars($meta['filter']);
-			if ($meta['filter']) $instance->AddFilter($meta['filter'],ctCUSTOM);
-
-			// add Order
-			utopia::MergeVars($meta['order']);
-			if ($meta['order']) $instance->AddOrderBy($meta['order']);
-
-			// init limit
-			utopia::MergeVars($meta['limit']);
-			$instance->limit = $meta['limit'];
-
-			// get rows
-			$rows = array();
-			try {
-				$rows = $instance->GetRows();
-			} catch (Exception $e) {
-				uNotices::AddNotice('<p>There was a problem accessing the records, please check your filter and sorting options for invalid fields.</p>',NOTICE_TYPE_WARNING);
-			}
-		} else $rows = array();
-
+		if (!($instance = utopia::GetInstance($meta['module'],false))) {
+			echo 'Could not load Data Source';
+			return;
+		}
+		
 		$content = $append = $prepend = '';
     	
 		$html = str_get_html($meta['content'],true,true,DEFAULT_TARGET_CHARSET,false);
@@ -212,14 +197,52 @@ class uCustomWidget implements iWidget {
 			$repeatable = $ele;
 		}
 	
-		$obj = utopia::GetInstance($meta['module']);
-		$fields = $obj->fields;
+		{ // get rows
+			foreach ($instance->fields as $fieldName => $fieldInfo) {
+				if (isset($fieldInfo['ismetadata']) && !isset($meta[$fieldName])) $meta[$fieldName] = null;
+			}
+			
+			// add filters
+			utopia::MergeVars($meta['filter']);
+			if ($meta['filter']) $instance->AddFilter($meta['filter'],ctCUSTOM);
+
+			// add Order
+			utopia::MergeVars($meta['order']);
+			if ($meta['order']) $instance->AddOrderBy($meta['order']);
+
+			// init limit
+			$page = NULL;
+			$limit = NULL;
+			utopia::MergeVars($meta['limit']);
+			if ($meta['limit'] && strpos($meta['limit'],',')===FALSE && stripos($meta['content'],'{pagination}') !== FALSE) {
+				$page = isset($_GET['page']) ? $_GET['page'] : 0;
+				$limit = $meta['limit'];
+				$meta['limit'] = ($limit*$page).','.$meta['limit'];
+			}
+			$instance->limit = $meta['limit'];
+
+			// get rows
+			$rows = array();
+			try {
+				$rows = $instance->GetRows();
+			} catch (Exception $e) {
+				uNotices::AddNotice('<p>There was a problem accessing the records, please check your filter and sorting options for invalid fields.</p>',NOTICE_TYPE_WARNING);
+			}
+		}
+
+		// process limit
+		$total = count($rows);
+		$instance->ApplyLimit($rows,$meta['limit']);
+		
+		// process repeatable area
+		$instance = utopia::GetInstance($meta['module']);
+		$fields = $instance->fields;
 		if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$repeatable,$matches,PREG_PATTERN_ORDER)) {
 			$searchArr = $matches[0];
 			$typeArr = isset($matches[1]) ? $matches[1] : false;
 			$varsArr = isset($matches[2]) ? $matches[2] : false;
 			foreach ($rows as $row) {
-				$row['_module_url'] = $obj->GetURL($row[$obj->GetPrimaryKey()]);
+				$row['_module_url'] = $instance->GetURL($row[$instance->GetPrimaryKey()]);
 				$c = $repeatable;
 				foreach ($searchArr as $k => $search) {
 					$field = $varsArr[$k];
@@ -228,18 +251,18 @@ class uCustomWidget implements iWidget {
 					if (!array_key_exists($field,$row)) continue;
 					if ($qs) {
 						parse_str(html_entity_decode($qs),$qs);
-						$obj->FieldStyles_Add($field,$qs);
+						$instance->FieldStyles_Add($field,$qs);
 					}
 					switch ($typeArr[$k]) {
 						case 'u':
-							$replace = $obj->PreProcess($field,$row[$field],$row);
+							$replace = $instance->PreProcess($field,$row[$field],$row);
 							$replace = UrlReadable($replace);
 							break;
 						case 'd':
-							$replace = $obj->PreProcess($field,$row[$field],$row);
+							$replace = $instance->PreProcess($field,$row[$field],$row);
 							break;
 						default:
-							$replace = $obj->GetCell($field,$row);
+							$replace = $instance->GetCell($field,$row);
 							break;
 					}
 					$c = str_replace($search,$replace,$c);
@@ -247,9 +270,19 @@ class uCustomWidget implements iWidget {
 				$content .= $c;
 			}
 		}
-		$obj->fields = $fields;
-
+		$instance->fields = $fields;
 		$ret = $append.$content.$prepend;
+		
+		// process full doc
+		$ret = str_ireplace('{total}',$total,$ret);
+		if ($page !== NULL && $limit !== NULL) {
+			ob_start();
+			$pages = max(ceil($total / $limit),1);
+			utopia::OutputPagination($pages);
+			$ret = str_ireplace('{pagination}',ob_get_contents(),$ret);
+			ob_end_clean();
+		}
+		
 		while (utopia::MergeVars($ret));
 
 		return $ret;

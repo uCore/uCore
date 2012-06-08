@@ -64,5 +64,5 @@ function InsertWidget(id) {
 }
 
 $(document).on('click','.widget-field',function () {
-	tinyMCE.execCommand('mceInsertContent',true,'{field.'+(this.dataset['fieldname'])+'}');
+	tinyMCE.execCommand('mceInsertContent',true,'{'+(this.dataset['fieldname'])+'}');
 });

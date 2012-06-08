@@ -1659,7 +1659,6 @@ FIN;
 		return $from;
 	}
 
-	public $rowcount = false;
 	public function GetSelectStatement() {//$filter = '',$sortColumn='') {
 		// init fields, get primary key, its required by all tables anyway so force it...
 		//grab the table alias and primary key from the alias's tabledef
@@ -1688,7 +1687,6 @@ FIN;
 		$from = $this->GetFromClause();
 
 		$distinct = flag_is_set($this->GetOptions(),DISTINCT_ROWS) ? ' DISTINCT' : '';
-		if ($this->rowcount) $flds[] = 'COUNT(*) as row_count';
 		$qry = "SELECT$distinct ".join(",\n",$flds);
 		if ($from) $qry .= " \nFROM ".$from;//$this->GetPrimaryTable().$joins;
 		return $qry;
@@ -2043,10 +2041,6 @@ FIN;
 			$query .= " $order";
 		}
 
-		$limitKey = '_p_'.$this->GetModuleId();
-		if (empty($this->limit) && isset($_GET[$limitKey])) $this->limit = $_GET[$limitKey];
-		if (!empty($this->limit)) $query .= ' LIMIT '.$this->limit;
-
 		if ($this->explainQuery) print_r(GetRows(sql_query("EXPLAIN EXTENDED $query")));
 
 		$this->dataset = sql_query($query);
@@ -2054,15 +2048,35 @@ FIN;
 		return $this->dataset;
 	}
 
-	public function GetRowCount() {
-		$this->rowcount = true;
-		$old_limit = $this->limit;
-		$this->limit = 1;
-		$result = $this->GetDataset();
-		$row = mysql_fetch_assoc($result);
-		$this->limit = $old_limit;
-		$this->rowcount = false;
-		return $row['row_count'];
+	public function GetLimit(&$limitRet=null,&$pageRet=null,$limit=null) {
+		if ($limit === null) {
+			$limitKey = '_l_'.$this->GetModuleId();
+			if (isset($_GET[$limitKey])) $limit = $_GET[$limitKey];
+		}
+		if ($limit === null) $limit = $this->limit;
+		if ($limit === null) return NULL;
+		
+		$a = explode(',',$limit);
+		if (count($a) > 1)
+			list($pageRet,$limitRet) = $a;
+		else
+			$limitRet = $a[0];
+			
+		if ($limitRet === 0) $limitRet = NULL;
+	}
+	public function ApplyLimit(&$rows,$limit=null) {
+		$this->GetLimit($limit,$page,$limit);
+		
+		$pageKey = '_p_'.$this->GetModuleId();
+		if ($page === NULL) $page = isset($_GET[$pageKey]) ? $_GET[$pageKey] : 0;
+		
+		if (!$limit) return;
+
+		$total = count($rows);
+		$pages = ceil(max(0,$total / $limit));
+		if ($page >= $pages) $page = $pages-1;
+		
+		$rows = array_slice($rows,$page * $limit,$limit);
 	}
 
 	public function GetCurrentRecord($refresh = FALSE) {
@@ -2700,7 +2714,7 @@ abstract class uListDataModule extends uDataModule {
 
 	public function CheckMaxRows($mod = 0) {
 		AjaxEcho('// max recs: '.$this->GetMaxRows());
-		$rows = $this->GetRowCount();
+		$rows = count($this->GetRows());
 		if (!$this->GetMaxRows() || $rows + $mod < $this->GetMaxRows()) {
 			AjaxEcho('$(".newRow").show();');
 			return TRUE;
@@ -2714,11 +2728,14 @@ abstract class uListDataModule extends uDataModule {
 		return NULL;//$this->maxRecs;
 	}
 	
+	public $limit = 50;
+	
 	public function ShowData($rows = null, $tabTitle = null,$tabOrder = null) {
 		//	echo "showdata ".get_class($this)."\n";
 
 		if (!$rows) $rows = $this->GetRows();
 		$num_rows = count($rows);
+		$this->ApplyLimit($rows);
 		
 		if (!$tabTitle) $tabTitle = $this->GetTitle();
 		if (!$tabOrder) $tabOrder = $this->GetSortOrder();
@@ -2845,10 +2862,21 @@ abstract class uListDataModule extends uDataModule {
 
 			$c = ob_get_contents();
 			ob_end_clean();
-
+			
+			$pagination = '';
+			$this->GetLimit($limit);
+			if ($limit) {
+				$pages = max(ceil($num_rows / $limit),1);
+				ob_start();
+					utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
+					$pagination = ob_get_contents();
+				ob_end_clean();
+			}
+			
 			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
-			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows.' (Max 150 shown)';
-			echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<span class="right"><b>'.$records.'</b></span>'.$pager.'</td></tr>';
+			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
+			$pager = '<div class="right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itTEXT,$limit,NULL,array('class'=>'uFilter uLimit')).' per page</div>';
+			echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<b>'.$records.'</b>'.$pager.'</td></tr>';
 
 			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD)) echo $c;
 
