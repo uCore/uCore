@@ -1320,7 +1320,7 @@ FIN;
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
 		
 		$this->fields[$aliasName] = array(
-		  'alias'       => $aliasName,
+			'alias'       => $aliasName,
 			'tablename'   => $tableAlias,
 			'visiblename' => $visiblename,
 			'inputtype'   => $inputtype,
@@ -1356,6 +1356,7 @@ FIN;
 		}
 		// values here
 		if ($values === NULL) switch ($inputtype) {
+			case itNONE:
 			case itCOMBO:
 			case itOPTION:
 			case itSUGGEST:
@@ -1828,12 +1829,11 @@ FIN;
 		$fieldToCompare = NULL;
 		if ($filterData['type'] == FILTER_WHERE) {
 			if (array_key_exists($fieldName,$this->fields)) {
-				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0)
-					$fieldToCompare = '`'.$this->fields[$fieldName]['tablename'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`'; // PRAGMA,  use tables PK
-				elseif (isset($this->fields[$fieldName]['vtable']['parent']) && isset($this->fields[$fieldName]['values'])) {
+				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0 || (isset($this->fields[$fieldName]['vtable']['parent']) && isset($this->fields[$fieldName]['values']))) {
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`';
-				} else
-					$fieldToCompare = '`'.$this->fields[$fieldName]['tablename'].'`.`'.$this->fields[$fieldName]['field'].'`'; // NOT PRAGMA, use field
+				} else {
+					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['field'].'`';
+				}
 			} else if (!IsSelectStatement($fieldName))
 			return '';
 			//	ErrorLog("Unable to clearly define where statement for field ($fieldName)");
