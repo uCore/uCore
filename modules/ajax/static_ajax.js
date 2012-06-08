@@ -11,7 +11,7 @@ function FilterOnEnter(sender) {
 
 function FilterOnLeave(sender) {
     isFiltering = false;
-    if ($(sender).attr('name').indexOf('_f_') > -1) StartFilterTimer();
+	StartFilterTimer();
 	if (sender.tagName == 'SELECT') return;
 
 	if (sender.value == '') $(sender).val($(sender).attr('title'));
@@ -85,7 +85,7 @@ $(document).ready(function(){
 		$(this).bind('blur' , function (event) {FilterOnLeave(this);});
 		//$(this).bind('change', function (event) {ReloadFilters();});
 		
-		$(this).bind('keydown', function (event) { if ($(this).attr('name').indexOf('_f_') == -1) return; if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
+		$(this).bind('keydown', function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
 
 		 // allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
 		$(this).bind('selectstart', function (event) {event.stopPropagation(); return true;});
@@ -445,7 +445,7 @@ var Base64 = {
 var reloadTimer = null;
 function StartFilterTimer() {
     clearTimeout(reloadTimer);
-    reloadTimer = setTimeout("ReloadFilters()",2000);
+    reloadTimer = setTimeout("ReloadFilters()",100);
 }
 function ReloadFilters() {
   if (isFiltering == true) return;
@@ -458,6 +458,7 @@ function ReloadFilters() {
 	$(".uFilter").each(function () {
 		var name = $(this).attr('name');
 		if (empty(name)) return;
+		if ($(this).val() == $(this)[0].defaultValue) return;
 		//processed.push(name);
 		//alert(gup(escape(name)));
 		//oldVal = decodeURIComponent(gup(escape(name))).replace(/\+/g, ' ');
