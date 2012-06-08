@@ -13,6 +13,8 @@ class tabledef_ModOpts extends uTableDef {
 		$this->SetPrimaryKey('ident');
 	}
 }
+
+utopia::AddTemplateParser('option','modOpts::GetOption','.+');
 class modOpts extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Options'; }
 	public function GetSortOrder() { return -9999.5; }
