@@ -2369,7 +2369,7 @@ FIN;
 		$originalValue = $newValue;
 
 		$field = $this->fields[$fieldAlias]['field'];
-		$table		= $tbl['table'];
+		$table		= $tbl['tModule'];
 		$tablePk	= $tbl['pk'];
 		
 		if (array_key_exists('parent',$tbl)) {
