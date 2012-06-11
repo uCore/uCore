@@ -2062,7 +2062,7 @@ FIN;
 		else
 			$limitRet = intval($a[0]);
 			
-		if (!$limitRet == 0) $limitRet = NULL;
+		if (!is_numeric($limitRet) || !$limitRet) $limitRet = NULL;
 	}
 	public function ApplyLimit(&$rows,$limit=null) {
 		$this->GetLimit($limit,$page,$limit);
