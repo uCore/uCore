@@ -1223,7 +1223,7 @@ class utopia {
 	
 	static function OutputPagination($pages,$pageKey = 'page') {
 		//$pages $pageKey
-		if ($pages <= 1) return;
+		if ($pages <= 1) return 1;
 		$parsed = parse_url($_SERVER['REQUEST_URI']);
 		$args = isset($parsed['query']) ? $parsed['query'] : '';
 		if (is_string($args)) parse_str($args,$args);
@@ -1254,6 +1254,7 @@ class utopia {
 			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Next &gt;</a></li>';
 		}
 		echo '</ul>';
+		return $page+1;
 	}
 	
 	static function SanitiseValue(&$value,$type,$default=null,$isRegex=false) {
