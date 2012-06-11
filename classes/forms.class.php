@@ -2060,9 +2060,9 @@ FIN;
 		if (count($a) > 1)
 			list($pageRet,$limitRet) = $a;
 		else
-			$limitRet = $a[0];
+			$limitRet = intval($a[0]);
 			
-		if ($limitRet === 0) $limitRet = NULL;
+		if (!$limitRet == 0) $limitRet = NULL;
 	}
 	public function ApplyLimit(&$rows,$limit=null) {
 		$this->GetLimit($limit,$page,$limit);

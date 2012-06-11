@@ -213,6 +213,7 @@ class uCustomWidget implements iWidget {
 			// init limit
 			$page = NULL;
 			$limit = NULL;
+			$meta['limit'] = trim($meta['limit']);
 			utopia::MergeVars($meta['limit']);
 			if ($meta['limit'] && strpos($meta['limit'],',')===FALSE && stripos($meta['content'],'{pagination}') !== FALSE) {
 				$page = isset($_GET['page']) ? $_GET['page'] : 0;
@@ -275,7 +276,7 @@ class uCustomWidget implements iWidget {
 		
 		// process full doc
 		$ret = str_ireplace('{total}',$total,$ret);
-		if ($page !== NULL && $limit !== NULL) {
+		if ($page !== NULL && is_numeric($limit)) {
 			ob_start();
 			$pages = max(ceil($total / $limit),1);
 			$cPage = utopia::OutputPagination($pages,'_p_'.$rec['block_id']);
