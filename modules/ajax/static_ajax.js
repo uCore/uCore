@@ -26,8 +26,8 @@ $(document).ready(function(){
 	
 	$('form').append('<input type="submit" style="width:0;height:0;border:0;padding:0;margin:0;float:left;" />');
 
-	$('li:first','ul').addClass('first-item');
-	$('li:last','ul').addClass('last-item');
+	$('li:first','ul').addClass('first-child');
+	$('li:last','ul').addClass('last-child');
 
 	$(".tabGroup").tabs();
 	$(".tabGroup").bind("tabsshow", function(event, ui) { 
