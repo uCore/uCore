@@ -1829,7 +1829,7 @@ FIN;
 		$fieldToCompare = NULL;
 		if ($filterData['type'] == FILTER_WHERE) {
 			if (array_key_exists($fieldName,$this->fields)) {
-				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0 || (isset($this->fields[$fieldName]['vtable']['parent']) && isset($this->fields[$fieldName]['values']))) {
+				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0 || (isset($this->fields[$fieldName]['vtable']['parent']) && $this->fields[$fieldName]['vtable']['parent'] !== $this->sqlTableSetup['alias'])) {
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`';
 				} else {
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['field'].'`';
