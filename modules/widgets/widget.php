@@ -147,7 +147,7 @@ class uCustomWidget implements iWidget {
 		$fields = $obj->fields;
 		$ret = '';
 		$ret .= '<span data-fieldname="total" class="btn widget-field">Total Records</span>';
-		if ($meta['limit'] && strpos($meta['limit'],',')===FALSE && stripos($meta['content'],'{pagination}') !== FALSE) {
+		if (isset($meta['limit']) && strpos($meta['limit'],',')===FALSE && isset($meta['content']) && stripos($meta['content'],'{pagination}') !== FALSE) {
 			$ret .= '<span data-fieldname="pages" class="btn widget-field">Total Pages</span>';
 			$ret .= '<span data-fieldname="current_page" class="btn widget-field">Current Page</span>';
 			$ret .= '<span data-fieldname="pagination" class="btn widget-field">Pagination</span>';
@@ -278,9 +278,11 @@ class uCustomWidget implements iWidget {
 		if ($page !== NULL && $limit !== NULL) {
 			ob_start();
 			$pages = max(ceil($total / $limit),1);
-			utopia::OutputPagination($pages);
+			$cPage = utopia::OutputPagination($pages,'_p_'.$rec['block_id']);
 			$ret = str_ireplace('{pagination}',ob_get_contents(),$ret);
 			ob_end_clean();
+			$ret = str_ireplace('{pages}',$pages,$ret);
+			$ret = str_ireplace('{current_page}',$cPage,$ret);
 		}
 		
 		while (utopia::MergeVars($ret));
