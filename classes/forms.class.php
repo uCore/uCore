@@ -2390,7 +2390,7 @@ FIN;
 				if ($toField == $tablePk) {
 					$field = $fromField;
 					$tbl = $this->sqlTableSetupFlat[$tbl['parent']];
-					$table		= $tbl['table'];
+					$table		= $tbl['tModule'];
 					$tablePk	= $tbl['pk'];
 					break;
 				}
