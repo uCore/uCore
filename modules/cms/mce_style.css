@@ -6,3 +6,7 @@
 .mceEditor.defaultSkin table.mceLayout .mceIframeContainer { border:none }
 
 .mce_formatPreview a span { color: black !important; background-color:white !important; }
+
+#exposeMce {
+	background:url(images/scanline.png); opacity:0.7; position:fixed;top:0;bottom:0;left:0;right:0;z-index:1000;
+}

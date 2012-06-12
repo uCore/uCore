@@ -4,6 +4,8 @@ $(document).on('click','*',function(event) {
 	$('.mceExternalToolbar').hide();
 });
 
+var exposeMce = $('<div id="exposeMce"/>');
+	
 function moveMceToolbars(event,ed) {
 	// move the toolbars post render
 	ed.onPostRender.add(function(ed, cm) {
@@ -29,6 +31,17 @@ function moveMceToolbars(event,ed) {
 			'transform':'none',
 			'min-width':0
 		});
+
+		$('body').append(exposeMce);
+		var cont = $('.mceLayout',ed.getContainer());
+		cont.parents().each(function() {
+			if ($(this).css('transform') !== 'none' && $(this).css('transform') !== null) $(this).css('transform','none');
+			if ($(this).css('-webkit-transform') !== 'none' && $(this).css('-webkit-transform') !== null) $(this).css('-webkit-transform','none');
+			if ($(this).css('-moz-transform') !== 'none' && $(this).css('-moz-transform') !== null) $(this).css('-moz-transform','none');
+			if ($(this).css('-o-transform') !== 'none' && $(this).css('-o-transform') !== null) $(this).css('-o-transform','none');
+			if ($(this).css('-ms-transform') !== 'none' && $(this).css('-ms-transform') !== null) $(this).css('-ms-transform','none');
+		});
+		cont.css({'position':'relative','z-index':1001});
 		
 		// wake up the autoresize plugin
 		setTimeout(function(){ed.execCommand('mceAutoResize', false, undefined, {skip_focus: true, skip_undo: true});},1);
