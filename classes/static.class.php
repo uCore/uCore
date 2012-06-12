@@ -1210,7 +1210,7 @@ class utopia {
 	}
 	static function GetMimeType($path) {
 		$cType = NULL;
-		if (function_exists('finfo_open')) {
+		if (function_exists('finfo_open') && defined('FILEINFO_MIME_TYPE')) {
 			$finfo = finfo_open(FILEINFO_MIME_TYPE);
 			$cType = finfo_file($finfo,$path);
 		} elseif (function_exists('mime_content_type')) {
