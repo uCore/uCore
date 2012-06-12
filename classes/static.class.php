@@ -1213,6 +1213,7 @@ class utopia {
 		if (function_exists('finfo_open') && defined('FILEINFO_MIME_TYPE')) {
 			$finfo = finfo_open(FILEINFO_MIME_TYPE);
 			$cType = finfo_file($finfo,$path);
+			finfo_close($finfo);
 		} elseif (function_exists('mime_content_type')) {
 			$cType = mime_content_type($path);
 		} else {
