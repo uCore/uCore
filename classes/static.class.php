@@ -771,7 +771,7 @@ class utopia {
 		if (self::IsRequestSecure()) {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
-
+		$template = utf8_decode($template);
 		do if (self::UsingTemplate() && class_exists('DOMDocument')) {
 			$doc = new DOMDocument();
 			$doc->formatOutput = true;
@@ -779,7 +779,7 @@ class utopia {
 			$doc->validateOnParse = true;
 
 			try {
-				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.$template)) break;
+				if (!$doc->loadHTML($template)) break;
 			} catch (Exception $e) { }
 			$doc->encoding = 'UTF-8';
 			
