@@ -32,7 +32,7 @@ function moveMceToolbars(event,ed) {
 			'min-width':0
 		});
 
-		$('body').append(exposeMce);
+/*		$('body').append(exposeMce);
 		var cont = $('.mceLayout',ed.getContainer());
 		cont.parents().each(function() {
 			if ($(this).css('transform') !== 'none' && $(this).css('transform') !== null) $(this).css('transform','none');
@@ -42,6 +42,7 @@ function moveMceToolbars(event,ed) {
 			if ($(this).css('-ms-transform') !== 'none' && $(this).css('-ms-transform') !== null) $(this).css('-ms-transform','none');
 		});
 		cont.css({'position':'relative','z-index':1001});
+*/
 		
 		// wake up the autoresize plugin
 		setTimeout(function(){ed.execCommand('mceAutoResize', false, undefined, {skip_focus: true, skip_undo: true});},1);
