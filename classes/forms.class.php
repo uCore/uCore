@@ -2049,6 +2049,7 @@ FIN;
 	}
 
 	public function GetLimit(&$limitRet=null,&$pageRet=null,$limit=null) {
+		if ($limit === '') $limit = NULL;
 		if ($limit === null) {
 			$limitKey = '_l_'.$this->GetModuleId();
 			if (isset($_GET[$limitKey])) $limit = $_GET[$limitKey];

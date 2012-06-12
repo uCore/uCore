@@ -198,6 +198,7 @@ class uCustomWidget implements iWidget {
 		}
 	
 		{ // get rows
+			$instance->_SetupParents(); $instance->_SetupFields();
 			foreach ($instance->fields as $fieldName => $fieldInfo) {
 				if (isset($fieldInfo['ismetadata']) && !isset($meta[$fieldName])) $meta[$fieldName] = null;
 			}
@@ -213,10 +214,11 @@ class uCustomWidget implements iWidget {
 			// init limit
 			$page = NULL;
 			$limit = NULL;
+			$instance->GetLimit($meta['limit'],$_,$meta['limit']);
 			$meta['limit'] = trim($meta['limit']);
 			utopia::MergeVars($meta['limit']);
 			if ($meta['limit'] && strpos($meta['limit'],',')===FALSE && stripos($meta['content'],'{pagination}') !== FALSE) {
-				$page = isset($_GET['page']) ? $_GET['page'] : 0;
+				$page = isset($_GET['_p_'.$rec['block_id']]) ? $_GET['_p_'.$rec['block_id']] : 0;
 				$limit = $meta['limit'];
 				$meta['limit'] = ($limit*$page).','.$meta['limit'];
 			}
