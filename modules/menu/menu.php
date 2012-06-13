@@ -1,8 +1,8 @@
 <?php
 
-utopia::AddTemplateParser('menu1','uMenu::GetMenu','.*',true);
-utopia::AddTemplateParser('menu','uMenu::GetNestedMenu','.*',true);
-utopia::AddTemplateParser('sitemap','uMenu::DrawNestedMenu','',true);
+utopia::AddTemplateParser('menu1','uMenu::GetMenu','.*');
+utopia::AddTemplateParser('menu','uMenu::GetNestedMenu','.*');
+utopia::AddTemplateParser('sitemap','uMenu::DrawNestedMenu','');
 class uMenu {
 	private static $items = array();
 	public static function &AddItem($id,$text,$url,$group='',$attr=null,$pos=null) {
@@ -26,18 +26,19 @@ class uMenu {
 		
 		array_sort_subkey(self::$items[$group],'pos');
 		
-		echo '<ul class="u-menu">';
+		$ret = '<ul class="u-menu">';
 		foreach (self::$items[$group] as $item) {
 			$attrs = BuildAttrString($item['attr']);
 
-			echo '<li '.$attrs.'>';
-			echo '<a href="'.$item['url'].'" title="'.$item['text'].'">'.$item['text'].'</a>';
+			$ret .= '<li '.$attrs.'>';
+			$ret .= '<a href="'.$item['url'].'" title="'.$item['text'].'">'.$item['text'].'</a>';
 			if ($level !== 0) self::GetMenu($item['id'],$level);
-			echo '</li>';
+			$ret .= '</li>';
 		}
-		echo '</ul>';
+		$ret .= '</ul>';
+		return $ret;
 	}
 	static function GetNestedMenu($group='') {
-		self::GetMenu($group,-1);
+		return self::GetMenu($group,-1);
 	}
 }
