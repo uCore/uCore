@@ -772,14 +772,13 @@ class utopia {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
 		do if (self::UsingTemplate() && class_exists('DOMDocument')) {
-			$template = utf8_decode($template);
 			$doc = new DOMDocument();
 			$doc->formatOutput = true;
 			$doc->preserveWhiteSpace = false;
 			$doc->validateOnParse = true;
 
 			try {
-				if (!$doc->loadHTML($template)) break;
+				if (!$doc->loadHTML(utf8_decode($template))) break;
 			} catch (Exception $e) { }
 			$doc->encoding = 'UTF-8';
 			
