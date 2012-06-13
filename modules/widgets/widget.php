@@ -214,16 +214,15 @@ class uCustomWidget implements iWidget {
 			// init limit
 			$page = NULL;
 			$limit = NULL;
+			utopia::MergeVars($meta['limit']);
 			$instance->GetLimit($meta['limit'],$_,$meta['limit']);
 			$meta['limit'] = trim($meta['limit']);
-			utopia::MergeVars($meta['limit']);
 			if ($meta['limit'] && strpos($meta['limit'],',')===FALSE && stripos($meta['content'],'{pagination}') !== FALSE) {
 				$page = isset($_GET['_p_'.$rec['block_id']]) ? $_GET['_p_'.$rec['block_id']] : 0;
 				$limit = $meta['limit'];
 				$meta['limit'] = ($limit*$page).','.$meta['limit'];
 			}
-			$instance->limit = $meta['limit'];
-
+			
 			// get rows
 			$rows = array();
 			try {
