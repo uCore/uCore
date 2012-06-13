@@ -771,8 +771,8 @@ class utopia {
 		if (self::IsRequestSecure()) {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
-		$template = utf8_decode($template);
 		do if (self::UsingTemplate() && class_exists('DOMDocument')) {
+			$template = utf8_decode($template);
 			$doc = new DOMDocument();
 			$doc->formatOutput = true;
 			$doc->preserveWhiteSpace = false;
