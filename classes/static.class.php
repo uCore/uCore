@@ -714,11 +714,32 @@ class utopia {
 			if (isset($inifile['parent'])) $cssfiles = self::GetTemplateCSS(PATH_ABS_TEMPLATES.$inifile['parent']);
 		}
 		
-		// add my css
-		if (utopia::IsMobile() && file_exists($template.'/mobile.css'))
-			$cssfiles[] = $template.'/mobile.css';
-		elseif (file_exists($template.'/styles.css'))
-			$cssfiles[] = $template.'/styles.css';
+		$namedcss = null;
+		$templatefile = $template.'/template.php';
+		if (utopia::IsMobile()) {
+			if (file_exists($template.'/mobile.css')) $namedcss = $template.'/mobile.css';
+			if (file_exists($template.'/mobile.php')) $templatefile = $template.'/mobile.php';
+		} else {
+			if (file_exists($template.'/styles.css')) $namedcss = $template.'/styles.css';
+		}
+		
+		if ($namedcss) $cssfiles[] = $namedcss;
+		
+		// parse template file for additional styles
+		if (class_exists('DOMDocument')) {
+			$doc = new DOMDocument();
+			try {
+				$doc->loadHTML(get_include_contents($templatefile));
+			} catch (Exception $e) { }
+			foreach ($doc->getElementsByTagName('link') as $link) {
+				if ($link->getAttribute('rel') == 'stylesheet') {
+					$v = $link->getAttribute('href');
+					self::MergeVars($v);
+					$v = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/',PATH_ABS_ROOT,$v);
+					$cssfiles[] = $v;
+				}
+			}
+		}
 
 		return $cssfiles;
 	}
