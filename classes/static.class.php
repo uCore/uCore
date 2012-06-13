@@ -798,6 +798,7 @@ class utopia {
 			$doc->preserveWhiteSpace = false;
 			$doc->validateOnParse = true;
 
+			$template = str_replace('<head>', '<head>' . '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>', $template);
 			try {
 				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.$template)) break;
 			} catch (Exception $e) { }
