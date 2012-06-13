@@ -10,6 +10,12 @@ class uCSS extends uBasicModule {
 		
 		$beforeRef = $head->getElementsByTagName('link')->length ? $head->getElementsByTagName('link')->item(0) : null;
 		foreach (self::$linkFiles as $path) {
+			// already exists?
+			$exists = false;
+			foreach ($templateDoc->getElementsByTagName('link') as $l) {
+				if ($l->getAttribute('rel') == 'stylesheet' && $l->getAttribute('href') == $path['path']) { $exists = true; break; }
+			}
+			if ($exists) continue;
 			$node = $templateDoc->createElement('link');
 			$node->setAttribute('type','text/css'); $node->setAttribute('rel','stylesheet'); $node->setAttribute('href',$path['path']);
 			
