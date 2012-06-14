@@ -714,13 +714,11 @@ class utopia {
 			if (isset($inifile['parent'])) $cssfiles = self::GetTemplateCSS(PATH_ABS_TEMPLATES.$inifile['parent']);
 		}
 		
-		$namedcss = null;
+		$namedcss = $template.'/styles.css';
 		$templatefile = $template.'/template.php';
 		if (utopia::IsMobile()) {
 			if (file_exists($template.'/mobile.css')) $namedcss = $template.'/mobile.css';
 			if (file_exists($template.'/mobile.php')) $templatefile = $template.'/mobile.php';
-		} else {
-			if (file_exists($template.'/styles.css')) $namedcss = $template.'/styles.css';
 		}
 		
 		if ($namedcss) $cssfiles[] = $namedcss;
