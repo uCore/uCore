@@ -21,7 +21,7 @@ class uMenu {
 	}
 	public static function GetMenu($group='',$level = 1) {
 		$group = strtolower($group);
-		if (!isset(self::$items[$group])) return;
+		if (!isset(self::$items[$group])) return '';
 		$level = $level -1;
 		
 		array_sort_subkey(self::$items[$group],'pos');
