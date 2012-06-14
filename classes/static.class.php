@@ -721,7 +721,7 @@ class utopia {
 			if (file_exists($template.'/mobile.php')) $templatefile = $template.'/mobile.php';
 		}
 		
-		if ($namedcss) $cssfiles[] = $namedcss;
+		if (file_exists($namedcss)) $cssfiles[] = $namedcss;
 		
 		// parse template file for additional styles
 		if (class_exists('DOMDocument')) {
