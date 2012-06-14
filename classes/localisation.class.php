@@ -197,5 +197,11 @@ class uLocale implements ArrayAccess {
 	public function offsetUnset($key) {
 		unset($this->localisations[$key]);
 	}
+	
+	public static function InitLocale() {
+		uLocale::ResetLocale();
+		if (self::$locale_limit === NULL) uLocale::LimitLocale(array(DEFAULT_LOCALE));
+	}
 }
 uConfig::AddConfigVar('DEFAULT_LOCALE','Default Locale','en_GB',uLocale::ListLocale());
+uEvents::AddCallback('ConfigDefined','uLocale::InitLocale');
