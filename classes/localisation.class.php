@@ -8,7 +8,7 @@ define('LOCALE_LIST_TYPE_CURR_SYMBOL',flag_gen('LOCALE_LIST_TYPE'));
 
 class uLocale implements ArrayAccess {
 	public static $locale_cache = array();
-	public static $locale_limit = array();
+	public static $locale_limit = NULL;
 	public static $locale_win = array(
 		'chinese'=>array('lang'=>'Chinese','terr'=>'China'),
 		'chs'=>array('lang'=>'Chinese','terr'=>'Simplified'),
@@ -86,7 +86,7 @@ class uLocale implements ArrayAccess {
 		foreach ($locales as $code => $locale) {
 			// limit
 			$allow = true;
-			foreach (self::$locale_limit as $limit) {
+			if (self::$locale_limit) foreach (self::$locale_limit as $limit) {
 				$allow = false;
 				if (stripos($code,$limit) !== FALSE) { $allow = true; break; }
 				if (stripos($locale['lang'],$limit) !== FALSE) { $allow = true; break; }

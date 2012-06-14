@@ -1340,7 +1340,8 @@ FIN;
 				$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 				break;
 			case ftCURRENCY:
-				$this->AddField($aliasName.'_locale', $fieldName.'_locale', $tableAlias,NULL,itCOMBO,uLocale::ListLocale('%i (%l, %t)'));
+				$list = uLocale::ListLocale('%i (%l, %t)');
+				$this->AddField($aliasName.'_locale', $fieldName.'_locale', $tableAlias,(count($list)>1 ? 'Currency' : NULL),itCOMBO,$list);
 				$this->SetDefaultValue($aliasName.'_locale',DEFAULT_LOCALE);
 				$this->AddPreProcessCallback($aliasName,array('utopia','convCurrency'));
 				break;
