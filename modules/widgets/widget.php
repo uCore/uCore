@@ -236,43 +236,12 @@ class uCustomWidget implements iWidget {
 		$total = count($rows);
 		$instance->ApplyLimit($rows,$meta['limit']);
 		
-		// process repeatable area
-		$instance = utopia::GetInstance($meta['module']);
-		$fields = $instance->fields;
-		if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$repeatable,$matches,PREG_PATTERN_ORDER)) {
-			$searchArr = $matches[0];
-			$typeArr = isset($matches[1]) ? $matches[1] : false;
-			$varsArr = isset($matches[2]) ? $matches[2] : false;
-			foreach ($rows as $row) {
-				$row['_module_url'] = $instance->GetURL($row[$instance->GetPrimaryKey()]);
-				$c = $repeatable;
-				foreach ($searchArr as $k => $search) {
-					$field = $varsArr[$k];
-					$qs = null;
-					if (strpos($field,'?') !== FALSE) list($field,$qs) = explode('?',$field,2);
-					if (!array_key_exists($field,$row)) continue;
-					if ($qs) {
-						parse_str(html_entity_decode($qs),$qs);
-						$instance->FieldStyles_Add($field,$qs);
-					}
-					switch ($typeArr[$k]) {
-						case 'u':
-							$replace = $instance->PreProcess($field,$row[$field],$row);
-							$replace = UrlReadable($replace);
-							break;
-						case 'd':
-							$replace = $instance->PreProcess($field,$row[$field],$row);
-							break;
-						default:
-							$replace = $instance->GetCell($field,$row);
-							break;
-					}
-					$c = str_replace($search,$replace,$c);
-				}
-				$content .= $c;
-			}
+		foreach ($rows as $row) {
+			$c = $repeatable;
+			$instance->MergeFields($c,$row);
+			$content .= $c;
 		}
-		$instance->fields = $fields;
+		
 		$ret = $append.$content.$prepend;
 		
 		// process full doc

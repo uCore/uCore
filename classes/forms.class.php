@@ -2463,6 +2463,40 @@ FIN;
 
 		return $ret;
 	}
+	
+	public function MergeFields(&$string,$row) {
+		$fields = $this->fields;
+		if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
+			$searchArr = $matches[0];
+			$typeArr = isset($matches[1]) ? $matches[1] : false;
+			$varsArr = isset($matches[2]) ? $matches[2] : false;
+			$row['_module_url'] = $this->GetURL($row[$this->GetPrimaryKey()]);
+			foreach ($searchArr as $k => $search) {
+				$field = $varsArr[$k];
+				$qs = null;
+				if (strpos($field,'?') !== FALSE) list($field,$qs) = explode('?',$field,2);
+				if (!array_key_exists($field,$row)) continue;
+				if ($qs) {
+					parse_str(html_entity_decode($qs),$qs);
+					$this->FieldStyles_Add($field,$qs);
+				}
+				switch ($typeArr[$k]) {
+					case 'u':
+						$replace = $this->PreProcess($field,$row[$field],$row);
+						$replace = UrlReadable($replace);
+						break;
+					case 'd':
+						$replace = $this->PreProcess($field,$row[$field],$row);
+						break;
+					default:
+						$replace = $this->GetCell($field,$row);
+						break;
+				}
+				$string = str_replace($search,$replace,$string);
+			}
+		}
+		$this->fields = $fields;
+	}
 
 	public function GetCell($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		if (is_array($row) && array_key_exists('__module__',$row) && $row['__module__'] != get_class($this)) {
