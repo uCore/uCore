@@ -37,7 +37,7 @@ class uConfig {
 			array_shift($lines);
 			foreach ($lines as $line) {
 				if (!$line) continue;
-				list($ident,$val) = explode('=',$line);
+				list($ident,$val) = explode('=',$line,2);
 				$arr[trim($ident)] = trim($val);
 			}
 		}
