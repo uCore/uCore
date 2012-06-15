@@ -18,6 +18,16 @@ function FilterOnLeave(sender) {
 	if (sender.value == $(sender).attr('title')) $(sender).addClass('utopia-filter-default');
 }
 
+
+$(document).on('click','.btn-del',function(event) {
+	if (confirm('Are you sure you wish to delete this record?')) {
+		uf(this);
+	}
+	event.stopImmediatePropagation();
+	event.preventDefault();
+	return false;
+});
+
 $(document).ready(function(){
 	//$('.btn').button();
 	// preload hourglass image
