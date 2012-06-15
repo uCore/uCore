@@ -673,13 +673,13 @@ class uCMS_View extends uSingleDataModule {
 	public function GetCmsParents($cms_id,$includeSelf=true) {
 		$parents = array();
 		$rec = $this->LookupRecord($cms_id);
+		if ($includeSelf) $parents[] = $cms_id;
 		while ($rec['parent']) {
 			$parents[] = $rec['parent'];
 			$rec = $this->LookupRecord($rec['parent']);
 			if (!$rec) break;
 		}
-		array_reverse($parents);
-		if ($includeSelf) $parents[] = $cms_id;
+		$parents = array_reverse($parents);
 		return $parents;
 	}
 
