@@ -32,7 +32,7 @@ class uMenu {
 
 			$ret .= '<li '.$attrs.'>';
 			$ret .= '<a href="'.$item['url'].'" title="'.$item['text'].'">'.$item['text'].'</a>';
-			if ($level !== 0) self::GetMenu($item['id'],$level);
+			if ($level !== 0) $ret .= self::GetMenu($item['id'],$level);
 			$ret .= '</li>';
 		}
 		$ret .= '</ul>';
