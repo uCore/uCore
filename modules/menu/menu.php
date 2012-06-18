@@ -41,4 +41,10 @@ class uMenu {
 	static function GetNestedMenu($group='') {
 		return self::GetMenu($group,-1);
 	}
+	
+	static function AddStyles() {
+		uCSS::IncludeFile(dirname(__FILE__).'/menu.css');
+		uJavascript::IncludeFile(dirname(__FILE__).'/menu.js');
+	}
 }
+uEvents::AddCallback('InitComplete','uMenu::AddStyles');
