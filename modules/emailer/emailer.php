@@ -216,7 +216,7 @@ class uEmailer extends uDataModule {
 		}
 
 		$message->setSubject($subject);
-		$message->setBody($content, 'text/html');
+		$message->setBody($content, ($content == strip_tags($content)) ? 'text/plain' : 'text/html');
 
 		$to = self::ConvertEmails($to);
 		$message->setTo($to);
