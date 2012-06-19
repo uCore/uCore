@@ -457,7 +457,9 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddFilter('cms_id',ctEQ,itNONE,$rec['cms_id']);
 		$this->fields['content']['visiblename'] = NULL;
 		$this->fields['publishing']['visiblename'] = NULL;
+		$this->tabGroup = '_ADMIN_EDIT_';
 		$this->ShowData();
+		$this->tabGroup = NULL;
 		$c = ob_get_contents();
 		ob_end_clean();
 		$pubCell = '<span class="left" style="padding-left:10px">'.$this->GetCell('publishing',$rec).'</span>';
