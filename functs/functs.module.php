@@ -23,7 +23,7 @@ function LoadModulesDir($indir, $recursive = TRUE) {
 
 	$dir = glob($indir.'*', GLOB_MARK);
 	foreach ($dir as $d) {
-		if ($d == '.' || $d == '..') continue;
+		if ($d == '.' || $d == '..' || $d == '.git' || $d == '.svn') continue;
 		$files = array_merge($files,LoadModulesDir($d));
 	}
 	return $files;
