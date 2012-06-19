@@ -2213,7 +2213,8 @@ FIN;
 				array_unshift($args,$originalValue,$pkVal,$value,$rec,$fieldName);
 				array_splice($args,$num); // strip out any extra args than the function can take (stops 'wrong param count' error)
 
-				$value = call_user_func_array($callback,$args);
+				$nv = call_user_func_array($callback,$args);
+				if ($nv !== null) $value = $nv;
 			}
 		}
 
