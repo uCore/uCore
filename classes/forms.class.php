@@ -122,6 +122,8 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function GetDescription() {}
 	public function GetKeywords() {}
 
+	public $tabGroup = NULL;
+	
 	private $isSecurePage = false;
 	public function SetSecure() {
 		$this->isSecurePage = true;
@@ -2799,7 +2801,7 @@ abstract class uListDataModule extends uDataModule {
 		if (!isset($GLOBALS['inlineListCount'])) $GLOBALS['inlineListCount'] = 0;
 		else $GLOBALS['inlineListCount']++;
 
-		$tabGroupName = utopia::Tab_InitGroup();
+		$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
 
 		//$layoutID = utopia::tab_ //$tabGroupName.'-'.get_class($this)."_list_".$GLOBALS['inlineListCount'];
 		$metadataTitle = ' {tabTitle:\''.$tabTitle.'\', tabPosition:\''.$this->GetSortOrder().'\'}';
@@ -3142,7 +3144,7 @@ abstract class uSingleDataModule extends uDataModule {
 		if (get_class($this) == utopia::GetCurrentModule()) $order -= 10;
 		$extraCount = 1;
 //		if (!flag_is_set($this->GetOptions(), NO_TABS))
-		$tabGroupName = utopia::Tab_InitGroup();
+		$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
 		foreach ($this->layoutSections as $sectionID => $sectionName) {
 			//$secCount++;
 			//			echo "<div class='layoutSection' >";
