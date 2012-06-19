@@ -2058,9 +2058,10 @@ FIN;
 		if ($limit === null) return NULL;
 		
 		$a = explode(',',$limit);
-		if (count($a) > 1)
+		if (count($a) > 1) {
 			list($pageRet,$limitRet) = $a;
-		else
+			$pageRet = floor($pageRet / $limitRet);
+		} else
 			$limitRet = intval($a[0]);
 			
 		if (!is_numeric($limitRet) || !$limitRet) $limitRet = NULL;
