@@ -270,8 +270,8 @@ function GetQSPairs($url) {
 }
 
 function UrlReadable($string) {
-	$string = preg_replace('/[^0-9a-z\-_\.]+/i','-',$string);
-	$string = preg_replace('/[\-]{2,}/i','-',$string);
+	$string = preg_replace('/[^\pL0-9a-z\-_\.]+/iu','-',$string);
+	$string = preg_replace('/[\-]{2,}/iu','-',$string);
 	return trim($string,'-');
 }
 
