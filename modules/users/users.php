@@ -68,7 +68,7 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('password','password','users','Password',itPASSWORD);
 		$this->AddField('role','name','roles','Role',itCOMBO);
-		$this->AddField('email_confirm','email_confirm','users','email_confirm');
+		$this->AddField('email_confirm','email_confirm','users');
 	}
 
 	public function SetupParents() {
