@@ -389,7 +389,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddChild('uCMS_View','cms_id','link');
 	}
 	public function getEditor($id = '') {
-		$this->editPageCallback();
 		$canEdit = uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE;
 		// get content
 		$rec = uCMS_View::findPage();
@@ -481,6 +480,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	}
 }
 utopia::AddTemplateParser('content',array(utopia::GetInstance('uCMS_Edit'),'getEditor'),'.*');
+uEvents::AddCallback('AfterRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'));
 
 utopia::AddTemplateParser('cms','uCMS_View::templateParser');
 uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'));
