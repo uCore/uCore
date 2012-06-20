@@ -994,6 +994,26 @@ class utopia {
 	}
 
 	/*  MISC  */
+	static function EvalString($string) {
+		if (!$string) return $string;
+		
+		// convert all <? tags to comment tags
+		$string = str_replace('<?','<!--?',$string);
+		$string = str_replace('?>','?-->',$string);
+		
+		// convert all php comment tags back to php
+		$string = str_replace('<!--?php','<?php',$string);
+		$string = str_replace('?-->','?>',$string);
+		ob_start();
+			eval('?>'.$string.'<?php ');
+			$string = ob_get_contents();
+		ob_end_clean();
+		
+		// convert all comment tags back to <?
+		$string = str_replace('<!--?','<?',$string);
+		return $string;
+	}
+	
 	static function output_buffer($text) {
 		utopia::AppendVar('content',$text);
 		return '';
