@@ -887,6 +887,8 @@ class utopia {
 
 	static function MergeVars(&$string) {
 		$start = $string;
+		$string = utopia::EvalString($string);
+		
 		foreach (self::$templateParsers as $ident => $arr) {
 			if (preg_match_all('/{'.$ident.'}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
 				$searchArr = $matches[0];
