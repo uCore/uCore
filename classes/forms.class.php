@@ -2917,7 +2917,7 @@ abstract class uListDataModule extends uDataModule {
 			$pager = '<div class="right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itTEXT,$limit,NULL,array('class'=>'uFilter uLimit')).' per page</div>';
 			echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<b>'.$records.'</b>'.$pager.'</td></tr>';
 
-			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD)) echo $c;
+			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD) || $this->hasEditableFilters === true) echo $c;
 
 			echo "</thead>\n";
 		}
