@@ -40,10 +40,13 @@ $(document).ready(function(){
 	$('li:last','ul').addClass('last-child');
 
 	$(".tabGroup").tabs();
-	$(".tabGroup").bind("tabsshow", function(event, ui) { 
-		var scrollPos = $(window).scrollTop();
+	$(".tabGroup").bind('tabsshow', function(event, ui) { // bind after creation to stop immediate redirection to first hash
+		var nodes = $(ui.tab.hash);
+		nodes.removeAttr('id'); // remove ID to stop scrolling
 		window.location.hash = ui.tab.hash;
-		$(window).scrollTop(scrollPos);
+		nodes.attr('id',ui.tab.hash.replace('#','')); // re-establish ID
+	});
+	
 	});
 //	$('#btnOptions').bind('click',function () { showOptions() });
   $('th.sortable').live('click',function (e) {
