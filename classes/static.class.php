@@ -1258,7 +1258,7 @@ class utopia {
 		} elseif (function_exists('mime_content_type')) {
 			$cType = mime_content_type($path);
 		} else {
-			ob_start();system("file -bi '$path'",$cType);ob_end_clean();
+			$cType = exec("file -bi '$path'");
 		}
 		return $cType;
 	}
