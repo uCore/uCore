@@ -3082,31 +3082,36 @@ abstract class uSingleDataModule extends uDataModule {
 		}
 		return $ret;
 	}
+	
+	public $limit = 1;
 
 	public function ShowData(){//$customFilter=NULL) {//,$sortColumn=NULL) {
 		//	echo "showdata ".get_class($this)."\n";
 		//check pk and ptable are set up
 		if (is_empty($this->GetTabledef())) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
-		// new rec?
-		$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
-		$fltrVal = $this->GetFilterValue($fltr['uid']);
-		
-		$row = NULL;
-		if ($fltrVal) { // records exist, lets get the first.
-			$dataset = $this->GetDataset();
-			$row = $this->LookupRecord();
-			if (!$row) {
-				echo "The record you requested is not available.";
-				return;
-			}
-			// TODO: pagination for single record display
-			//			if (mysql_num_rows($result) > 1) {
-			// multiple records exist in this set, sort out pagination
-			//			}
-
+		$row = null;
+		$num_rows = 0;
+		if (!isset($_GET['_n_'.$this->GetModuleId()])) {
+			$rows = $this->GetRows();
+			$num_rows = count($rows);
+			$this->ApplyLimit($rows);
+			
+			$row = reset($rows);
 		}
 
+		$pagination = '';
+		$this->GetLimit($limit);
+		if ($limit) {
+			$pages = max(ceil($num_rows / $limit),1);
+			ob_start();
+				utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
+				$pagination = ob_get_contents();
+			ob_end_clean();
+		}
+		$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
+		$pager = '<div class="right">'.$pagination.'</div>';
+			
 		TriggerEvent('OnShowDataDetail');
 
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE) && $row) {
@@ -3169,13 +3174,10 @@ abstract class uSingleDataModule extends uDataModule {
 				$out .= "</tr>";
 			}
 			$out .= "</table>";
-//			if (!flag_is_set($this->GetOptions(), NO_TABS))
-				utopia::Tab_Add($SN,$out,$tabGroupName,false,$order);
-//			else
-//				echo $out;
+			utopia::Tab_Add($SN,$out,$tabGroupName,false,$order);
 		}
 
-//		if (!flag_is_set($this->GetOptions(), NO_TABS))
-			utopia::Tab_InitDraw($tabGroupName);
+		if ($num_rows > 1) echo '<div class="oh"><b>'.$records.'</b>'.$pager.'</div>';
+		utopia::Tab_InitDraw($tabGroupName);
 	}
 }
