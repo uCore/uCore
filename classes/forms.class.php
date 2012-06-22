@@ -587,7 +587,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$setup = $this->GetFieldProperty($fieldAlias ,'vtable');
 		$table = $setup['table'];
 
-		$key = $this->GetPrimaryKey($fieldAlias);
+		$key = $this->GetPrimaryKeyTable($fieldAlias);
 		$pkVal = $table !== $this->GetPrimaryTable() ? $rec['_'.$tableAlias.'_pk'] : $rec[$key];
 
 		return $this->DrawImageFromTable($field,$table,$key,$pkVal,$width,$height,$attr,$link,NULL,NULL,$linkAttr);
@@ -858,7 +858,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		return '_'.$this->sqlTableSetup['alias'].'_pk';
 	}
-	public function GetPrimaryKey($fieldAlias=NULL) {
+	public function GetPrimaryKeyTable($fieldAlias=NULL) {
 		if (!is_null($fieldAlias)) {
 			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
 			return $setup['pk'];
@@ -869,14 +869,20 @@ abstract class uDataModule extends uBasicModule {
 		}
 		return $this->pk;
 	}
+	public function GetPrimaryKey() {
+		$pkT = $this->GetPrimaryKeyTable();
+		foreach ($this->fields as $fieldAlias=>$info) {
+			if ($info['field'] == $pkT && $this->FindFilter($fieldAlias)) return $fieldAlias;
+		}
+		return $this->GetPrimaryKeyTable();
+	}
 
 	public function GetPrimaryTable($fieldAlias=NULL) {
 		if (!is_null($fieldAlias)) {
 			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
 			return $setup['table'];
 		}
-		if ($this->pt == NULL)
-		$this->pt = TABLE_PREFIX.$this->GetTabledef();
+		if ($this->pt == NULL) $this->pt = TABLE_PREFIX.$this->GetTabledef();
 		return $this->pt;
 	}
 
@@ -907,7 +913,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($this->UNION_MODULE !== TRUE) return;
 		$this->AddField('__module__',"'".get_class($this)."'",'');
 		$tbl = is_array($this->sqlTableSetup) ? $this->sqlTableSetup['alias'] : '';
-		$this->AddField('__module_pk__',$this->GetPrimaryKey(),$tbl);
+		$this->AddField('__module_pk__',$this->GetPrimaryKeyTable(),$tbl);
 	}
 
 	// this value will be used on new records or field updates
@@ -1075,6 +1081,7 @@ abstract class uDataModule extends uBasicModule {
 		$newTable['pk']		= $tableObj->GetPrimaryKey();
 		$newTable['tModule']= $tableModule;
 		$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
+		//$this->AddFilter('_'.$alias.'_pk',ctEQ,itNONE);
 		if ($parent==NULL) {
 			if ($this->sqlTableSetup != NULL) {
 				ErrorLog('Can only have one base table');
@@ -1082,7 +1089,7 @@ abstract class uDataModule extends uBasicModule {
 			}
 			$this->sqlTableSetup = $newTable;
 
-			$this->AddField($this->GetPrimaryKey(),$this->GetPrimaryKey(),$alias);
+			$this->AddField($this->GetPrimaryKeyTable(),$this->GetPrimaryKeyTable(),$alias);
 			$this->AddField('_module',"'".get_class($this)."'",$alias);
 			return;
 		} else {
@@ -2101,7 +2108,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function GetRowWhere($pkValue = NULL) {
-		if (!empty($pkValue)) return '`'.$this->GetPrimaryKey()."` = '".$pkValue."'";
+		if (!empty($pkValue)) return '`'.$this->GetPrimaryKeyTable()."` = '".$pkValue."'";
 		return '';
 	}
 	
@@ -2280,7 +2287,7 @@ abstract class uDataModule extends uBasicModule {
 		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
 		
 		$table = TABLE_PREFIX.$this->GetTabledef();
-		sql_query("DELETE FROM $table WHERE `{$this->GetPrimaryKey()}` = '$pkVal';");
+		sql_query("DELETE FROM $table WHERE `{$this->GetPrimaryKeyTable()}` = '$pkVal';");
 		
 		return TRUE;
 	}
