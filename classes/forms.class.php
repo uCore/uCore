@@ -686,11 +686,6 @@ abstract class uDataModule extends uBasicModule {
 	public abstract function SetupFields();
 	//public abstract function ShowData();//$customFilter = NULL);
 
-	private $makeSortable = array();
-	public function MakeSortable($updateField,$selector='') {
-		$this->makeSortable[] = array($selector,$updateField);
-	}
-
 	public $fieldsSetup = FALSE;
 	public function _SetupFields() {
 		if ($this->fieldsSetup == TRUE) return;
@@ -794,34 +789,6 @@ abstract class uDataModule extends uBasicModule {
 		if (!parent::Initialise()) return false;
 		$this->_SetupFields();
 		return true;
-	}
-
-	public function _RunModule() {
-		parent::_RunModule();
-		if ($this->makeSortable) {
-			$classname = get_class($this);
-			foreach ($this->makeSortable as $sortable) {
-				list($selector,$updateField) = $sortable;
-				echo <<<FIN
-<script language="javascript">
-$('.$classname $selector').sortable({
-	update: function (event,ui) {
-		var parent = $(this);
-		$(parent).children().each(function (i) {
-			var pk = $(this).attr('rel');
-			if (!pk) return;
-			var b = Base64.encode('$classname:$updateField('+pk+')');
-			while (b.substr(-1,1) == '=') {
-				b = b.substr(0,b.length-1);
-			}
-			uf('sql[add]['+b+']',i);
-		});
-	}
-});
-</script>
-FIN;
-			}
-		}
 	}
 
 	public function GetEncodedFieldName($field,$pkValue=NULL) {
@@ -2696,10 +2663,6 @@ FIN;
  * Default module for displaying results in a list format. Good for statistics and record searches.
  */
 abstract class uListDataModule extends uDataModule {
-	public function MakeSortable($updateField,$selector='table tbody'){
-		parent::MakeSortable($updateField,$selector);
-	}
-
 	public $injectionFields = array();
 
 	//private $maxRecs = NULL;
