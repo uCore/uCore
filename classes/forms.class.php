@@ -2344,11 +2344,13 @@ abstract class uDataModule extends uBasicModule {
 		$table		= $tbl['tModule'];
 		$tablePk	= $tbl['pk'];
 		
+		$preModPk	= NULL;
 		if (array_key_exists('parent',$tbl)) {
 			foreach ($tbl['joins'] as $fromField=>$toField) {
 				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) {
 					// find target PK value
 					$row = $this->LookupRecord(array($fromField=>$pkVal));
+					$preModPk = $pkVal;
 					$pkVal = $row[$this->GetPrimaryKeyField($fieldAlias)];
 					if ($pkVal === NULL) { // initialise a row if needed
 						$tableObj = utopia::GetInstance($table);
@@ -2394,6 +2396,7 @@ abstract class uDataModule extends uBasicModule {
 				default: throw $e;
 			}
 		}
+		if ($preModPk !== NULL) $pkVal = $preModPk;
 		
 		if ($oldPkVal === NULL) {
 			// new record added
