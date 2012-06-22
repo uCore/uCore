@@ -2769,8 +2769,8 @@ abstract class uListDataModule extends uDataModule {
 				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
 						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'uSingleDataModule')) {
-					$url = $obj->GetURL();
-					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New Item',$url,array('class'=>'btn-new')),1);
+					$url = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>'1'));
+					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New '.$obj->itemName,$url,array('class'=>'btn-new')),1);
 				}
 			}
 		}
@@ -3049,6 +3049,7 @@ abstract class uListDataModule extends uDataModule {
  * Default module for displaying results in a form style. Good for Data Entry.
  */
 abstract class uSingleDataModule extends uDataModule {
+	public $itemName = 'Item';
 	/*
 	 public function CreateParentNavButtons() {
 		foreach ($this->parents as $parentName => $linkArray){
