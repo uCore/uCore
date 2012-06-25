@@ -1323,7 +1323,7 @@ abstract class uDataModule extends uBasicModule {
 				$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 				break;
 			case ftCURRENCY:
-				$list = uLocale::ListLocale('');
+				$list = uLocale::ListLocale();
 				$this->AddField($aliasName.'_locale', $fieldName.'_locale', $tableAlias,(count($list)>1 ? 'Currency' : NULL),itCOMBO,$list);
 				$this->SetDefaultValue($aliasName.'_locale',DEFAULT_LOCALE);
 				$this->AddPreProcessCallback($aliasName,array('utopia','convCurrency'));
