@@ -1214,6 +1214,7 @@ class utopia {
 				$value .= $c['currency_symbol'];
 			}
 		}
+		$value = mb_convert_encoding($value, 'HTML-ENTITIES', "UTF-8");
 		return $value;
 	}
 

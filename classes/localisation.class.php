@@ -71,6 +71,7 @@ class uLocale implements ArrayAccess {
 		foreach ($locales as $code => $locale) {
 			if (setlocale(LC_ALL,self::GetLocaleTestArray($code)) === FALSE) continue;
 			$locales[$code] += localeconv();
+			$locales[$code]['int_curr_symbol'] = trim($locales[$code]['int_curr_symbol']);
 		}
 		setlocale(LC_ALL,$old);
 		self::$locale_cache = $locales;
@@ -83,25 +84,27 @@ class uLocale implements ArrayAccess {
 		
 		$return = array();
 		// get requested format
-		foreach ($locales as $code => $locale) {
-			// limit
-			$allow = true;
-			if (self::$locale_limit) foreach (self::$locale_limit as $limit) {
-				$allow = false;
-				if (preg_match('/'.preg_quote($limit,'/').'/ui',$code)) { $allow = true; break; }
-				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['lang'])) { $allow = true; break; }
-				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['terr'])) { $allow = true; break; }
-				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['int_curr_symbol'])) { $allow = true; break; }
-				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['currency_symbol'])) { $allow = true; break; }
+		if (self::$locale_limit) {
+			foreach (self::$locale_limit as $limit) {
+				foreach ($locales as $code => $locale) {
+					$search = array($code,$locale['lang'],$locale['terr'],$locale['int_curr_symbol'],$locale['currency_symbol']);
+					foreach ($search as $s) {
+						if (preg_match('/'.preg_quote($limit,'/').'/ui',$s)) {
+							$key = self::localef($keyFormat,$locale);
+							$return[$key] = self::localef($format,$locale);
+							break;
+						}
+					}
+				}
 			}
-			if (!$allow) continue;
-			
-			$key = self::localef($keyFormat,$locale);
-			$return[$key] = self::localef($format,$locale);
+		} else {
+			foreach ($locales as $code => $locale) {
+				$key = self::localef($keyFormat,$locale);
+				$return[$key] = self::localef($format,$locale);
+			}
+			asort($return);
 		}
 		
-		asort($return);
-
 		return $return;
 	}
 	private static function localef($format,$locale) {
