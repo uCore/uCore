@@ -78,7 +78,9 @@ class uLocale implements ArrayAccess {
 		self::$locale_cache = $locales;
 		return self::$locale_cache;
 	}
-	public static function ListLocale($format='%i (%l, %t)',$keyFormat='%C') {
+	public static $defaultFormat = '%i (%l, %t)';
+	public static function ListLocale($format='',$keyFormat='%C') {
+		if ($format === '') $format = self::$defaultFormat;
 		$locales = self::GetLocaleCache();
 		
 		$return = array();
