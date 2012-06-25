@@ -59,9 +59,9 @@ class uLocale implements ArrayAccess {
 		$output = utf8_encode(implode("\n",$output));
 		$blocks = explode("\n\n",$output);
 		foreach ($blocks as $block) {
-			if (!preg_match('/locale: ([a-z_]+)\.utf8 /i',$block,$match)) continue; $code = utf8_decode($match[1]);
-			if (!preg_match('/language \| (.+)/i',$block,$match)) continue; $lang = utf8_decode($match[1]);
-			if (!preg_match('/territory \| (.+)/i',$block,$match)) continue; $terr = utf8_decode($match[1]);
+			if (!preg_match('/locale: ([a-z_]+)\.utf8\s/iu',$block,$match)) continue; $code = $match[1];
+			if (!preg_match('/language \| (.+)/iu',$block,$match)) continue; $lang = $match[1];
+			if (!preg_match('/territory \| (.+)/iu',$block,$match)) continue; $terr = $match[1];
 			if ($code === $lang.'_'.$terr) continue;
 			$locales[$code] = array('code'=>$code,'lang'=>$lang,'terr'=>$terr);
 		}
@@ -69,10 +69,8 @@ class uLocale implements ArrayAccess {
 		
 		$old = setlocale(LC_ALL,0);
 		foreach ($locales as $code => $locale) {
-			setlocale(LC_ALL,self::GetLocaleTestArray($code));
-			$c = localeconv();
-			$locales[$code] = array_merge($locales[$code],$c);
-			foreach ($locales[$code] as $k=>$v) if (is_string($v)) $locales[$code][$k] = trim($v);
+			if (setlocale(LC_ALL,self::GetLocaleTestArray($code)) === FALSE) continue;
+			$locales[$code] += localeconv();
 		}
 		setlocale(LC_ALL,$old);
 		self::$locale_cache = $locales;
@@ -90,11 +88,11 @@ class uLocale implements ArrayAccess {
 			$allow = true;
 			if (self::$locale_limit) foreach (self::$locale_limit as $limit) {
 				$allow = false;
-				if (stripos($code,$limit) !== FALSE) { $allow = true; break; }
-				if (stripos($locale['lang'],$limit) !== FALSE) { $allow = true; break; }
-				if (stripos($locale['terr'],$limit) !== FALSE) { $allow = true; break; }
-				if (stripos($locale['int_curr_symbol'],$limit) !== FALSE) { $allow = true; break; }
-				if (stripos($locale['currency_symbol'],$limit) !== FALSE) { $allow = true; break; }
+				if (preg_match('/'.preg_quote($limit,'/').'/ui',$code)) { $allow = true; break; }
+				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['lang'])) { $allow = true; break; }
+				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['terr'])) { $allow = true; break; }
+				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['int_curr_symbol'])) { $allow = true; break; }
+				if (preg_match('/'.preg_quote($limit,'/').'/ui',$locale['currency_symbol'])) { $allow = true; break; }
 			}
 			if (!$allow) continue;
 			
