@@ -537,12 +537,12 @@ class utopia {
 			if ($tabInfo['isURL'])
 			echo '<li><a href="'.$tabInfo['content'].'"><span>'.$tabInfo['title'].'</span></a></li>';
 			else
-			echo '<li><a href="#'.$tabID.'"><span>'.$tabInfo['title'].'</span></a></li>';
+			echo '<li><a href="#'.$tabGroup.'_'.$tabID.'"><span>'.$tabInfo['title'].'</span></a></li>';
 		}
 		echo '</ul>';
 		foreach ($tabGroupArray as $tabID => $tabInfo) {
 			if ($tabInfo['isURL']) continue;
-			echo '<div id="'.$tabID.'" class="{tabTitle:\''.$tabInfo['title'].'\'}">'.$tabInfo['content']."</div>\n";
+			echo '<div id="'.$tabGroup.'_'.$tabID.'" class="{tabTitle:\''.$tabInfo['title'].'\'}">'.$tabInfo['content']."</div>\n";
 		}
 		echo '</div>'; // cose container
 	}

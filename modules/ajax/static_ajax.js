@@ -28,6 +28,11 @@ $(document).on('click','.btn-del',function(event) {
 	return false;
 });
 
+$(window).bind('hashchange', function() {
+	var hash = window.location.hash.replace('#','');
+	$('[href="#'+hash+'"]').closest('.tabGroup').tabs('select',hash);
+});
+
 $(document).ready(function(){
 	//$('.btn').button();
 	// preload hourglass image
