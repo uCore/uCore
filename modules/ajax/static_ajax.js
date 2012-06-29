@@ -476,7 +476,8 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('click','.btn',function(event) {event.stopPropagation();});
 	$(document).on('click','.btn-submit',function(event) {
 		var frm = $(this).closest('form');
-		if ($(this).attr('name').match(/^usql\-/)) {
+		var n = $(this).attr('name');
+		if (n && n.match(/^usql\-/)) {
 			var eleData = {'__ajax':'updateField'};
 			$(':input',frm).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
 			var hourglass = makeHourglass(this);
