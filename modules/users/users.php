@@ -295,12 +295,20 @@ class uUserProfile extends uSingleDataModule {
 	public function GetTitle() { return 'User Profile'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_Users'; }
+	public function GetSortOrder() { return 10000000; }
+	public $isAjax = false;
 	public function SetupFields() {
 		$this->CreateTable('users');
 		
+		$this->NewSection('Account Details');
 		$this->AddField('user_id','user_id','users');
-		$this->AddField('username','username','users','Username',itTEXT);
+		$this->AddSpacer('Changing your login email will require you to verify before the change is accepted.');
+		$this->AddField('username','username','users','Username/Email',itTEXT);
 		$this->AddField('password','password','users','Password',itPASSWORD);
+		$this->AddField('confirm_password','','','Confirm Password',itPASSWORD);
+		$this->AddSpacer();
+		$this->AddField('current_password','','','Current Password',itPASSWORD);
+		$this->AddField('submit',"'Update Account'",'','',itSUBMIT);
 
 		$l = uUserLogin::IsLoggedIn();
 		$this->AddFilter('user_id',ctEQ,itNONE,$l);
@@ -323,8 +331,25 @@ class uUserProfile extends uSingleDataModule {
 		$o = utopia::GetInstance(__CLASS__);
 		return $o->LookupRecord();
 	}
+	private $auth = false;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		if ($this->auth === false) {
+			$this->auth = $this->LookupRecord(array('password'=>md5($_POST[$this->CreateSqlField('current_password',$pkVal)])));
+			if ($this->auth === null)
+				uNotices::AddNotice('The password you entered does not match our records.',NOTICE_TYPE_ERROR);
+		}
+		if ($this->auth === null) return;
+		if ($fieldAlias == 'password') {
+			if (!$newValue) return;
+			if ($newValue !== $_POST[$this->CreateSqlField('confirm_password',$pkVal)]) {
+				uNotices::AddNotice('Password confirmation did not match, please try again.',NOTICE_TYPE_WARNING);
+				return;
+			}
+			uNotices::AddNotice('Your password has been updated.');
+		}
 		if ($fieldAlias == 'username') {
+			$rec = $this->LookupRecord();
+			if ($rec['username'] === $newValue) return;
 			$newValue = trim($newValue);
 			if (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) {
 				uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
