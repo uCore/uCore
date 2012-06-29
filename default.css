@@ -84,6 +84,10 @@ ul.pagination li { list-style:none; float:left; }
 
 .layoutDetailSection td.fld { white-space:nowrap; width:1px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
+.inputtype { margin: 2px; box-sizing: border-box; border: 1px solid #aaa; }
+.inputtype-checkboxlist { background:white; height:6em; overflow:auto; display:inline-block; resize:both; }
+.inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
+
 .layoutDetailSection .inputtype { min-width: 25em; width: 30%; }
 .layoutDetailSection .inputtype.inputtype-richtext { width: 80%; }
 .layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; }

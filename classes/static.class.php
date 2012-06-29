@@ -297,9 +297,16 @@ class utopia {
 				$out .= '<a '.$attr.' href="javascript:void(0)">'.$defaultValue.'</a>';
 				break;
 			case itCHECKBOX:
-				if (is_array($possibleValues)) foreach ($possibleValues as $name => $val) {
-					$checked = ($val === $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
-					$out .= "<div class=\"left mr10\"><input$attr type=\"checkbox\"$checked value=\"$val\"/>$name</div>";
+				if (is_array($possibleValues)) {
+					$at = array();
+					if (isset($attr['styles'])) $at['styles'] = $attr['styles'];
+					$at = BuildAttrString($at);
+					$out .= '<span$at class="inputtype inputtype-checkboxlist">';
+					foreach ($possibleValues as $name => $val) {
+						$checked = ($val === $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
+						$out .= "<label><input$attr type=\"checkbox\"$checked value=\"$val\"/>$name</label>";
+					}
+					$out .= '</span>';
 				} else {
 					$checked = ($defaultValue == 1) ? ' checked="checked"': '';
 					$out .= "<input$attr type=\"checkbox\"$checked value=\"1\"/>";
