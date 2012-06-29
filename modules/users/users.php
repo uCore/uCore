@@ -31,14 +31,8 @@ class tabledef_Users extends uTableDef {
 			
 			if (preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) { // email address has been updated - set email_confirm and email_confirm_code
 				if ($pkVal === NULL) parent::UpdateField('username',$newValue,$pkVal);
-				$randKey = genRandom(20);
 				parent::UpdateField('email_confirm',$newValue,$pkVal);
-				parent::UpdateField('email_confirm_code',$randKey,$pkVal);
-				// TODO: send verification email!
-				$obj = utopia::GetInstance('uVerifyEmail');
-				$url = 'http://'.utopia::GetDomainName().$obj->GetURL(array('c'=>$randKey));
-				uNotices::AddNotice('Please check your email for a validation link.');
-				uEmailer::SendEmailTemplate('account_activate',array('email'=>$newValue,'activate_link'=>$url),'email');
+				uVerifyEmail::VerifyAccount($pkVal);
 			} else {
 				parent::UpdateField('username',$newValue,$pkVal);
 			}
@@ -185,6 +179,9 @@ class uRegisterUser extends uDataModule {
 		if ($usr = $this->RegisterForm()) {
 			echo '<p>Your account has now been created.</p>';
 			uUserLogin::SetLogin($usr);
+			$rec = $this->LookupRecord($usr);
+			$reset = utopia::GetInstance('uResetPassword');
+			$reset->ResetPW($rec['username']);
 		}
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
@@ -234,7 +231,7 @@ class uRegisterUser extends uDataModule {
 				
 				// add record
 				$pk = NULL;
-				$this->UpdateFields(array('username'=>$_POST['username'],'password'=>$_POST['password']),$pk);
+				$this->UpdateFields(array('password'=>$_POST['password'],'username'=>$_POST['username']),$pk);
 
 				return $pk;
 			} while (false);
@@ -288,6 +285,28 @@ class uVerifyEmail extends uDataModule {
 			echo '<p>Your email address has now been validated.</p>';
 			$this->UpdateField('email_confirm_code',true,$rec['user_id']);
 		}
+	}
+	public static function VerifyAccount($user_id) {
+		$o = utopia::GetInstance(__CLASS__);
+		$rec = $o->LookupRecord($user_id);
+		
+		// no password?  send reset code
+		if (!$rec['password']) {
+			$reset = utopia::GetInstance('uResetPassword');
+			$reset->ResetPW($rec['username']);
+			return;
+		}
+		
+		// already verified
+		if (!$rec['email_confirm'] || $rec['username'] == $rec['email_confirm']) return;
+
+		// account email changed, send 
+		$randKey = genRandom(20);
+		$o->UpdateField('email_confirm_code',$randKey,$user_id);
+		
+		$url = 'http://'.utopia::GetDomainName().$o->GetURL(array('c'=>$randKey));
+		uNotices::AddNotice('Please check '.$rec['email_confirm'].' for a validation link.');
+		uEmailer::SendEmailTemplate('account_activate',array('email'=>$rec['email_confirm'],'activate_link'=>$url),'email');
 	}
 }
 
