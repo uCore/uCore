@@ -1184,7 +1184,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	private $spacerCount = NULL;
-	public function AddSpacer($text = '',$titleText = '&nbsp;') {
+	public function AddSpacer($text = '&nbsp;',$titleText = '') {
 		if ($this->spacerCount === NULL) $this->spacerCount = 0;
 		$this->AddField("__spacer_{$this->spacerCount}__","'$text'",'',"$titleText");
 		$this->spacerCount = $this->spacerCount + 1;
