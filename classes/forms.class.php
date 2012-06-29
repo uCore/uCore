@@ -1143,9 +1143,6 @@ abstract class uDataModule extends uBasicModule {
 		$arr = NULL;
 
 		if (is_array($values)) {
-			if (!is_assoc($values)) { // assume we want the key = val
-				$values = array_flip($values);
-			}
 			$arr = $values;
 		} elseif (IsSelectStatement($values)) {
 			$arr = array();
