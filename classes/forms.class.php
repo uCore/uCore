@@ -1484,10 +1484,10 @@ abstract class uDataModule extends uBasicModule {
 	// EG: (set1.rule1 and set1.rule2) or (set2.rule1)
 	// create a new set by calling $this->NewFilterset();
 	public function NewFiltersetWhere() {
-		$this->filters[FILTER_WHERE][] = NULL;
+		$this->filters[FILTER_WHERE][] = array();
 	}
 	public function NewFiltersetHaving() {
-		$this->filters[FILTER_HAVING][] = NULL;
+		$this->filters[FILTER_HAVING][] = array();
 	}
 	public function ClearFilters() {
 		$this->filters = array(FILTER_WHERE=>array(),FILTER_HAVING=>array());
@@ -1718,8 +1718,8 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($filterType as $fsetID => $filterset) {
 				if (is_array($filterset)) foreach ($filterset as $arrID => $filterInfo) {
 					if ($filterInfo['fieldName'] != $fieldName) continue;
-					if ($compareType && $filterInfo['ct'] !== $compareType) continue;
-					if ($inputType && $filterInfo['it'] !== $inputType) continue;
+					if ($compareType !== NULL && $filterInfo['ct'] !== $compareType) continue;
+					if ($inputType !== NULL && $filterInfo['it'] !== $inputType) continue;
 					return $this->filters[$ftypeID][$fsetID][$arrID];
 				}
 			}
