@@ -1199,8 +1199,29 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public $layoutSections = array();
-	public function NewSection($secName = '') {
-		$this->layoutSections[] = $secName;
+	public $cLayoutSection = null;
+	public function NewSection($title,$order = null) {
+		if ($order === null) $order = count($this->layoutSections);
+		$a = array('title'=>$title,'order'=>$order);
+		$found = false;
+		foreach ($this->layoutSections as $k => $i) {
+			if ($i['title'] == $title) {
+				$this->layoutSections[$k] = $a; $found = $k; break;
+			}
+		}
+		$this->cLayoutSection = $found;
+		if ($found === FALSE) {
+			$this->layoutSections[] = $a;
+			$this->cLayoutSection = count($this->layoutSections) -1;
+		}
+		array_sort_subkey($this->layoutSections,'order');
+	}
+	public function RenameSection($old,$new) {
+		foreach ($this->layoutSections as $k => $i) {
+			if ($i['title'] == $old) {
+				$this->layoutSections[$k]['title'] = $new; break;
+			}
+		}
 	}
 
 	private $defaultStyles = array();
@@ -2817,7 +2838,7 @@ abstract class uListDataModule extends uDataModule {
 
 					if ($fieldData['layoutsection'] !== $sectionID) {// || $fieldName == $lastFieldName) {
 						// write the section, and reset the count
-						$sectionName = $this->layoutSections[$sectionID];
+						$sectionName = $this->layoutSections[$sectionID]['title'];
 						$secClass = empty($sectionName) ? '' : ' sectionHeader';
 						echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
 						$sectionCount = 0;
@@ -2827,7 +2848,7 @@ abstract class uListDataModule extends uDataModule {
 					//if ($sectionCount == 0 && $sectionID > 0) $this->firsts[$fieldName] = true;
 					$sectionCount++;
 				}
-				$sectionName = $this->layoutSections[$sectionID];
+				$sectionName = $this->layoutSections[$sectionID]['title'];
 				$secClass = empty($sectionName) ? '' : ' sectionHeader';
 				echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
 				echo "</tr>";
@@ -3129,10 +3150,11 @@ abstract class uSingleDataModule extends uDataModule {
 		$extraCount = 1;
 //		if (!flag_is_set($this->GetOptions(), NO_TABS))
 		$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
-		foreach ($this->layoutSections as $sectionID => $sectionName) {
+		foreach ($this->layoutSections as $sectionID => $sectionInfo) {
 			//$secCount++;
 			//			echo "<div class='layoutSection' >";
 			// add header?
+			$sectionName = $sectionInfo['title'];
 			if ($sectionName === '') {
 				if ($sectionID === 0) $SN = 'General';
 				else { $SN = "Extra ($extraCount)"; $extraCount++; }
