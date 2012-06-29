@@ -273,7 +273,7 @@ class utopia {
 		$attributes['name'] = $fieldName;
 		
 		if (isset($attributes['class'])) $attributes['class'] .= ' inputtype inputtype-'.$inputType;
-		else $attributes['class'] = 'inputtype-'.$inputType;
+		else $attributes['class'] = 'inputtype inputtype-'.$inputType;
 
 		$defaultValue = mb_convert_encoding($defaultValue, 'HTML-ENTITIES', "UTF-8");
 		$defaultValue = utopia::jsonTryDecode($defaultValue);

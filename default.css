@@ -84,12 +84,13 @@ ul.pagination li { list-style:none; float:left; }
 
 .layoutDetailSection td.fld { white-space:nowrap; width:1px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
-.layoutDetailSection .inputtype { min-width: 25em; }
-.layoutDetailSection .inputtype-text { width: 30%; }
-.layoutDetailSection .inputtype-richtext { width: 80%; }
-.layoutDetailSection .inputtype-checkbox { min-width:0; }
-.layoutDetailSection .inputtype-radio { min-width:0; }
-.layoutDetailSection .inputtype-button { min-width:0; }
+.layoutDetailSection .inputtype { min-width: 25em; width: 30%; }
+.layoutDetailSection .inputtype.inputtype-richtext { width: 80%; }
+.layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; }
+.layoutDetailSection .inputtype.inputtype-radio { min-width:0; width:auto; }
+.layoutDetailSection .inputtype.inputtype-button { min-width:0; width:auto; }
+.layoutDetailSection .inputtype.inputtype-submit { min-width:0; width:auto; }
+.layoutDetailSection .inputtype.inputtype-reset { min-width:0; width:auto; }
 
 .red {
 	color: #f00
