@@ -2362,7 +2362,7 @@ abstract class uDataModule extends uBasicModule {
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
 
-		if (!isset($tableAlias)) return FALSE; // cannot update a field that has no table
+		if (!$tableAlias) return FALSE; // cannot update a field that has no table
 
 		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return FALSE;
 		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,$pkVal)) === FALSE) return FALSE;
