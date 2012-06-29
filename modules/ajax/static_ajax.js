@@ -33,6 +33,14 @@ $(window).bind('hashchange', function() {
 	$('[href="#'+hash+'"]').closest('.tabGroup').tabs('select',hash);
 });
 
+// filter functionality
+$(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
+$(document).on('focus','.uFilter',function (event) {FilterOnEnter(this);});
+$(document).on('blur','.uFilter',function (event) {FilterOnLeave(this);});
+$(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
+// allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
+$(document).on('selectstart','.uFilter',function (event) {event.stopPropagation(); return true;});
+
 $(document).ready(function(){
 	//$('.btn').button();
 	// preload hourglass image
@@ -95,15 +103,6 @@ $(document).ready(function(){
 	$(window).bind("beforeunload", function(){ uf=null; });
 	$(".uFilter").each(function() {
 		FilterOnLeave(this);
-		$(this).bind('click', function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
-		$(this).bind('focus', function (event) {FilterOnEnter(this);});
-		$(this).bind('blur' , function (event) {FilterOnLeave(this);});
-		//$(this).bind('change', function (event) {ReloadFilters();});
-
-		$(this).bind('keydown', function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
-
-		 // allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
-		$(this).bind('selectstart', function (event) {event.stopPropagation(); return true;});
 	});
 
 	window.onscroll = function() {
