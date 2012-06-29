@@ -1327,7 +1327,14 @@ abstract class uDataModule extends uBasicModule {
 			'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
 			'field'       => $fieldName,
 			'foreign'     => false,
+			'order'		  => count($this->fields),
 		);
+		
+		$before = $this->insertBefore;
+		if (is_string($before) && isset($this->fields[$before])) {
+			$this->fields[$aliasName]['order'] = $this->fields[$before]['order'] - 0.5;
+		}
+
 		if (is_array($fieldName)) {
 			$this->fields[$aliasName]['field'] = "";
 			$this->AddPreProcessCallback($aliasName, $fieldName);
@@ -1370,10 +1377,14 @@ abstract class uDataModule extends uBasicModule {
 		$this->fields[$aliasName]['values'] = $values;
 
 		if ($visiblename !== NULL) {
-			if (!$this->layoutSections) $this->NewSection();
-			$this->fields[$aliasName]['layoutsection'] = count($this->layoutSections)-1;
+			if (!$this->layoutSections) $this->NewSection('General');
+			$this->fields[$aliasName]['layoutsection'] = $this->cLayoutSection;
 		}
 		return TRUE;
+	}
+	private $insertBefore = null;
+	public function SetAddFieldPosition($before=null) {
+		$this->insertBefore = $before;
 	}
 
 	public function GetFields($visibleOnly=false,$layoutSection=NULL) {
@@ -2770,6 +2781,7 @@ abstract class uListDataModule extends uDataModule {
 	
 	public function ShowData($rows = null, $tabTitle = null,$tabOrder = null) {
 		//	echo "showdata ".get_class($this)."\n";
+		array_sort_subkey($this->fields,'order');
 
 		if (!$rows) $rows = $this->GetRows();
 		$num_rows = count($rows);
@@ -3108,6 +3120,8 @@ abstract class uSingleDataModule extends uDataModule {
 		//check pk and ptable are set up
 		if (is_empty($this->GetTabledef())) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
+		array_sort_subkey($this->fields,'order');
+		
 		$row = null;
 		$num_rows = 0;
 		if (!isset($_GET['_n_'.$this->GetModuleId()])) {
