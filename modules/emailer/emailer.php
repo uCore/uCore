@@ -243,7 +243,7 @@ class uEmailer extends uDataModule {
 		if (is_array($string)) $emails = $string;
 		else $emails = explode(',',$string);
 		foreach ($emails as $email) {
-			preg_match('/^([^<]+)<?([^>]+)?/',$email,$matches);
+			if (!preg_match('/^([^<]+)<?([^>]+)?/',$email,$matches)) continue;
 			if (isset($matches[2]))	$output[$matches[2]] = $matches[1];
 			else $output[] = $matches[1];
 		}
