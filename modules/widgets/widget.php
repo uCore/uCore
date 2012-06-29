@@ -209,7 +209,10 @@ class uCustomWidget implements iWidget {
 
 			// add Order
 			utopia::MergeVars($meta['order']);
-			if ($meta['order']) $instance->AddOrderBy($meta['order']);
+			if ($meta['order']) {
+				$instance->ordering = NULL;
+				$instance->AddOrderBy($meta['order']);
+			}
 
 			// init limit
 			$page = NULL;
