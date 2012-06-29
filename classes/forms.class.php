@@ -686,6 +686,8 @@ abstract class uDataModule extends uBasicModule {
 	public abstract function SetupFields();
 	//public abstract function ShowData();//$customFilter = NULL);
 
+	public $isAjax = true;
+	
 	public $fieldsSetup = FALSE;
 	public function _SetupFields() {
 		if ($this->fieldsSetup == TRUE) return;
@@ -845,7 +847,7 @@ abstract class uDataModule extends uBasicModule {
 		$attributes['style'] = $this->FieldStyles_Get($field,$defaultValue);
 
 		if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
-		$attributes['class'] .= ' uf';
+		if ($this->isAjax) $attributes['class'] .= ' uf';
 
 		$fieldName = $this->CreateSqlField($field,$pkValue);
 		if ($inputType == itFILE) $attributes['id'] = $fieldName;
@@ -2818,6 +2820,7 @@ abstract class uListDataModule extends uDataModule {
 		$metadataTitle = ' {tabTitle:\''.$tabTitle.'\', tabPosition:\''.$this->GetSortOrder().'\'}';
 		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
+		if (!$this->isAjax) echo '<form action="" onsubmit="this.action = window.location" method="post"><input type="hidden" name="__ajax" value="updateField">';
 		echo "<table class=\"layoutListSection datalist\">";
 
 		/*		echo "<colgroup>";
@@ -3045,6 +3048,7 @@ abstract class uListDataModule extends uDataModule {
 		echo $body;
 		// now finish table
 		echo "</table>";//"</div>";
+		if (!$this->isAjax) echo '</form>';
 
 		$cont = ob_get_contents();
 		ob_end_clean();
@@ -3181,7 +3185,9 @@ abstract class uSingleDataModule extends uDataModule {
 			//            $globTargetFilter = $this->GetTargetFilter('*',$row);
 			// start table
 			//echo "<div id='$tabGroupName-".get_class($this)."_$sectionID' class=\"draggable$metadataTitle\">";
-			$out = "<table class=\"layoutDetailSection\">";
+			$out = '';
+			if (!$this->isAjax) $out .= '<form action="" onsubmit="this.action = window.location" method="post">';
+			$out .= "<table class=\"layoutDetailSection\">";
 			//if ($SN && count($this->layoutSections) == 1) $out .= "<tr><th colspan=\"2\">$SN</th></tr>"; // add a header to the table
 
 
@@ -3207,6 +3213,7 @@ abstract class uSingleDataModule extends uDataModule {
 				$out .= "</tr>";
 			}
 			$out .= "</table>";
+			if (!$this->isAjax) $out .= '</form>';
 			utopia::Tab_Add($SN,$out,$tabGroupName,false,$order);
 		}
 

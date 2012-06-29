@@ -474,7 +474,19 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('change','.uf',_fieldChange);
 	$(document).on('click','input[type=button].uf, .btn.uf',_fieldChange);
 	$(document).on('click','.btn',function(event) {event.stopPropagation();});
-	$(document).on('click','.btn-submit',function(event) {var frm = $(this).closest('form'); if (frm.length) return frm[0].submit();});
+	$(document).on('click','.btn-submit',function(event) {
+		var frm = $(this).closest('form');
+		if ($(this).attr('name').match(/^usql\-/)) {
+			var eleData = {'__ajax':'updateField'};
+			$(':input',frm).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
+			var hourglass = makeHourglass(this);
+			return _ufData(eleData,hourglass);
+		}
+		if (frm.length) { // sitting within form, submit it
+			if (frm[0].onsubmit && frm[0].onsubmit() === false) return false;
+			return frm[0].submit();
+		}
+	});
 	$(document).on('click','.btn-reset',function(event) {var frm = $(this).closest('form'); if (frm.length) return frm[0].reset();});
 });
 var isUpdating = [];
@@ -483,7 +495,7 @@ function StoppedUpdating(ele) {
 		if (isUpdating[e].element == ele) delete isUpdating[e];
 	}
 }
-function _fieldChange(event) { uf(this); return false; }
+function _fieldChange(event) { uf(this); event.stopImmediatePropagation(); return false; }
 function uf(ele, forcedValue, hourglassEle) {
 	for (e in isUpdating) {
 		if (isUpdating[e].element == ele) return;
@@ -493,17 +505,7 @@ function uf(ele, forcedValue, hourglassEle) {
 	if (!hourglassEle) hourglassEle = ele;
 	if (typeof(hourglassEle) == 'string') hourglassEle = document.getElementById(hourglassEle);
 	if (hourglassEle) {
-		var hourglass = $('<img align="texttop" src="'+PATH_REL_CORE+'images/hourglass.png">');
-		var offset = $(hourglassEle).offset();
-		hourglass.css({
-			position:'absolute',
-			'z-index':5000,
-			top: offset.top,
-			left: offset.left + hourglassEle.offsetWidth
-		});
-		$('body').append(hourglass);
-		$('body').addClass('progressCursor');
-		if (!$(hourglassEle).is(':file')) $(hourglassEle).attr('disabled','disabled');
+		var hourglass = makeHourglass(hourglassEle);
 	}
 
 	// timeout for autocomplete
@@ -528,22 +530,10 @@ function _uf(ele,hourglass) {
 	if (forcedValue != undefined || forcedValue != null) {
 		eleVal = forcedValue;
 	} else {
-		var eleVal = [];
-		var n = eleName.replace('usql-','');
-		$(ele).closest('span.'+n).find('[name="'+eleName+'"]').each(function () {
-			if (this.tagName == 'INPUT' && $(this).is(':checkbox')) {
-				if ($(this).is(':checked')) eleVal.push($(this).val());
-			} else {
-				eleVal.push($(this).val());
-			}
-		});
-		switch (eleVal.length) {
-			case 0: eleVal = ''; break;
-			case 1: eleVal = eleVal[0]; break;
-		}
+		eleVal = getEleVal(ele);
 	}
 
-	var eleData = {'__ajax':'updateField'}
+	var eleData = {'__ajax':'updateField'};
 
 	targetPage = window.location.toString().replace(window.location.hash,'');
 
@@ -590,4 +580,61 @@ function _uf(ele,hourglass) {
 		StoppedUpdating(ele);
 		$('.auto-complete-list').hide();
 	});
+}
+
+function _ufData(eleData,hourglass) {
+	targetPage = window.location.toString().replace(window.location.hash,'');
+	$.ajax({
+		type: "POST",
+		async: true,
+		cache: false,
+		url: targetPage,
+		data: eleData,
+		dataType: "script"
+	}).done(function(msg){
+		$(hourglass).remove();
+		InitJavascript.run();
+	}).fail(function(obj,type,e){
+		$(hourglass).remove();
+	}).always(function(){
+		$(hourglass).remove();
+		$('.auto-complete-list').hide();
+	});
+}
+
+function getEleVal(ele) {
+	var eleName = ele;
+	if (typeof(ele) != 'string') {
+		eleName = $(ele).attr('name');
+	}
+	if (eleName == undefined) return;
+	var eleVal = [];
+	var n = eleName.replace('usql-','');
+	$(ele).closest('span.'+n).find('[name="'+eleName+'"]').each(function () {
+		if (this.tagName == 'INPUT' && $(this).is(':checkbox')) {
+			if ($(this).is(':checked')) eleVal.push($(this).val());
+		} else {
+			eleVal.push($(this).val());
+		}
+	});
+	switch (eleVal.length) {
+		case 0: eleVal = ''; break;
+		case 1: eleVal = eleVal[0]; break;
+	}
+	return eleVal;
+}
+
+function makeHourglass(hourglassEle) {
+	var hourglass = $('<img align="texttop" src="'+PATH_REL_CORE+'images/hourglass.png">');
+	var offset = $(hourglassEle).offset();
+	hourglass.css({
+		position:'absolute',
+		'z-index':5000,
+		top: offset.top,
+		left: offset.left + hourglassEle.offsetWidth
+	});
+	$('body').append(hourglass);
+	$('body').addClass('progressCursor');
+	//if (!$(hourglassEle).is(':file')) $(hourglassEle).attr('color','disabled');
+	return hourglass;
 }
