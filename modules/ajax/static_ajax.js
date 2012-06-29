@@ -474,6 +474,17 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('change','.uf',_fieldChange);
 	$(document).on('click','input[type=button].uf, .btn.uf',_fieldChange);
 	$(document).on('click','.btn',function(event) {event.stopPropagation();});
+	$(document).on('submit','form',function(event) {
+		if ($('[name^="usql-"]',this).length) {
+			var eleData = {'__ajax':'updateField'};
+			$(':input',this).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
+			var hourglass = makeHourglass(this);
+			_ufData(eleData,hourglass);
+			event.stopImmediatePropagation(); 
+			return false;
+		}
+		return true;
+	});
 	$(document).on('click','.btn-submit',function(event) {
 		var frm = $(this).closest('form');
 		var n = $(this).attr('name');
