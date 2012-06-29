@@ -2391,9 +2391,9 @@ abstract class uDataModule extends uBasicModule {
 		$preModPk	= NULL;
 		if (array_key_exists('parent',$tbl)) {
 			foreach ($tbl['joins'] as $fromField=>$toField) {
-				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) {
+				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) { // if the table join is linked to the parents primary key, then updated that record
 					// find target PK value
-					$row = $this->LookupRecord(array($fromField=>$pkVal));
+					$row = $this->LookupRecord($pkVal);
 					$preModPk = $pkVal;
 					$pkVal = $row[$this->GetPrimaryKeyField($fieldAlias)];
 					if ($pkVal === NULL) { // initialise a row if needed
