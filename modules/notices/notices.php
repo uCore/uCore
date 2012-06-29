@@ -23,6 +23,11 @@ class uNotices extends uBasicModule {
 		self::ShowNotices();
 	}
 	public static function ShowNotices() {
+		// is redirect issued?  If so, don't draw now.
+		foreach (headers_list() as $h) {
+			if (preg_match('/^location:/i',$h)) return;
+		}
+		
 		echo '<div class="uNotices">';
 		if (isset($_SESSION['notices'])) foreach ($_SESSION['notices'] as $k => $notice) {
 			echo self::GetNotice($notice['message'],$notice['type']);
