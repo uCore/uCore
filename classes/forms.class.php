@@ -1449,10 +1449,10 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public $grouping = NULL;
-	public function AddGrouping($alias,$direction = 'ASC') {
+	public function AddGrouping($alias) {
 		if ($this->grouping === NULL) $this->grouping = array();
 		//	$this->grouping[] = (array_key_exists($alias,$this->fields) ? $this->fields[$alias]['tablename'].'.' : '')."$alias $direction";
-		$this->grouping[] = "`$alias` $direction";
+		$this->grouping[] = "`$alias`";
 	}
 
 	public $ordering = NULL;
