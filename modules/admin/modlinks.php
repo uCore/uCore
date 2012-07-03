@@ -45,6 +45,7 @@ class modLinks extends uBasicModule {
 				//if (($obj instanceof iAdminModule) && !$isadmin) continue;
 
 				$order = $obj->GetSortOrder();
+				if ($order === NULL) $order = 10000;
 				$url = $obj->GetURL();
 				$title = $obj->GetTitle();
 				if (!$url || !$title) continue;
