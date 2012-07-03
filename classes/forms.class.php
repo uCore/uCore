@@ -2795,12 +2795,11 @@ abstract class uListDataModule extends uDataModule {
 		$children = utopia::GetChildren(get_class($this));
 		foreach ($children as $childModule => $links) {
 			foreach ($links as $link) {
-				//if (!$child) continue;
-				//ErrorLog(print_r($child,true));
 				$obj = utopia::GetInstance($link['moduleName']);
 				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
 						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
-						&& is_subclass_of($link['moduleName'],'uSingleDataModule')) {
+						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
+						&& ($link['parentField'] === NULL || $link['parentField'] === '*')) {
 					$url = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>'1'));
 					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New '.$obj->itemName,$url,array('class'=>'btn-new')),1);
 				}
