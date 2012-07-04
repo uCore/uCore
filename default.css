@@ -1,3 +1,4 @@
+body { position: relative; }
 body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 
