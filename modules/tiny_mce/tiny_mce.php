@@ -121,7 +121,8 @@ FIN
 			unset($attributes['mce_options']);
 		}
 		$optName = 'mceRichOptions';
-		if ($inputType == itHTML) $optName = 'mceHtmlOptions';
+		if ($inputType == itHTML) $optName = '$.extend({protect:[/<\?php.*?\?>/g,/<a.*><\/a>/g]}, mceHtmlOptions)';
+		
 		$script = '<script type="text/javascript">tinyMCE.init($.extend({},mceDefaultOptions,'.$optName.$extendOpts.',{editor_selector:"'.$saveClass.'"}))</script>';
 		
 		return utopia::DrawInput($fieldName,itTEXTAREA,$defaultValue,$possibleValues,$attributes,$noSubmit).$script;
