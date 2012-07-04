@@ -1010,9 +1010,6 @@ class utopia {
 		$string = str_replace('<?','<!--?',$string);
 		$string = str_replace('?>','?-->',$string);
 		
-		// convert all php comment tags back to php
-		$string = str_replace('<!--?php','<?php',$string);
-		$string = str_replace('?-->','?>',$string);
 		ob_start();
 			eval('?>'.$string.'<?php ');
 			$string = ob_get_contents();
@@ -1020,6 +1017,7 @@ class utopia {
 		
 		// convert all comment tags back to <?
 		$string = str_replace('<!--?','<?',$string);
+		$string = str_replace('?-->','?>',$string);
 		return $string;
 	}
 	
