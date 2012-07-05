@@ -2298,15 +2298,15 @@ abstract class uDataModule extends uBasicModule {
 		$this->_SetupFields();
 		
 		// can we access this field?
-		if ($pkVal !== NULL && !$this->LookupRecord($pkVal)) return false;
-
-		if ($fieldAlias === '__u_delete_record__')
-			$this->DeleteRecord($pkVal);
-		elseif ($isFile)
-			$this->UploadFile($fieldAlias,$value,$pkVal);
-		else
-			$this->UpdateField($fieldAlias,$value,$pkVal);
-    
+		if ($pkVal === NULL || $this->LookupRecord($pkVal)) {
+			if ($fieldAlias === '__u_delete_record__')
+				$this->DeleteRecord($pkVal);
+			elseif ($isFile)
+				$this->UploadFile($fieldAlias,$value,$pkVal);
+			else
+				$this->UpdateField($fieldAlias,$value,$pkVal);
+		}
+	
 		// reset all fields.
 		$this->ResetField($fieldAlias,$pkVal);
 		foreach ($this->fields as $alias => $field) {
