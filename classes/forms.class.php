@@ -83,6 +83,7 @@ define('PERSISTENT_PARENT',flag_gen());
 define('SHOW_FUNCTIONS',flag_gen());
 define('SHOW_TOTALS',flag_gen());
 define('LIST_HIDE_HEADER',flag_gen());
+define('LIST_HIDE_STATUS',flag_gen());
 
 define('DEFAULT_OPTIONS',ALLOW_FILTER);
 
@@ -2928,7 +2929,9 @@ abstract class uListDataModule extends uDataModule {
 			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
 			$pager = '<div class="right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itTEXT,$limit,NULL,array('class'=>'uFilter uLimit')).' per page</div>';
-			echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<b>'.$records.'</b>'.$pager.'</td></tr>';
+			if (!flag_is_set($this->GetOptions(),LIST_HIDE_STATUS)) {
+				echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<b>'.$records.'</b>'.$pager.'</td></tr>';
+			}
 
 			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD) || $this->hasEditableFilters === true) echo $c;
 
