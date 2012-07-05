@@ -24,8 +24,19 @@ th.sortable { cursor:pointer; }
 img { border: none }
 
 .ui-widget { font-size:0.8em !important; }
-.ui-tabs-panel { font-size: 1.2em }
 .ui-button .ui-button-text { line-height:normal; }
+.ui-tabs { padding:0; }
+.ui-tabs-panel { font-size: 1.2em }
+.ui-tabs-nav {
+	-moz-border-radius-bottomright: 0;
+	-webkit-border-bottom-right-radius: 0;
+	-khtml-border-bottom-right-radius: 0;
+	border-bottom-right-radius: 0;
+	-moz-border-radius-bottomleft: 0;
+	-webkit-border-bottom-left-radius: 0;
+	-khtml-border-bottom-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
 
 .ui-icon { display: inline-block !important; }
 
