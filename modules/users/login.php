@@ -86,6 +86,8 @@ class uUserLogin extends uDataModule {
 		$rec = $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)));
 		if ($rec) {
 			$_SESSION['current_user'] = $rec['user_id'];
+			$obj = utopia::GetInstance('uUserProfile');
+			$obj->UpdateFieldRaw('last_login','NOW()',$rec['user_id']);
 			if (isset($_REQUEST['remember_me'])) {
 				session_set_cookie_params(604800,PATH_REL_ROOT);
 				session_regenerate_id(true);

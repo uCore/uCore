@@ -10,6 +10,8 @@ class tabledef_Users extends uTableDef {
 		$this->AddField('email_confirm',ftVARCHAR,150);
 		$this->AddField('email_confirm_code',ftVARCHAR,100);
 		
+		$this->AddField('last_login',ftDATE);
+		
 		// require verification
 		// start with random email field - maybe hash the email?
 		// 
@@ -60,8 +62,9 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->CreateTable('roles','tabledef_UserRoles','users',array('role'=>'role_id'));
 		
 		$this->AddField('username','username','users','Username',itTEXT);
-		$this->AddField('password','password','users','Password',itPASSWORD);
 		$this->AddField('role','name','roles','Role',itCOMBO);
+		$this->AddField('last_login','last_login','users','Last Login');
+		$this->AddField('password','password','users','Change Password',itPASSWORD);
 		$this->AddField('email_confirm','email_confirm','users');
 	}
 
