@@ -95,11 +95,6 @@ class uUserLogin extends uDataModule {
 		} else {
 			uNotices::AddNotice('Username and password do not match.',NOTICE_TYPE_ERROR);
 		}
-
-/*		if (self::IsLoggedIn() && ((utopia::GetCurrentModule() == __CLASS__) || (array_key_exists('adminredirect',$_REQUEST) && $_REQUEST['adminredirect'] == 1))) {
-			$obj = utopia::GetInstance('uDashboard');
-			header('Location: '.$obj->GetURL()); die();
-		}*/
 	}
 
 	public static function IsLoggedIn() {
