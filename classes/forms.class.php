@@ -1605,7 +1605,9 @@ abstract class uDataModule extends uBasicModule {
 
 	public function SetFieldType($alias,$type) {
 		$this->_SetupFields();
+		$ret = $this->GetFieldType($alias);
 		$this->SetFieldProperty($alias,'datatype',$type);
+		return $ret;
 	}
 
 	public function GetFieldType($alias) {
@@ -2353,7 +2355,14 @@ abstract class uDataModule extends uBasicModule {
 			if ($this->UpdateField($field,$val,$pkVal) === FALSE) return FALSE;
 		}
 	}
-
+	
+	public function UpdateFieldRaw($fieldAlias,$newValue,&$pkVal=NULL) {
+		$fieldType = $this->SetFieldType($fieldAlias,ftRAW);
+		$ret = $this->UpdateField($fieldAlias,$newValue,$pkVal);
+		$this->SetFieldType($fieldAlias,$fieldType);
+		return $ret;
+	}
+	
 	// returns a string pointing to a new url, TRUE if the update succeeds, false if it fails, and null to refresh the page
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
