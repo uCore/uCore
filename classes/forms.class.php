@@ -3064,8 +3064,7 @@ abstract class uListDataModule extends uDataModule {
 		$cont = ob_get_contents();
 		ob_end_clean();
 
-		$soMod = get_class($this) == utopia::GetCurrentModule() ? -10 : 0;
-		utopia::Tab_Add($tabTitle,$cont,$tabGroupName,false,$tabOrder+$soMod);
+		utopia::Tab_Add($tabTitle,$cont,$tabGroupName,false,$tabOrder);
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 
@@ -3175,32 +3174,21 @@ abstract class uSingleDataModule extends uDataModule {
 		//		}
 
 		$order = $this->GetSortOrder();
-		if (get_class($this) == utopia::GetCurrentModule()) $order -= 10;
+		
 		$extraCount = 1;
 //		if (!flag_is_set($this->GetOptions(), NO_TABS))
 		$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
 		foreach ($this->layoutSections as $sectionID => $sectionInfo) {
-			//$secCount++;
-			//			echo "<div class='layoutSection' >";
-			// add header?
 			$sectionName = $sectionInfo['title'];
 			if ($sectionName === '') {
 				if ($sectionID === 0) $SN = 'General';
 				else { $SN = "Extra ($extraCount)"; $extraCount++; }
 			} else
 			$SN = ucwords($sectionName);
-			$metadataTitle = " {tabTitle:'$SN', tabPosition:'".($order+$extraCount)."'}";
-			$order = $order + 0.01;
 
-			//            $globTargetUrl = $this->GetTargetUrl('*',$row);
-			//            $globTargetFilter = $this->GetTargetFilter('*',$row);
-			// start table
-			//echo "<div id='$tabGroupName-".get_class($this)."_$sectionID' class=\"draggable$metadataTitle\">";
 			$out = '';
 			if (!$this->isAjax) $out .= '<form action="" onsubmit="this.action = window.location" method="post">';
 			$out .= "<table class=\"layoutDetailSection\">";
-			//if ($SN && count($this->layoutSections) == 1) $out .= "<tr><th colspan=\"2\">$SN</th></tr>"; // add a header to the table
-
 
 			$fields = $this->GetFields(true,$sectionID);
 			$hasFieldHeaders = false;
