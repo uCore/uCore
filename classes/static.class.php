@@ -491,11 +491,8 @@ class utopia {
 	}
 	static function Tab_Add($tabTitle,$tabContent,$tabGroup=NULL,$isURL=false,$order=NULL) {
 		if ($order === NULL) $order = count(self::$tabGroups[$tabGroup]);
-		//self::$tabOrderCount++;
-		//echo "Added Tab: $tabTitle - $order<br>";
 		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
 		$tabID = self::Tab_GetCount($tabGroup)+1;
-		//echo $tabTitle
 		if (isset(self::$tabGroups[$tabGroup]['tab'.$tabID])) { ErrorLog("TabID ($tabID) already exists in Group ($tabGroup)"); return; }
 		self::$tabGroups[$tabGroup]['tab'.$tabID] = array('id'=>$tabGroup.'-'.$tabID,'title'=>$tabTitle,'content'=>$tabContent,'isURL'=>$isURL,'order'=>$order);
 	}
@@ -505,7 +502,6 @@ class utopia {
 	}
 	static function Tab_Append($tabID,$content,$tabGroup=NULL) {
 		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
-//		print_r(self::$tabGroups[$tabGroup]);
 		if (!isset(self::$tabGroups[$tabGroup]['tab'.$tabID])) { ErrorLog("TabID ($tabID) doesnt exist in Group ($tabGroup) for append."); return; }
 		self::$tabGroups[$tabGroup]['tab'.$tabID]['content'] .= $content;
 	}
@@ -519,24 +515,9 @@ class utopia {
 	static function Tab_DrawGroup($tabGroup=NULL,$extraClasses="") {
 		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
 		$tabGroupArray = self::$tabGroups[$tabGroup];
-		//print_r($tabGroupArray);
 		if (count($tabGroupArray) <= 1) { $tabInfo = reset($tabGroupArray); echo $tabInfo['content']; return; }
 
-
-		$takenOrders = array();
-		foreach ($tabGroupArray as $tabID => $tabInfo) {
-			$takenOrders[] = $tabInfo['order'];
-		}
-		foreach ($tabGroupArray as $tabID => $tabInfo) {
-			if ($tabInfo['order'] === NULL) {
-				$i = 2;
-				while (array_search($i,$takenOrders)!==FALSE) $i++;
-				$tabGroupArray[$tabID]['order'] = $i;
-				$takenOrders[] = $i;
-			}
-		}
 		array_sort_subkey($tabGroupArray,'order');
-		//print_r($tabGroupOrdered);
 
 		echo '<div class="tabGroup '.$extraClasses.'" id="'.$tabGroup.'">';
 		echo '<ul>';

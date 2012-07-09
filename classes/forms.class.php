@@ -3210,17 +3210,13 @@ abstract class uSingleDataModule extends uDataModule {
 
 			$fieldCount = count($fields);
 			foreach ($fields as $fieldName => $fieldData) {
-				//$pkValue	= is_array($row) && array_key_exists($this->GetPrimaryKey(),$row) ? $row[$this->GetPrimaryKey()] : NULL;
 				$fieldValue	= $this->PreProcess($fieldName,is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '',$row);
-
 				$targetUrl = $this->GetTargetUrl($fieldName,$row);
 
 				$out .= "<tr>";
-
 				if ($hasFieldHeaders)
 					$out .= "<td class=\"fld\">".$fieldData['visiblename']."</td>";
 				$out .= '<td>'.$this->GetCell($fieldName,$row,$targetUrl).'</td>';
-
 				$out .= "</tr>";
 			}
 			$out .= "</table>";
