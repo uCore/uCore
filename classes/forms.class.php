@@ -1330,8 +1330,8 @@ abstract class uDataModule extends uBasicModule {
 			'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
 			'field'       => $fieldName,
 			'foreign'     => false,
-			'order'		  => count($this->fields),
 		);
+		$this->fields[$aliasName]['order'] = count($this->fields);
 		
 		$before = $this->insertBefore;
 		if (is_string($before) && isset($this->fields[$before])) {
@@ -1392,6 +1392,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function GetFields($visibleOnly=false,$layoutSection=NULL) {
 		$arr = $this->fields;
+		array_sort_subkey($arr,'order');
 		foreach ($arr as $fieldName=>$fieldInfo) {
 			if ($visibleOnly && $fieldInfo['visiblename']===NULL) unset($arr[$fieldName]);
 			if ($layoutSection !== NULL && array_key_exists('layoutsection',$fieldInfo) && $fieldInfo['layoutsection'] !== $layoutSection) unset($arr[$fieldName]);
@@ -2989,8 +2990,8 @@ abstract class uListDataModule extends uDataModule {
 			foreach ($rows as $row) {
 				$i++;
 				// move totals here
-				foreach ($this->fields as $fieldName => $fieldData) {
-					if ($fieldData['visiblename'] === NULL) continue;
+				$fields = $this->GetFields();
+				foreach ($fields as $fieldName => $fieldData) {
 					switch ($this->GetFieldType($fieldName)) {
 						case ftNUMBER:
 						case ftCURRENCY:
@@ -3134,8 +3135,6 @@ abstract class uSingleDataModule extends uDataModule {
 		//check pk and ptable are set up
 		if (is_empty($this->GetTabledef())) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
 
-		array_sort_subkey($this->fields,'order');
-		
 		$row = null;
 		$num_rows = 0;
 		if (!isset($_GET['_n_'.$this->GetModuleId()])) {
