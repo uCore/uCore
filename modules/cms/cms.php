@@ -171,7 +171,7 @@ FIN;
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			$ret .= $listObj->GetDeleteButton($child['cms_id']);
 			$ret .= '</div>';
-			$ret .= $child['title'].$info;
+			$ret .= htmlentities($child['title']).$info;
 			$ret .= '</div>';
 			$ret .= self::GetChildren($child['children'],$child['cms_id']);
 			$ret .= '</li>';
