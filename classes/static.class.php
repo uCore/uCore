@@ -302,9 +302,9 @@ class utopia {
 					if (isset($attr['styles'])) $at['styles'] = $attr['styles'];
 					$at = BuildAttrString($at);
 					$out .= '<span$at class="inputtype inputtype-checkboxlist">';
-					foreach ($possibleValues as $name => $val) {
-						$checked = ($val === $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
-						$out .= "<label><input$attr type=\"checkbox\"$checked value=\"$val\"/>$name</label>";
+					foreach ($possibleValues as $key => $val) {
+						$checked = ($key === $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue))) ? ' checked="checked"' : '';
+						$out .= "<label><input$attr type=\"checkbox\"$checked value=\"$key\"/>$val</label>";
 					}
 					$out .= '</span>';
 				} else {
@@ -316,11 +316,11 @@ class utopia {
 				if (!is_array($possibleValues)) { ErrorLog('Option field specified but no possible values found'); return ''; }
 				$count = 0;
 				$defaultExists = false;
-				foreach ($possibleValues as $name => $val) {
+				foreach ($possibleValues as $key => $val) {
 					$count++; $attributes['id'] = "$fieldName-$count"; $attr = BuildAttrString($attributes);
-					$checked = ($val == $defaultValue || (is_array($defaultValue) && in_array($val,$defaultValue))) ? ' checked="checked"' : '';
+					$checked = ($key == $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue))) ? ' checked="checked"' : '';
 					if ($checked != '') $defaultExists = true;
-					$out .= "<input type=\"radio\" $attr value=\"$val\"$checked/>$name<br/>";
+					$out .= "<input type=\"radio\" $attr value=\"$key\"$checked/>$val<br/>";
 				}
 				if (!$defaultExists && ($defaultValue != ''))
 				$out .= "<input type=\"radio\" $attr value=\"$val\" checked=\"true\">$defaultValue";
