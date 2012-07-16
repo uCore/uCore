@@ -14,7 +14,6 @@ td { vertical-align: top }
 
 th.sortable { cursor:pointer; }
 
-.utopia-filter-default { color: #AAA; }
 *:focus { outline: 1px; }
 
 .btn { margin:1px 3px }
@@ -103,12 +102,13 @@ ul.pagination li { list-style:none; float:left; }
 .inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
 
 .layoutDetailSection .inputtype { min-width: 25em; width: 30%; }
-.layoutDetailSection .inputtype.inputtype-richtext { width: 80%; }
-.layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; }
 .layoutDetailSection .inputtype.inputtype-radio { min-width:0; width:auto; }
 .layoutDetailSection .inputtype.inputtype-button { min-width:0; width:auto; }
 .layoutDetailSection .inputtype.inputtype-submit { min-width:0; width:auto; }
 .layoutDetailSection .inputtype.inputtype-reset { min-width:0; width:auto; }
+
+.inputtype.inputtype-checkbox { min-width:0; width:auto; background:none; border:0; }
+
 
 .red {
 	color: #f00
@@ -116,3 +116,5 @@ ul.pagination li { list-style:none; float:left; }
 
 .uSearch .searchResult a { padding-bottom: 5px; font-size:1.1em }
 .uSearch .searchResult { margin-bottom: 30px; }
+
+.utopia-placeholder { color: #AAA; }

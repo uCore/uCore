@@ -1,22 +1,72 @@
 // JavaScript Document
 
-var isFiltering = false;
-function FilterOnEnter(sender) {
-	isFiltering = true;
+// Placeholders
+function PlaceholderEnter(sender) {
 	if (sender.tagName == 'SELECT') return;
-	$(sender).removeClass('utopia-filter-default');
-	if (sender.value == $(sender).attr('title'))
+	$(sender).removeClass('utopia-placeholder');
+	if (sender.value == $(sender).attr('placeholder'))
 		sender.value = '';
 }
 
-function FilterOnLeave(sender) {
-	isFiltering = false;
-	StartFilterTimer();
+function PlaceholderLeave(sender) {
 	if (sender.tagName == 'SELECT') return;
 
-	if (sender.value == '') $(sender).val($(sender).attr('title'));
-	if (sender.value == $(sender).attr('title')) $(sender).addClass('utopia-filter-default');
+	if (sender.value == '') $(sender).val($(sender).attr('placeholder'));
+	if (sender.value == $(sender).attr('placeholder')) $(sender).addClass('utopia-placeholder');
 }
+$(function () {
+	// edit all input titles to placeholders
+	$(':input[title]').each(function(){
+		$(this).attr('placeholder',$(this).attr('title'));
+	});
+	$(".uFilter").each(function() {
+		PlaceholderLeave(this);
+	});
+});
+$(document).on('focus',':input[title]',function (event) {PlaceholderEnter(this);});
+$(document).on('blur',':input[title]',function (event) {setTimeout(function(){PlaceholderLeave(this);},100);});
+
+// Filters
+$(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
+$(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
+// allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
+$(document).on('selectstart','.uFilter',function (event) {event.stopPropagation(); return true;});
+$(document).on('blur','.uFilter',function (event) {setTimeout(function(){ReloadFilters();},100);});
+
+function ReloadFilters() {
+	var newFilters = {};
+	var updated = false;
+
+	$(".uFilter").each(function () {
+		var name = $(this).attr('name');
+		if (empty(name)) return;
+		if ($(this).val() == $(this)[0].defaultValue) return;
+		//processed.push(name);
+		//alert(gup(escape(name)));
+		//oldVal = decodeURIComponent(gup(escape(name))).replace(/\+/g, ' ');
+		//if (oldVal == '')
+		//	oldVal = decodeURIComponent(gup(name)).replace(/\+/g, ' ');
+		var oldVal = gup(name);
+		var newVal;
+
+		if (($(this).val() == $(this).attr('title')) || ($(this).attr('type') == 'checkbox' && !$(this).attr('checked')) || ($(this).attr('type') == 'radio' && !$(this).attr('checked')))
+			newVal = '';
+		else
+			newVal = String($(this).val());
+
+		valHasChanged = (oldVal !== newVal);
+		if (valHasChanged) {
+			updated = true;
+			newFilters[name] = newVal;
+		}
+	});
+
+	if (!updated) return;
+	// need to track existing filters, if they dont have a filter box then we must re-add them
+
+	ReloadWithItems(newFilters);
+}
+
 
 
 $(document).on('click','.btn-del',function(event) {
@@ -33,13 +83,6 @@ $(window).bind('hashchange', function() {
 	$('[href="#'+hash+'"]').closest('.tabGroup').tabs('select',hash);
 });
 
-// filter functionality
-$(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
-$(document).on('focus','.uFilter',function (event) {FilterOnEnter(this);});
-$(document).on('blur','.uFilter',function (event) {FilterOnLeave(this);});
-$(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
-// allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
-$(document).on('selectstart','.uFilter',function (event) {event.stopPropagation(); return true;});
 
 $(document).ready(function(){
 	//$('.btn').button();
@@ -101,9 +144,6 @@ $(document).ready(function(){
 	});
 
 	$(window).bind("beforeunload", function(){ uf=null; });
-	$(".uFilter").each(function() {
-		FilterOnLeave(this);
-	});
 
 	window.onscroll = function() {
 		// Thanks to Johan SundstrÃ¶m (http://ecmanaut.blogspot.com/) and David Lantner (http://lantner.net/david)
@@ -402,46 +442,6 @@ var Base64 = {
 		return string;
 	}
 
-}
-
-var reloadTimer = null;
-function StartFilterTimer() {
-	clearTimeout(reloadTimer);
-	reloadTimer = setTimeout("ReloadFilters()",100);
-}
-function ReloadFilters() {
-	if (isFiltering == true) return;
-	var newFilters = {};
-	var updated = false;
-
-	$(".uFilter").each(function () {
-		var name = $(this).attr('name');
-		if (empty(name)) return;
-		if ($(this).val() == $(this)[0].defaultValue) return;
-		//processed.push(name);
-		//alert(gup(escape(name)));
-		//oldVal = decodeURIComponent(gup(escape(name))).replace(/\+/g, ' ');
-		//if (oldVal == '')
-		//	oldVal = decodeURIComponent(gup(name)).replace(/\+/g, ' ');
-		var oldVal = gup(name);
-		var newVal;
-
-		if (($(this).val() == $(this).attr('title')) || ($(this).attr('type') == 'checkbox' && !$(this).attr('checked')) || ($(this).attr('type') == 'radio' && !$(this).attr('checked')))
-			newVal = '';
-		else
-			newVal = String($(this).val());
-
-		valHasChanged = (oldVal !== newVal);
-		if (valHasChanged) {
-			updated = true;
-			newFilters[name] = newVal;
-		}
-	});
-
-	if (!updated) return;
-	// need to track existing filters, if they dont have a filter box then we must re-add them
-
-	ReloadWithItems(newFilters);
 }
 
 function ReloadWithItems(items, ignoreCurrent) {
