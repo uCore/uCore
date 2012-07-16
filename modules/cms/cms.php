@@ -90,7 +90,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$editLink = $editObj->GetURL();
 		$fid = $editObj->FindFilter('cms_id');
 		echo <<<FIN
-		<script type="text/javascript">
+	<script type="text/javascript">
 		function RefreshIcons() {
 			$('.ui-treesort-item:not(.ui-treesort-folder) > .cmsParentToggle').remove();
 			$('.ui-treesort-folder').each(function () {
@@ -130,7 +130,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			e.stopPropagation();
 		});
 		InitialiseTree();
-		</script>
+	</script>
 FIN;
 		$c = ob_get_contents();
 		ob_end_clean();

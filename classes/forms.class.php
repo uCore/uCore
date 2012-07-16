@@ -2296,9 +2296,9 @@ abstract class uDataModule extends uBasicModule {
 			$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']);
 
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA)
-		$vals = cbase64_encode(get_class($this)."|$fieldName");
+			$vals = cbase64_encode(get_class($this)."|$fieldName");
 		else
-		$vals = $filterInfo['values'];
+			$vals = $filterInfo['values'];
 
 		if (!$attributes) $attributes = array();
 		$attributes['title'] = strip_tags($emptyVal);
