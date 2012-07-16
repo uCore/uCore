@@ -130,13 +130,35 @@ class uCustomWidget implements iWidget {
 			$installed[$classname] = $classname;
 		}
 		$sender->AddMetaField('module','Data Source',itCOMBO,$installed);
-		$sender->AddMetaField('filter','Filter',itTEXT);
-		$sender->AddMetaField('order','Order',itTEXT);
-		$sender->AddMetaField('limit','Limit',itTEXT);
 		$sender->AddField('content_info','"The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element a class of _r (class=\"_r\"), or _ri to repeat contained elements only (innerHTML)."','','');
 		$sender->AddField('fields',array(__CLASS__,'getPossibleFields'),'blocks','Possible Fields');
 		$sender->AddMetaField('content','Content',itHTML);
 		$sender->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
+
+		$sender->NewSection('Filters');
+		$sender->AddMetaField('clear_filter','Remove Filters',itCHECKBOX,'uCustomWidget::ListFilters');
+		$sender->AddMetaField('filter','Add Filter',itTEXT);
+		$sender->AddMetaField('order','Order',itTEXT);
+		$sender->AddMetaField('limit','Limit',itTEXT);
+	}
+	public static function ListFilters($obj,$field,$pkVal) {
+		$rec = $obj->LookupRecord($pkVal);
+		$meta = json_decode($rec['__metadata'],true);
+		if (!$meta || !isset($meta['module']) || !$meta['module']) return NULL;
+		if (!class_exists($meta['module'])) return NULL;
+		$obj = utopia::GetInstance($meta['module']);
+		if (!$obj) return NULL;
+		
+		$arr = array();
+		$f = $obj->filters;
+		foreach ($f as $t) {
+			foreach ($t as $fs) {
+				foreach ($fs as $filter) {
+					$arr[$filter['uid']] = $filter['fieldName'];
+				}
+			}
+		}
+		return $arr;
 	}
 	public static function getPossibleFields($originalVal,$pk,$processedVal,$rec) {
 		$meta = json_decode($rec['__metadata'],true);
@@ -160,10 +182,13 @@ class uCustomWidget implements iWidget {
 		return trim($ret);
 	}
 	static function DrawData($rec) {
+		if (!isset($rec['__metadata'])) return '';
+		
 		$meta = json_decode($rec['__metadata'],true);
 
 		if (!isset($meta['module'])) $meta['module'] = null;
 		if (!isset($meta['filter'])) $meta['filter'] = null;
+		if (!isset($meta['clear_filter'])) $meta['clear_filter'] = null;
 		if (!isset($meta['order'])) $meta['order'] = null;
 		if (!isset($meta['limit'])) $meta['limit'] = null;
 		if (!isset($meta['content'])) $meta['content'] = null;
@@ -201,6 +226,13 @@ class uCustomWidget implements iWidget {
 			$instance->_SetupParents(); $instance->_SetupFields();
 			foreach ($instance->fields as $fieldName => $fieldInfo) {
 				if (isset($fieldInfo['ismetadata']) && !isset($meta[$fieldName])) $meta[$fieldName] = null;
+			}
+			
+			// clear filters
+			$meta['clear_filter'] = utopia::jsonTryDecode($meta['clear_filter']);
+			if (!is_array($meta['clear_filter'])) $meta['clear_filter'] = array($meta['clear_filter']);
+			foreach ($meta['clear_filter'] as $uid) {
+				$instance->RemoveFilter($uid);
 			}
 			
 			// add filters
@@ -272,7 +304,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 	public function GetTabledef() { return 'tabledef_Widgets'; }
 	public function SetupFields() {
 		$this->CreateTable('blocks');
-		$this->AddField('block_id','block_id','blocks','Block ID',itTEXT);
+		$this->AddField('block_id','block_id','blocks','Widget ID',itTEXT);
 
 		$installed = array();
 		$classes = get_declared_classes();
@@ -292,7 +324,8 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 
 	public function InitInstance($type) {
 		if (class_exists($type)) call_user_func(array($type,'Initialise'),$this);
-		$this->AddField('preview',array($this,'getPreview'),'blocks','Preview');
+		$this->NewSection('Preview');
+		$this->AddField('preview',array($this,'getPreview'),'blocks','');
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		$rec = $this->LookupRecord($pkVal);
@@ -324,13 +357,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		$content = '';
 		if ($rec['block_type'] && class_exists($rec['block_type'])) $content = call_user_func(array($rec['block_type'],'DrawData'),$rec);
 
-		$meta = json_decode($rec['__metadata'],true);
-
-		// add container
-		$w = isset($meta['width']) ? $meta['width'] : '';	if (is_numeric($w)) $w = $w.'px';	if ($w) $w = 'width:'.$w.';';
-		$h = isset($meta['height'])?$meta['height'] : '';	if (is_numeric($h)) $h = $h.'px';	if ($h) $h = 'height:'.$h.';';
-		$style = ($w || $h) ? ' style="'.$w.$h.'"' : '';
-		$ret = '<div class="uWidget uWidget-'.$rec['block_id'].'" '.$style.'>'.$content.'</div>';
+		$ret = '<div class="uWidget uWidget-'.$rec['block_id'].'">'.$content.'</div>';
 
 		return $ret;
 	}
