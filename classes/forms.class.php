@@ -1752,6 +1752,20 @@ abstract class uDataModule extends uBasicModule {
 		$null = NULL;
 		return $null;
 	}
+	
+	public function RemoveFilter($uid) {
+		foreach ($this->filters as &$filterTypeArray) {
+			foreach ($filterTypeArray as &$filterset) {
+				if (!is_array($filterset)) continue;
+				foreach ($filterset as $k => &$filterInfo) {
+					if ($filterInfo['uid'] == $uid)	{
+						unset($filterset[$k]);
+						return true;
+					}
+				}
+			}
+		}
+	}
 
 	public function GetFilterValue($uid, $refresh = FALSE) {
 		//		ErrorLog(get_class($this).".GetFilterValue($uid)");
