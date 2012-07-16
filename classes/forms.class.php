@@ -815,7 +815,7 @@ abstract class uDataModule extends uBasicModule {
 			$attributes = array_merge($this->fields[$field]['attr'],$attributes);
 		$inputType = $inputTypeOverride ? $inputTypeOverride : $this->fields[$field]['inputtype'];
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
-		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field);
+		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field,$pkValue);
 
 		$prefix = NULL;
 
@@ -1127,14 +1127,18 @@ abstract class uDataModule extends uBasicModule {
 		}
 	}
 
-	public function GetValues($alias) {
+	public function GetValues($alias,$pkVal=null) {
 		if (!isset($this->fields[$alias])) {
 			$fltr = $this->FindFilter($alias);
 			return $fltr['values'];
 		}
 
-		if (isset($this->fields[$alias]['values_cache'])) return $this->fields[$alias]['values_cache'];
+		if (isset($this->fields[$alias]['values']) && is_callable($this->fields[$alias]['values'])) {
+			return call_user_func_array($this->fields[$alias]['values'],array($this,$alias,$pkVal));
+		}
 
+		if (isset($this->fields[$alias]['values_cache'])) return $this->fields[$alias]['values_cache'];
+		
 		return $this->SetValuesCache($alias,$this->FindValues($alias,isset($this->fields[$alias]['values'])?$this->fields[$alias]['values']:NULL));
 	}
 
@@ -1143,6 +1147,8 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function FindValues($aliasName,$values,$stringify = FALSE) {
+		if (is_callable($values)) return $values;
+
 		$arr = NULL;
 
 		if (is_array($values)) {
@@ -2384,7 +2390,7 @@ abstract class uDataModule extends uBasicModule {
 		$fieldPK = $this->GetPrimaryKey($fieldAlias);
 		
 		$tbl		= $this->fields[$fieldAlias]['vtable'];
-		$values		= $this->GetValues($fieldAlias);
+		$values		= $this->GetValues($fieldAlias,$pkVal);
 
 		if ($newValue !== NULL && $newValue !== '' && is_numeric($newValue) && $this->fields[$fieldAlias]['inputtype'] == itSUGGEST || $this->fields[$fieldAlias]['inputtype'] == itSUGGESTAREA) {
 			$valSearch = (is_assoc($values)) ? array_flip($values) : $values;
