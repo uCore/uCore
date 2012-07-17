@@ -234,7 +234,7 @@ class uRegisterUser extends uDataModule {
 				
 				// add record
 				$pk = NULL;
-				$this->UpdateFields(array('password'=>$_POST['password'],'username'=>$_POST['username']),$pk);
+				$this->UpdateFields(array('username'=>$_POST['username'],'password'=>$_POST['password']),$pk);
 
 				return $pk;
 			} while (false);
@@ -360,13 +360,12 @@ class uUserProfile extends uSingleDataModule {
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		$cUser = $this->LookupRecord(array('user_id'=>uUserLogin::IsLoggedIn()));
 		if ($fieldAlias == 'username') {
+			$newValue = trim($newValue);
 			if ($newValue === $cUser['username']) return;
 			if ($cUser['password'] !== md5($_POST[$this->CreateSqlField('current_password_email',$pkVal)])) {
 				uNotices::AddNotice('The password you entered does not match our records.',NOTICE_TYPE_ERROR);
 				return;
 			}
-			$newValue = trim($newValue);
-			if ($rec['username'] === $newValue) return;
 			if (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) {
 				uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
 				return;
