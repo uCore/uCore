@@ -42,11 +42,15 @@ class tabledef_Users extends uTableDef {
 		}
 		if ($pkVal === NULL) parent::UpdateField('username','unverified_'.genRandom(75),$pkVal);
 		if ($fieldName == 'email_confirm_code' && $newValue === true) {
+			// get old username
+			$row = GetRow(sql_query('SELECT username, email_confirm FROM '.$this->tablename.' WHERE user_id = '.$pkVal));
+			$old = $row['username']; $new = $row['email_confirm'];
 			// set username to email_confirm
 			parent::UpdateField('username','email_confirm',$pkVal,ftRAW);
 			// clear email_confirm + code
 			parent::UpdateField('email_confirm','',$pkVal);
 			parent::UpdateField('email_confirm_code','',$pkVal);
+			uEvents::TriggerEvent('UsernameChanged',NULL,array($old,$new));
 		}
 		parent::UpdateField($fieldName,$newValue,$pkVal,$fieldType);
 	}
