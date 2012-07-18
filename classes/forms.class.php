@@ -737,7 +737,8 @@ abstract class uDataModule extends uBasicModule {
 			unset($filters[$uid]);
 		}
 		if (array_key_exists($this->GetPrimaryKey(), $filters)) {
-			$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()]);
+			$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()],true);
+			if (!$rec) return;
 			$fields = array();
 			foreach ($this->rewriteMapping as $seg) {
 				if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
