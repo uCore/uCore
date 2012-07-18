@@ -754,6 +754,7 @@ abstract class uDataModule extends uBasicModule {
 	public function GetURL($filters = NULL, $encodeAmp = false) {
 		$this->_SetupParents();
 		$this->_SetupFields();
+		if ($filters === FALSE) return parent::GetURL($filters,$encodeAmp);
 		if (!is_array($filters) && $filters !== NULL) $filters = array($this->GetPrimaryKey()=>$filters);
 
 		$this->RewriteFilters($filters);
