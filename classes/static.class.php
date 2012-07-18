@@ -961,11 +961,11 @@ class utopia {
   static function parseSession($id) { return isset($_SESSION[$id]) ? $_SESSION[$id] : ''; }
   static function parseConst($id) { return defined($id) ? constant($id) : ''; }
 
-	static function PageNotFound() {
+	static function PageNotFound($title = '404 Not Found',$content = 'The page you requested could not be found. Return to the <a href="{home_url}">homepage</a>.') {
 		header("HTTP/1.0 404 Not Found",true,404);
-		utopia::SetTitle('404 Not Found');
-		echo '<h1>404 Not Found</h1>';
-		echo '<p>The page you requested could not be found. Return to the <a href="{home_url}">homepage</a>.</p>';
+		utopia::SetTitle($title);
+		if ($title) echo "<h1>$title</h1>";
+		if ($content) echo "<p>$content</p>";
 		self::AddMetaTag('robots','noindex');
 		die();
 	}
