@@ -774,6 +774,8 @@ class utopia {
 
 		while (self::MergeVars($template));
 
+		$template = str_replace('<head>', '<head>' . '<base href="'.PATH_REL_ROOT.'"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>', $template);
+		
 		// Make all resources secure
 		if (self::IsRequestSecure()) {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
@@ -784,7 +786,6 @@ class utopia {
 			$doc->preserveWhiteSpace = false;
 			$doc->validateOnParse = true;
 
-			$template = str_replace('<head>', '<head>' . '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>', $template);
 			try {
 				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.$template)) break;
 			} catch (Exception $e) { }
