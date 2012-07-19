@@ -96,8 +96,21 @@ class module_TinyMCE extends uBasicModule {
 		if (item.type != 0) return;
 
 		var mceInfo = item.target.data('options').mceInfo;
+		var absPath = 'http://' + window.location.hostname + item.fullPath;
 
-		mceInfo.win.document.getElementById(mceInfo.field_name).value = item.fullPath;
+		mceInfo.win.document.getElementById(mceInfo.field_name).value = absPath;
+
+		// are we an image browser
+		if (typeof(mceInfo.win.ImageDialog) != "undefined") {
+			// we are, so update image dimensions...
+			if (mceInfo.win.ImageDialog.getImageData)
+				mceInfo.win.ImageDialog.getImageData();
+
+			// ... and preview if necessary
+			if (mceInfo.win.ImageDialog.showPreviewImage)
+				mceInfo.win.ImageDialog.showPreviewImage(absPath);
+		}
+
 		mb.dialog('close');
 	}
 	var mceDefaultOptions = $baseOpts;
