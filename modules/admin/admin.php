@@ -73,7 +73,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		uEvents::TriggerEvent('ShowDashboard');
 	}
 	public function UpdateHtaccess() {
-		$rc = PATH_REL_CORE;
+		$rc = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
 		$content = <<<FIN
@@ -105,9 +105,16 @@ FileETag MTime Size
 	RewriteEngine on
 	RewriteRule ^(.*/)?(\.svn)|(\.git) - [F,L]
 	ErrorDocument 403 "Access Forbidden"
-
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule ^(.*)$	{$rc}index.php [NE,L,QSA]
+	
+	# Skip if file exists
+	RewriteCond %{REQUEST_FILENAME} -f
+	RewriteRule .* - [L]
+	
+	# Handle base UserDir
+	RewriteCond %{REQUEST_URI} ^(/~.+)/.*$
+	RewriteRule .*	%1/{$rc}index.php [NE,L,QSA]
+	
+	RewriteRule .*	/{$rc}index.php [NE,L,QSA]
 </IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
