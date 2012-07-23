@@ -111,7 +111,7 @@ FileETag MTime Size
 	RewriteRule .* - [L]
 	
 	# Handle base UserDir
-	RewriteCond %{REQUEST_URI} ^(/~.+)/.*$
+	RewriteCond %{REQUEST_URI} ^(/~[^/]+)
 	RewriteRule .*	%1/{$rc}index.php [NE,L,QSA]
 	
 	RewriteRule .*	/{$rc}index.php [NE,L,QSA]
