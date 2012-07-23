@@ -69,7 +69,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 			if (!($o instanceof iAdminModule)) unset($modules[$k]);
 			else $modules[$k] = $o->GetTitle();
 		}
-		self::$modules = array_flip($modules);
+		self::$modules = $modules;
 	}
 	private static $linked = array();
 	public static function LinkRoles($id,$modules) {
@@ -80,7 +80,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		if (!$modules) return;
 		
 		foreach (self::$modules as $t => $mod) {
-			if (array_search($mod,$modules) !== FALSE) unset(self::$modules[$t]);
+			if (array_search($t,$modules) !== FALSE) unset(self::$modules[$t]);
 		}
 		self::$modules[$id] = $id;
 		
