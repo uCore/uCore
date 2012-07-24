@@ -1251,7 +1251,7 @@ class utopia {
 		return $cType;
 	}
 	
-	static function OutputPagination($pages,$pageKey = 'page') {
+	static function OutputPagination($pages,$pageKey = 'page',$spread = 2) {
 		//$pages $pageKey
 		if ($pages <= 1) return 1;
 		$parsed = parse_url($_SERVER['REQUEST_URI']);
@@ -1275,6 +1275,8 @@ class utopia {
 			if ($i == $page+1) $rel[] = 'next';
 			if ($i == 0) $rel[] = 'first';
 			if ($i == $pages-1) $rel[] = 'last';
+			if ($i < $page-$spread) continue;
+			if ($i > $page+$spread) continue;
 			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">'.($i+1).'</a></li>';
 		}
 		if ($page < $pages-1) {
