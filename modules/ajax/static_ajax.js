@@ -671,10 +671,6 @@ function makeHourglass(hourglassEle) {
 				.addClass(this.element.attr('class'))
 				.addClass( "ui-combobox-input" )
 				.attr('readonly','readonly')
-				.css('margin-top','-'+this.element.css('border-top-width'))
-				.css('margin-right','-'+this.element.css('border-right-width'))
-				.css('margin-bottom','-'+this.element.css('border-bottom-width'))
-				.css('margin-left','-'+this.element.css('border-left-width'))
 				.click(toggleDropdown)
 				.autocomplete({
 					delay: 0,
