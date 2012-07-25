@@ -118,3 +118,22 @@ ul.pagination li { list-style:none; float:left; }
 .uSearch .searchResult { margin-bottom: 30px; }
 
 .utopia-placeholder { color: #AAA; }
+
+
+
+.ui-combobox {
+	position: relative;
+	display: inline-block;
+	padding:0 !important;
+}
+.ui-combobox .ui-combobox-toggle {
+	position: absolute;
+	top: 0; bottom: 0;
+	right:0;
+	padding: 0;
+	margin:0;
+}
+.ui-combobox .ui-combobox-input.ui-autocomplete-input {
+	display:block;
+	margin:0; border:0; background:transparent;
+}
