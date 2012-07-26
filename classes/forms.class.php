@@ -1175,7 +1175,7 @@ abstract class uDataModule extends uBasicModule {
 			$pk = $obj->GetPrimaryKey();
 			$table = $tbl['table'];
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
-			if ($table === TABLE_PREFIX.$this->GetTabledef() && $arr) {
+			if ($this->fields[$aliasName]['tablename'] === $this->sqlTableSetup['alias'] && $arr) {
 				$arr = array_combine(array_values($arr),array_values($arr));
 				$this->fields[$aliasName]['foreign'] = false;
 			} else {
