@@ -705,6 +705,7 @@ function makeHourglass(hourglassEle) {
 							select.children( "option" ).each(function() {
 								if ( $( this ).text().match( matcher ) ) {
 									this.selected = valid = true;
+									select.change();
 									return false;
 								}
 							});
@@ -713,15 +714,17 @@ function makeHourglass(hourglassEle) {
 								$( this ).val( "" );
 								select.val( "" );
 								input.data( "autocomplete" ).term = "";
+								select.change();
 								return false;
 							}
 						}
+						select.change();
 					}
 				});
 				//.addClass( "ui-widget ui-widget-content ui-corner-left" );
 
 			input.data( "autocomplete" )._renderItem = function( ul, item ) {
-				return $( "<li></li>" )
+				return $( "<li"+($(item.option).val() == select.val() ? ' class="ui-state-highlight"' : '')+"></li>" )
 					.data( "item.autocomplete", item )
 					.append( "<a>" + item.label + "</a>" )
 					.appendTo( ul );
@@ -765,5 +768,5 @@ function makeHourglass(hourglassEle) {
 	});
 })( jQuery );
 $(function () {
-	$('.inputtype-combo').combobox();
+	InitJavascript.add(function() {$('select.inputtype-combo').combobox();});
 });
