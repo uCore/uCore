@@ -8,8 +8,8 @@
 .cmsItemActions { float:right; padding-left:10px; position:relative; }
 .cmsItemActions a { background-color:white !important; }
 
-.cmsItem.ui-treesort-folder { padding-left:0; }
-.cmsItem .cmsItem { padding-top:1px; min-height:18px; margin: 1px 0 0 16px; }
+.cmsItem .cmsItem { padding-top:1px; min-height:18px; }
+.cmsItem .cmsParentToggle { margin-left:-16px }
 
 .admin-bar .admin-menu .mceToolbarContainer { display: block; border-left:0; clear:both; padding:0; width:100%; line-height:0; }
 .admin-bar .mceExternalToolbar {
