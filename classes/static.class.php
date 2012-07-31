@@ -299,11 +299,16 @@ class utopia {
 			case itCHECKBOX:
 				if (is_array($possibleValues)) {
 					$at = array();
-					if (isset($attr['styles'])) $at['styles'] = $attr['styles'];
+					if (isset($attributes['styles'])) $at['styles'] = $attributes['styles'];
 					$at = BuildAttrString($at);
+		
+					if (is_array($possibleValues) && !preg_match('/^usql\-/',$fieldName)) {
+						$attributes['name'] = $attributes['name'].'[]';
+						$attr = BuildAttrString($attributes);
+					}
 					$out .= '<span$at class="inputtype inputtype-checkboxlist">';
 					foreach ($possibleValues as $key => $val) {
-						$checked = ($key === $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue))) ? ' checked="checked"' : '';
+						$checked = ((string)$key === $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue))) ? ' checked="checked"' : '';
 						$out .= "<label><input$attr type=\"checkbox\"$checked value=\"$key\"/>$val</label>";
 					}
 					$out .= '</span>';
