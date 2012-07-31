@@ -1,31 +1,42 @@
 // JavaScript Document
 
-// Placeholders
-function PlaceholderEnter(sender) {
-	if (sender.tagName == 'SELECT') return;
-	$(sender).removeClass('utopia-placeholder');
-	if (sender.value == $(sender).attr('placeholder'))
-		sender.value = '';
-}
+jQuery.support.placeholder = (function(){
+    var i = document.createElement('input');
+    return 'placeholder' in i;
+})();
 
-function PlaceholderLeave(sender) {
-	if (sender.tagName == 'SELECT') return;
-	if ($(sender).val() == '') $(sender).val($(sender).attr('placeholder'));
-	if ($(sender).val() == $(sender).attr('placeholder')) $(sender).addClass('utopia-placeholder');
-}
+
+// Placeholders
 $(function () {
 	// edit all input titles to placeholders
 	$(':input[title]').each(function(){
 		$(this).attr('placeholder',$(this).attr('title'));
 	});
-	$(".uFilter, :input[placeholder]").each(function() {
-		PlaceholderLeave(this);
-	});
 });
-$(document).on('focus',':input[placeholder]',function (event) {PlaceholderEnter(this);});
-$(document).on('blur',':input[placeholder]',function (event) {var sender = this; setTimeout(function(){PlaceholderLeave(sender);},50);});
 
-$(document).on('submit','form',function (event) { $(".uFilter, :input[placeholder]").each(function() { PlaceholderEnter(this); }); });
+// Placeholders - legacy
+if (!$.support.placeholder) {
+	function PlaceholderEnter(sender) {
+		if (sender.tagName == 'SELECT') return;
+		$(sender).removeClass('utopia-placeholder');
+		if (sender.value == $(sender).attr('placeholder'))
+			sender.value = '';
+	}
+	function PlaceholderLeave(sender) {
+		if (sender.tagName == 'SELECT') return;
+		if ($(sender).val() == '') $(sender).val($(sender).attr('placeholder'));
+		if ($(sender).val() == $(sender).attr('placeholder')) $(sender).addClass('utopia-placeholder');
+	}
+	$(function () {
+		$(".uFilter, :input[placeholder]").each(function() {
+			PlaceholderLeave(this);
+		});
+	});
+	$(document).on('focus',':input[placeholder]',function (event) {PlaceholderEnter(this);});
+	$(document).on('blur',':input[placeholder]',function (event) {var sender = this; setTimeout(function(){PlaceholderLeave(sender);},50);});
+
+	$(document).on('submit','form',function (event) { $(".uFilter, :input[placeholder]").each(function() { PlaceholderEnter(this); }); });
+}
 
 // Filters
 $(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
