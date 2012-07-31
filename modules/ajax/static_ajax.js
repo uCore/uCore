@@ -25,6 +25,8 @@ $(function () {
 $(document).on('focus',':input[placeholder]',function (event) {PlaceholderEnter(this);});
 $(document).on('blur',':input[placeholder]',function (event) {var sender = this; setTimeout(function(){PlaceholderLeave(sender);},50);});
 
+$(document).on('submit','form',function (event) { $(".uFilter, :input[placeholder]").each(function() { PlaceholderEnter(this); }); });
+
 // Filters
 $(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
 $(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
