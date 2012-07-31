@@ -1159,14 +1159,12 @@ abstract class uDataModule extends uBasicModule {
 			$arr = array();
 			$result = sql_query($values);
 			while ($result != false && (($row = mysql_fetch_row($result)) !== FALSE)) {
-				$r = array();
 				if (isset($row[1])) {
 					// key value pair
-					$r[$row[1]] = $row[0];
+					$arr[$row[0]] = $row[1];
 				} else {
-					$r[$row[0]] = $row[0];
+					$arr[$row[0]] = $row[0];
 				}
-				$arr = $r;
 			}
 		} elseif (($values===true || is_string($values)) && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
