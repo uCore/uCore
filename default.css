@@ -100,6 +100,7 @@ ul.pagination li { list-style:none; float:left; }
 .inputtype { margin: 2px; box-sizing: border-box; border: 1px solid #aaa; background:white; color:#362B36; }
 .inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
 .inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; clear:both; }
+.inputtype-checkboxlist input { float:none; }
 
 .layoutDetailSection .inputtype { min-width: 25em; width: 30%; }
 .layoutDetailSection .inputtype.inputtype-radio { min-width:0; width:auto; }
