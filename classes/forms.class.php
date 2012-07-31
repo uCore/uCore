@@ -1168,7 +1168,6 @@ abstract class uDataModule extends uBasicModule {
 				}
 				$arr = $r;
 			}
-			$arr = ksort($arr);
 		} elseif (($values===true || is_string($values)) && $this->fields[$aliasName]['vtable']) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$obj = utopia::GetInstance($tbl['tModule']);
@@ -1181,7 +1180,6 @@ abstract class uDataModule extends uBasicModule {
 			} else {
 				$this->fields[$aliasName]['foreign'] = true;
 			}
-			asort($arr);
 		}
 		
 		if ($stringify && is_array($arr) && $arr) {
