@@ -199,14 +199,16 @@ class uEmailer extends uDataModule {
 			// mail
 			//$transport = Swift_MailTransport::newInstance();
 			// sendmail
-			$transport = Swift_SendmailTransport::newInstance('/usr/sbin/sendmail -bs');
+			$transport = Swift_SendmailTransport::newInstance('sendmail -bs');
 		}
 		
-		$from = $from ? $from : modOpts::GetOption('emailer_from');
-		$from = self::ConvertEmails($from);
-
 		$mailer = Swift_Mailer::newInstance($transport);
-		$message = Swift_Message::newInstance()->setFrom($from);
+		$message = Swift_Message::newInstance();
+		
+		$message->setSender(self::ConvertEmails(modOpts::GetOption('emailer_from')));
+		
+		$from = $from ? $from : modOpts::GetOption('emailer_from');
+		if ($from) $message->setFrom(self::ConvertEmails($from));
 
 		if ($attachments) foreach ($attachments as $attachment) {
 			if (!$attachment) continue;
