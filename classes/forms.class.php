@@ -1547,18 +1547,14 @@ abstract class uDataModule extends uBasicModule {
 		}  else $fieldData =& $fd;
 		
 		if ($values === NULL) switch ($inputType) {
+			case itNONE:
 			case itCOMBO:
 			case itOPTION:
 			case itSUGGEST:
 			case itSUGGESTAREA:
-				//				ErrorLog("filter on $fieldName setting values to ''");
-				$values = $this->FindValues($fieldName,true); //'';
+				$values = true;
 			default:
 				break;
-		}
-
-		if (is_string($values)) {
-			$values = $this->FindValues($fieldName,$values);
 		}
 
 		$value = $dvalue;
@@ -2300,7 +2296,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA)
 			$vals = cbase64_encode(get_class($this)."|$fieldName");
 		else
-			$vals = $filterInfo['values'];
+			$vals = $this->FindValues($fieldName,$filterInfo['values']);
 
 		if (!$attributes) $attributes = array();
 		$attributes['title'] = strip_tags($emptyVal);
@@ -2452,7 +2448,7 @@ abstract class uDataModule extends uBasicModule {
 		
 		if ((preg_match('/{[^}]+}/',$field) > 0) || IsSelectStatement($field) || is_array($field)) {
 			$this->ResetField($fieldAlias,$pkVal);
-			return FALSE; // this field is a pragma or select statement
+			return FALSE; // this field is a pragma, select statement or callback
 		}
 		
 
