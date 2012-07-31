@@ -10,21 +10,20 @@ function PlaceholderEnter(sender) {
 
 function PlaceholderLeave(sender) {
 	if (sender.tagName == 'SELECT') return;
-
-	if (sender.value == '') $(sender).val($(sender).attr('placeholder'));
-	if (sender.value == $(sender).attr('placeholder')) $(sender).addClass('utopia-placeholder');
+	if ($(sender).val() == '') $(sender).val($(sender).attr('placeholder'));
+	if ($(sender).val() == $(sender).attr('placeholder')) $(sender).addClass('utopia-placeholder');
 }
 $(function () {
 	// edit all input titles to placeholders
 	$(':input[title]').each(function(){
 		$(this).attr('placeholder',$(this).attr('title'));
 	});
-	$(".uFilter").each(function() {
+	$(".uFilter, :input[placeholder]").each(function() {
 		PlaceholderLeave(this);
 	});
 });
-$(document).on('focus',':input[title]',function (event) {PlaceholderEnter(this);});
-$(document).on('blur',':input[title]',function (event) {setTimeout(function(){PlaceholderLeave(this);},100);});
+$(document).on('focus',':input[placeholder]',function (event) {PlaceholderEnter(this);});
+$(document).on('blur',':input[placeholder]',function (event) {var sender = this; setTimeout(function(){PlaceholderLeave(sender);},50);});
 
 // Filters
 $(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
