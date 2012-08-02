@@ -487,6 +487,7 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('click','input[type=button].uf, .btn.uf',_fieldChange);
 	$(document).on('click','.btn',function(event) {event.stopPropagation();});
 	$(document).on('submit','form',function(event) {
+		if ($(this).attr('target')) return;
 		if ($('[name^="usql-"]',this).length) {
 			var eleData = {'__ajax':'updateField'};
 			$(':input',this).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
@@ -499,6 +500,7 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	});
 	$(document).on('click','.btn-submit',function(event) {
 		var frm = $(this).closest('form');
+		if (frm.attr('target')) return;
 		var n = $(this).attr('name');
 		if (n && n.match(/^usql\-/)) {
 			var eleData = {'__ajax':'updateField'};
