@@ -22,7 +22,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	public function GetOptions() { return ALWAYS_ACTIVE; }
 
 	public function GetSortOrder() { return -10000; }
-	public function GetURL($filters = NULL, $encodeAmp = false) {
+	public function GetURL($filters = NULL) {
 		$qs = $filters ? '?'.http_build_query($filters) : '';
 		return PATH_REL_CORE.'index.php'.$qs;
 	}

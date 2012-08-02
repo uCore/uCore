@@ -490,7 +490,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		return rtrim($newPath,'/');
 	}
 
-	public function GetURL($filters = NULL, $encodeAmp = false) {
+	public function GetURL($filters = NULL) {
 		if (!is_array($filters)) $filters = array();
 
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
@@ -751,10 +751,10 @@ abstract class uDataModule extends uBasicModule {
 		return true;
 	}
 
-	public function GetURL($filters = NULL, $encodeAmp = false) {
+	public function GetURL($filters = NULL) {
 		$this->_SetupParents();
 		$this->_SetupFields();
-		if ($filters === FALSE) return parent::GetURL($filters,$encodeAmp);
+		if ($filters === FALSE) return parent::GetURL($filters);
 		if (!is_array($filters) && $filters !== NULL) $filters = array($this->GetPrimaryKey()=>$filters);
 
 		$this->RewriteFilters($filters);
@@ -787,7 +787,7 @@ abstract class uDataModule extends uBasicModule {
 				}
 			}
 		}
-		return parent::GetURL($filArr,$encodeAmp);
+		return parent::GetURL($filArr);
 	}
 
 	public function Initialise() {

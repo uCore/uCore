@@ -4,8 +4,8 @@ class uSearch extends uBasicModule {
 		$this->SetRewrite(array('{adv}','{q}'));
 		uCSS::IncludeFile(dirname(__FILE__).'/search.css');
 	}
-	public function GetURL($filters = NULL, $encodeAmp = false) {
-		return str_replace('//','/',parent::GetURL($filters, $encodeAmp));
+	public function GetURL($filters = NULL) {
+		return str_replace('//','/',parent::GetURL($filters));
 	}
 	function GetUUID() { return 'search'; }
 	function GetTitle() { return (isset($_GET['q']) ? $_GET['q'].' - ' : '').utopia::GetDomainName().' search'; }

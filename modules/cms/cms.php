@@ -499,7 +499,7 @@ class uCMS_View extends uSingleDataModule {
 			$content = $rec['content'];
 		return '<div class="cms-'.$id.'">{content}</div>';
 	}
-	public function GetURL($filters = NULL, $encodeAmp = false) {
+	public function GetURL($filters = NULL) {
 		if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
 		if (!is_array($filters) && is_string($filters)) $filters = array('cms_id'=>$filters);
 		$this->RewriteFilters($filters);
