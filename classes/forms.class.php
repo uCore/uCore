@@ -2039,6 +2039,15 @@ abstract class uDataModule extends uBasicModule {
 	 * @returns MySQL Dataset
 	 */
 	public function &GetDataset() {
+		$query = $this->GetSqlQuery();
+
+		if ($this->explainQuery) print_r(GetRows(sql_query("EXPLAIN EXTENDED $query")));
+
+		$this->dataset = sql_query($query);
+
+		return $this->dataset;
+	}
+	public function GetSqlQuery() {
 		$this->_SetupFields();
 
 		// GET SELECT
@@ -2073,12 +2082,7 @@ abstract class uDataModule extends uBasicModule {
 			}
 			$query .= " $order";
 		}
-
-		if ($this->explainQuery) print_r(GetRows(sql_query("EXPLAIN EXTENDED $query")));
-
-		$this->dataset = sql_query($query);
-
-		return $this->dataset;
+		return $query;
 	}
 
 	public function GetLimit(&$limitRet=null,&$pageRet=null,$limit=null) {
