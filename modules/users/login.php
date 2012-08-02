@@ -189,10 +189,12 @@ class uResetPassword extends uDataModule {
 
 		//email out verification
 		$name = $rec['username'] ? ' '.$rec['username'] : '';
+		$url = $this->GetURL(array('e'=>$user,'c'=>$randKey));
+		$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
 		if (empty($rec['password']))
-			uEmailer::SendEmailTemplate('account_activate',array('email'=>$user,'contact_name'=>$name,'activate_link'=>'http://'.utopia::GetDomainName().$this->GetURL(array('e'=>$user,'c'=>$randKey))),'email');
+			uEmailer::SendEmailTemplate('account_activate',array('email'=>$user,'contact_name'=>$name,'activate_link'=>$url),'email');
 		else
-			uEmailer::SendEmailTemplate('account_resetpw',array('email'=>$user,'contact_name'=>$name,'activate_link'=>'http://'.utopia::GetDomainName().$this->GetURL(array('e'=>$user,'c'=>$randKey))),'email');
+			uEmailer::SendEmailTemplate('account_resetpw',array('email'=>$user,'contact_name'=>$name,'activate_link'=>$url),'email');
 	}
 
 	public function RunModule() {

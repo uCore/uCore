@@ -310,8 +310,8 @@ class uVerifyEmail extends uDataModule {
 		// account email changed, send 
 		$randKey = genRandom(20);
 		$o->UpdateField('email_confirm_code',$randKey,$user_id);
-		
-		$url = 'http://'.utopia::GetDomainName().$o->GetURL(array('c'=>$randKey));
+		$url = $o->GetURL(array('c'=>$randKey));
+		$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
 		uNotices::AddNotice('Please check '.$rec['email_confirm'].' for a validation link.');
 		uEmailer::SendEmailTemplate('account_activate',array('email'=>$rec['email_confirm'],'activate_link'=>$url),'email');
 	}
