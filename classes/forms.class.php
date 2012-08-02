@@ -2308,7 +2308,7 @@ abstract class uDataModule extends uBasicModule {
 			$vals = $this->FindValues($fieldName,$filterInfo['values']);
 
 		if (!$attributes) $attributes = array();
-		$attributes['title'] = strip_tags($emptyVal);
+		$attributes['placeholder'] = strip_tags($emptyVal);
 		if (array_key_exists('class',$attributes)) $attributes['class'] .= 'uFilter';
 		else $attributes['class'] = 'uFilter';
 
