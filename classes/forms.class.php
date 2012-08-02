@@ -2283,11 +2283,24 @@ abstract class uDataModule extends uBasicModule {
 		$default = $this->GetFilterValue($filterInfo['uid']);
 
 		$pre = '';
+		$emptyVal = '';
 		if (!empty($filterInfo['title'])) {
-//			$pre = $filterInfo['title'].' ';
-			$emptyVal = $filterInfo['title'].' '.htmlentities($filterInfo['ct']);
-		} else
-			$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']);
+			$emptyVal = $filterInfo['title'];
+		} elseif (isset($this->fields[$fieldName])) {
+			switch ($filterInfo['ct']) {
+				case ctGT:
+				case ctGTEQ:
+					$emptyVal = 'From'; break;
+				case ctLT:
+				case ctLTEQ:
+					$emptyVal = 'To'; break;
+				case ctEQ:
+				case ctLIKE:
+					$emptyVal = 'Search'; break;
+				default:
+					$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']); break;
+			}
+		}
 
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA)
 			$vals = cbase64_encode(get_class($this)."|$fieldName");
