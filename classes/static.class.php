@@ -993,16 +993,19 @@ class utopia {
 	/*  MISC  */
 	static function EvalString($string) {
 		if (!$string) return $string;
-
-		$string = preg_replace('/<\?xml(.+?)\?>/i','<--?xml$1?-->',$string);
-
+		
+		// convert all <? tags to comment tags
+		$string = str_replace('<?','<!--?',$string);
+		$string = str_replace('?>','?-->',$string);
+		
 		ob_start();
 			eval('?>'.$string.'<?php ');
 			$string = ob_get_contents();
 		ob_end_clean();
-
-		$string = preg_replace('/<--\?xml(.+?)\--?>/i','<?xml$1?>',$string);
 		
+		// convert all comment tags back to <?
+		$string = str_replace('<!--?','<?',$string);
+		$string = str_replace('?-->','?>',$string);
 		return $string;
 	}
 	
