@@ -166,7 +166,7 @@ class uEmailer extends uDataModule {
 		return $row;
 	}
 
-	public static function SendEmailTemplate($ident,$data,$emailField,$from=null,$attachments = null) {
+	public static function SendEmailTemplate($ident,$data,$emailField,$from=null,$attachments=null,$messageCallback=null) {
 		$row = self::GetTemplate($ident);
 
 		if (!array_key_exists(0,$data)) $data = array($data);
@@ -185,12 +185,12 @@ class uEmailer extends uDataModule {
 			$body = self::ReplaceData($item,$row['body']);
 			$recip = explode(',',$item[$emailField]);
 
-			$failures = array_merge($failures,self::SendEmail($recip,$subject,$body,$from,$attachments));
+			$failures = array_merge($failures,self::SendEmail($recip,$subject,$body,$from,$attachments,$messageCallback));
 		}
 		return $failures;
 	}
 
-	public static function SendEmail($to,$subject,$content,$from=null,$attachments=null) {
+	public static function SendEmail($to,$subject,$content,$from=null,$attachments=null,$messageCallback=null) {
 		if (modOpts::GetOption('smtp_host')) {
 			$transport = Swift_SmtpTransport::newInstance(modOpts::GetOption('smtp_host'), modOpts::GetOption('smtp_port'))
 				->setUsername(modOpts::GetOption('smtp_user'))
@@ -224,6 +224,7 @@ class uEmailer extends uDataModule {
 		$to = self::ConvertEmails($to);
 		$message->setTo($to);
 		try {
+			if (is_callable($messageCallback)) call_user_func_array($messageCallback,array($message));
 			$mailer->send($message,$failures);
 		} catch (Exception $e) {
 			 DebugMail('Email Error',$e->getMessage());
