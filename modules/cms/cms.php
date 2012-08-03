@@ -15,7 +15,7 @@ class tabledef_CMS extends uTableDef {
 		$this->AddField('nofollow',ftBOOL);
 		$this->AddField('title',ftVARCHAR,200);  // google only shows 66 chars in title
 		$this->AddField('description',ftVARCHAR,400); // google only shows 150 chars in description
-		$this->AddField('content',ftTEXT);
+		$this->AddField('content',ftLONGTEXT);
 		$this->AddField('content_time',ftTIMESTAMP);
 		$this->AddField('content_published',ftTEXT);
 		$this->AddField('content_published_time',ftTIMESTAMP);
