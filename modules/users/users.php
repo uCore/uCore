@@ -163,13 +163,15 @@ class uRegisterUser extends uDataModule {
 	}
 	public function SetupParents() {
 		$this->SetRewrite(false);
-		uEvents::AddCallback('LoginButtons',array($this,'RegisterLink'));
+		uEvents::AddCallback('AfterRunModule',array($this,'RegisterLink'),'uUserLogin');
 		modOpts::AddOption('open_user_registration','Allow User Registrations',NULL,false,itYESNO);
 	}
 	public function GetUUID() { return 'register'; }
 	public function RegisterLink() {
 		if (!modOpts::GetOption('open_user_registration')) return;
-		echo '<a class="btn" href="'.$this->GetURL().'">Register</a>';
+		echo '<h2>New User?</h2>';
+		echo '<p>If you are a new user, please register first.</p>';
+		echo '<a class="btn register" href="'.$this->GetURL().'">Register</a>';
 //		echo '<p>Don&apos;t have an account?  <a href="'.$this->GetURL().'">Register</a> now.</p>';
 	}
 	public function RunModule() {
