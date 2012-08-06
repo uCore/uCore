@@ -128,7 +128,9 @@ class uSearch extends uBasicModule {
 		$distance = 0;
 		$count = 0;
 		$divCount = 0;
+		$match = 0;
 		foreach ($searchwords as $ser) {
+			$wordScore = 0;
 			foreach ($subjwords as $sub) {
 				$ser = strtolower($ser); $sub = strtolower($sub);
 				$percent = 0;
@@ -152,13 +154,15 @@ class uSearch extends uBasicModule {
 //				if ($percent >= 95) {
 //					$score = $score +5;
 //				}
-				$score = $score*$percent;
+				$score += $score*$percent;
 	
 //				echo "$ser+$sub=$score @ $percent<br>";
-	
-				$distance += $score / 600;
+				$wordScore += $score;
+				$distance += $score;
 			}
+			if ($wordScore > 0) $match=$match+1;
 		}
+		if ($match !== $searchCount) return 0;
 //		$csea = count($searchwords);
 		$csub = count($subjwords);
 		$distance = ($distance / $csub);
