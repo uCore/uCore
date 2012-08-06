@@ -129,7 +129,9 @@ class uSearch extends uBasicModule {
 		$count = 0;
 		$divCount = 0;
 		$match = 0;
+		$or = false;
 		foreach ($searchwords as $ser) {
+			if ($ser == 'or') $or = true;
 			$wordScore = 0;
 			foreach ($subjwords as $sub) {
 				$ser = strtolower($ser); $sub = strtolower($sub);
@@ -162,7 +164,7 @@ class uSearch extends uBasicModule {
 			}
 			if ($wordScore > 0) $match=$match+1;
 		}
-		if ($match !== $searchCount) return 0;
+		if (!$or && $match !== $searchCount) return 0;
 //		$csea = count($searchwords);
 		$csub = count($subjwords);
 		$distance = ($distance / $csub);
