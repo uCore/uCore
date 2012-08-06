@@ -410,7 +410,8 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			return $this->GetCell('content:'.$id,$rec);
 		}
 		
-		$content = utopia::EvalString($content[$id]);
+		$content = $content[$id];
+		utopia::MergeVars($content);
 			
 		return $content;
 	}

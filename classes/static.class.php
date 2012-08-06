@@ -884,7 +884,6 @@ class utopia {
 
 	static function MergeVars(&$string) {
 		$start = $string;
-		$string = utopia::EvalString($string);
 		
 		foreach (self::$templateParsers as $ident => $arr) {
 			if (preg_match_all('/{'.$ident.'}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
@@ -1003,18 +1002,13 @@ class utopia {
 	static function EvalString($string) {
 		if (!$string) return $string;
 		
-		// convert all <? tags to comment tags
-		$string = str_replace('<?','<!--?',$string);
-		$string = str_replace('?>','?-->',$string);
-		
+		$string = preg_replace('/\<\?\s/i','<?php ',$string);
+
 		ob_start();
 			eval('?>'.$string.'<?php ');
 			$string = ob_get_contents();
 		ob_end_clean();
 		
-		// convert all comment tags back to <?
-		$string = str_replace('<!--?','<?',$string);
-		$string = str_replace('?-->','?>',$string);
 		return $string;
 	}
 	
