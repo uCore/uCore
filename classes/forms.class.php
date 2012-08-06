@@ -1367,6 +1367,7 @@ abstract class uDataModule extends uBasicModule {
 				$this->AddPreProcessCallback($aliasName,array('utopia','convTime'));
 				break;
 			case ftDATETIME:
+			case ftTIMESTAMP:
 				$this->AddPreProcessCallback($aliasName,array('utopia','convDateTime'));
 				break;
 		}

@@ -1169,7 +1169,9 @@ class utopia {
 	static function convDateTime($originalValue,$pkVal,$processedVal) {
 		if (!$originalValue) return '';
 		$t = strtotime( $originalValue );
-		return strftime(FORMAT_DATETIME,$t);
+		$hasSeconds = ($t % 60) !== 0;
+		if ($hasSeconds) return strftime(FORMAT_DATETIME,$t);
+		return strftime(FORMAT_DATE,$t);
 	}
 	static function convCurrency($originalValue,$pkVal,$processedVal,$rec,$fieldName) {
 		$locale = DEFAULT_LOCALE;
