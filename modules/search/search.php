@@ -114,7 +114,7 @@ class uSearch extends uBasicModule {
 		return array_unique($words);
 	}
 	
-	static function SearchCompareScore($word1,$word2, $sensativity = 75) {
+	static function SearchCompareScore($word1,$word2, $sensativity = 90) {
 		if ($word1 === true || $word2 === true) return 1;
 		if (!$word1 || !$word2) return 0;
 		if ($word1 === $word2) return 1;
@@ -133,6 +133,7 @@ class uSearch extends uBasicModule {
 		foreach ($searchwords as $ser) {
 			if ($ser == 'or') $or = true;
 			$wordScore = 0;
+			if ($ser == 'or' || $ser == 'and')  continue;
 			foreach ($subjwords as $sub) {
 				$ser = strtolower($ser); $sub = strtolower($sub);
 				$percent = 0;
