@@ -3,7 +3,7 @@ body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 
 input, select, textarea { margin:2px;
-	box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;
+	box-sizing: border-box; -moz-box-sizing: border-box; -webkit-box-sizing: border-box; -ms-box-sizing: border-box;
 }
 
 .left { float:left } .right { float:right } .oh { overflow:hidden }
@@ -97,7 +97,7 @@ ul.pagination li { list-style:none; float:left; }
 
 .layoutDetailSection td.fld { white-space:nowrap; width:1px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
-.inputtype { margin: 2px; box-sizing: border-box; border: 1px solid #aaa; background:white; color:#362B36; }
+.inputtype { margin: 2px; padding:4px; box-sizing: border-box; border: 1px solid #aaa; background:white; color:#362B36; }
 .inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
 .inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
 .inputtype-checkboxlist .inputtype.inputtype-checkbox { float:none; padding:0; margin-right:5px; }
