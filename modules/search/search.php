@@ -90,6 +90,8 @@ class uSearch extends uBasicModule {
 	}
 
 	static function SplitSearchWords($string) {
+		if (is_array($string)) return $string;
+		if (is_numeric($string)) return array($string);
 		if (!is_string($string)) return $string;
 		$string = strip_tags($string);
 	
@@ -116,15 +118,15 @@ class uSearch extends uBasicModule {
 	
 	static function SearchCompareScore($word1,$word2, $sensativity = 90) {
 		if ($word1 === true || $word2 === true) return 1;
-		if (!$word1 || !$word2) return 0;
 		if ($word1 === $word2) return 1;
-	
+
 		$searchwords = self::SplitSearchWords($word1);
 		$subjwords = self::SplitSearchWords($word2);
-	
+		if (!$searchwords || !$subjwords) return 0;
+
 		$searchCount = count($searchwords);
 		$totalScores = 0;
-	
+
 		$distance = 0;
 		$count = 0;
 		$divCount = 0;
@@ -145,9 +147,9 @@ class uSearch extends uBasicModule {
 				}
 				$startMatch = substr($sub,0,strlen($ser)) == $ser;
 				$count++;
-	
+
 				$score = 0;
-	
+
 				if ($percent >= $sensativity) {
 					$divCount++;
 					$score++;
@@ -158,7 +160,7 @@ class uSearch extends uBasicModule {
 //					$score = $score +5;
 //				}
 				$score += $score*$percent;
-	
+
 //				echo "$ser+$sub=$score @ $percent<br>";
 				$wordScore += $score;
 				$distance += $score;
