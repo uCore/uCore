@@ -113,7 +113,7 @@ class uEmailer extends uDataModule {
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 
 	public function SetupParents() {
-		modOpts::AddOption('smtp_host','SMTP Host','Emails');
+		modOpts::AddOption('smtp_host','SMTP Host','Emails','localhost');
 		modOpts::AddOption('smtp_port','SMTP Port','Emails',25);
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','yourname@yourdomain.tld');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
@@ -191,16 +191,13 @@ class uEmailer extends uDataModule {
 	}
 
 	public static function SendEmail($to,$subject,$content,$from=null,$attachments=null,$messageCallback=null) {
-		if (modOpts::GetOption('smtp_host')) {
-			$transport = Swift_SmtpTransport::newInstance(modOpts::GetOption('smtp_host'), modOpts::GetOption('smtp_port'))
-				->setUsername(modOpts::GetOption('smtp_user'))
-				->setPassword(modOpts::GetOption('smtp_pass'));
-		} else {
-			// mail
-			//$transport = Swift_MailTransport::newInstance();
-			// sendmail
-			$transport = Swift_SendmailTransport::newInstance('sendmail -bs');
-		}
+		$host = modOpts::GetOption('smtp_host'); $port = modOpts::GetOption('smtp_port');
+		if (!$host) $host = 'localhost';
+		if (!$port) $port = 25;
+		$transport = Swift_SmtpTransport::newInstance($host, $port);
+		
+		$user = modOpts::GetOption('smtp_user'); $pass = modOpts::GetOption('smtp_pass');
+		if ($user) $transport->setUsername($user)->setPassword($pass);
 		
 		$mailer = Swift_Mailer::newInstance($transport);
 		$message = Swift_Message::newInstance();
