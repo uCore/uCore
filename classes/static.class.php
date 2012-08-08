@@ -14,7 +14,7 @@ utopia::AddTemplateParser('const','utopia::parseConst');
 utopia::AddTemplateParser('domain','utopia::GetDomainName','');
 
 utopia::AddTemplateParser('home_url',PATH_REL_ROOT,'');
-utopia::AddTemplateParser('home_url_abs','http://'.utopia::GetDomainName().PATH_REL_ROOT,'');
+utopia::AddTemplateParser('home_url_abs',rtrim('http://'.utopia::GetDomainName().PATH_REL_ROOT,'/'),'');
 utopia::AddTemplateParser('inline','inline=true','');
 
 utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
