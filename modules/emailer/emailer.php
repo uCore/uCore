@@ -183,6 +183,7 @@ class uEmailer extends uDataModule {
 		foreach ($data as $item) {
 			$subject = self::ReplaceData($item,$row['subject']);
 			$body = self::ReplaceData($item,$row['body']);
+			if (!$body) continue;
 			$recip = explode(',',$item[$emailField]);
 
 			$failures = array_merge($failures,self::SendEmail($recip,$subject,$body,$from,$attachments,$messageCallback));
