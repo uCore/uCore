@@ -26,7 +26,7 @@ class module_TinyMCE extends uBasicModule {
 			$options = array();
 			$options['mode'] = "specific_textareas";
 			$options['document_base_url'] = rtrim('http://'.utopia::GetDomainName().PATH_REL_ROOT,'/');
-			$options['convert_urls'] = true;
+			$options['convert_urls'] = false;
 			$options['remove_script_host'] = false;
 			$options['relative_urls'] = true;
 			$options['cleanup_on_startup'] = true;

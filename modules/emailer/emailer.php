@@ -77,7 +77,7 @@ class uEmailTemplateDetails extends uSingleDataModule implements iAdminModule {
 		return $ret;
 	}
 	public function RunModule() {
-		uJavascript::AddText('var mceDefaultOptions = $.extend({},mceDefaultOptions,{relative_urls:false});');
+		uJavascript::AddText('var mceDefaultOptions = $.extend({},mceDefaultOptions,{relative_urls:false,convert_urls:true});');
 		$this->ShowData();
 	}
 }
