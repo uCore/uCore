@@ -339,7 +339,7 @@ class utopia {
 				$out .= "<input type=\"password\" $attr value=\"\"/>";
 				break;
 			case itTEXT:
-				$val = $defaultValue;
+				$val = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
 				$out .= "<input type=\"text\" $attr value=\"$val\"/>";
 				break;
 			case itTEXTAREA:
