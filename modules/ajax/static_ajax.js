@@ -780,5 +780,5 @@ function makeHourglass(hourglassEle) {
 	});
 })( jQuery );
 $(function () {
-	InitJavascript.add(function() {$('select.inputtype-combo').combobox();});
+	InitJavascript.add(function() {$('select').combobox();});
 });
