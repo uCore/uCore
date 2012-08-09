@@ -6,6 +6,8 @@ LoadFiles();
 timer_end('Load Files');
 
 if ($_POST && get_magic_quotes_gpc()) $_POST = utopia::stripslashes_deep($_POST);
+if ($_GET && get_magic_quotes_gpc()) $_GET = utopia::stripslashes_deep($_GET);
+if ($_REQUEST && get_magic_quotes_gpc()) $_REQUEST = utopia::stripslashes_deep($_REQUEST);
 
 ob_start('utopia::output_buffer',2);
 register_shutdown_function('utopia::Finish');
