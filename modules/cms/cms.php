@@ -491,12 +491,12 @@ class uCMS_View extends uSingleDataModule {
 	}
 	public function assertContent() {
 		if (utopia::GetCurrentModule() !== __CLASS__ && isset($_GET['uuid'])) {
+			echo '{content}';
 			$rec = $this->LookupRecord($_GET['uuid']);
 		} else {
 			$rec = self::findPage();
 		}
 		if (!$rec) return;
-		echo '{content}';
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 	}
 	static function templateParser($id) {
