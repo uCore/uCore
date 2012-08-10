@@ -198,7 +198,7 @@ function InterpretSqlString($sqlString, &$module, &$field, &$pkVal) {
 	$field = $matches[2];
 
 	if (!isset($matches[3]) || $matches[3] === '')
-		$pkVal = NULL;
+		$pkVal = $pkVal;
 	elseif ($matches[3] == '()') {
 		$pkVal = '';
 	} else

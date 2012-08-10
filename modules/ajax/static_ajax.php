@@ -223,7 +223,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 				$enc_name = $match[1];
 				$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
 				
-				$pkVal = NULL;
 				InterpretSqlString($string, $module, $field, $pkVal);
 				$obj = utopia::GetInstance($module);
 				$obj->ProcessUpdates($enc_name,$field,$value,$pkVal);
