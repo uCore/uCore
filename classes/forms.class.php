@@ -2590,7 +2590,9 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
-		$value = $this->PreProcess($fieldName,(is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '',$row);
+		$value = (is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '';
+		if ($value === '' && preg_match('/^\'(.+?)\'/', $this->fields[$fieldName]['field'],$match)) $value = $match[1];
+		$value = $this->PreProcess($fieldName,$value,$row);
 
 		$fieldData = array();
 		if (isset($this->fields[$fieldName])) $fieldData = $this->fields[$fieldName];
