@@ -43,13 +43,18 @@ class uEvents {
 		if (!is_array($eventData)) $eventData = array($eventData);
 		array_unshift($eventData,$object,$eventName);
 
-		$return = true;
+		// accumulate all handlers
+		$handlers = array();
 		foreach ($process as $module) {
 			if (!isset(self::$callbacks[$eventName][$module])) continue;
-			array_sort_subkey(self::$callbacks[$eventName][$module],'order');
-			foreach (self::$callbacks[$eventName][$module] as $callback) {
-				$return = $return && (call_user_func_array($callback['callback'],$eventData) !== FALSE);
-			}
+			$handlers = array_merge($handlers, self::$callbacks[$eventName][$module]);
+		}
+		// sort handlers
+		array_sort_subkey($handlers,'order');
+		// execute handlers, break if any return FALSE;
+		$return = true;
+		foreach ($handlers as $callback) {
+			$return = $return && (call_user_func_array($callback['callback'],$eventData) !== FALSE);
 		}
 		return $return;
 	}
