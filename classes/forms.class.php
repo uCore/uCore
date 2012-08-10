@@ -2865,7 +2865,7 @@ abstract class uListDataModule extends uDataModule {
 		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
 		if (!$this->isAjax) echo '<form action="" onsubmit="this.action = window.location" method="post"><input type="hidden" name="__ajax" value="updateField">';
-		echo "<table class=\"layoutListSection datalist\">";
+		echo "<table class=\"".get_class($this)." layoutListSection datalist\">";
 
 		/*		echo "<colgroup>";
 		 // need first 'empty' column for buttons?
@@ -2972,9 +2972,9 @@ abstract class uListDataModule extends uDataModule {
 			
 			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
-			$pager = '<div class="right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itTEXT,$limit,NULL,array('class'=>'uFilter uLimit')).' per page</div>';
+			$pager = '<div class="pagination right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itTEXT,$limit,NULL,array('class'=>'uFilter uLimit')).' per page</div>';
 			if (!flag_is_set($this->GetOptions(),LIST_HIDE_STATUS)) {
-				echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<b>'.$records.'</b>'.$pager.'</td></tr>';
+				echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
 			}
 
 			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD) || $this->hasEditableFilters === true) echo $c;
