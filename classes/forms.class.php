@@ -3229,7 +3229,6 @@ abstract class uSingleDataModule extends uDataModule {
 
 			$fieldCount = count($fields);
 			foreach ($fields as $fieldName => $fieldData) {
-				$fieldValue	= $this->PreProcess($fieldName,is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '',$row);
 				$targetUrl = $this->GetTargetUrl($fieldName,$row);
 
 				$out .= "<tr>";
