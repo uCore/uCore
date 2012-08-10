@@ -489,7 +489,16 @@ class uCMS_View extends uSingleDataModule {
 		$page = self::findPage();
 		return $page['updated'];
 	}
-	public function assertContent() { if (utopia::GetCurrentModule() !== __CLASS__ && isset($_GET['uuid']) && $rec = $this->LookupRecord($_GET['uuid'])) { echo '{content}'; utopia::UseTemplate(self::GetTemplate($rec['cms_id'])); } }
+	public function assertContent() {
+		if (utopia::GetCurrentModule() !== __CLASS__ && isset($_GET['uuid'])) {
+			$rec = $this->LookupRecord($_GET['uuid']);
+		} else {
+			$rec = self::findPage();
+		}
+		if (!$rec) return;
+		echo '{content}';
+		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
+	}
 	static function templateParser($id) {
 		$obj = utopia::GetInstance('uCMS_View');
 		$rec = $obj->LookupRecord($id);
@@ -662,7 +671,6 @@ class uCMS_View extends uSingleDataModule {
 		$path = $this->GetCmsParents($rec['cms_id']);
 		utopia::SetVar('cms_root_id',reset($path));
 		
-		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 		utopia::SetDescription($rec['description']);
 		echo '{cms.'.$rec['cms_id'].'}';
 	}
