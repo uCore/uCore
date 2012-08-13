@@ -34,7 +34,6 @@ class tabledef_Users extends uTableDef {
 			if (preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) { // email address has been updated - set email_confirm and email_confirm_code
 				if ($pkVal === NULL) parent::UpdateField('username',$newValue,$pkVal);
 				parent::UpdateField('email_confirm',$newValue,$pkVal);
-				uVerifyEmail::VerifyAccount($pkVal);
 			} else {
 				parent::UpdateField('username',$newValue,$pkVal);
 			}
@@ -184,14 +183,13 @@ class uRegisterUser extends uDataModule {
 		// already logged in?
 		if (uUserLogin::IsLoggedIn()) {
 			echo '<p>You are already logged in.</p>';
+			return;
 		}
 		
 		if ($usr = $this->RegisterForm()) {
 			echo '<p>Your account has now been created.</p>';
 			uUserLogin::SetLogin($usr);
-			$rec = $this->LookupRecord($usr);
-			$reset = utopia::GetInstance('uResetPassword');
-			$reset->ResetPW($rec['username']);
+			uVerifyEmail::VerifyAccount($usr);
 		}
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
@@ -299,16 +297,9 @@ class uVerifyEmail extends uDataModule {
 	public static function VerifyAccount($user_id) {
 		$o = utopia::GetInstance(__CLASS__);
 		$rec = $o->LookupRecord($user_id);
-		
-		// no password?  send reset code
-		if (!$rec['password']) {
-			$reset = utopia::GetInstance('uResetPassword');
-			$reset->ResetPW($rec['username']);
-			return;
-		}
-		
+
 		// already verified
-		if (!$rec['email_confirm'] || $rec['username'] == $rec['email_confirm']) return;
+		if (!$rec['email_confirm']) return true;
 
 		// account email changed, send 
 		$randKey = genRandom(20);
@@ -317,6 +308,7 @@ class uVerifyEmail extends uDataModule {
 		$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
 		uNotices::AddNotice('Please check '.$rec['email_confirm'].' for a validation link.');
 		uEmailer::SendEmailTemplate('account_activate',array('email'=>$rec['email_confirm'],'activate_link'=>$url),'email');
+		return false;
 	}
 }
 
