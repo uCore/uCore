@@ -830,7 +830,7 @@ class utopia {
 				$head->appendChild($node);
 			}
 			if (utopia::GetKeywords(true)) {
-				$node = $doc->createElement('meta'); $node->setAttribute('name','ketwords'); $node->setAttribute('content',utopia::GetKeywords(true));
+				$node = $doc->createElement('meta'); $node->setAttribute('name','keywords'); $node->setAttribute('content',utopia::GetKeywords(true));
 				$head->appendChild($node);
 			}
 			
