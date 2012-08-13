@@ -33,6 +33,8 @@ else {
 uTableDef::checksumValid(null,null); // cache table checksums
 uTableDef::TableExists(null); // cache table exists
 
+uEvents::TriggerEvent('BeforeInit');
+
 timer_start('Module Initialise');
 $allmodules = utopia::GetModulesOf('uTableDef') + utopia::GetModulesOf('uBasicModule');
 foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to be setup fully
