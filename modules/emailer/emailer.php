@@ -191,7 +191,8 @@ class uEmailer extends uDataModule {
 	}
 
 	public static function SendEmail($to,$subject,$content,$from=null,$attachments=null,$messageCallback=null) {
-		if (!$to || !$content) return;
+		$to = self::ConvertEmails($to);
+		if (!$to || !$content) return array_keys($to);
 		$host = modOpts::GetOption('smtp_host'); $port = modOpts::GetOption('smtp_port');
 		if (!$host) $host = 'localhost';
 		if (!$port) $port = 25;
@@ -219,7 +220,6 @@ class uEmailer extends uDataModule {
 		$message->setSubject($subject);
 		$message->setBody($content, ($content == strip_tags($content)) ? 'text/plain' : 'text/html');
 
-		$to = self::ConvertEmails($to);
 		$message->setTo($to);
 		try {
 			if (is_callable($messageCallback)) call_user_func_array($messageCallback,array($message));
