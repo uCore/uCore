@@ -92,7 +92,7 @@ class uUsersList extends uListDataModule implements iAdminModule {
 class uAssertAdminUser extends uBasicModule {
 	public function GetTitle() { return 'Create Admin User'; }
 	public function SetupParents() {
-		uEvents::AddCallback('InitComplete',array($this,'AssertAdminUser'));
+		uEvents::AddCallback('AfterInit',array($this,'AssertAdminUser'));
 		module_Offline::IgnoreClass(__CLASS__);
 	}
 	public function AssertAdminUser() {

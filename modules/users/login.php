@@ -55,7 +55,7 @@ class uUserLogin extends uDataModule {
 
 	public function SetupParents() {
 		uEvents::AddCallback('BeforeRunModule',array($this,'checkLogin'),utopia::GetCurrentModule());
-		uEvents::AddCallback('InitComplete',array($this,'CheckSession'));
+		uEvents::AddCallback('AfterInit',array($this,'CheckSession'));
 
 		$this->SetRewrite(true);
 	}
@@ -149,7 +149,7 @@ class uUserLogin extends uDataModule {
 		uEvents::TriggerEvent('AfterShowLogin');
 	}
 }
-uEvents::AddCallback('InitComplete','uUserLogin::IsLoggedIn',-1000);
+uEvents::AddCallback('AfterInit','uUserLogin::IsLoggedIn',-1000);
 
 
 class uResetPassword extends uDataModule {

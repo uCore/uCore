@@ -565,7 +565,7 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	public function SetupParents() {
-		uEvents::AddCallback('InitComplete',array($this,'InitSitemap'));
+		uEvents::AddCallback('AfterInit',array($this,'InitSitemap'));
 		uEvents::AddCallback('ProcessDomDocument','uCMS_View::ProcessDomDocument');
 		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
 		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');

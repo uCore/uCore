@@ -47,4 +47,4 @@ class uMenu {
 		uJavascript::IncludeFile(dirname(__FILE__).'/menu.js');
 	}
 }
-uEvents::AddCallback('InitComplete','uMenu::AddStyles');
+uEvents::AddCallback('AfterInit','uMenu::AddStyles');

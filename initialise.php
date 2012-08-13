@@ -46,6 +46,7 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 }
 timer_end('Module Initialise');
 
+uEvents::TriggerEvent('AfterInit');
 uEvents::TriggerEvent('InitComplete');
 
 // process ajax function

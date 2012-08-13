@@ -29,7 +29,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 
 	public function SetupParents() {
 		$this->AddParent('uUsersList');
-		uEvents::AddCallback('InitComplete',array($this,'AssertAdminRole'));
+		uEvents::AddCallback('AfterInit',array($this,'AssertAdminRole'));
 	}
 	public function AssertAdminRole() {
 		$rec = $this->LookupRecord(-1,true);

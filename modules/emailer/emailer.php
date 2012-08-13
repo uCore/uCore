@@ -118,7 +118,7 @@ class uEmailer extends uDataModule {
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','yourname@yourdomain.tld');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
 		modOpts::AddOption('emailer_from','Mailer From','Emails',utopia::GetDomainName().' Mailer <mailer@'.preg_replace('/^www./','',utopia::GetDomainName()).'>');
-		uEvents::AddCallback('InitComplete',array($this,'InitialiseTemplates'));
+		uEvents::AddCallback('AfterInit',array($this,'InitialiseTemplates'));
 	}
 
 	public function SetupFields() {
