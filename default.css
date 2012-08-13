@@ -133,6 +133,7 @@ ul.pagination li { list-style:none; float:left; }
 	right:0;
 	padding: 0;
 	margin:0;
+	border-top: 0; border-right: 0; border-bottom: 0;
 }
 .ui-combobox .ui-combobox-input.ui-autocomplete-input {
 	display:block;
