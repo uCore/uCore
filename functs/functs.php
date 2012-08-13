@@ -533,6 +533,7 @@ function fixdateformat($string) {
 }
 
 function IsSelectStatement($str) {
+	if (!is_string($str)) return false;
 	return (strtolower(substr(trim($str,'('),0,6)) == 'select');
 }
 
