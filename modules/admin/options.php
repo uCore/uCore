@@ -50,6 +50,7 @@ class modOpts extends uListDataModule implements iAdminModule {
 		
 		foreach ($rows as $r) {
 			if (!isset(self::$types[$r['ident']])) continue;
+			if (!$r['name']) continue;
 			$grouped[self::$types[$r['ident']][3]][] = $r;
 		}
 		
