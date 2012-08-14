@@ -129,7 +129,7 @@ ul.pagination li { list-style:none; float:left; }
 }
 .ui-combobox .ui-combobox-toggle {
 	position: absolute;
-	top: 0; bottom: 0; right:1px;
+	top: 0; bottom: 0; right:0;
 	padding: 0;	margin:0;
 	border-top: 0; border-right: 0; border-bottom: 0;
 }
