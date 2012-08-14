@@ -278,7 +278,6 @@ class utopia {
 		if (isset($attributes['class'])) $attributes['class'] .= ' inputtype inputtype-'.$inputType;
 		else $attributes['class'] = 'inputtype inputtype-'.$inputType;
 
-		if (!is_array($defaultValue)) $defaultValue = mb_convert_encoding($defaultValue, 'HTML-ENTITIES', "UTF-8");
 		$defaultValue = utopia::jsonTryDecode($defaultValue);
 		
 		$attr = BuildAttrString($attributes);
@@ -339,13 +338,12 @@ class utopia {
 				$out .= "<input type=\"password\" $attr value=\"\"/>";
 				break;
 			case itTEXT:
-				$val = htmlspecialchars($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
-				$out .= "<input type=\"text\" $attr value=\"$val\"/>";
+				$defaultValue = str_replace('"','&quot;',$defaultValue);
+				$out .= "<input type=\"text\" $attr value=\"$defaultValue\"/>";
 				break;
 			case itTEXTAREA:
 				//sanitise value.
 				if (!utopia::SanitiseValue($defaultValue,'string') && !utopia::SanitiseValue($defaultValue,'NULL')) $defaultValue = 'Value has been sanitised: '.var_export($defaultValue,true);
-				$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
 				$out .= "<textarea $attr>$defaultValue</textarea>";
 				break;
 			case itCOMBO:
@@ -1212,7 +1210,7 @@ class utopia {
 				$value .= $c['currency_symbol'];
 			}
 		}
-		$value = mb_convert_encoding($value, 'HTML-ENTITIES', "UTF-8");
+		$value = mb_convert_encoding($value, 'HTML-ENTITIES', CHARSET_ENCODING);
 		return $value;
 	}
 

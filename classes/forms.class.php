@@ -2193,6 +2193,7 @@ abstract class uDataModule extends uBasicModule {
   // sends ARGS,originalValue,pkVal,processedVal
 	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
+		$value = mb_convert_encoding($value, 'HTML-ENTITIES', CHARSET_ENCODING);
 		$originalValue = $value;
 		if (isset($this->fields[$fieldName]['ismetadata'])) {
 			$value = utopia::jsonTryDecode($value);
@@ -2593,27 +2594,24 @@ abstract class uDataModule extends uBasicModule {
 		$value = (is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '';
 		if ($value === '' && isset($this->fields[$fieldName]) && preg_match('/^\'(.+?)\'/', $this->fields[$fieldName]['field'],$match)) $value = $match[1];
 		$value = $this->PreProcess($fieldName,$value,$row);
-
+		
 		$fieldData = array();
 		if (isset($this->fields[$fieldName])) $fieldData = $this->fields[$fieldName];
 		if (!$fieldData && strpos($fieldName,':') !== FALSE) {
 			list($vname) = explode(':',$fieldName);
 			if (isset($this->fields[$vname])) $fieldData = $this->fields[$vname];
 		}
-		//$url = htmlentities($url);
-		// htmlentities moved here from the to do.
+		
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
-		if ((array_key_exists('htmlencode',$fieldData) && $fieldData['htmlencode']) && $inputType != itTEXTAREA) $value = htmlentities($value,ENT_COMPAT,CHARSET_ENCODING);
 		if ($inputType !== itNONE && (($row !== NULL && flag_is_set($this->GetOptions(),ALLOW_EDIT)) || ($row === NULL  && flag_is_set($this->GetOptions(),ALLOW_ADD)))) {
 			$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
 			$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 		} else {
-			//possible problems where value contains html? (html will be displayed in full)
-			if (empty($url) || ($value != '' && $value[0] == '<' && substr($value,0,4) != '<img'))
-				$ret = $value;
-			else {
+			if ($url) {
 				$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
 				$ret = "<a$class href=\"$url\">$value</a>";
+			} else {
+				$ret = $value;
 			}
 		}
 		return $ret;
