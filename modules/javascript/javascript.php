@@ -94,16 +94,12 @@ class uJavascript extends uBasicModule {
 		self::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
 		self::IncludeFile(dirname(__FILE__).'/js/functs.js');
 
-		modOpts::AddOption('google_api_key','Google API Key');
-		$key = ($gAPI = modOpts::GetOption('google_api_key')) ? 'key='.$gAPI.'&' : '';
-
 		// commented because if a user enters an incorrect version (too high for example) they can not change it back.
 //		modOpts::AddOption('jquery_version','jQuery Version',NULL,1);
 //		$jq  = modOpts::GetOption('jQuery');
 
 //		modOpts::AddOption('jquery_ui_version','jQuery UI Version',NULL,1);
 //		$jqui = modOpts::GetOption('jquery_ui_version');
-
 	}
 
 	public function RunModule() {
