@@ -178,6 +178,7 @@ class uResetPassword extends uDataModule {
 		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('password','password','users','Password',itPASSWORD);
 		$this->AddField('role','name','roles','Role',itCOMBO);
+		$this->AddField('email_confirm','email_confirm','users');
 		$this->AddField('email_confirm_code','email_confirm_code','users');
 	}
 
@@ -185,6 +186,12 @@ class uResetPassword extends uDataModule {
 		$rec = $this->LookupRecord(array('username'=>$user));
 		if (!$rec) return FALSE; // user not found.
 
+		// account has not yet been validated.
+		if ($rec['username'] == $rec['email_confirm']) {
+			uVerifyEmail::VerifyAccount($rec['user_id']);
+			return;
+		}
+		
 		$randKey = genRandom(20);
 		$this->UpdateField('email_confirm_code',$randKey,$rec['user_id']);
 
