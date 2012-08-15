@@ -18,8 +18,6 @@ class tabledef_Users extends uTableDef {
 
 		$this->SetPrimaryKey('user_id');
 		$this->SetIndexField('username');
-		
-		uEmailer::InitialiseTemplate('account_activate','Confirm your email address','<p>Please verify your email by clicking the link below:</p><p>{activate_link}</p>',array('email','active_link'));
 	}
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
 		if ($fieldName == 'username') {
@@ -160,6 +158,8 @@ class uRegisterUser extends uDataModule {
 		$this->AddField('role','name','roles','Role',itCOMBO);
 
 		$this->AddField('email_confirm_code','email_confirm_code','users');
+
+		uEmailer::InitialiseTemplate('account_activate','Confirm your email address','<p>Please verify your email by clicking the link below:</p><p><a href="{home_url_abs}/{activate_link}">{home_url_abs}/{activate_link}</a></p>',array('email','active_link'));
 	}
 	public function SetupParents() {
 		$this->SetRewrite(false);

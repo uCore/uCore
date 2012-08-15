@@ -161,8 +161,7 @@ class uResetPassword extends uDataModule {
 
 	public function SetupParents() {
 		$this->SetRewrite(array('{e}','{c}'));
-		uEmailer::InitialiseTemplate('account_activate','Activate your account','Hi {email},<br/>Please activate your account by clicking the link below:<br/>{activate_link}');
-		uEmailer::InitialiseTemplate('account_resetpw','Reset your password','Hi {email},<br/>You can reset your password by clicking the link below:<br/>{activate_link}');
+		uEmailer::InitialiseTemplate('account_resetpw','Reset your password','<p>You can reset your password by clicking the link below:</p><p><a href="{home_url_abs}/{activate_link}">{home_url_abs}/{activate_link}</a></p>',array('email','activate_link'));
 		uEvents::AddCallback('LoginButtons',array($this,'forgottenPasswordButton'));
 	}
 	public function forgottenPasswordButton() {
