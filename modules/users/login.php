@@ -51,7 +51,7 @@ class uUserLogin extends uDataModule {
 		$this->CreateTable('users','tabledef_Users');
 		$this->AddField('username','username','users');
 		$this->AddField('password','password','users');
-		$this->AddField('can_login','({email_confirm} != {username})','users');
+		$this->AddField('can_login','(!({email_confirm} <=> {username}))','users');
 		$this->AddFilter('can_login',ctEQ,itNONE,1);
 	}
 
