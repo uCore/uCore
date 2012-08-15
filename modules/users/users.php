@@ -299,7 +299,7 @@ class uVerifyEmail extends uDataModule {
 		} else {
 			$this->UpdateField('email_confirm_code',true,$rec['user_id']);
 			uUserLogin::SetLogin($rec['user_id']);
-			uNotices::AddNotice('Your email address has now been validated.');
+			uNotices::AddNotice('Thank you!  Your email address has been successfully validated.');
 			$o = utopia::GetInstance('uUserProfile');
 			header('Location: '.$o->GetURL());
 		}
