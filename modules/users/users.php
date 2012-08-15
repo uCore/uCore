@@ -67,6 +67,7 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->AddField('last_login','last_login','users','Last Login');
 		$this->AddField('password','password','users','Change Password',itPASSWORD);
 		$this->AddField('email_confirm','email_confirm','users');
+		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users');
 		$this->AddFilter('username',ctLIKE,itTEXT);
 	}
 
@@ -96,7 +97,7 @@ class uAssertAdminUser extends uBasicModule {
 	public function AssertAdminUser() {
 		// admin user exists?
 		$obj = utopia::GetInstance('uUsersList');
-		$rec = $obj->LookupRecord(array('_roles_pk'=>-1),true);
+		$rec = $obj->LookupRecord(array('_roles_pk'=>-1,'validated'=>1),true);
 		if ($rec) return;
 
 		// module is persist?
@@ -108,7 +109,7 @@ class uAssertAdminUser extends uBasicModule {
 	}
 	public function RunModule() {
 		$obj = utopia::GetInstance('uUsersList');
-		$rec = $obj->LookupRecord(array('_roles_pk'=>-1),true);
+		$rec = $obj->LookupRecord(array('_roles_pk'=>-1,'validated'=>1),true);
 		if ($rec) {
 			header('Location: '.PATH_REL_CORE); die();
 		}
@@ -130,17 +131,24 @@ class uAssertAdminUser extends uBasicModule {
 		}
 		
 		// now register user
-		$obj = utopia::GetInstance('uRegisterUser');
-		$user_id = $obj->RegisterForm();
+		$regObj = utopia::GetInstance('uRegisterUser');
+		$user_id = $regObj->RegisterForm();
 		// login as this user, then perform the update
 
 		if ($user_id) {
 			// now set this users role
-			$obj->UpdateField('role',-1,$user_id);
+			$regObj->UpdateField('role',-1,$user_id);
 			unset($_SESSION['db_admin_authed']);
 			uNotices::AddNotice('Admin user has now been set up.');
-			uUserLogin::SetLogin($user_id);
+			
+			uVerifyEmail::VerifyAccount($usr);
+			
 			header('Location: '.PATH_REL_CORE); die();
+		}
+
+		if ($_POST && isset($_POST['username'])) {
+			$rec = $obj->LookupRecord(array('username'=>$_POST['username']),true);
+			uVerifyEmail::VerifyAccount($rec['user_id']);
 		}
 	}
 }
@@ -188,7 +196,6 @@ class uRegisterUser extends uDataModule {
 		
 		if ($usr = $this->RegisterForm()) {
 			echo '<p>Your account has now been created.</p>';
-			uUserLogin::SetLogin($usr);
 			uVerifyEmail::VerifyAccount($usr);
 		}
 	}
@@ -267,7 +274,7 @@ class uRegisterUser extends uDataModule {
 class uVerifyEmail extends uDataModule {
 	public function GetTitle() { return 'Verify'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
-	public function GetOptions() { return ALLOW_EDIT; }
+	public function GetOptions() { return ALLOW_EDIT | PERSISTENT; }
 
 	public function GetUUID() { return 'verify-email'; }
 
@@ -290,8 +297,11 @@ class uVerifyEmail extends uDataModule {
 			// no code given or code not found.
 			echo '<p>Could not validate your request.  If you are trying to change your email, please log in with your old credentials and re-submit the request.</p>';
 		} else {
-			echo '<p>Your email address has now been validated.</p>';
 			$this->UpdateField('email_confirm_code',true,$rec['user_id']);
+			uUserLogin::SetLogin($rec['user_id']);
+			uNotices::AddNotice('Your email address has now been validated.');
+			$o = utopia::GetInstance('uUserProfile');
+			header('Location: '.$o->GetURL());
 		}
 	}
 	public static function VerifyAccount($user_id) {
