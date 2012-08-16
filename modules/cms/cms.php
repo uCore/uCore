@@ -134,7 +134,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 FIN;
 		$c = ob_get_contents();
 		ob_end_clean();
-		utopia::Tab_Add('Page Editor',$c,$tabGroupName,false);
+		utopia::Tab_Add('Page Editor',$c,$this->GetModuleId(),$tabGroupName,false);
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 	public static function RefreshList() {

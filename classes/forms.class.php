@@ -1385,7 +1385,7 @@ abstract class uDataModule extends uBasicModule {
 		$this->fields[$aliasName]['values'] = $values;
 
 		if ($visiblename !== NULL) {
-			if (!$this->layoutSections) $this->NewSection('General');
+			if (!$this->layoutSections) $this->NewSection('');
 			$this->fields[$aliasName]['layoutsection'] = $this->cLayoutSection;
 		}
 		return TRUE;
@@ -3097,7 +3097,7 @@ abstract class uListDataModule extends uDataModule {
 		$cont = ob_get_contents();
 		ob_end_clean();
 
-		utopia::Tab_Add($tabTitle,$cont,$tabGroupName,false,$tabOrder);
+		utopia::Tab_Add($tabTitle,$cont,$this->GetModuleId(),$tabGroupName,false,$tabOrder);
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 
@@ -3239,7 +3239,7 @@ abstract class uSingleDataModule extends uDataModule {
 			}
 			$out .= "</table>";
 			if (!$this->isAjax) $out .= '</form>';
-			utopia::Tab_Add($SN,$out,$tabGroupName,false,$order);
+			utopia::Tab_Add($SN,$out,$this->GetModuleId(),$tabGroupName,false,$order);
 		}
 
 		if ($num_rows > 1) echo '<div class="oh"><b>'.$records.'</b>'.$pager.'</div>';

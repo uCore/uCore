@@ -80,7 +80,7 @@ FIN
 
 		$out = ob_get_contents();
 		ob_end_clean();
-		utopia::Tab_Add($this->GetTitle(),$out,$tabGroupName,false,$this->GetSortOrder());
+		utopia::Tab_Add($this->GetTitle(),$out,$this->GetModuleId(),$tabGroupName,false,$this->GetSortOrder());
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 	static function OnRename($from,$to) {
