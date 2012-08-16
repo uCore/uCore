@@ -217,7 +217,7 @@ class uResetPassword extends uDataModule {
 			echo '<form id="loginForm" action="'.$this->GetURL(array()).'" method="post">';
 			echo '<div style="margin-top:10px">What is your email address?</div>';
 			echo '<div style="margin-left:20px;">My e-mail address is '.utopia::DrawInput('e',itTEXT).'</div>';
-			echo '<input type="submit" class="btn" value="Recover Password" />';
+			echo '<input type="submit" class="btn" value="Reset Password" />';
 			echo '</form>';
 			return;
 		}
