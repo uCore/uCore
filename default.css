@@ -108,6 +108,8 @@ ul.pagination li { list-style:none; float:left; }
 .layoutDetailSection .inputtype.inputtype-submit { min-width:0; width:auto; }
 .layoutDetailSection .inputtype.inputtype-reset { min-width:0; width:auto; }
 
+.inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0 }
+
 .inputtype.inputtype-checkbox { min-width:0; width:auto; background:none; border:0; }
 
 
