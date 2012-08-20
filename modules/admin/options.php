@@ -15,9 +15,8 @@ class tabledef_ModOpts extends uTableDef {
 }
 
 utopia::AddTemplateParser('option','modOpts::GetOption','.+');
-class modOpts extends uListDataModule implements iAdminModule {
+class modOpts extends uDataModule {
 	public function GetTitle() { return 'Options'; }
-	public function GetSortOrder() { return -9999.5; }
 	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE; }
 	public function GetTabledef() { return 'tabledef_ModOpts'; }
 	public function SetupFields() {
@@ -28,37 +27,9 @@ class modOpts extends uListDataModule implements iAdminModule {
 		$this->AddField('value','value','opts','Value',itTEXT);
 	}
 	public function SetupParents() {
-		$this->AddParent('/');
 		self::AddOption('site_name','Site Name',NULL);
 	}
-	public function GetRows($filter=NULL,$clearFilters=false) {
-		$rows = parent::GetRows($filter,$clearFilters);
-		foreach ($rows as $k=>$row) {
-			foreach (self::$types as $id=>$t) {
-				if ($id == $row['ident']) {
-					$rows[$k]['name'] = $t[2];
-					$rows[$k]['group'] = $t[3];
-				}
-			}
-		}
-		return $rows;
-	}
-	public function RunModule() {
-		$rows = $this->GetRows();
-		array_sort_subkey($rows,'group');
-		$grouped = array();
-		
-		foreach ($rows as $r) {
-			if (!isset(self::$types[$r['ident']])) continue;
-			if (!$r['name']) continue;
-			$grouped[self::$types[$r['ident']][3]][] = $r;
-		}
-		
-		foreach ($grouped as $group=>$g) {
-			$order = $group == 'Site Options' ? -10000 : null;
-			$this->ShowData($g,$group,$order);
-		}
-	}
+	public function RunModule() { }
 	public static $types = array();
 	public static function AddOption($ident,$name,$group=NULL,$init='',$fieldType=itTEXT,$values=NULL) {
 		if (!$group) $group = 'Site Options';
@@ -77,11 +48,56 @@ class modOpts extends uListDataModule implements iAdminModule {
 		$obj = utopia::GetInstance(__CLASS__);
 		$obj->UpdateField('value',$value,$ident);
 	}
+}
+
+class modOptsList extends uListDataModule implements iAdminModule {
+	public function GetTitle() { return 'Options'; }
+	public function GetSortOrder() { return -9999.5; }
+	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE; }
+	public function GetTabledef() { return 'tabledef_ModOpts'; }
+	public function SetupFields() {
+		$this->CreateTable('opts');
+		$this->AddField('ident','ident','opts');
+		$this->AddField('group','','');
+		$this->AddField('name','','','Name');
+		$this->AddField('value','value','opts','Value',itTEXT);
+	}
+	public function SetupParents() {
+		$this->AddParent('/');
+	}
+	public function GetRows($filter=NULL,$clearFilters=false) {
+		$rows = parent::GetRows($filter,$clearFilters);
+		foreach ($rows as $k=>$row) {
+			foreach (modOpts::$types as $id=>$t) {
+				if ($id == $row['ident']) {
+					$rows[$k]['name'] = $t[2];
+					$rows[$k]['group'] = $t[3];
+				}
+			}
+		}
+		return $rows;
+	}
+	public function RunModule() {
+		$rows = $this->GetRows();
+		array_sort_subkey($rows,'group');
+		$grouped = array();
+		
+		foreach ($rows as $r) {
+			if (!isset(modOpts::$types[$r['ident']])) continue;
+			if (!$r['name']) continue;
+			$grouped[modOpts::$types[$r['ident']][3]][] = $r;
+		}
+		
+		foreach ($grouped as $group=>$g) {
+			$order = $group == 'Site Options' ? -10000 : null;
+			$this->ShowData($g,$group,$order);
+		}
+	}
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		$pk = $this->GetPrimaryKey();
-		if ($fieldName == 'value' && isset(self::$types[$row[$pk]])) {
-			$inputTypeOverride = self::$types[$row[$pk]][0];
-			$valuesOverride = self::$types[$row[$pk]][1];
+		if ($fieldName == 'value' && isset(modOpts::$types[$row[$pk]])) {
+			$inputTypeOverride = modOpts::$types[$row[$pk]][0];
+			$valuesOverride = modOpts::$types[$row[$pk]][1];
 		}
 		return parent::GetCellData($fieldName, $row, $url, $inputTypeOverride, $valuesOverride);
 	}
