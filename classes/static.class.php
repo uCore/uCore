@@ -498,7 +498,7 @@ class utopia {
 	static function Tab_Add($tabTitle,$tabContent,$tabID,$tabGroup=NULL,$isURL=false,$order=NULL) {
 		if ($order === NULL) $order = count(self::$tabGroups[$tabGroup]);
 		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
-		//$tabID = self::Tab_GetCount($tabGroup)+1;
+		$tabID .= '-'.UrlReadable($tabTitle);
 		if (isset(self::$tabGroups[$tabGroup]['tab'.$tabID])) { ErrorLog("TabID ($tabID) already exists in Group ($tabGroup)"); return; }
 		self::$tabGroups[$tabGroup][$tabID] = array('id'=>$tabID,'title'=>$tabTitle,'content'=>$tabContent,'isURL'=>$isURL,'order'=>$order);
 	}
@@ -526,12 +526,12 @@ class utopia {
 			if ($tabInfo['isURL'])
 			echo '<li><a href="'.$tabInfo['content'].'"><span>'.$tabInfo['title'].'</span></a></li>';
 			else
-			echo '<li><a href="#'.$tabID.'-'.UrlReadable($tabInfo['title']).'"><span>'.$tabInfo['title'].'</span></a></li>';
+			echo '<li><a href="#'.$tabID.'"><span>'.$tabInfo['title'].'</span></a></li>';
 		}
 		echo '</ul>';
 		foreach ($tabGroupArray as $tabID => $tabInfo) {
 			if ($tabInfo['isURL']) continue;
-			echo '<div id="'.$tabID.'-'.UrlReadable($tabInfo['title']).'" class="{tabTitle:\''.$tabInfo['title'].'\'}">'.$tabInfo['content']."</div>\n";
+			echo '<div id="'.$tabID.'" class="{tabTitle:\''.$tabInfo['title'].'\'}">'.$tabInfo['content']."</div>\n";
 		}
 		echo '</div>'; // cose container
 	}
