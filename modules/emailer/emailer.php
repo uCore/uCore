@@ -209,6 +209,7 @@ class uEmailer extends uDataModule {
 		$from = $from ? $from : modOpts::GetOption('emailer_from');
 		if ($from) $message->setFrom(self::ConvertEmails($from));
 
+		if (!is_array($attachments)) $attachments = array($attachments);
 		if ($attachments) foreach ($attachments as $attachment) {
 			if (!$attachment) continue;
 			if ($attachment instanceof Swift_Attachment)
