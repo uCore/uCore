@@ -254,13 +254,12 @@ class internalmodule_StaticAjax extends uBasicModule {
 		if (!$_GET['term']) $found[] = array('value'=>'','label'=>'-','key'=>'');
 		if (is_array($vals)) foreach ($vals as $key=>$value) {
 			if (empty($key) && empty($value)) continue;
-			if (empty($_GET['term']) || strpos(strtolower($key), strtolower($_GET['term'])) !== false) {
+			$label = $value.($key == $value ? '' : ' ('.$key.')');
+			if (empty($_GET['term']) || stripos($label, $_GET['term']) !== false) {
 				$f = array(
-					'value'	=> $value,
-					'label' => $key.($key == $value ? '' : ' ('.$value.')'),
-					'key' => $key,
+					'value'	=> $key,
+					'label' => $label,
 				);
-				if ($value !== $key) $f['desc'] = 'ID: '.$value;
 				$found[] = $f;
 			}
 		}

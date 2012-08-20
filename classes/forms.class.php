@@ -2419,11 +2419,11 @@ abstract class uDataModule extends uBasicModule {
 		$tbl		= $this->fields[$fieldAlias]['vtable'];
 		$values		= $this->GetValues($fieldAlias,$pkVal);
 
-		if ($newValue !== NULL && $newValue !== '' && is_numeric($newValue) && $this->fields[$fieldAlias]['inputtype'] == itSUGGEST || $this->fields[$fieldAlias]['inputtype'] == itSUGGESTAREA) {
+	/*	if ($newValue !== NULL && $newValue !== '' && is_numeric($newValue) && $this->fields[$fieldAlias]['inputtype'] == itSUGGEST || $this->fields[$fieldAlias]['inputtype'] == itSUGGESTAREA) {
 			$valSearch = (is_assoc($values)) ? array_flip($values) : $values;
 			$srch = array_search($newValue, $valSearch);
 			if ($srch !== FALSE) $newValue = $srch;
-		}
+		}*/
 		if ($this->fields[$fieldAlias]['inputtype'] == itMD5 || $this->fields[$fieldAlias]['inputtype'] == itPASSWORD) {
 			if (empty($newValue)) return FALSE;
 			$newValue = md5($newValue);
