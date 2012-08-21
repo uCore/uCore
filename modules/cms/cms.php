@@ -497,6 +497,7 @@ class uCMS_View extends uSingleDataModule {
 			$rec = self::findPage();
 		}
 		if (!$rec) return;
+		if (!utopia::UsingTemplate()) return;
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 	}
 	static function templateParser($id) {
