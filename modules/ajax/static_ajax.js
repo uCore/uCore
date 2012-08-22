@@ -482,6 +482,22 @@ function ReloadWithItems(items, ignoreCurrent) {
 	window.location.assign(window.location.pathname+newQS+window.location.hash);
 }
 
+var focused = null;
+$(document).on('focus',':input',function() {
+	focused = this;
+});
+$(document).on('click',':not(:input)',function() {
+	focused = null;
+});
+function ReFocus() {
+	if (!$.contains(document,focused)) {
+		if ($(focused).attr('id')) focused = $('#'+$(focused).attr('id'))[0];
+		else if ($(focused).attr('name')) focused = $('[name="'+$(focused).attr('name')+'"]')[0];
+	}
+	if (!focused) return;
+	focused.focus();
+}
+
 $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('change','.uf',_fieldChange);
 	$(document).on('click','input[type=button].uf, .btn.uf',_fieldChange);
@@ -578,6 +594,7 @@ function _uf(ele,hourglass) {
 
 				StoppedUpdating(ele);
 				$('.auto-complete-list').hide();
+				ReFocus();
 //				$('.uf').change(_fieldChange);
 			}
 		});
@@ -605,6 +622,7 @@ function _uf(ele,hourglass) {
 		$(hourglass).remove();
 		StoppedUpdating(ele);
 		$('.auto-complete-list').hide();
+		ReFocus();
 	});
 }
 
@@ -625,6 +643,7 @@ function _ufData(eleData,hourglass) {
 	}).always(function(){
 		$(hourglass).remove();
 		$('.auto-complete-list').hide();
+		ReFocus();
 	});
 }
 

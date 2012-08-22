@@ -2346,6 +2346,7 @@ abstract class uDataModule extends uBasicModule {
 		// reset all fields.
 		$this->ResetField($fieldAlias,$pkVal);
 		foreach ($this->fields as $alias => $field) {
+			if (!isset($field['preprocess'])) continue;
 			$this->ResetField($alias,$pkVal);
 		}
 	}
