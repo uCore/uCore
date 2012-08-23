@@ -30,18 +30,12 @@ class adminLogout extends uBasicModule {
 	}
 }
 
-uEvents::AddCallback('BeforeRunModule','uUserLogin::CheckAccess');
 
 utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
 utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
 utopia::AddTemplateParser('login_status','uUserLogin::GetLoginStatus','');
 utopia::AddTemplateParser('login','uUserLogin::LoginForm','',true);
 class uUserLogin extends uDataModule {
-	public static function CheckAccess($object) {
-		$ret = uEvents::TriggerEvent('CanAccessModule',$object);
-		if ($ret === FALSE && get_class($object) == utopia::GetCurrentModule()) uNotices::AddNotice('Sorry, you do not have access to this feature.',NOTICE_TYPE_WARNING);
-		return $ret;
-	}
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'User Login'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT | NO_NAV; }
@@ -117,6 +111,7 @@ class uUserLogin extends uDataModule {
 		$parent = get_class($object);
 
 		if ($parent == utopia::GetCurrentModule() && $parent !== __CLASS__ && !AjaxEcho('window.location.reload();')) {
+			uNotices::AddNotice('Sorry, you do not have access to this feature.',NOTICE_TYPE_WARNING);
 			$this->_RunModule();
 		}
 		return FALSE;
