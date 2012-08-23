@@ -67,7 +67,9 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->AddField('last_login','last_login','users','Last Login');
 		$this->AddField('password','password','users','Change Password',itPASSWORD);
 		$this->AddField('email_confirm','email_confirm','users');
-		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users');
+		$this->AddField('email_confirm_code','email_confirm_code','users');
+		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users','Validate');
+		$this->AddPreProcessCallback('validated',array($this,'ValidateButtons'));
 		$this->AddFilter('username',ctLIKE,itTEXT);
 	}
 
@@ -79,11 +81,20 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->ShowData();
 	}
 	
+	public function ValidateButtons($originalValue,$pkVal,$value,$rec,$fieldName) {
+		if ($originalValue == 1 || $pkVal === NULL) {
+			return '';
+		}
+		return $this->DrawSqlInput('_validate_user','Force Validate',$pkVal,NULL,itBUTTON).$this->DrawSqlInput('_validate_send','Send Validation',$pkVal,NULL,itBUTTON);
+	}
+	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		if ($fieldAlias == 'role' && $pkVal == $_SESSION['current_user']) {
 			uNotices::AddNotice('You cannot edit your own role',NOTICE_TYPE_ERROR);
 			return;
 		}
+		if ($fieldAlias == '_validate_user') return $this->UpdateField('email_confirm_code',true,$pkVal);
+		if ($fieldAlias == '_validate_send') { uVerifyEmail::VerifyAccount($pkVal); return; }
 		parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
 }
