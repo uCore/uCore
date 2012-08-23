@@ -48,7 +48,7 @@ class module_TinyMCE extends uBasicModule {
 			$richOpts = array();
 			$richOpts['plugins'] = "paste,inlinepopups,spellchecker,save";
 			$richOpts['valid_elements'] = 'b,strong,i,u,ul,ol,li,p,br';
-			$richOpts['theme_advanced_buttons1'] = "save,|,bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
+			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
 			$richOpts['theme_advanced_buttons3'] = "";
 			$richOpts['theme_advanced_buttons4'] = "";
@@ -57,9 +57,8 @@ class module_TinyMCE extends uBasicModule {
 			$htmlOpts['valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 			$htmlOpts['extended_valid_elements'] = '*[*]';// 'style,div[*],span[*],iframe[src|width|height|name|align|style]';
 
-			$htmlOpts['plugins'] = "paste,inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,save,autoresize";
+			$htmlOpts['plugins'] = "paste,inlinepopups,media,advimage,spellchecker,table,noneditable,style,layer,autoresize,save";
 			$htmlOpts['theme_advanced_buttons1_add'] = '|,forecolor,backcolor';
-			$htmlOpts['theme_advanced_buttons1_add_before'] = "save,|,";
 			$htmlOpts['theme_advanced_buttons2_add'] = 'media,|,insertlayer,moveforward,movebackward,absolute';
 			$htmlOpts['theme_advanced_buttons3_add'] = ",|,styleprops,spellchecker,|,tablecontrols";
 
@@ -139,6 +138,9 @@ FIN
 		}
 		$optName = 'mceRichOptions';
 		if ($inputType == itHTML) $optName = '$.extend({protect:[/<\?php.*?\?>/g,/<a[^>]*?><\/a>/g]}, mceHtmlOptions)';
+		
+		
+		$extendOpts .= ',($(".'.$saveClass.'").closest("form").length ? {} : {theme_advanced_buttons1_add_before:"save,|,"})';
 		
 		$script = '<script type="text/javascript">tinyMCE.init($.extend({},mceDefaultOptions,'.$optName.$extendOpts.',{editor_selector:"'.$saveClass.'"}))</script>';
 		
