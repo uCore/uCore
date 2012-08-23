@@ -335,8 +335,6 @@ abstract class uTableDef implements iUtopiaModule {
 		
 		if (is_array($newValue))
 			$newValue = json_encode($newValue);
-		else
-			$newValue = trim($newValue);
 		
 		if ($fieldType != ftRAW) $newValue = mysql_real_escape_string($newValue);
 		if ($newValue) switch ($fieldType) {      //"STR_TO_DATE('$newValue','".FORMAT_DATE."')"; break;
