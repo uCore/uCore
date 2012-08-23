@@ -81,6 +81,8 @@ class module_TinyMCE extends uBasicModule {
 	function onSave(ed) {
 		uf(ed.getElement(),ed.getContent(),ed.getContainer());
 	}
+	$(document).on('submit','form',function(){tinyMCE.triggerSave(true,true)});
+	$(document).on('click','.btn-submit',function(){tinyMCE.triggerSave(true,true)});
 	var mb = null;
 	function openMediaBrowser(field_name, url, type, win) {
 		if (!mb) mb = $('<div></div>');
