@@ -12,6 +12,8 @@ if ($_REQUEST && get_magic_quotes_gpc()) $_REQUEST = utopia::stripslashes_deep($
 ob_start('utopia::output_buffer',2);
 register_shutdown_function('utopia::Finish');
 
+header('Access-Control-Allow-Origin: http://'.utopia::GetDomainName());
+
 uConfig::DefineConfig();
 uConfig::ValidateConfig();
 
