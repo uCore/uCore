@@ -308,7 +308,7 @@ class utopia {
 						$attributes['name'] = $attributes['name'].'[]';
 						$attr = BuildAttrString($attributes);
 					}
-					$out .= '<span$at class="inputtype inputtype-checkboxlist">';
+					$out .= '<span'.$at.' class="inputtype inputtype-checkboxlist">';
 					foreach ($possibleValues as $key => $val) {
 						$checked = ((string)$key === $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue))) ? ' checked="checked"' : '';
 						$out .= "<label><input$attr type=\"checkbox\"$checked value=\"$key\"/>$val</label>";
