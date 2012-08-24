@@ -2355,8 +2355,12 @@ abstract class uDataModule extends uBasicModule {
 		AjaxEcho('//'.get_class($this)."@DeleteRecord($pkVal)");
 		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
 		
+		if (uEvents::TriggerEvent('BeforeDeleteRecord',$this,array($pkVal)) === FALSE) return FALSE;
+		
 		$table = TABLE_PREFIX.$this->GetTabledef();
 		sql_query("DELETE FROM $table WHERE `{$this->GetPrimaryKeyTable()}` = '$pkVal';");
+		
+		uEvents::TriggerEvent('AfterDeleteRecord',$this,array($pkVal));
 		
 		return TRUE;
 	}
