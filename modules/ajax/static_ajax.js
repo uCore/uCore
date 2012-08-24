@@ -167,7 +167,7 @@ $(document).ready(function(){
 
 	$('img.calendar_trigger').bind('click', function (event) {event.stopPropagation(); return true;});
 
-	$("[name^=sql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
+	$("[name^=usql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
 });
 
 function RefreshTableSorters() {
@@ -490,7 +490,7 @@ $(document).on('click',':not(:input)',function() {
 	focused = null;
 });
 function ReFocus() {
-	if (!$.contains(document,focused)) {
+	if (!$.contains(document.documentElement,focused)) {
 		if ($(focused).attr('id')) focused = $('#'+$(focused).attr('id'))[0];
 		else if ($(focused).attr('name')) focused = $('[name="'+$(focused).attr('name')+'"]')[0];
 	}
@@ -577,7 +577,7 @@ function _uf(ele,hourglass) {
 
 	var eleData = {'__ajax':'updateField'};
 
-	targetPage = window.location.toString().replace(window.location.hash,'');
+	targetPage = window.location.pathname+window.location.search;
 
 	if ($(ele).attr('type') == 'file') {
 		$(ele).ajaxFileUpload({
@@ -627,7 +627,7 @@ function _uf(ele,hourglass) {
 }
 
 function _ufData(eleData,hourglass) {
-	targetPage = window.location.toString().replace(window.location.hash,'');
+	targetPage = window.location.pathname+window.location.search;
 	$.ajax({
 		type: "POST",
 		async: true,
@@ -670,7 +670,7 @@ function getEleVal(ele) {
 }
 
 function makeHourglass(hourglassEle) {
-	var hourglass = $('<img align="texttop" src="'+PATH_REL_CORE+'images/hourglass.png">');
+	var hourglass = $('<img align="texttop" src="'+PATH_REL_CORE+'images/hourglass.png"/>');
 	var offset = $(hourglassEle).offset();
 	hourglass.css({
 		position:'absolute',
