@@ -152,7 +152,7 @@ class uAssertAdminUser extends uBasicModule {
 			unset($_SESSION['db_admin_authed']);
 			uNotices::AddNotice('Admin user has now been set up.');
 			
-			uVerifyEmail::VerifyAccount($usr);
+			uVerifyEmail::VerifyAccount($user_id);
 			
 			header('Location: '.PATH_REL_CORE); die();
 		}
