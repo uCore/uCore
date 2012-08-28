@@ -56,20 +56,22 @@ class uLocale implements ArrayAccess {
 		exec('locale -av',$output);
 		
 		$locales = array();
-		$output = utf8_encode(implode("\n",$output));
-		$blocks = explode("\n\n",$output);
-		foreach ($blocks as $block) {
-			if (!preg_match('/locale: ([a-z_]+)\.utf8\s/iu',$block,$match)) continue; $code = $match[1];
-			if (!preg_match('/language \| (.+)/iu',$block,$match)) continue; $lang = $match[1];
-			if (!preg_match('/territory \| (.+)/iu',$block,$match)) continue; $terr = $match[1];
-			if ($code === $lang.'_'.$terr) continue;
-			$locales[$code] = array('code'=>$code,'lang'=>$lang,'terr'=>$terr);
+		if ($output) {
+			$output = utf8_encode(implode("\n",$output));
+			$blocks = explode("\n\n",$output);
+			foreach ($blocks as $block) {
+				if (!preg_match('/locale: ([a-z_]+)\.utf8\s/iu',$block,$match)) continue; $code = $match[1];
+				if (!preg_match('/language \| (.+)/iu',$block,$match)) continue; $lang = $match[1];
+				if (!preg_match('/territory \| (.+)/iu',$block,$match)) continue; $terr = $match[1];
+				if ($code === $lang.'_'.$terr) continue;
+				$locales[$code] = array('code'=>$code,'lang'=>$lang,'terr'=>$terr);
+			}
 		}
 		if (!$locales) $locales = self::$locale_win;
 		
 		$old = setlocale(LC_ALL,0);
 		foreach ($locales as $code => $locale) {
-			if (setlocale(LC_ALL,self::GetLocaleTestArray($code)) === FALSE) continue;
+			if (setlocale(LC_ALL,$code) === FALSE) continue;
 			$locales[$code] += localeconv();
 			$locales[$code]['int_curr_symbol'] = trim($locales[$code]['int_curr_symbol']);
 		}
@@ -115,16 +117,7 @@ class uLocale implements ArrayAccess {
 		self::$locale_limit = $limit;
 	}
 	public static function ResetLocale() {
-		setlocale(LC_ALL, self::GetLocaleTestArray(DEFAULT_LOCALE));
-	}
-	public static function GetLocaleTestArray($locale) {
-		$arr = array();
-		$arr[] = $locale.'.utf8';
-		$arr[] = $locale.'.UTF-8';
-		$arr[] = $locale.'.UTF8';
-		
-		$arr[] = $locale;
-		return $arr;
+		setlocale(LC_ALL, DEFAULT_LOCALE);
 	}
 
 	private static $localeArray = array();
