@@ -196,10 +196,18 @@ class uEmailer extends uDataModule {
 		$host = modOpts::GetOption('smtp_host'); $port = modOpts::GetOption('smtp_port');
 		if (!$host) $host = 'localhost';
 		if (!$port) $port = 25;
-		$transport = Swift_SmtpTransport::newInstance($host, $port);
 		
+		// setup mail transport
+		$mailTransport = Swift_MailTransport::newInstance();
+		// setup sendmail transport
+		$sendmailTransport = Swift_SendmailTransport::newInstance('sendmail -bs');
+		// setup smtp transport
+		$smtpTransport = Swift_SmtpTransport::newInstance($host, $port);
 		$user = modOpts::GetOption('smtp_user'); $pass = modOpts::GetOption('smtp_pass');
-		if ($user) $transport->setUsername($user)->setPassword($pass);
+		if ($user) $smtpTransport->setUsername($user)->setPassword($pass);
+		
+		// create failover transport
+		$transport = Swift_FailoverTransport::newInstance(array($smtpTransport,$sendmailTransport,$mailTransport));
 		
 		$mailer = Swift_Mailer::newInstance($transport);
 		$message = Swift_Message::newInstance();
