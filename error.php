@@ -6,6 +6,7 @@ set_exception_handler('uErrorHandler::exception_handler');
 
 class uErrorHandler {
 	static function ThrowException($code, $message, $file=null, $line=null, $errcontext=null) {
+		if (error_reporting() === 0) return;
 		// Convert Errors to Exceptions
 		throw new ErrorException($message, $code, 0, $file, $line);
 	}
