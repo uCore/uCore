@@ -1174,7 +1174,7 @@ class utopia {
 	static function money_format($originalValue,$locale=DEFAULT_LOCALE) {
 		if (!is_numeric($originalValue)) return $originalValue;
 		if (!$locale) $locale = DEFAULT_LOCALE;
-		$locales = uLocale::ListLocale(NULL);
+		$locales = uLocale::ListLocale(NULL,'%C',true);
 		$c = null;
 		if (isset($locales[$locale])) $c = $locales[$locale];
 		else {
