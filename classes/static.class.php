@@ -666,7 +666,7 @@ class utopia {
 		if (!$template) $template = TEMPLATE_BLANK;
 		$ret = true;
 
-		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template)) {
+		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template.'/template.php')) {
 			$template = TEMPLATE_BLANK;
 			$ret = false;
 		}
