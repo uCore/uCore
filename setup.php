@@ -5,10 +5,10 @@ define('CFG_TYPE_PATH',flag_gen('configType'));
 define('CFG_TYPE_PASSWORD',flag_gen('configType'));
 define('CFG_TYPE_CALLBACK',flag_gen('configType'));
 
-uConfig::AddConfigVar('ERROR_EMAIL','Debug Email Address');
-uConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
-uConfig::AddConfigVar('SQL_SERVER','Database Server Address');
-uConfig::AddConfigVar('SQL_PORT','Database Port');
+uConfig::AddConfigVar('ERROR_EMAIL','Email Address');
+define('DB_TYPE','mysql');// uConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
+uConfig::AddConfigVar('SQL_SERVER','Database Host');
+uConfig::AddConfigVar('SQL_PORT','Database Port',3306);
 uConfig::AddConfigVar('SQL_DBNAME','Database Name');
 uConfig::AddConfigVar('SQL_USERNAME','Database Username');
 uConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,NULL,CFG_TYPE_PASSWORD);
@@ -113,9 +113,12 @@ class uConfig {
 		return true;
 	}
 	static function ShowConfig() {
-		utopia::UseTemplate(TEMPLATE_ADMIN);
-		utopia::SetTitle('uCore Configuration');
-		echo '<h1>uCore Configuration</h1>';
+		if (!self::$isValid) {
+			$rc = preg_replace('/'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
+			utopia::UseTemplate($rc.'styles/install');
+			utopia::SetTitle('uCore Installation');
+			echo '<h1>uCore Installation</h1>';
+		}
 
 		$frmAction = DEFAULT_FILE;
 		echo <<<FIN
@@ -158,7 +161,7 @@ FIN;
 			echo '</td></tr>';
 		}
 		$_SESSION['__config_validate'] = true;
-		echo '</table><input type="submit" value="Save"></form>';
+		echo '</table><input type="submit" value="Make It So!"></form>';
 		if (!self::$isValid) utopia::Finish();
 	}
 }

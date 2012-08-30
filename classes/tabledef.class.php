@@ -27,8 +27,8 @@ define('ftRAW'				,'raw');
 define('SQL_NULL'			,'null');
 define('SQL_NOT_NULL'		,'not null');
 
-uConfig::AddConfigVar('TABLE_PREFIX','Table Prefix','');
-uConfig::AddConfigVar('MYSQL_ENGINE','MySQL Engine','InnoDB',array('MyISAM','InnoDB'));
+define('TABLE_PREFIX',''); //uConfig::AddConfigVar('TABLE_PREFIX','Table Prefix','');
+define('MYSQL_ENGINE','MyISAM'); //uConfig::AddConfigVar('MYSQL_ENGINE','MySQL Engine','InnoDB',array('MyISAM','InnoDB'));
 
 function getSqlTypeFromFieldType($fieldType) {
 	switch ($fieldType) {
