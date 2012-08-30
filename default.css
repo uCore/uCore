@@ -141,3 +141,9 @@ ul.pagination li { list-style:none; float:left; }
 	margin:0; border:0; background:transparent;
 	height:100%; line-height:100%; width:100%;
 }
+.ui-autocomplete.ui-menu {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	max-height: 200px;
+	white-space: nowrap;
+}
