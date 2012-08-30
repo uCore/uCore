@@ -22,7 +22,7 @@ th.sortable { cursor:pointer; }
 
 img { border: none }
 
-.ui-widget { font-size:0.8em !important; }
+.ui-widget { font-size:0.8em; }
 .ui-button .ui-button-text { line-height:normal; }
 .ui-tabs { padding:0; }
 .ui-tabs-panel { font-size: 1.2em }
