@@ -140,7 +140,6 @@ FIN;
 			if (isset($info['notice'])) echo '<span style="color:red;font-size:0.8em">'.$info['notice'].'</span><br/>';
 			if (is_array($info['values'])) {
 				$assoc = is_assoc($info['values']);
-				if ($info['type'] & CFG_TYPE_PATH) echo PATH_REL_ROOT;
 				echo '<select name="'.$key.'">';
 				foreach ($info['values'] as $k => $v) {
 					if ($info['type'] & CFG_TYPE_PATH) $v = str_replace(PATH_ABS_ROOT,'',$v);
