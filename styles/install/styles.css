@@ -11,19 +11,25 @@ body {
 	font-size:12px;
 	color: #ccc;
 }
+
 .installwrap{
-width: 430px;
-margin: 0 auto;
+	width: 424px;
+	margin: 0 auto;
+}
+
+table{
+	margin: 0 auto;
 }
 
 td {
-font-size: 12px;
-text-align: left;
-height: 36px;
+	font-size: 12px;
+	text-align: left;
+	height: 36px;
+	white-space: nowrap;
 }
 
 form {
-text-align: center;
+	text-align: center;
 }
 
 .inputtype, input{
@@ -31,45 +37,67 @@ text-align: center;
 	background-color: #101012;
 	color: #ccc;
 	-webkit-box-shadow: inset 0px -1px 0px 0px #37383d;
- box-shadow: inset 0px -1px 0px 0px #37383d;
- 	-webkit-border-radius: 14px;
+	box-shadow: inset 0px -1px 0px 0px #37383d;
+	-webkit-border-radius: 14px;
 	-moz-border-radius: 14px;
 	border-radius: 14px;
 	border: 1px solid #2d2e33;
 }
 
 input:focus{
-outline:none;
-border: 1px solid #80AD31;
+	outline:none;
+	border: 1px solid #80AD31;
 }
 
 input[type="submit"]{
-	margin-top: 20px;
+	margin-top: 30px;
 	padding: 6px 25px;
-background: rgb(150,198,64); /* Old browsers */
-background: -moz-linear-gradient(top,  rgb(150,198,64) 0%, rgb(89,128,23) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(150,198,64)), color-stop(100%,rgb(89,128,23))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* IE10+ */
-background: linear-gradient(to bottom,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#96c640', endColorstr='#598017',GradientType=0 ); /* IE6-9 */
-	color: #101010;
+	background: rgb(150,198,64); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgb(150,198,64) 0%, rgb(89,128,23) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(150,198,64)), color-	stop(100%,rgb(89,128,23))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  rgb(150,198,64) 0%,rgb(89,128,23) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#96c640', endColorstr='#598017',GradientType=0 ); /* IE6-9 */
+	color: #25340a;
 	-webkit-box-shadow:  0px 1px 0px 0px #000, inset 0 1px 0 0 #b4d67a;
 	box-shadow: 0px 1px 0px 0px #000, inset 0 1px 0 0 #b4d67a;
-		-webkit-border-radius: 14px;
+	-webkit-border-radius: 14px;
 	-moz-border-radius: 14px;
 	border-radius: 14px;
 	border: none;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: bold;
+	text-shadow: 0px 1px 0px #b4d67a;
+	filter: dropshadow(color=#b4d67a, offx=0, offy=1);
+	
 }
+
+input[type="submit"]:hover,input[type="submit"]:focus{
+	background: rgb(89,128,23); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgb(89,128,23) 0%, rgb(150,198,64) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgb(89,128,23)), color-stop(100%,rgb(150,198,64))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgb(89,128,23) 0%,rgb(150,198,64) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgb(89,128,23) 0%,rgb(150,198,64) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgb(89,128,23) 0%,rgb(150,198,64) 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  rgb(89,128,23) 0%,rgb(150,198,64) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#598017', endColorstr='#96c640',GradientType=0 ); /* IE6-9 */
+	-webkit-box-shadow:  0px 1px 0px 0px #37383d, inset 0 1px 0 0 #000;
+	box-shadow: 0px 1px 0px 0px #37383d, inset 0 1px 0 0 #000;
+}
+
 
 h1{
 	text-align: center;
 	font-weight: normal;
 	color: #ccc;
-	 text-shadow: 0px 1px 2px #000000;
-	 filter: dropshadow(color=#000000, offx=0, offy=1);
-}
+	text-shadow: 0px 1px 2px #000000;
+	filter: dropshadow(color=#000000, offx=0, offy=1);
+	padding-bottom: 14px;
+	 
+	 }
 
 a, a:link, a:visited {
 	color: #80AD31;
