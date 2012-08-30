@@ -73,7 +73,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		uEvents::TriggerEvent('ShowDashboard');
 	}
 	public function UpdateHtaccess() {
-		$rc = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
+		$rc = PATH_REL_CORE;
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
 		$content = <<<FIN
@@ -110,11 +110,7 @@ FileETag MTime Size
 	RewriteCond %{REQUEST_FILENAME} -f
 	RewriteRule .* - [L]
 	
-	# Handle base UserDir
-	RewriteCond %{REQUEST_URI} ^(/~[^/]+)
-	RewriteRule .*	%1/{$rc}index.php [NE,L,QSA]
-	
-	RewriteRule .*	/{$rc}index.php [NE,L,QSA]
+	RewriteRule .*	{$rc}index.php [NE,L,QSA]
 </IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
