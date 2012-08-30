@@ -68,8 +68,6 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	}
 
 	public function RunModule() {
-		echo '<h1>Welcome to Dashboard</h1>';
-
 		uEvents::TriggerEvent('ShowDashboard');
 	}
 	public function UpdateHtaccess() {

@@ -202,6 +202,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 		timer_start('Run Module');
 		ob_start();
+		if ($this instanceof iAdminModule) echo '<h1>'.$this->GetTitle().'</h1>';
 		$result = $this->RunModule();
 		$c = ob_get_contents();
 		ob_end_clean();
