@@ -190,6 +190,7 @@ class uEmailer extends uDataModule {
 		return $failures;
 	}
 
+	private static $mailTransport = null;
 	public static function SendEmail($to,$subject,$content,$from=null,$attachments=null,$messageCallback=null) {
 		$to = self::ConvertEmails($to);
 		if (!$to || !$content) return array_keys($to);
@@ -197,19 +198,21 @@ class uEmailer extends uDataModule {
 		if (!$host) $host = 'localhost';
 		if (!$port) $port = 25;
 		
-		// setup mail transport
-		$mailTransport = Swift_MailTransport::newInstance();
-		// setup sendmail transport
-		$sendmailTransport = Swift_SendmailTransport::newInstance('sendmail -bs');
-		// setup smtp transport
-		$smtpTransport = Swift_SmtpTransport::newInstance($host, $port);
-		$user = modOpts::GetOption('smtp_user'); $pass = modOpts::GetOption('smtp_pass');
-		if ($user) $smtpTransport->setUsername($user)->setPassword($pass);
+		if (!self::$mailTransport) {
+			// setup mail transport
+			$mailTransport = Swift_MailTransport::newInstance();
+			// setup sendmail transport
+			$sendmailTransport = Swift_SendmailTransport::newInstance('sendmail -bs');
+			// setup smtp transport
+			$smtpTransport = Swift_SmtpTransport::newInstance($host, $port);
+			$user = modOpts::GetOption('smtp_user'); $pass = modOpts::GetOption('smtp_pass');
+			if ($user) $smtpTransport->setUsername($user)->setPassword($pass);
+			
+			// create failover transport
+			self::$mailTransport = Swift_FailoverTransport::newInstance(array($smtpTransport,$sendmailTransport,$mailTransport));
+		}
 		
-		// create failover transport
-		$transport = Swift_FailoverTransport::newInstance(array($smtpTransport,$sendmailTransport,$mailTransport));
-		
-		$mailer = Swift_Mailer::newInstance($transport);
+		$mailer = Swift_Mailer::newInstance(self::$mailTransport);
 		$message = Swift_Message::newInstance();
 		
 		$message->setSender(self::ConvertEmails(modOpts::GetOption('emailer_from')));
