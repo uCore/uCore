@@ -31,9 +31,6 @@ class adminLogout extends uBasicModule {
 }
 
 
-uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uUserLogin'),'checkLogin'),utopia::GetCurrentModule());
-uEvents::AddCallback('AfterInit',array(utopia::GetInstance('uUserLogin'),'CheckSession'));
-
 utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
 utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
 utopia::AddTemplateParser('login_status','uUserLogin::GetLoginStatus','');
@@ -53,6 +50,9 @@ class uUserLogin extends uDataModule {
 	}
 
 	public function SetupParents() {
+		uEvents::AddCallback('BeforeRunModule',array($this,'checkLogin'),utopia::GetCurrentModule());
+		uEvents::AddCallback('AfterInit',array($this,'CheckSession'));
+
 		$this->SetRewrite(true);
 	}
 	
@@ -104,22 +104,15 @@ class uUserLogin extends uDataModule {
 	}
 
 	public function checkLogin($object) {
-		// persistent, no login required
+		if (self::IsLoggedIn()) return;
 		if (flag_is_set($object->GetOptions(), PERSISTENT)) return;
-
-		// not logged in, require login
-		if (!self::IsLoggedIn()) {
-			$this->_RunModule();
-			return FALSE;
-		}
-
-		// has access
 		if (uEvents::TriggerEvent('CanAccessModule',$object) !== FALSE) return;
 
-		// show notice if current module
 		$parent = get_class($object);
+
 		if ($parent == utopia::GetCurrentModule() && $parent !== __CLASS__ && !AjaxEcho('window.location.reload();')) {
 			uNotices::AddNotice('Sorry, you do not have access to this feature.',NOTICE_TYPE_WARNING);
+			$this->_RunModule();
 		}
 		return FALSE;
 	}
