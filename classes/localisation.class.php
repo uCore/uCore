@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 define('LOCALE_LIST_TYPE_LANG_TERR',flag_gen('LOCALE_LIST_TYPE'));
 define('LOCALE_LIST_TYPE_LANG',flag_gen('LOCALE_LIST_TYPE'));
