@@ -173,7 +173,7 @@ class utopia {
 		$REQUESTED_URL = array_key_exists('HTTP_X_REWRITE_URL',$_SERVER) ? $_SERVER['HTTP_X_REWRITE_URL'] : $_SERVER['REQUEST_URI'];
 		$REQUESTED_URL = preg_replace('/\?.*/i','',$REQUESTED_URL);
 
-		$REQUESTED_URL = preg_replace('/^'.addcslashes(PATH_REL_ROOT,'/').'/','',$REQUESTED_URL);
+		$REQUESTED_URL = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$REQUESTED_URL);
 		$REQUESTED_URL = preg_replace('/^u\//','',$REQUESTED_URL);
 
 		$path = urldecode($REQUESTED_URL);
