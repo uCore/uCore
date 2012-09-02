@@ -12,8 +12,6 @@ if ($_REQUEST && get_magic_quotes_gpc()) $_REQUEST = utopia::stripslashes_deep($
 ob_start('utopia::output_buffer',2);
 register_shutdown_function('utopia::Finish');
 
-header('Access-Control-Allow-Origin: http://'.utopia::GetDomainName());
-
 uConfig::DefineConfig();
 uConfig::ValidateConfig();
 
@@ -47,6 +45,8 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 	timer_end('Init: '.$row['module_name']);
 }
 timer_end('Module Initialise');
+
+header('Access-Control-Allow-Origin: '.modOpts::GetOption('site_url'));
 
 uEvents::TriggerEvent('AfterInit');
 uEvents::TriggerEvent('InitComplete');

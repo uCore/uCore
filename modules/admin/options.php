@@ -28,6 +28,7 @@ class modOpts extends uDataModule {
 	}
 	public function SetupParents() {
 		self::AddOption('site_name','Site Name',NULL);
+		self::AddOption('site_url','Site URL',NULL,'http://'.$_SERVER['HTTP_HOST'].PATH_REL_ROOT);
 	}
 	public function RunModule() { }
 	public static $types = array();
