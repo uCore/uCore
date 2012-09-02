@@ -3,6 +3,7 @@ if (PHP_SAPI == "cli") {
 	$_SERVER['HTTP_HOST'] = 'cli';
 	$_SERVER['REQUEST_URI'] = $argv[1];
 	$_SERVER['SCRIPT_NAME'] = '/'.basename(dirname(__FILE__)).'/index.php';
+	$_SERVER['REMOTE_ADDR'] = 'cli';
 	putenv('HTTP_MOD_REWRITE=On');
 }
 
