@@ -1,4 +1,10 @@
 <?php
+if (PHP_SAPI == "cli") {
+	$_SERVER['HTTP_HOST'] = 'cli';
+	$_SERVER['REQUEST_URI'] = $argv[1];
+	putenv('HTTP_MOD_REWRITE=On');
+}
+
 //--  Charset
 define('CHARSET_ENCODING'        , 'utf-8');
 define('SQL_CHARSET_ENCODING'    , 'utf8');
