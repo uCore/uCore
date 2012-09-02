@@ -14,7 +14,7 @@ utopia::AddTemplateParser('const','utopia::parseConst');
 utopia::AddTemplateParser('domain','utopia::GetDomainName','');
 
 utopia::AddTemplateParser('home_url',PATH_REL_ROOT,'');
-utopia::AddTemplateParser('home_url_abs',rtrim('http://'.utopia::GetDomainName().PATH_REL_ROOT,'/'),'');
+utopia::AddTemplateParser('home_url_abs','utopia::GetSiteURL','');
 utopia::AddTemplateParser('inline','inline=true','');
 
 utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
@@ -1012,6 +1012,11 @@ class utopia {
 
 	static function GetDomainName() {
 		return $_SERVER['HTTP_HOST'];
+	}
+	static $siteurl = null;
+	static function GetSiteURL() {
+		if (!self::$siteurl) self::$siteurl = rtrim(modOpts::GetOption('site_url'),'/');
+		return self::$siteurl;
 	}
 
 	static function GetRelativePath($path) {
