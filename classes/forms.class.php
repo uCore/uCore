@@ -177,7 +177,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (!$currentOnly || get_class($this) == utopia::GetCurrentModule()) {
 			$url = $this->GetURL($_GET);
 			$checkurl = $_SERVER['REQUEST_URI'];
-			if (($this->isSecurePage && !utopia::IsRequestSecure()) || $checkurl !== $url) {
+			if (($this->isSecurePage && !utopia::IsRequestSecure()) || $checkurl !== urldecode($url)) {
 				$abs = '';
 				if ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') != $this->isSecurePage) {
 					$layer = 'http';
