@@ -2416,7 +2416,7 @@ abstract class uDataModule extends uBasicModule {
 
 		if (!$tableAlias) return FALSE; // cannot update a field that has no table
 
-		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return FALSE;
+		if (($this->fields[$fieldAlias]['options'] & PERSISTENT != PERSISTENT) && uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return FALSE;
 		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,$pkVal)) === FALSE) return FALSE;
 		
 		$oldPkVal = $pkVal;
