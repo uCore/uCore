@@ -5,6 +5,9 @@ if (PHP_SAPI == "cli") {
 	$_SERVER['SCRIPT_NAME'] = '/'.basename(dirname(__FILE__)).'/index.php';
 	$_SERVER['REMOTE_ADDR'] = 'cli';
 	putenv('HTTP_MOD_REWRITE=On');
+
+	$q = parse_url($_SERVER['REQUEST_URI'],PHP_URL_QUERY);
+	parse_str($q,$_GET);
 }
 
 //--  Charset
