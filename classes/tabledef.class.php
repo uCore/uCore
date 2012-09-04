@@ -304,7 +304,12 @@ abstract class uTableDef implements iUtopiaModule {
 			$alterArray[] = ' ADD UNIQUE (`'.$unq.'`)';
 		}
 
-		sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
+		// change engine?
+		$row = GetRow(sql_query("SHOW TABLE STATUS LIKE '$this->tablename'"));
+		if ($row && $row['Engine'] != $this->engine) {
+			sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
+		}
+		
 		array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
 		foreach ($otherArray as $qry) {
 			//echo $qry;
