@@ -52,6 +52,7 @@ abstract class uTableDef implements iUtopiaModule {
 	public $unique = array();
 	public $primary = array();
 	public $engine = NULL;
+	public $auto_increment = null;
 	public abstract function SetupFields();
 
 	private $isDisabled = false;
@@ -70,24 +71,28 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function SetPrimaryKey($name, $auto_increment = true) {
-		if (!isset($this->fields[$name])) return;
-		$this->primary[] = $name;
-		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) {
-			$this->fields[$name]['default'] = NULL;
-			$this->fields[$name]['extra'] = 'auto_increment';
+		if (!is_array($name)) {
+			if (isset($this->fields[$name]) && $this->fields[$name]['type'] == ftNUMBER && $auto_increment && $this->auto_increment === null) {
+				$this->fields[$name]['default'] = NULL;
+				$this->auto_increment = $name;
+			}
+			$name = array($name);
 		}
+		foreach ($name as $k=>$v) {
+			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
+		}
+		$this->primary = $name;
+
 	}
 	public function SetUniqueField($name) {
-		if (!isset($this->fields[$name])) return;
+		if (!is_array($name)) $name = array($name);
+		foreach ($name as $k=>$v) if (!isset($this->fields[$v])) unset($name[$k]);
 		$this->unique[] = $name;
 	}
-	public function SetIndexField($name, $auto_increment = false) {
-		if (!isset($this->fields[$name])) return;
+	public function SetIndexField($name) {
+		if (!is_array($name)) $name = array($name);
+		foreach ($name as $k=>$v) if (!isset($this->fields[$v])) unset($name[$k]);
 		$this->index[] = $name;
-		if ($this->fields[$name]['type'] == ftNUMBER && $auto_increment) {
-			$this->fields[$name]['default'] = NULL;
-			$this->fields[$name]['extra'] = 'auto_increment';
-		}
 	}
 
 	public function GetPrimaryKey() {
@@ -192,8 +197,13 @@ abstract class uTableDef implements iUtopiaModule {
 		$len = '';
 		if ($fieldData['type'] == ftTEXT || $fieldData['type'] == ftVARCHAR) $len = "({$fieldData['length']})";
 
+		$auto = '';
+		if ($this->auto_increment == $fieldName) {
+			$auto = 'AUTO_INCREMENT';
+			$default = 'NULL';
+		}
 
-		return "`$fieldName` $type$length {$fieldData['null']} $default {$fieldData['extra']} $comments $collate";
+		return "`$fieldName` $type$length {$fieldData['null']} $default $auto {$fieldData['extra']} $comments $collate";
 	}
 
 	public function Initialise() {
@@ -227,16 +237,6 @@ abstract class uTableDef implements iUtopiaModule {
 			$fullColumns = sql_query('SHOW FULL COLUMNS FROM `'.$this->tablename.'`',true);
 			$fullColumns = GetRows($fullColumns);
 
-/*			$fieldCheck = true;
-			// check fields
-			foreach ($this->fields as $fieldName => $info) {
-				$found = false;
-				foreach ($fullColumns as $row) {
-					if ($fieldName == $row['Field']) { $found = true; break; }
-				}
-				if (!$found) { $fieldCheck = false; break; }
-			}*/
-
 			// update table
 			$this->RefreshTable($fullColumns);
 		}
@@ -268,40 +268,18 @@ abstract class uTableDef implements iUtopiaModule {
 			if (strtolower($rows[$i]['Field']) === strtolower($fieldName)) { $row = $rows[$i]; break; }
 			
 			if ($row !== NULL) // field exists, "modify" it
-				$alterArray[] = "\nMODIFY $col_def";
+				$alterArray[] = "MODIFY $col_def";
 			else // field doesnt exist, either hasnt been renamed, or hasnt been created yet. -- NO RENAME YET
-				$alterArray[] = "\nADD $col_def";
+				$alterArray[] = "ADD $col_def";
 
 			// timestamps do not set their value correctly for previously created records if the default value is current_timestamp, we must set it now, to the default value
 			if ((strtolower($fieldData['type']) == 'timestamp') && (strtolower($fieldData['default']) == 'current_timestamp')) {
 				if ($fieldData['null'] == 'null')
-				$otherArray[] = "\nUPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` IS NULL";
+				$otherArray[] = "UPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` IS NULL";
 				else
-				$otherArray[] = "\nUPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` = 0";
+				$otherArray[] = "UPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` = 0";
 				//					sql_query($qry,true);
 			}
-		}
-
-/*		foreach ($rows as $row) {
-			if (strpos($row['Extra'],'auto_increment') !== FALSE && (!isset($this->fields[$row['Field']]) || strpos($this->fields[$row['Field']]['extra'],'auto_increment') === FALSE))
-				array_unshift($alterArray, 'MODIFY `'.$row['Field'].'` '.$row['Type']);
-			if ($row['Key'] === 'PRI') $currentPK = $row['Field'];
-		}*/
-
-		// drop all indexes
-		$indexResult = sql_query("SHOW INDEX FROM `$this->tablename`");
-		while ($indexRow = GetRow($indexResult)) {
-			if ($indexRow['Key_name'] === 'PRIMARY') continue;
-			array_unshift($alterArray,"\nDROP INDEX `".$indexRow['Key_name']."`");
-		}
-		$alterArray = array_unique($alterArray);
-
-		$alterArray[] = ' DROP PRIMARY KEY, ADD PRIMARY KEY (`'.implode('`,`',$this->primary).'`)';
-		if ($this->index) foreach ($this->index as $idx) {
-			$alterArray[] = ' ADD INDEX (`'.$idx.'`)';
-		}
-		if ($this->unique) foreach ($this->unique as $unq) {
-			$alterArray[] = ' ADD UNIQUE (`'.$unq.'`)';
 		}
 
 		// change engine?
@@ -309,12 +287,66 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($row && $row['Engine'] != $this->engine) {
 			sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
 		}
+
+		$idx = array(); $unq = array();
+		$indexes = GetRows(sql_query("SHOW INDEX FROM `$this->tablename`"));
+		foreach ($indexes as $v) {
+			if ($v['Key_name'] == 'PRIMARY') {
+				$pri[] = $v['Column_name'];
+			} else if ($v['Non_unique'] == '0') {
+				$unq[$v['Key_name']][] = $v['Column_name'];
+			} else {
+				$idx[$v['Key_name']][] = $v['Column_name'];
+			}
+		}
 		
+		$priDiff = array_merge(array_diff($this->primary,$pri),array_diff($pri,$this->primary));
+		if ($priDiff) {
+			$alterArray[] = ' DROP PRIMARY KEY, ADD PRIMARY KEY (`'.implode('`,`',$this->primary).'`)';
+		}
+
+		// remove indexes that no longer exist
+		if ($diff = self::keyDiff($idx,$this->index)) {
+			foreach ($diff as $k=>$v) {
+				array_unshift($alterArray,"DROP INDEX `$k`");
+			}
+		}
+
+		// add new indexes
+		if ($diff = self::keyDiff($this->index,$idx)) {
+			foreach ($diff as $f) {
+				$alterArray[] = 'ADD INDEX (`'.implode('`,`',$f).'`)';
+			}
+		}
+
+		// remove unique indexes that no longer exist
+		if ($diff = self::keyDiff($unq,$this->unique)) {
+			foreach ($diff as $k=>$v) {
+				array_unshift($alterArray,"DROP INDEX `$k`");
+			}
+		}
+
+		// add new unique indexes
+		if ($diff = self::keyDiff($this->unique,$unq)) {
+			foreach ($diff as $f) {
+				$alterArray[] = 'ADD UNIQUE (`'.implode('`,`',$f).'`)';
+			}
+		}
+
 		array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
 		foreach ($otherArray as $qry) {
-			//echo $qry;
 			sql_query($qry);
 		}
+	}
+	private static function keyDiff($arr1,$arr2) {
+		$diff = array();
+		foreach ($arr1 as $k=>$v) {
+			foreach ($arr2 as $kk => $vv) {
+				if ($v == $vv) continue(2);
+			}
+			$diff[$k] = $v;
+		}
+		return $diff;
 	}
 	
 	private function CreateTable() {
