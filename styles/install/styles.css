@@ -3,7 +3,7 @@ green: #8CC63F / #80AD31
 */
 
 body {
-	text-align:left !important;
+	text-align:center;
 	background-repeat: repeat;
 	background-image: url(images/grey-bg.jpg);
 	margin:50px auto;
@@ -17,7 +17,7 @@ body {
 	margin: 0 auto;
 }
 
-table{
+table {
 	margin: 0 auto;
 }
 
@@ -26,10 +26,6 @@ td {
 	text-align: left;
 	height: 36px;
 	white-space: nowrap;
-}
-
-form {
-	text-align: center;
 }
 
 .inputtype, input{
@@ -89,13 +85,13 @@ input[type="submit"]:hover,input[type="submit"]:focus{
 }
 
 
-h1{
+h1,h2{
 	text-align: center;
 	font-weight: normal;
 	color: #ccc;
 	text-shadow: 0px 1px 2px #000000;
 	filter: dropshadow(color=#000000, offx=0, offy=1);
-	padding-bottom: 14px;
+	padding: 14px 0;
 }
 
 a, a:link, a:visited {
