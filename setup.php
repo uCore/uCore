@@ -94,7 +94,6 @@ class uConfig {
 			}
 		}
 
-		if ($showConfig) self::ShowConfig();
 		try {
 			sql_query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
 		} catch (Exception $e) {
@@ -103,8 +102,13 @@ class uConfig {
 
 		$changed = false;
 		foreach (self::$configVars as $key => $info) {
-			if (isset($info['notice'])) self::ShowConfig();
+			if (isset($info['notice'])) $showConfig = true;
 			if (!isset(self::$oConfig[$key]) || self::$oConfig[$key] !== constant($key)) $changed = true;
+		}
+
+		if ($showConfig) {
+			if (!file_exists(PATH_ABS_CONFIG)) self::ShowConfig();
+			self::DownMaintenance();
 		}
 		
 		if ($changed) self::SaveConfig();
@@ -162,5 +166,18 @@ FIN;
 		$_SESSION['__config_validate'] = true;
 		echo '</table><input type="submit" value="Make It So!"></form>';
 		if (!self::$isValid) utopia::Finish();
+	}
+	static function DownMaintenance() {
+		$rc = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
+		utopia::UseTemplate($rc.'styles/install');
+
+		header("HTTP/1.0 503 Service Unavailable",true,503);
+		utopia::SetTitle('Website Down For Maintenance');
+		echo '<h1>We Will Be Back Soon</h1>';
+		echo '<p>We are currently unavailable while we make upgrades to improve our service to you.  We&#39;ll return very soon.</p>';
+		echo '<p>We apologise for the inconvenience and appreciate your patience.<p>';
+		echo '<h2>Thank you!</h2>';
+
+		utopia::Finish();
 	}
 }
