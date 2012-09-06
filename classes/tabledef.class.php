@@ -202,7 +202,6 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 
 		if ($current) {
-			if ($type == $current['Type']) $type = NULL;
 			if ($null == 'null' && $current['Null'] == 'YES') $null = NULL;
 			if ($null != 'null' && $current['Null'] == 'NO') $null = NULL;
 			if (strcasecmp($default,$current['Default'])===0) $default = NULL;
@@ -217,8 +216,9 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($comments) $comments = "COMMENT '$comments'";
 		if ($collate) $collate = "COLLATE '$collate'";
 
-		$data = array_filter(array($type,$null,$default,$extra,$comments,$collate,$position));
+		$data = array_filter(array($null,$default,$extra,$comments,$collate,$position));
 		if (!$data) return '';
+		array_unshift($data,$type);
 
 		return "`$fieldName` ".implode(' ',$data);
 	}
