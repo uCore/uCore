@@ -210,7 +210,7 @@ abstract class uTableDef implements iUtopiaModule {
 			if ($collate == $current['Collation']) $collate = NULL;
 		}
 		if ($default !== NULL) {
-			if ($default !== 'CURRENT_TIMESTAMP') $default = "'$default'";
+			if ($default !== 'CURRENT_TIMESTAMP' && !is_numeric($default)) $default = "'$default'";
 			$default = "DEFAULT $default";
 		}
 		if ($comments) $comments = "COMMENT '$comments'";
