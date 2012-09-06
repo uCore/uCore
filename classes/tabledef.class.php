@@ -182,28 +182,45 @@ abstract class uTableDef implements iUtopiaModule {
 		return FALSE;
 	}
 	
-	private function GetColDef($fieldName) {
+	private function GetColDef($fieldName,$current = null,$position = null) {
 		$fieldData = $this->fields[$fieldName];
-		$type = getSqlTypeFromFieldType($fieldData['type']);
-		$length = empty($fieldData['length']) ? '' : "({$fieldData['length']})";
+		$type = getSqlTypeFromFieldType($fieldData['type']).(empty($fieldData['length']) ? '' : "({$fieldData['length']})");
 		if ($fieldData['type'] == ftTIMESTAMP) {
-			if (strtolower($fieldData['default']) == 'current_timestamp') $default = " DEFAULT CURRENT_TIMESTAMP";
-			else $default = " DEFAULT 0";
+			if (strtolower($fieldData['default']) == 'current_timestamp') $default = 'CURRENT_TIMESTAMP';
+			else $default = "0";
 		} else
-			$default = $fieldData['default'] === NULL ? '' : "DEFAULT '{$fieldData['default']}'";
-		$comments = $fieldData['comments'] === NULL ? '' : "COMMENT '{$fieldData['comments']}'";
-		$collate = $fieldData['collation'] === NULL ? '' : "COLLATE '{$fieldData['collation']}'";
+			$default = $fieldData['default'] === NULL ? NULL : "{$fieldData['default']}";
+		$null = $fieldData['null'];
+		$comments = $fieldData['comments'];
+		$collate = $fieldData['collation'];
+		if (!in_array($fieldData['type'],array(ftVARCHAR,ftTEXT,ftLONGTEXT))) $collate = null;
 
-		$len = '';
-		if ($fieldData['type'] == ftTEXT || $fieldData['type'] == ftVARCHAR) $len = "({$fieldData['length']})";
-
-		$auto = '';
+		$extra = $fieldData['extra'];
 		if ($this->auto_increment == $fieldName) {
-			$auto = 'AUTO_INCREMENT';
-			$default = 'NULL';
+			$extra = trim('AUTO_INCREMENT '.$extra);
+			$default = null;
 		}
 
-		return "`$fieldName` $type$length {$fieldData['null']} $default $auto {$fieldData['extra']} $comments $collate";
+		if ($current) {
+			if ($type == $current['Type']) $type = NULL;
+			if ($null == 'null' && $current['Null'] == 'YES') $null = NULL;
+			if ($null != 'null' && $current['Null'] == 'NO') $null = NULL;
+			if (strcasecmp($default,$current['Default'])===0) $default = NULL;
+			if ($comments == $current['Comment']) $comments = NULL;
+			if (strcasecmp($extra, $current['Extra'])===0) $extra = NULL;
+			if ($collate == $current['Collation']) $collate = NULL;
+		}
+		if ($default !== NULL) {
+			if ($default !== 'CURRENT_TIMESTAMP') $default = "'$default'";
+			$default = "DEFAULT $default";
+		}
+		if ($comments) $comments = "COMMENT '$comments'";
+		if ($collate) $collate = "COLLATE '$collate'";
+
+		$data = array_filter(array($type,$null,$default,$extra,$comments,$collate,$position));
+		if (!$data) return '';
+
+		return "`$fieldName` ".implode(' ',$data);
 	}
 
 	public function Initialise() {
@@ -254,18 +271,20 @@ abstract class uTableDef implements iUtopiaModule {
 		$alterArray[] = "CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION;
 
 		// lets keep the sql querys to a minimum, get all the rows first, and process them locally.
-
 		$keys = array_keys($this->fields);
 		$count = -1;
 		foreach ($this->fields as $fieldName => $fieldData) {
 			$count++;
-			// build field
-			$position = $count==0 ? "FIRST" : 'AFTER `'.$keys[$count-1].'`';
-			$col_def = $this->GetColDef($fieldName).' '.$position;
 
 			$row = NULL;
 			for ($i = 0,$rowCount = count($rows); $i < $rowCount; $i++) // find if field is already in the table
 			if (strtolower($rows[$i]['Field']) === strtolower($fieldName)) { $row = $rows[$i]; break; }
+			
+			// build field
+			$position = null;
+			if ($count !== $i) $position = $count==0 ? 'FIRST' : 'AFTER `'.$keys[$count-1].'`';
+			$col_def = $this->GetColDef($fieldName,$row,$position);
+			if (!$col_def) continue;
 			
 			if ($row !== NULL) // field exists, "modify" it
 				$alterArray[] = "MODIFY $col_def";
@@ -288,6 +307,7 @@ abstract class uTableDef implements iUtopiaModule {
 			sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
 		}
 
+		// update all indexes and keys
 		$idx = array(); $unq = array();
 		$indexes = GetRows(sql_query("SHOW INDEX FROM `$this->tablename`"));
 		foreach ($indexes as $v) {
@@ -332,7 +352,8 @@ abstract class uTableDef implements iUtopiaModule {
 				$alterArray[] = 'ADD UNIQUE (`'.implode('`,`',$f).'`)';
 			}
 		}
-
+		
+		// apply changes
 		array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
 		foreach ($otherArray as $qry) {
 			sql_query($qry);
