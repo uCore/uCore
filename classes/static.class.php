@@ -918,6 +918,8 @@ class utopia {
 				}
 			}
 		}
+		$string = str_replace('%7B','{',$string);
+		$string = str_replace('%7D','}',$string);
 		return ($string !== $start);
 	}
 
