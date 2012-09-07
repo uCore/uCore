@@ -41,6 +41,8 @@ function getSqlTypeFromFieldType($fieldType) {
 			return 'longblob';
 		case ftUPLOAD:
 			return 'varchar(500)';
+		case ftBOOL:
+			return 'tinyint';
 		default:
 			return $fieldType;
 	}
@@ -80,18 +82,25 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 		foreach ($name as $k=>$v) {
 			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
+			$this->fields[$v]['null'] = SQL_NOT_NULL;
 		}
 		$this->primary = $name;
 
 	}
 	public function SetUniqueField($name) {
 		if (!is_array($name)) $name = array($name);
-		foreach ($name as $k=>$v) if (!isset($this->fields[$v])) unset($name[$k]);
+		foreach ($name as $k=>$v) {
+			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
+			$this->fields[$v]['null'] = SQL_NOT_NULL;
+		}
 		$this->unique[] = $name;
 	}
 	public function SetIndexField($name) {
 		if (!is_array($name)) $name = array($name);
-		foreach ($name as $k=>$v) if (!isset($this->fields[$v])) unset($name[$k]);
+		foreach ($name as $k=>$v) {
+			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
+			$this->fields[$v]['null'] = SQL_NOT_NULL;
+		}
 		$this->index[] = $name;
 	}
 
@@ -121,10 +130,9 @@ abstract class uTableDef implements iUtopiaModule {
 		$field['type'] = $type;
 		if ($length == NULL && $type == ftCURRENCY) $length = "10,2";
 		if ($length == NULL && $type == ftPERCENT) $length = "5,2";
+		if ($length == NULL && $type == ftNUMBER) $length = "11";
+		if ($type == ftBOOL) $length = "1";
 		$sqltype = getSqlTypeFromFieldType($type);
-		$field['length'] = $length;
-		$field['collation'] = (!stristr($sqltype, 'binary') && !stristr($sqltype, 'blob')) ? $collation : NULL;
-		$field['null'] = $null;
 
 		$zeroIfNull = array_flip(array(ftNUMBER,ftBOOL,ftDECIMAL,ftPERCENT,ftCURRENCY,ftTIMESTAMP,ftTIME));
 		$emptyIfNull = array();
@@ -133,8 +141,11 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($default === NULL && in_array($sqltype,$emptyIfNull))
 			$default = '';
 
+		$field['length'] = $length;
+		$field['null'] = $null;
 		$field['default'] = $default;
 		$field['extra'] = $extra;
+		$field['collation'] = (!stristr($sqltype, 'binary') && !stristr($sqltype, 'blob')) ? $collation : NULL;
 		$field['comments'] = $comments;
 
 		if ($type == ftFILE || $type == ftIMAGE) {
@@ -187,7 +198,7 @@ abstract class uTableDef implements iUtopiaModule {
 		$type = getSqlTypeFromFieldType($fieldData['type']).(empty($fieldData['length']) ? '' : "({$fieldData['length']})");
 		if ($fieldData['type'] == ftTIMESTAMP) {
 			if (strtolower($fieldData['default']) == 'current_timestamp') $default = 'CURRENT_TIMESTAMP';
-			else $default = "0";
+			else $default = "0000-00-00 00:00:00";
 		} else
 			$default = $fieldData['default'] === NULL ? NULL : "{$fieldData['default']}";
 		$null = $fieldData['null'];
@@ -200,14 +211,17 @@ abstract class uTableDef implements iUtopiaModule {
 			$extra = trim('AUTO_INCREMENT '.$extra);
 			$default = null;
 		}
-
+		
+		$changed = true;
 		if ($current) {
-			if ($null == 'null' && $current['Null'] == 'YES') $null = NULL;
-			if ($null != 'null' && $current['Null'] == 'NO') $null = NULL;
-			if (strcasecmp($default,$current['Default'])===0) $default = NULL;
-			if ($comments == $current['Comment']) $comments = NULL;
-			if (strcasecmp($extra, $current['Extra'])===0) $extra = NULL;
-			if ($collate == $current['Collation']) $collate = NULL;
+			$changed = false;
+			if ($type != $current['Type']) $changed = true;
+			if ($null == 'null' && $current['Null'] != 'YES') $changed = true;
+			if ($null != 'null' && $current['Null'] != 'NO') $changed = true;
+			if (strcasecmp($default,$current['Default'])!==0) $changed = true;
+			if ($comments != $current['Comment']) $changed = true;
+			if (strcasecmp($extra, $current['Extra'])!==0) $changed = true;
+			if ($collate != $current['Collation']) $changed = true;
 		}
 		if ($default !== NULL) {
 			if ($default !== 'CURRENT_TIMESTAMP' && !is_numeric($default)) $default = "'$default'";
@@ -216,9 +230,8 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($comments) $comments = "COMMENT '$comments'";
 		if ($collate) $collate = "COLLATE '$collate'";
 
-		$data = array_filter(array($null,$default,$extra,$comments,$collate,$position));
-		if (!$data) return '';
-		array_unshift($data,$type);
+		if (!$changed) return '';
+		$data = array_filter(array($type,$null,$default,$extra,$comments,$collate,$position));
 
 		return "`$fieldName` ".implode(' ',$data);
 	}
@@ -268,7 +281,6 @@ abstract class uTableDef implements iUtopiaModule {
 
 		$alterArray = array();
 		$otherArray = array();
-		$alterArray[] = "CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION;
 
 		// lets keep the sql querys to a minimum, get all the rows first, and process them locally.
 		$keys = array_keys($this->fields);
@@ -294,10 +306,9 @@ abstract class uTableDef implements iUtopiaModule {
 			// timestamps do not set their value correctly for previously created records if the default value is current_timestamp, we must set it now, to the default value
 			if ((strtolower($fieldData['type']) == 'timestamp') && (strtolower($fieldData['default']) == 'current_timestamp')) {
 				if ($fieldData['null'] == 'null')
-				$otherArray[] = "UPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` IS NULL";
+					$otherArray[] = "UPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` IS NULL";
 				else
-				$otherArray[] = "UPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` = 0";
-				//					sql_query($qry,true);
+					$otherArray[] = "UPDATE `$this->tablename` SET `$fieldName` = NOW() WHERE `$fieldName` = 0";
 			}
 		}
 
@@ -353,8 +364,12 @@ abstract class uTableDef implements iUtopiaModule {
 			}
 		}
 		
-		// apply changes
-		array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
+		if ($alterArray) {
+			array_unshift($alterArray,"CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION);
+			array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
+		}
+		if (!$otherArray) return;
+
 		foreach ($otherArray as $qry) {
 			sql_query($qry);
 		}
