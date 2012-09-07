@@ -146,4 +146,5 @@ ul.pagination li { list-style:none; float:left; }
 	overflow-y: scroll;
 	max-height: 200px;
 	white-space: nowrap;
+	z-index:99999999;
 }
