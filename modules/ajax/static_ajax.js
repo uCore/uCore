@@ -178,8 +178,8 @@ function RefreshTableSorters() {
 }
 
 function RefreshTables() {
-	$('.datalist TBODY TR:even').removeClass('ui-widget-header');
-	$('.datalist TBODY TR:odd').addClass('ui-widget-header');
+	$('TR:even','.datalist TBODY').removeClass('odd').addClass('even');
+	$('TR:odd','.datalist TBODY').removeClass('even').addClass('odd');
 }
 
 function UpdateSelectedLinks() {

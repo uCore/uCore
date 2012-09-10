@@ -11,6 +11,8 @@ input, select, textarea { margin:2px;
 .aw { width:auto }
 
 td { vertical-align: top }
+tr.odd { background-color: #ddd }
+
 
 th.sortable { cursor:pointer; }
 
