@@ -102,7 +102,7 @@ $(document).ready(function(){
 	$("<img>").attr("src", PATH_REL_CORE+'images/hourglass.png');
 	//$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
 
-	$('form').append('<input type="submit" style="width:0;height:0;border:0;padding:0;margin:0;float:left;" />');
+	$('form').append('<input type="submit" style="width:0;height:0;border:0;padding:0;margin:0;float:left;" value="" />');
 
 	$('li:first-child').addClass('first-child');
 	$('li:last-child').addClass('last-child');
