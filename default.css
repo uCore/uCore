@@ -45,7 +45,7 @@ img { border: none }
         zoom: 1; /* required for ie hasLayout */
 }
 
-.icon-document { background: url(images/document-icon.png) left center no-repeat; height:32px; line-height:32px; padding-left:36px; display: inline-block;}
+.icon-document { background: url(images/document-icon.png) left center no-repeat; min-height:32px; line-height:32px; padding-left:36px; display: inline-block;}
 
 .shadeRow { background-color:#e0e0e0; }
 .new-ident { background-image:url(images/newrec-ident.gif); background-position:center; background-repeat:no-repeat; width:25px}
