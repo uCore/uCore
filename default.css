@@ -102,7 +102,8 @@ ul.pagination li { list-style:none; float:left; }
 .inputtype { margin: 2px; padding:4px; box-sizing: border-box; border: 1px solid #aaa; background:white; color:#362B36; height:24px; line-height:24px; }
 .inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
 .inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
-.inputtype-checkboxlist .inputtype.inputtype-checkbox { float:none; padding:0; margin-right:5px; }
+.inputtype-checkboxlist .inputtype.inputtype-checkbox { float:none; padding:0; margin-right:5px; height:auto; line-height:normal; }
+.inputtype-textarea { height:6em; line-height:normal; }
 
 .layoutDetailSection .inputtype { width:300px; }
 .layoutDetailSection .inputtype.inputtype-radio { min-width:0; width:auto; }
