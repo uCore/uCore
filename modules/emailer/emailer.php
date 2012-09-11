@@ -117,7 +117,7 @@ class uEmailer extends uDataModule {
 		modOpts::AddOption('smtp_port','SMTP Port','Emails',25);
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
-		modOpts::AddOption('emailer_from','Mailer From','Emails',utopia::GetDomainName().' Mailer <mailer@'.preg_replace('/^www./','',utopia::GetDomainName()).'>');
+		modOpts::AddOption('emailer_from','Mailer From','Emails','');
 		uEvents::AddCallback('AfterInit',array($this,'InitialiseTemplates'));
 	}
 
@@ -200,25 +200,24 @@ class uEmailer extends uDataModule {
 		
 		if (!self::$mailTransport) {
 			// setup mail transport
-			$mailTransport = Swift_MailTransport::newInstance();
-			// setup sendmail transport
-			$sendmailTransport = Swift_SendmailTransport::newInstance('sendmail -bs');
+			$mailTransport = Swift_MailTransport::newInstance('');
 			// setup smtp transport
 			$smtpTransport = Swift_SmtpTransport::newInstance($host, $port);
 			$user = modOpts::GetOption('smtp_user'); $pass = modOpts::GetOption('smtp_pass');
 			if ($user) $smtpTransport->setUsername($user)->setPassword($pass);
 			
 			// create failover transport
-			self::$mailTransport = Swift_FailoverTransport::newInstance(array($smtpTransport,$sendmailTransport,$mailTransport));
+			self::$mailTransport = Swift_FailoverTransport::newInstance(array($smtpTransport,$mailTransport));
 		}
 		
 		$mailer = Swift_Mailer::newInstance(self::$mailTransport);
 		$message = Swift_Message::newInstance();
 		
-		$message->setSender(self::ConvertEmails(modOpts::GetOption('emailer_from')));
-		
-		$from = $from ? $from : modOpts::GetOption('emailer_from');
-		if ($from) $message->setFrom(self::ConvertEmails($from));
+		$sender = self::ConvertEmails(modOpts::GetOption('emailer_from'));
+		$message->setSender($sender);
+
+		$from = $from ? self::ConvertEmails($from) : $sender;
+		if ($from) $message->setFrom($from);
 
 		if (!is_array($attachments)) $attachments = array($attachments);
 		if ($attachments) foreach ($attachments as $attachment) {
