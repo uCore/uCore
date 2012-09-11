@@ -395,8 +395,13 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 
 		$flds[] = 'PRIMARY KEY ('.implode(',',$this->primary).')';
-		if ($this->index) $flds[] = ' INDEX ('.implode(',',$this->index).')';
-		if ($this->unique) $flds[] = ' UNIQUE ('.implode(',',$this->unique).')';
+
+		foreach ($this->index as $f) {
+			$flds[] = ' INDEX (`'.implode('`,`',$f).'`)';
+		}
+		foreach ($this->unique as $f) {
+			$flds[] = ' UNIQUE (`'.implode('`,`',$f).'`)';
+		}
 
 		$qry .= join(",\n",$flds)."\n) CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION.";";
 		//echo "$qry\n";
