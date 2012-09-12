@@ -480,7 +480,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 utopia::AddTemplateParser('content',array(utopia::GetInstance('uCMS_Edit'),'getEditor'),'.*');
 uEvents::AddCallback('AfterRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'));
 
-utopia::AddTemplateParser('cms','uCMS_View::templateParser');
 uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'));
 class uCMS_View extends uSingleDataModule {
 	public function GetOptions() { return ALLOW_FILTER; }
@@ -500,16 +499,6 @@ class uCMS_View extends uSingleDataModule {
 		if (!$rec) return;
 		if (!utopia::UsingTemplate()) return;
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
-	}
-	static function templateParser($id) {
-		$obj = utopia::GetInstance('uCMS_View');
-		$rec = $obj->LookupRecord($id);
-		$content = $rec['content_published'];
-		if (isset($_GET['preview']) && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') !== FALSE)
-			$content = $rec['content'];
-		if ($rec['content_time'] == 0)
-			$content = $rec['content'];
-		return '<div class="cms-'.$id.'">{content}</div>';
 	}
 	public function GetURL($filters = NULL) {
 		if (is_array($filters) && array_key_exists('uuid',$filters)) unset($filters['uuid']);
@@ -674,7 +663,7 @@ class uCMS_View extends uSingleDataModule {
 		utopia::SetVar('cms_root_id',reset($path));
 		
 		utopia::SetDescription($rec['description']);
-		echo '{cms.'.$rec['cms_id'].'}';
+		echo '<div class="cms-'.$rec['cms_id'].'">{content}</div>';
 	}
 	
 	public function GetCmsParents($cms_id,$includeSelf=true) {
