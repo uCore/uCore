@@ -278,7 +278,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		return $preview.$publish.$revert;
 	}
 	
-	public function processWidget($field,$pkVal,$value) {
+	public function processWidget($originalValue,$pkVal,$value,$rec,$fieldName) {
 			// replace pragma with uWidgetDiv
 //			$value = preg_replace('/\{widget\.(.+)\}/Ui','<div class="uWidgetPlaceholder mceNonEditable" title="$0"><h1>$1</h1> options here (including delete) <input type="button" onclick="window.top.location = \'$0\'" value="EDIT"></div>',$value);
 
