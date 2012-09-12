@@ -1,6 +1,6 @@
 <?php
 error_reporting(-1);
-ini_set('display_errors','On');
+ini_set('display_errors','Off');
 set_error_handler('uErrorHandler::ThrowException');
 set_exception_handler('uErrorHandler::exception_handler');
 
@@ -17,7 +17,8 @@ class uErrorHandler {
 		$fullError = sprintf("<b>ERROR</b> [%s] %s<br />\n  Error on line %s in file %s<br />\n%s",$e->getCode(),$e->getMessage(),$e->getLine(),$e->getFile(),nl2br(htmlentities($e->getTraceAsString())));
 		DebugMail('Server Error: '.$e->getCode(),$fullError);
 
-		if (!AjaxEcho('alert("'.$fullError.'")')) echo $fullError;
+		$fullError = 'An error has occurred.  The system administrator has been notified.';
+		echo $fullError;
 		return $fullError;
 	}
 }
