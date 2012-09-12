@@ -18,7 +18,8 @@ class uErrorHandler {
 		DebugMail('Server Error: '.$e->getCode(),$fullError);
 		error_log($fullError);
 
-		$fullError = 'An error has occurred.  The system administrator has been notified.';
+		if (ini_get('display_errors') != 'on') $fullError = 'An error has occurred.  The system administrator has been notified.';
+		
 		echo $fullError;
 		return $fullError;
 	}
