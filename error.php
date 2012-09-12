@@ -16,6 +16,7 @@ class uErrorHandler {
 	static function EchoException($e) {
 		$fullError = sprintf("<b>ERROR</b> [%s] %s<br />\n  Error on line %s in file %s<br />\n%s",$e->getCode(),$e->getMessage(),$e->getLine(),$e->getFile(),nl2br(htmlentities($e->getTraceAsString())));
 		DebugMail('Server Error: '.$e->getCode(),$fullError);
+		error_log($fullError);
 
 		$fullError = 'An error has occurred.  The system administrator has been notified.';
 		echo $fullError;
