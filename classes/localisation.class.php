@@ -242,15 +242,16 @@ class uLocale implements ArrayAccess {
 		return self::$localeArray[$locale];
 	}
 
-	public function LocaleExists($locale,$string = null) {
+	public static function LocaleExists($locale,$string = null) {
 		if ($string) return isset(self::$localeArray[$locale][$string]);
 		return isset(self::$localeArray[$locale]);
 	}
 	// get selected language
-	public function FindLocale($string = null) {
+	public static function FindLocale($string = null) {
 		// use specified language
-		if (isset($_SESSION['locale'])) $locale = $_SESSION['locale'];
-		if (self::LocaleExists($locale,$string)) return $locale;
+		if (isset($_GET['locale'])) $_SESSION['locale'] = $_GET['locale'];
+		if (isset($_SESSION['locale'])) return $_SESSION['locale'];
+		//if (self::LocaleExists($locale,$string)) return $locale;
 
 		// use Accept-Language header
 		$localeList = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
@@ -275,10 +276,10 @@ class uLocale implements ArrayAccess {
 		return 'en';
 	}
 	// override the $_SERVER['HTTP_ACCEPT_LANGUAGE'] setting
-	public function SetLocale($locale) {
+	public static function SetLocale($locale) {
 		$_SESSION['locale'] = $locale;
 	}
-	public function ListLocales() {
+	public static function ListLocales() {
 		return array_keys(self::$localeArray);
 	}
 
