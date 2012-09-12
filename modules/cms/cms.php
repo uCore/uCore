@@ -317,7 +317,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		if ($fieldAlias == 'cms_id' && !$newValue) return;
-		if ($pkVal == NULL && $fieldAlias == 'title') $this->UpdateField('cms_id',strtolower(UrlReadable($newValue)),$pkVal);
+		if ($pkVal == NULL && $fieldAlias == 'title') $this->UpdateField('cms_id',UrlReadable($newValue),$pkVal);
 		if ($fieldAlias == 'revert') {
 			$rec = $this->LookupRecord($pkVal);
 			$this->UpdateField('content',$rec['content_published'],$pkVal);
