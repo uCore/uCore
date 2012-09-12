@@ -394,7 +394,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		// get content
 		$rec = uCMS_View::findPage();
 		if(!$rec) return; // page not found
-		
+
 		$content = $rec['content_published'];
 		if ($rec['content_time'] == 0)
 			$content = $rec['content'];

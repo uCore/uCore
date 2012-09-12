@@ -788,7 +788,7 @@ class utopia {
 			$doc->validateOnParse = true;
 
 			try {
-				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.$template)) break;
+				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.utf8_decode($template))) break;
 			} catch (Exception $e) { }
 			$doc->encoding = 'UTF-8';
 			
