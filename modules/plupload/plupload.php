@@ -11,7 +11,7 @@ var $jsVarName = {
     runtimes : 'html5,flash,browserplus,html4',
     chunk_size : '1mb',
     url : '$uploadPath',
-    flash_swf_url : '{$pathCore}modules/plupload/plupload.flash.swf'
+    flash_swf_url : '{$pathCore}modules/plupload/lib/plupload.flash.swf'
 };
 FIN
 		);
