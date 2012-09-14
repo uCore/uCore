@@ -107,10 +107,10 @@ ul.pagination li { list-style:none; float:left; }
 input.inputtype { padding-top:0; padding-bottom:0 }
 
 .layoutDetailSection .inputtype { width:300px; }
-.layoutDetailSection .inputtype.inputtype-radio { min-width:0; width:auto; }
-.layoutDetailSection .inputtype.inputtype-button { min-width:0; width:auto; }
-.layoutDetailSection .inputtype.inputtype-submit { min-width:0; width:auto; }
-.layoutDetailSection .inputtype.inputtype-reset { min-width:0; width:auto; }
+.inputtype.inputtype-radio { min-width:0; width:auto; height:auto; }
+.inputtype.inputtype-button { min-width:0; width:auto; height:auto; }
+.inputtype.inputtype-submit { min-width:0; width:auto; height:auto; }
+.inputtype.inputtype-reset { min-width:0; width:auto; height:auto; }
 
 .inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0 }
 
