@@ -70,20 +70,21 @@ class jqFileManager {
 		if ($newpath != $path) $newpath = self::ResolvePath($newpath);
 		return $newpath;
 	}
-
-	static function AddIcon($path, $title='',$folder=false,$icon='') {
-		self::$data[] = array('path'=>$path,'title'=>$title,'type'=>$folder,'icon'=>$icon);
-	}
-	static function ProcessAjax($rootPath,$deleteCallback=null,$renameCallback=null,$iconCallback=null) {
+	static function GetPath($rootPath) {
 		$pMod = array_key_exists('path',$_POST) ? $_POST['path'] : '';
 		$path = $rootPath.'/'.trim($pMod,'/');
 		$path = self::ResolvePath($path);
 		$path = rtrim($path,'/');
 		if (strpos($path,$rootPath)===FALSE) $path = $rootPath;
+		return $path;
+	}
 
+	static function AddIcon($path, $title='',$folder=false,$icon='') {
+		self::$data[] = array('path'=>$path,'title'=>$title,'type'=>$folder,'icon'=>$icon);
+	}
+	static function ProcessAjax($rootPath,$deleteCallback=null,$renameCallback=null,$iconCallback=null) {
+		$path = self::GetPath($rootPath);
 		if (!file_exists($path)) mkdir($path,octdec('0777'),true);
-
-		if (isset($_FILES['file'])) return self::ProcessUpload($path);
 
 		if (isset($_POST['delete'])) {
 			$from = self::ResolvePath($path.'/'.$_POST['delete']);
@@ -145,11 +146,10 @@ class jqFileManager {
 	}
 
 	public static function ProcessUpload($path) {
-		if (ob_get_level()) ob_end_clean();
 		$destination = realpath($path);
 
 		// HTTP headers for no cache etc
-		header('Content-type: application/json; charset=UTF-8');
+		header('Content-type: text/html; charset=UTF-8');
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 		header("Cache-Control: no-store, no-cache, must-revalidate");

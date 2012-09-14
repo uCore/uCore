@@ -38,6 +38,7 @@ FIN
 		header("X-Robots-Tag: noindex", true);
 
 		utopia::CancelTemplate();
+		if (isset($_GET['upload'])) return jqFileManager::ProcessUpload(jqFileManager::GetPath(PATH_UPLOADS));
 		jqFileManager::ProcessAjax(PATH_UPLOADS,null,'fileManager::OnRename','fileManager::GetIcon');
 	}
 	static function GetIcon($path) {
