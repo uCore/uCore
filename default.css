@@ -150,5 +150,5 @@ input.inputtype { padding-top:0; padding-bottom:0 }
 	overflow-y: scroll;
 	max-height: 200px;
 	white-space: nowrap;
-	z-index:99999999;
+	z-index:99999999 !important;
 }
