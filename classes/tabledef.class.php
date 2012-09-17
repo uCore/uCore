@@ -428,7 +428,7 @@ abstract class uTableDef implements iUtopiaModule {
 			case ftCURRENCY:	// currency
 			case ftPERCENT:		// percent
 			case ftFLOAT:		// float
-			case ftDECIMAL:		$newValue = floatval(preg_replace('/[^0-9\.-]/','',$newValue)); break;
+			case ftDECIMAL:		$newValue = floatval($newValue); break;
 			case ftBOOL:		// bool
 			case ftNUMBER:		$newValue = ($newValue==='' ? '' : intval(preg_replace('/[^0-9\.-]/','',$newValue))); break;
 		}
