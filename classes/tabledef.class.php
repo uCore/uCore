@@ -421,10 +421,16 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($fieldType != ftRAW) $newValue = mysql_real_escape_string($newValue);
 		if ($newValue) switch ($fieldType) {      //"STR_TO_DATE('$newValue','".FORMAT_DATE."')"; break;
 			case ftRAW: break;
-			case ftDATE:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('".fixdateformat($newValue)."','".FORMAT_DATE."'))"; break;
-			case ftTIME:		$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('$newValue','".FORMAT_TIME."'))"; break;
+			case ftDATE:
+			case ftTIME:
 			case ftDATETIME:	// datetime
-			case ftTIMESTAMP:	$newValue = $newValue == '' ? 'NULL' : "(STR_TO_DATE('$newValue','".FORMAT_DATETIME."'))"; break;
+			case ftTIMESTAMP:
+				$parsed = strptime($newValue,FORMAT_TIME);
+				if ($parsed===FALSE) $parsed = strptime($newValue,FORMAT_DATE);
+				if ($parsed===FALSE) $parsed = strptime($newValue,FORMAT_DATETIME);
+				if ($parsed!==FALSE) $parsed = mktime($parsed['tm_hour'], $parsed['tm_min'], $parsed['tm_sec'], 1 , $parsed['tm_yday'] + 1, $parsed['tm_year'] + 1900); 
+				else $parsed = strtotime($newValue);
+				$newValue = $newValue == '' ? 'NULL' : date('Y-m-d H:i:s',$parsed); break;
 			case ftCURRENCY:	// currency
 			case ftPERCENT:		// percent
 			case ftFLOAT:		// float
@@ -436,7 +442,7 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($newValue === '' || $newValue === NULL)
 			$newValue = 'NULL';
 		else {
-			$dontQuoteTypes = array(ftRAW,ftDATE,ftTIME,ftDATETIME,ftTIMESTAMP,ftCURRENCY,ftPERCENT,ftFLOAT,ftDECIMAL,ftBOOL,ftNUMBER);
+			$dontQuoteTypes = array(ftRAW,ftCURRENCY,ftPERCENT,ftFLOAT,ftDECIMAL,ftBOOL,ftNUMBER);
 			if (!in_array($fieldType,$dontQuoteTypes)) {
 				$newValue = "'$newValue'";
 			}
@@ -457,5 +463,9 @@ abstract class uTableDef implements iUtopiaModule {
 			$pkVal = $row['new_pk'];
 		}
 		elseif ($pkVal === NULL) $pkVal = mysql_insert_id();
+	}
+	public function LookupRecord($pkVal) {
+		$row = GetRow(sql_query('SELECT * FROM '.$this->tablename.' WHERE '.$this->GetPrimaryKey().' = \''.$pkVal.'\''));
+		return $row;
 	}
 }
