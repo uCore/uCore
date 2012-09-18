@@ -172,7 +172,7 @@ FIN;
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			$ret .= $listObj->GetDeleteButton($child['cms_id']);
 			$ret .= '</div>';
-			$ret .= htmlentities($child['title']).$info;
+			$ret .= $editObj->PreProcess('title',$child['title'],$child).$info;
 			$ret .= '</div>';
 			$ret .= self::GetChildren($child['children'],$child['cms_id']);
 			$ret .= '</li>';
