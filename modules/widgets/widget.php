@@ -260,11 +260,7 @@ class uCustomWidget implements iWidget {
 			
 			// get rows
 			$rows = array();
-			try {
-				$rows = $instance->GetRows();
-			} catch (Exception $e) {
-				uNotices::AddNotice('<p>There was a problem accessing the records, please check your filter and sorting options for invalid fields.</p>',NOTICE_TYPE_WARNING);
-			}
+			$rows = $instance->GetRows();
 		}
 
 		// process limit
