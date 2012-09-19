@@ -879,9 +879,9 @@ class utopia {
 		$start = $string;
 		
 		foreach (self::$templateParsers as $ident => $arr) {
-			if (preg_match_all('/{'.$ident.'}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
+			if (preg_match_all('/(%7B|{)'.$ident.'(}|%7D)/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
 				$searchArr = $matches[0];
-				$varsArr = isset($matches[1]) ? $matches[1] : false;
+				$varsArr = isset($matches[2]) ? $matches[2] : false;
 				foreach ($searchArr as $k => $search) {
 					if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
 					$searchLen = strlen($search);
@@ -918,8 +918,6 @@ class utopia {
 				}
 			}
 		}
-		$string = str_replace('%7B','{',$string);
-		$string = str_replace('%7D','}',$string);
 		return ($string !== $start);
 	}
 
