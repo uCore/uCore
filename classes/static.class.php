@@ -716,7 +716,7 @@ class utopia {
 		if (class_exists('DOMDocument')) {
 			$doc = new DOMDocument();
 			try {
-				$doc->loadHTML(get_include_contents($templatefile));
+				$doc->loadHTML(file_get_contents($templatefile));
 			} catch (Exception $e) { }
 			foreach ($doc->getElementsByTagName('link') as $link) {
 				if ($link->getAttribute('rel') == 'stylesheet') {
