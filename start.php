@@ -23,6 +23,7 @@ define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate
 if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
 
 function runtimeHeader($startTime) {
+	error_reporting(0);
 	$endTime = microtime(true);
 	header('X-Runtime: '.($endTime-$startTime));
 }
