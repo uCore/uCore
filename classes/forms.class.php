@@ -354,19 +354,8 @@ abstract class uBasicModule implements iUtopiaModule {
 	 * @param (bool|function) $requireLogin Either True or False for admin login, or a custom callback function.
 	 * @return bool
 	 */
-	public function RegisterAjax($ajaxIdent, $callback, $requireAdmin = null) {
-		if (!array_key_exists('ajax',$GLOBALS)) $GLOBALS['ajax'] = array();
-		if (array_key_exists($ajaxIdent,$GLOBALS['ajax'])) {
-			//ErrorLog(get_class($this)." cannot register ajax identifier '$ajaxIdent' because it is already registered.");
-			return FALSE;
-		}
-
-		$GLOBALS['ajax'][$ajaxIdent]['callback'] = $callback;
-		$GLOBALS['ajax'][$ajaxIdent]['class'] = get_class($this);
-		if ($requireAdmin === NULL)
-		$requireAdmin = $this instanceof iAdminModule;
-		$GLOBALS['ajax'][$ajaxIdent]['req_admin'] = $requireAdmin;
-		return true;
+	public function RegisterAjax($ajaxIdent, $callback) {
+		return utopia::RegisterAjax($ajaxIdent, $callback);
 	}
 
 	public function GetVar($varname) {

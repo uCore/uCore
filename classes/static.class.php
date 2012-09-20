@@ -1032,6 +1032,29 @@ class utopia {
 		return $path;
 	}
 
+	private static $ajaxFunctions = array();
+	static function RegisterAjax($ajaxIdent, $callback) {
+		if (array_key_exists($ajaxIdent,self::$ajaxFunctions)) {
+			//ErrorLog(get_class($this)." cannot register ajax identifier '$ajaxIdent' because it is already registered.");
+			return FALSE;
+		}
+
+		self::$ajaxFunctions[$ajaxIdent]['callback'] = $callback;
+		return true;
+	}
+	static function RunAjax($ajaxIdent) {
+		if (!array_key_exists($ajaxIdent,self::$ajaxFunctions)) die("Cannot perform ajax request, '$ajaxIdent' has not been registered.");
+
+		$callback	= self::$ajaxFunctions[$ajaxIdent]['callback'];
+
+		// validate
+		if (!is_callable($callback)) die("Callback function for ajax method '$ajaxIdent' does not exist.");
+
+		call_user_func($callback);
+
+		utopia::Finish(); // commented why ?
+		die();
+	}
 	static function AjaxUpdateElement($eleName,$html) {
 		if (is_object($html)) return;
     	$enc = base64_encode($html);

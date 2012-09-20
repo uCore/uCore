@@ -31,7 +31,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 			uAdminBar::AddItem('<a class="dashboard-link" href="'.PATH_REL_CORE.'">Dashboard</a>',FALSE,-100);
 
 		$this->AddParent('/');
-		$this->RegisterAjax('toggleT',array($this,'toggleT'));
+		utopia::RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->UpdateHtaccess();
 	}
 	public function optimizeTables() {

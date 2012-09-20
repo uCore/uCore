@@ -88,7 +88,7 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 		$this->AddField('block_type','block_type','blocks','Type');
 	}
 	public function SetupParents() {
-		$this->RegisterAjax('getWidgets',array($this,'getWidgets'));
+		utopia::RegisterAjax('getWidgets',array($this,'getWidgets'));
 		//$this->AddParentCallback('uCMS_List',array($this,'ShowData'));
 		$this->AddParent('/');
 	}

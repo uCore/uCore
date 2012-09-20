@@ -54,21 +54,7 @@ uEvents::TriggerEvent('InitComplete');
 // process ajax function
 if (array_key_exists('__ajax',$_REQUEST)) {
 	$ajaxIdent	= $_REQUEST['__ajax'];
-	if (!array_key_exists('ajax',$GLOBALS) || !array_key_exists($ajaxIdent,$GLOBALS['ajax'])) die("Cannot perform ajax request, '$ajaxIdent' has not been registered.");
-
-	$callback	= $GLOBALS['ajax'][$ajaxIdent]['callback'];
-	$class		= $GLOBALS['ajax'][$ajaxIdent]['class'];
-
-	// validate
-	if (!is_callable($callback))
-	die("Callback function for ajax method '$ajaxIdent' does not exist.");
-
-	//RunModule();
-	//ErrorLog(print_r($callback,true));
-	call_user_func($callback);
-	//echo utopia::GetVar('error_log');
-	utopia::Finish(); // commented why ?
-	die();
+	utopia::RunAjax($ajaxIdent);
 }
 
 if (!isset($_GET['inline'])) utopia::UseTemplate();

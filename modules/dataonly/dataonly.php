@@ -6,9 +6,9 @@ class uDataOnly extends uBasicModule {
 	public function GetOptions() { return DEFAULT_OPTIONS | NO_NAV | PERSISTENT_PARENT; }
 
 	public function SetupParents() {
-		$this->RegisterAjax('excel',array($this,'excel'));
-		$this->RegisterAjax('print',array($this,'showPrint'));
-		$this->RegisterAjax('raw',array($this,'rawOutput'));
+		utopia::RegisterAjax('excel',array($this,'excel'));
+		utopia::RegisterAjax('print',array($this,'showPrint'));
+		utopia::RegisterAjax('raw',array($this,'rawOutput'));
 	}
 
 	public static function inject($module) {

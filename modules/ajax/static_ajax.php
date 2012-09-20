@@ -11,15 +11,15 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public function SetupParents() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
 		// register ajax
-		$this->RegisterAjax('updateField','internalmodule_StaticAjax::UpdateField');
-		$this->RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
-		$this->RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
-		$this->RegisterAjax('showQueries','internalmodule_StaticAjax::showQueries');
-		$this->RegisterAjax('getImage','internalmodule_StaticAjax::getImage');
-		$this->RegisterAjax('getFile','internalmodule_StaticAjax::getFile');
-		$this->RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
-		$this->RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
-		$this->RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
+		utopia::RegisterAjax('updateField','internalmodule_StaticAjax::UpdateField');
+		utopia::RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
+		utopia::RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
+		utopia::RegisterAjax('showQueries','internalmodule_StaticAjax::showQueries');
+		utopia::RegisterAjax('getImage','internalmodule_StaticAjax::getImage');
+		utopia::RegisterAjax('getFile','internalmodule_StaticAjax::getFile');
+		utopia::RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
+		utopia::RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
+		utopia::RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
 	}
 
 	public function RunModule() { }

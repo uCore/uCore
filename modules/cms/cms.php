@@ -59,7 +59,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		modOpts::AddOption('default_template','Default Template',NULL,$dTemplate,itCOMBO,$nTemplates);
 
 		$this->AddParent('/');
-		$this->RegisterAjax('reorderCMS',array($this,'reorderCMS'));
+		utopia::RegisterAjax('reorderCMS',array($this,'reorderCMS'));
 		
 		uUserRoles::LinkRoles('Page Editor',array('uCMS_List','uCMS_Edit'));
 	}
@@ -385,7 +385,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		return '<span class="btn" onclick="ChooseWidget()">Insert Widget</span>';
 	}
 	public function SetupParents() {
-		$this->RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
+		utopia::RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 		$this->AddParent('uCMS_List','cms_id');
 		$this->AddChild('uCMS_View','cms_id','link');
 	}

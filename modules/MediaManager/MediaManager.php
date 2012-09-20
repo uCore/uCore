@@ -5,7 +5,7 @@ class fileManager extends uBasicModule implements iAdminModule {
 	function GetTitle() { return 'Media'; }
 	function SetupParents() {
 		$this->AddParent('/');
-		$this->RegisterAjax('fileManagerAjax',array($this,'ajax'));
+		utopia::RegisterAjax('fileManagerAjax',array($this,'ajax'));
 		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
 
 		uJavascript::IncludeFile(jqFileManager::GetPathJS());
