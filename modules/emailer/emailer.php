@@ -232,6 +232,7 @@ class uEmailer extends uDataModule {
 		$message->setBody($content, ($content == strip_tags($content)) ? 'text/plain' : 'text/html');
 
 		$message->setTo($to);
+		$failures = array();
 		try {
 			if (is_callable($messageCallback)) call_user_func_array($messageCallback,array($message));
 			$mailer->send($message,$failures);
