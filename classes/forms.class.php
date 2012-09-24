@@ -2356,7 +2356,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function UploadFile($fieldAlias,$fileInfo,&$pkVal = NULL) {
 		//$allowedTypes = $this->GetFieldProperty($fieldAlias, 'allowed');
-		if (uEvents::TriggerEvent('BeforeUploadFile',$this,array($fieldAlias,$fileInfo,$pkVal)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('BeforeUploadFile',$this,array($fieldAlias,$fileInfo,&$pkVal)) === FALSE) return FALSE;
 		
 		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); return; }
 		$type = getSqlTypeFromFieldType($this->GetFieldType($fieldAlias));
@@ -2372,7 +2372,7 @@ abstract class uDataModule extends uBasicModule {
 			$this->UpdateField($fieldAlias,$value,$pkVal);
 		}
 		
-		if (uEvents::TriggerEvent('AfterUploadFile',$this,array($fieldAlias,$fileInfo,$pkVal)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('AfterUploadFile',$this,array($fieldAlias,$fileInfo,&$pkVal)) === FALSE) return FALSE;
 	}
 
 	public function OnNewRecord($pkValue) {}
@@ -2405,7 +2405,7 @@ abstract class uDataModule extends uBasicModule {
 		if (!$tableAlias) return FALSE; // cannot update a field that has no table
 
 		if (($this->fields[$fieldAlias]['options'] & PERSISTENT != PERSISTENT) && uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return FALSE;
-		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,$pkVal)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,&$pkVal)) === FALSE) return FALSE;
 		
 		$oldPkVal = $pkVal;
 		$fieldPK = $this->GetPrimaryKey($fieldAlias);
@@ -2517,7 +2517,7 @@ abstract class uDataModule extends uBasicModule {
 		$this->ResetField($fieldAlias,$pkVal);
 		if ($oldPkVal !== $pkVal) $this->ResetField($fieldAlias,$oldPkVal);
 		
-		if (uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldAlias,$newValue,$pkVal)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldAlias,$newValue,&$pkVal)) === FALSE) return FALSE;
 
 		return $ret;
 	}

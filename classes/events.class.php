@@ -41,7 +41,7 @@ class uEvents {
 		$process = array_unique(array($module,''));
 		
 		if (!is_array($eventData)) $eventData = array($eventData);
-		array_unshift($eventData,$object,$eventName);
+		array_unshift($eventData,&$object,$eventName);
 
 		// accumulate all handlers
 		$handlers = array();
