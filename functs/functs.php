@@ -479,17 +479,6 @@ function ProtectedScript() {
 
 // Hook Event code within uBasicModule
 
-function TriggerEvent($eventName) {
-	if (!array_key_exists('events',$GLOBALS)) return;
-	if (!array_key_exists($eventName,$GLOBALS['events'])) return;
-	$args = array_slice(func_get_args(),1);
-	foreach ($GLOBALS['events'][$eventName] as $fullName) {
-		list($module,$funcName) = explode('.',$fullName);
-		$obj = utopia::GetInstance($module);
-		$obj->$funcName($args);
-	}
-}
-
 function unserializesession($data) {
 	$vars=preg_split(
              '/([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)\|/',

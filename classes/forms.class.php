@@ -2843,7 +2843,7 @@ abstract class uListDataModule extends uDataModule {
 			}
 		}
 
-		TriggerEvent('OnShowDataList');
+		uEvents::TriggerEvent('OnShowDataList',$this);
 		//		LoadChildren(get_class($this));
 		// first draw header for list
 		//		$fl = (flag_is_set($this->GetOptions(),ALLOW_FILTER)) ? ' filterable' : '';
@@ -3183,7 +3183,7 @@ abstract class uSingleDataModule extends uDataModule {
 		$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
 		$pager = '<div class="right">'.$pagination.'</div>';
 			
-		TriggerEvent('OnShowDataDetail');
+		uEvents::TriggerEvent('OnShowDataDetail',$this);
 
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE) && $row) {
 			$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
