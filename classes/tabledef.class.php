@@ -431,11 +431,11 @@ abstract class uTableDef implements iUtopiaModule {
 				if ($parsed!==FALSE) $parsed = mktime($parsed['tm_hour'], $parsed['tm_min'], $parsed['tm_sec'], 1 , $parsed['tm_yday'] + 1, $parsed['tm_year'] + 1900); 
 				else $parsed = strtotime($newValue);
 				$newValue = $newValue == '' ? 'NULL' : date('Y-m-d H:i:s',$parsed); break;
-			case ftCURRENCY:	// currency
-			case ftPERCENT:		// percent
 			case ftFLOAT:		// float
 			case ftDECIMAL:		$newValue = floatval($newValue); break;
 			case ftBOOL:		// bool
+			case ftPERCENT:		// percent
+			case ftCURRENCY:	// currency
 			case ftNUMBER:		$newValue = ($newValue==='' ? '' : intval(preg_replace('/[^0-9\.-]/','',$newValue))); break;
 		}
 
