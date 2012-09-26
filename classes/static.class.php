@@ -878,6 +878,9 @@ class utopia {
 	static function MergeVars(&$string) {
 		$start = $string;
 		
+		$pr = rtrim(PATH_REL_ROOT,'/');
+		$string = preg_replace('/'.preg_quote($pr.$pr,'/').'/',$pr,$string);
+		
 		foreach (self::$templateParsers as $ident => $arr) {
 			if (preg_match_all('/(%7B|{)'.$ident.'(}|%7D)/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
 				$searchArr = $matches[0];
