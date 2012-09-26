@@ -228,7 +228,9 @@ class uEmailer extends uDataModule {
 				$message->attach(Swift_Attachment::fromPath($attachment));
 		}
 
+		while (utopia::MergeVars($subject));
 		$message->setSubject($subject);
+		while (utopia::MergeVars($content));
 		$message->setBody($content, ($content == strip_tags($content)) ? 'text/plain' : 'text/html');
 
 		$message->setTo($to);
@@ -247,7 +249,6 @@ class uEmailer extends uDataModule {
 			if ($encode) $value = htmlspecialchars($value);
 			$text = str_replace('{'.$field.'}',str_replace("\n",'<w:br/>',$value),$text);
 		}
-		while (utopia::MergeVars($text));
 		return $text;
 	}
 
