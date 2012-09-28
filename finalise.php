@@ -1,5 +1,7 @@
 <?php
 
+utopia::OutputTemplate();
+
 if (isset($GLOBALS['timers']) && isset($_SESSION['admin_showT']) && $_SESSION['admin_showT'] === true) {
 	echo '<pre><table>';
 	foreach ($GLOBALS['timers'] as $name => $info) {
@@ -9,8 +11,6 @@ if (isset($GLOBALS['timers']) && isset($_SESSION['admin_showT']) && $_SESSION['a
 	}
 	echo '</table></pre>';
 }
-
-utopia::OutputTemplate();
 
 try { mysql_close(); } catch (Exception $e) {}
 
