@@ -355,7 +355,7 @@ class utopia {
 				if (is_array($possibleValues)) foreach ($possibleValues as $key => $val) {
 					if ($key === '') continue;
 					$selected = '';
-					if ($defaultValue !== '' && ($key == $defaultValue || $val == $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue)))) {
+					if ($defaultValue !== '' && ((is_array($defaultValue) && in_array($key,$defaultValue)) || (strcasecmp($key,$defaultValue) ===0))) {
 						$defaultExists = true;
 						$selected = ' selected="selected"';
 					}
