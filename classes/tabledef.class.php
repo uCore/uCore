@@ -433,7 +433,7 @@ abstract class uTableDef implements iUtopiaModule {
 				else $parsed = strtotime($newValue);
 				$newValue = $newValue == '' ? 'NULL' : date('Y-m-d H:i:s',$parsed); break;
 			case ftFLOAT:		// float
-			case ftDECIMAL:		$newValue = floatval($newValue); break;
+			case ftDECIMAL:		$l=setlocale(LC_ALL,'en_US'); $newValue = floatval($newValue); setlocale(LC_ALL,$l); break;
 			case ftBOOL:		// bool
 			case ftPERCENT:		// percent
 			case ftCURRENCY:	// currency
