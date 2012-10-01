@@ -30,6 +30,8 @@ define('SQL_NOT_NULL'		,'not null');
 define('TABLE_PREFIX',''); //uConfig::AddConfigVar('TABLE_PREFIX','Table Prefix','');
 define('MYSQL_ENGINE','MyISAM'); //uConfig::AddConfigVar('MYSQL_ENGINE','MySQL Engine','InnoDB',array('MyISAM','InnoDB'));
 
+interface iLinkTable {}
+
 function getSqlTypeFromFieldType($fieldType) {
 	switch ($fieldType) {
 		case ftCURRENCY:
@@ -415,11 +417,10 @@ abstract class uTableDef implements iUtopiaModule {
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldName,,$pkVal)\n"));
 		if ($fieldType === NULL) $fieldType = $this->fields[$fieldName]['type'];
 		
-		if (is_array($newValue))
-			$newValue = json_encode($newValue);
+		if (is_array($newValue)) $newValue = json_encode($newValue);
 		
 		if ($fieldType != ftRAW) $newValue = mysql_real_escape_string($newValue);
-		if ($newValue) switch ($fieldType) {      //"STR_TO_DATE('$newValue','".FORMAT_DATE."')"; break;
+		if ($newValue) switch ($fieldType) {
 			case ftRAW: break;
 			case ftDATE:
 			case ftTIME:

@@ -1075,8 +1075,11 @@ abstract class uDataModule extends uBasicModule {
 		$newTable['table']	= TABLE_PREFIX.$tableModule;
 		$newTable['pk']		= $tableObj->GetPrimaryKey();
 		$newTable['tModule']= $tableModule;
-		$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
+		
+		if (!preg_match('/_ufullconcat$/',$alias)) // don't add pk field for 'ufull' concat fields
+			$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
 		//$this->AddFilter('_'.$alias.'_pk',ctEQ,itNONE);
+		
 		if ($parent==NULL) {
 			if ($this->sqlTableSetup != NULL) {
 				ErrorLog('Can only have one base table');
@@ -1086,6 +1089,7 @@ abstract class uDataModule extends uBasicModule {
 
 			$this->AddField($this->GetPrimaryKeyTable(),$this->GetPrimaryKeyTable(),$alias);
 			$this->AddField('_module',"'".get_class($this)."'",$alias);
+			$this->AddGrouping($this->GetPrimaryKeyTable());
 			return;
 		} else {
 			$newTable['parent'] = $parent;
@@ -1116,6 +1120,9 @@ abstract class uDataModule extends uBasicModule {
 		} else {
 			// not found.. throw error
 			ErrorLog("Cannot find $parent");
+		}
+		if (is_a($tableModule,'iLinkTable',true) && !preg_match('/_ufullconcat$/',$alias)) {
+			$this->CreateTable($alias.'_ufullconcat', $tableModule, $parent, $joins, $joinType);
 		}
 	}
 
@@ -1622,40 +1629,20 @@ abstract class uDataModule extends uBasicModule {
 		 * field is ReplacePragma if field has "is_function" property, or starts with "(", single quote, or double quote
 		 * else, field is CONCAT
 		 */
-		
-		// first replace pragmas
-//		echo 'check for pragma: '.$fieldName;
-//		if (preg_match('/{[^}]+}/',$fieldName) > 0) { // has pragma code
-//			echo 'yes';
-//			$fieldName = ReplacePragma($fieldName, $fieldData['tablename']);
-//		}
-//		echo '<br>';
-    $chr1 = substr($fieldName,0,1);
-    if (!preg_match('/{[^}]+}/',$fieldData['field'])) {
-      if ($chr1 == '(' || $chr1 == "'" || $chr1 == '"')
-        $toAdd = $fieldData['field'];
-      else
-        $toAdd = "`{$fieldData['tablename']}`.`{$fieldData['field']}`";
-    } elseif ($this->GetFieldProperty($alias, 'is_function') || $chr1 == '(' || $chr1 == "'" || $chr1 == '"') {
+		 
+		$chr1 = substr($fieldName,0,1);
+		if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true)) {
+			$toAdd = 'GROUP_CONCAT(DISTINCT `'.$fieldData['tablename'].'_ufullconcat`.`'.$fieldName.'` SEPARATOR 0x1F)';
+		} elseif (!preg_match('/{[^}]+}/',$fieldData['field'])) {
+			if ($chr1 == '(' || $chr1 == "'" || $chr1 == '"')
+				$toAdd = $fieldData['field'];
+			else
+				$toAdd = "`{$fieldData['tablename']}`.`{$fieldData['field']}`";
+		} elseif ($this->GetFieldProperty($alias, 'is_function') || $chr1 == '(' || $chr1 == "'" || $chr1 == '"') {
 			$toAdd = ReplacePragma($fieldData['field'], $fieldData['tablename']);
-//		} elseif (preg_match('/{[^}]+}/',$fieldData['field']) > 0) { // has pragma code
-//			if (substr($fieldData['field'],0,1) === '{') // starts with a pragma, so assume we need to concat
-//				$toAdd = CreateConcatString($fieldData['field'], $fieldData['tablename']);
-//			else // doesnt start with a pragma, so it could well be a function, only replace the pragmas with the fields, dont make it concat
-//				$toAdd = ReplacePragma($fieldData['field'], $fieldData['tablename']);
 		} else {
-			// is it a date?
-			// is it a timestamp?
-			// use DATE_FORMAT
 			$toAdd = CreateConcatString($fieldName, $fieldData['tablename']);
-			//$flds[] = "$concat as $alias";
 		}
-//		switch ($this->GetFieldType($alias)) {
-//			case 'date': $toAdd = "IF($toAdd = 0,'',DATE_FORMAT($toAdd,'".FORMAT_DATE."'))"; break;
-//			case 'time': $toAdd = "IF($toAdd = 0,'',TIME_FORMAT($toAdd,'".FORMAT_TIME."'))"; break;
-//			case 'datetime':
-//			case 'timestamp': $toAdd = "IF($toAdd = 0,'',DATE_FORMAT($toAdd,'".FORMAT_DATETIME."'))"; break;
-//		}
 
 		return "$toAdd as `$alias`";
 	}
@@ -2135,6 +2122,7 @@ abstract class uDataModule extends uBasicModule {
 
 		$rows = array();
 		while (($row = mysql_fetch_assoc($dataset))) {
+			foreach ($row as $rk => $rv) if (strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
 			$rows[] = $row;
 		}
 		$this->filters = $fltrs;
@@ -2182,7 +2170,7 @@ abstract class uDataModule extends uBasicModule {
   // sends ARGS,originalValue,pkVal,processedVal
 	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
-		$value = mb_convert_encoding($value, 'HTML-ENTITIES', CHARSET_ENCODING);
+		if (is_string($value)) $value = mb_convert_encoding($value, 'HTML-ENTITIES', CHARSET_ENCODING);
 		$originalValue = $value;
 		if (isset($this->fields[$fieldName]['ismetadata'])) {
 			$value = utopia::jsonTryDecode($value);
@@ -2432,15 +2420,28 @@ abstract class uDataModule extends uBasicModule {
 		if (array_key_exists('parent',$tbl)) {
 			foreach ($tbl['joins'] as $fromField=>$toField) {
 				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) { // if the table join is linked to the parents primary key, then updated that record
+					$tableObj = utopia::GetInstance($table);
 					// find target PK value
 					$row = $this->LookupRecord($pkVal);
+					
+					// is link table?
+					if ($tableObj instanceof iLinkTable) {
+						if (!is_array($newValue)) $newValue = array($newValue);
+						// do link table stuff
+						// delete all where tofield is oldpk
+						sql_query('DELETE FROM `'.$tableObj->tablename.'` WHERE `'.$toField.'` = \''.$oldPkVal.'\'');
+						foreach ($newValue as $v) {
+							$n = null;
+							$tableObj->UpdateField($toField,$oldPkVal,$n); //set left
+							$tableObj->UpdateField($field,$v,$n); //set right
+						}
+						return true;
+					}
 					$preModPk = $pkVal;
 					$pkVal = $row[$this->GetPrimaryKeyField($fieldAlias)];
 					if ($pkVal === NULL) { // initialise a row if needed
-						$tableObj = utopia::GetInstance($table);
 						$tableObj->UpdateField($toField,$oldPkVal,$pkVal);
 					}
-					
 					break; // if linkFrom is the primary key of our main table then we don't update the parent table.
 				}
 			}
