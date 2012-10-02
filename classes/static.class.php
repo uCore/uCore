@@ -1295,30 +1295,33 @@ class utopia {
 
 		$page = isset($args[$pageKey]) ? $args[$pageKey] : 0;
 		echo '<ul class="pagination">';
-		if ($page > 0) {
+		if ($page > 0) { // previous
 			$args[$pageKey] = $page -1;
 			$rel = array('prev');
 			if (!$args[$pageKey]) unset($args[$pageKey]);
 			if ($page-1 == 0) $rel[] = 'first';
-			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">&lt; Previous</a></li>';
+			echo '<li class="previous"><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Previous</a></li>';
 		}
+		
+		$prespace = false; $postspace=false;
 		for ($i = 0; $i<$pages; $i++) {
 			$args[$pageKey] = $i;
 			$rel = array();
 			if (!$args[$pageKey]) unset($args[$pageKey]);
+			if ($i < $page-$spread && $i != 0) { if (!$prespace) echo '<li>...</li>'; $prespace = true; continue; }
+			if ($i > $page+$spread && $i != ($pages-1)) { if (!$postspace) echo '<li>...</li>'; $postspace = true; continue; }
 			if ($i == $page-1) $rel[] = 'prev';
 			if ($i == $page+1) $rel[] = 'next';
 			if ($i == 0) $rel[] = 'first';
 			if ($i == $pages-1) $rel[] = 'last';
-			if ($i < $page-$spread) continue;
-			if ($i > $page+$spread) continue;
 			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">'.($i+1).'</a></li>';
 		}
-		if ($page < $pages-1) {
+	
+		if ($page < $pages-1) { // next
 			$args[$pageKey] = $page +1;
 			$rel = array('next');
 			if ($page+1 == $pages-1) $rel[] = 'last';
-			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Next &gt;</a></li>';
+			echo '<li class="next"><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Next</a></li>';
 		}
 		echo '</ul>';
 		return $page+1;
