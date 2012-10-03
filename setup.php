@@ -77,33 +77,36 @@ class uConfig {
 	}
 	static $isValid = FALSE;
 	static function ValidateConfig() {
-		$showConfig = false;
-		foreach (self::$configVars as $key => $info) {
-			if (!defined($key)) {
-				$showConfig = true;
+		$showConfig = true;
+		if (self::$oConfig || $_POST) { // only validate config if there is a config to validate.
+			$showConfig = false;
+			foreach (self::$configVars as $key => $info) {
+				if (!defined($key)) {
+					$showConfig = true;
+				}
+				$val = defined($key) ? constant($key) : null;
+				if (($info['type'] & CFG_TYPE_PASSWORD) && empty($val)) {
+					$showConfig = true;
+					self::$configVars[$key]['notice'] = "Must not be empty.";
+				}
+				
+				if (($info['type'] & CFG_TYPE_PATH) && !is_dir(PATH_ABS_ROOT.$val)) {
+					$showConfig = true;
+					self::$configVars[$key]['notice'] = "Must be a valid directory.";
+				}
 			}
-			$val = defined($key) ? constant($key) : null;
-			if (($info['type'] & CFG_TYPE_PASSWORD) && empty($val)) {
-				$showConfig = true;
-				self::$configVars[$key]['notice'] = "Must not be empty.";
-			}
-			
-			if (($info['type'] & CFG_TYPE_PATH) && !is_dir(PATH_ABS_ROOT.$val)) {
-				$showConfig = true;
-				self::$configVars[$key]['notice'] = "Must be a valid directory.";
-			}
-		}
 
-		try {
-			sql_query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
-		} catch (Exception $e) {
-			self::$configVars['SQL_SERVER']['notice'] = $e->getMessage().' ('.$e->getCode().')';
-		}
+			try {
+				sql_query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
+			} catch (Exception $e) {
+				self::$configVars['SQL_SERVER']['notice'] = $e->getMessage().' ('.$e->getCode().')';
+			}
 
-		$changed = false;
-		foreach (self::$configVars as $key => $info) {
-			if (isset($info['notice'])) $showConfig = true;
-			if (!isset(self::$oConfig[$key]) || self::$oConfig[$key] !== constant($key)) $changed = true;
+			$changed = false;
+			foreach (self::$configVars as $key => $info) {
+				if (isset($info['notice'])) $showConfig = true;
+				if (!isset(self::$oConfig[$key]) || self::$oConfig[$key] !== constant($key)) $changed = true;
+			}
 		}
 
 		if ($showConfig) {
