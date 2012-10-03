@@ -27,7 +27,7 @@ class uEvents {
 		}
 		return $false;
 	}
-	public static function TriggerEvent($eventName,$object=null,$eventData=null) {
+	public static function TriggerEvent($eventName,$object=null,$eventData=array()) {
 		$module = null;
 		if (is_object($object)) $module = get_class($object);
 		if (is_string($object)) {
@@ -41,7 +41,7 @@ class uEvents {
 		$process = array_unique(array($module,''));
 		
 		if (!is_array($eventData)) $eventData = array($eventData);
-		array_unshift($eventData,&$object,$eventName);
+		$eventData = array_merge(array(&$object,$eventName),$eventData);
 
 		// accumulate all handlers
 		$handlers = array();
