@@ -411,7 +411,10 @@ abstract class uTableDef implements iUtopiaModule {
 
 	}
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
-	public function AddInputDate($fieldName = 'input_date') { $this->AddFieldArray($fieldName,ftTIMESTAMP,NULL,array('default'=>'CURRENT_TIMESTAMP')); }
+	public function AddInputDate($fieldName = 'input_date',$update=false) {
+		$this->AddFieldArray($fieldName,ftTIMESTAMP,NULL,array('default'=>'CURRENT_TIMESTAMP'));
+		if ($update) $this->SetFieldProperty($fieldName,'extra','ON UPDATE CURRENT_TIMESTAMP');
+	}
 
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldName,,$pkVal)\n"));
