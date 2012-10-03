@@ -2123,7 +2123,8 @@ abstract class uDataModule extends uBasicModule {
 		$rows = array();
 		while (($row = mysql_fetch_assoc($dataset))) {
 			foreach ($row as $rk => $rv) { // dont explode blob data
-				if ($this->GetFieldType($rk) !== ftFILE && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
+				$fieldData = $this->fields[$rk];
+				if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true) && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
 			}
 			$rows[] = $row;
 		}
