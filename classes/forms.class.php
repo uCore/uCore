@@ -2122,7 +2122,9 @@ abstract class uDataModule extends uBasicModule {
 
 		$rows = array();
 		while (($row = mysql_fetch_assoc($dataset))) {
-			foreach ($row as $rk => $rv) if (strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
+			foreach ($row as $rk => $rv) { // dont explode blob data
+				if ($this->GetFieldType($rk) !== ftFILE && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
+			}
 			$rows[] = $row;
 		}
 		$this->filters = $fltrs;
