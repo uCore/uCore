@@ -246,6 +246,7 @@ class uEmailer extends uDataModule {
 
 	public static function ReplaceData($pairs,$text,$encode=false) {
 		foreach ($pairs as $field=>$value) {
+			if (is_array($value)) $value = implode(', ',$value);
 			if ($encode) $value = htmlspecialchars($value);
 			$text = str_replace('{'.$field.'}',str_replace("\n",'<w:br/>',$value),$text);
 		}
