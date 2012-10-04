@@ -1127,6 +1127,10 @@ class utopia {
 
 	static function Cache_Output($data,$etag,$contentType,$filename='',$modified=0,$age=2592000,$disposition='inline') {
 		self::Cache_Check($etag,$contentType,$filename,$modified,$age,$disposition);
+		if (preg_match('/image\//i',$contentType)) {
+			while(ob_get_level()) ob_end_clean();
+			header('Content-Encoding: none');
+		}
 		echo $data;
 	}
 
