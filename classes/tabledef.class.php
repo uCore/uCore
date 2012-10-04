@@ -417,6 +417,7 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
+		uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldName,,$pkVal)\n"));
 		if ($fieldType === NULL) $fieldType = $this->fields[$fieldName]['type'];
 		
@@ -467,6 +468,7 @@ abstract class uTableDef implements iUtopiaModule {
 			$pkVal = $row['new_pk'];
 		}
 		elseif ($pkVal === NULL) $pkVal = mysql_insert_id();
+		uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 	}
 	public function LookupRecord($pkVal) {
 		$row = GetRow(sql_query('SELECT * FROM '.$this->tablename.' WHERE '.$this->GetPrimaryKey().' = \''.$pkVal.'\''));
