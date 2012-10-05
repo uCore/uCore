@@ -71,6 +71,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		uEvents::TriggerEvent('ShowDashboard');
 	}
 	public function UpdateHtaccess() {
+		if ($_SERVER['HTTP_HOST'] == 'cli') return; // don't rewrite htaccess for CLI
 		$rc = PATH_REL_CORE;
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
