@@ -809,6 +809,11 @@ abstract class uDataModule extends uBasicModule {
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
 		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field,$pkValue);
 
+		if (isset($this->fields[$field]['vtable']['parent']) && !is_a($this->fields[$field]['vtable']['tModule'],'iLinkTable',true) && $pkValue !== NULL) {
+			$rec = $this->LookupRecord($pkValue);
+			$defaultValue = $rec[$this->GetPrimaryKeyField($field)];
+		}
+
 		$prefix = NULL;
 
 		switch ($inputType) {
