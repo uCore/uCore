@@ -1163,7 +1163,7 @@ abstract class uDataModule extends uBasicModule {
 					$arr[$row[0]] = $row[0];
 				}
 			}
-		} elseif (($values===true || is_string($values)) && $this->fields[$aliasName]['vtable']) {
+		} elseif (($values===true || is_string($values)) && isset($this->fields[$aliasName]['vtable'])) {
 			$tbl = $this->fields[$aliasName]['vtable'];
 			$obj = utopia::GetInstance($tbl['tModule']);
 			$pk = $obj->GetPrimaryKey();
