@@ -1309,7 +1309,7 @@ abstract class uDataModule extends uBasicModule {
 			$this->includeMeta = true;
 			$this->AddField('__metadata','__metadata');
 		}
-		$this->AddField($name,$name,NULL,$visiblename,$inputtype,$values);
+		$this->AddField($name,"''",NULL,$visiblename,$inputtype,$values);
 		$this->fields[$name]['ismetadata'] = true;
 	}
 
@@ -1664,7 +1664,6 @@ abstract class uDataModule extends uBasicModule {
 		//		$tblInc = 1;
 
 		foreach ($this->fields as $alias => $fieldData) {
-			if (isset($fieldData['ismetadata'])) continue;
 			$str = $this->GetFieldLookupString($alias,$fieldData);
 			if (!empty($str)) $flds[] = $str;
 		}

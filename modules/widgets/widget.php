@@ -114,6 +114,8 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 			$obj = utopia::GetInstance('uWidgets');
 			$rec = $obj->LookupRecord($rec);
 			if (!$rec) return '';
+			$obj->InitInstance($rec['block_type']); // init and re-request
+			$rec = $obj->LookupRecord($rec['block_id']);
 		}
 		$content = '';
 		if ($rec['block_type'] && class_exists($rec['block_type'])) $content = call_user_func(array($rec['block_type'],'DrawData'),$rec);
