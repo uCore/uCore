@@ -9,9 +9,16 @@ class uCustomWidget implements iWidget {
 			$installed[$classname] = $classname;
 		}
 		$sender->AddMetaField('module','Data Source',itCOMBO,$installed);
-		$sender->AddField('content_info','"The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element a class of _r (class=\"_r\"), or _ri to repeat contained elements only (innerHTML)."','','');
+		
+		$sender->AddSpacer();
+		$sender->AddField('content_info',"'The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element a class of _r (class=\"_r\"), or _ri to repeat contained elements only (innerHTML).'",'','');
 		$sender->AddField('fields',array(__CLASS__,'getPossibleFields'),'blocks','Possible Fields');
 		$sender->AddMetaField('content','Content',itHTML);
+		$sender->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
+		
+		$sender->AddSpacer();
+		$sender->AddField('nr_info',"'The content below will be shown if no rows exist.'",'','');
+		$sender->AddMetaField('no_rows','Default',itHTML);
 		$sender->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
 
 		$sender->NewSection('Filters');
@@ -59,40 +66,11 @@ class uCustomWidget implements iWidget {
 		return trim($ret);
 	}
 	static function DrawData($rec) {
-		if (!isset($rec['module'])) $rec['module'] = null;
-		if (!isset($rec['filter'])) $rec['filter'] = null;
-		if (!isset($rec['clear_filter'])) $rec['clear_filter'] = null;
-		if (!isset($rec['order'])) $rec['order'] = null;
-		if (!isset($rec['limit'])) $rec['limit'] = null;
-		if (!isset($rec['content'])) $rec['content'] = null;
-
-		if (!$rec['module'] || !class_exists($rec['module'])) return '';
+		if (!$rec['module'] || !class_exists($rec['module'])) return $rec['no_rows'];
 
 		if (!($instance = utopia::GetInstance($rec['module'],false))) {
 			echo 'Could not load Data Source';
 			return;
-		}
-		
-		$content = $append = $prepend = '';
-    	
-		$html = str_get_html($rec['content'],true,true,DEFAULT_TARGET_CHARSET,false);
-		$ele = '';
-		if ($html) {
-			$ele = $html->find('._ri',0);
-			if ($ele) $ele = $ele->innertext;
-			else {
-				$ele = $html->find('._r',0);
-				if ($ele) $ele = $ele->outertext;
-				else $ele = '';
-			}
-		} else $html = $rec['content'];
-
-		$repeatable = $html;
-		if ($ele) {
-			// found a repeatable element
-			// split content at this element. prepare for apend and prepend.
-			list($append,$prepend) = explode($ele,$repeatable);
-			$repeatable = $ele;
 		}
 	
 		{ // get rows
@@ -135,10 +113,35 @@ class uCustomWidget implements iWidget {
 			$rows = array();
 			$rows = $instance->GetRows();
 		}
+		
+		if (!$rows) return $rec['no_rows'];
 
 		// process limit
 		$total = count($rows);
 		$instance->ApplyLimit($rows,$rec['limit']);
+		
+		// get content
+		$content = $append = $prepend = '';
+    	
+		$html = str_get_html($rec['content'],true,true,DEFAULT_TARGET_CHARSET,false);
+		$ele = '';
+		if ($html) {
+			$ele = $html->find('._ri',0);
+			if ($ele) $ele = $ele->innertext;
+			else {
+				$ele = $html->find('._r',0);
+				if ($ele) $ele = $ele->outertext;
+				else $ele = '';
+			}
+		} else $html = $rec['content'];
+
+		$repeatable = $html;
+		if ($ele) {
+			// found a repeatable element
+			// split content at this element. prepare for apend and prepend.
+			list($append,$prepend) = explode($ele,$repeatable);
+			$repeatable = $ele;
+		}
 		
 		foreach ($rows as $row) {
 			$c = $repeatable;
