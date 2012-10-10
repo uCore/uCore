@@ -1,18 +1,20 @@
 <?php
 
 class uTwitterWidget implements iWidget {
-        static function Initialise($sender) {
-                $sender->SetFieldType('width',ftNUMBER);
-               	$sender->SetFieldType('height',ftNUMBER);
-                $sender->AddMetaField('twitter_id','Twitter ID',itTEXT);
-        }
+	static function Initialise($sender) {
+		$sender->AddMetaField('twitter_id','Twitter ID',itTEXT);
+		$sender->AddMetaField('width','Width',itTEXT);
+		$sender->AddMetaField('height','Height',itTEXT);
+		
+		$sender->SetFieldType('width',ftNUMBER);
+		$sender->SetFieldType('height',ftNUMBER);
+	}
 	static function DrawData($data) {
-                $meta = json_decode($data['__metadata'],true);
-                $blockId = $data['block_id'];
-                $id = $meta['twitter_id'];
-                $width = isset($meta['width']) ? $meta['width'] : 250;
-                $height = isset($meta['height']) ? $meta['height'] : 350;
-                return <<<FIN
+		$blockId = $data['block_id'];
+		$id = $data['twitter_id'];
+		$width = $data['width'] ? $data['width'] : 250;
+		$height = $data['height'] ? $data['height'] : 350;
+		return <<<FIN
 <div id="twitter_$blockId"></div>
 <script type="text/javascript">
 $.getScript('http://widgets.twimg.com/j/2/widget.js',function () {
@@ -48,5 +50,5 @@ new TWTR.Widget({
 });
 </script>
 FIN;
-        }
+	}
 }

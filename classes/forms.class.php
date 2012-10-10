@@ -1291,13 +1291,6 @@ abstract class uDataModule extends uBasicModule {
 		unset($this->fields[$field]['style_fn']);
 	}
 
-	public function GetMetaValue($original,$pk,$value,$rec,$name) {
-		if ($pk === NULL) return NULL;
-		if (!$this->includeMeta) return NULL;
-		$metadata = json_decode($rec['__metadata'],true);
-		if (isset($metadata[$name])) return $metadata[$name];
-		return NULL;
-	}
 	public function SetMetaValue($fieldAlias,$newValue,&$pkVal=NULL) {
 		if ($pkVal == NULL) {
 			$newValue = json_encode(array($fieldAlias=>$newValue));
@@ -1316,7 +1309,7 @@ abstract class uDataModule extends uBasicModule {
 			$this->includeMeta = true;
 			$this->AddField('__metadata','__metadata');
 		}
-		$this->AddField($name,array($this,'GetMetaValue',$name),NULL,$visiblename,$inputtype,$values);
+		$this->AddField($name,$name,NULL,$visiblename,$inputtype,$values);
 		$this->fields[$name]['ismetadata'] = true;
 	}
 
@@ -1671,6 +1664,7 @@ abstract class uDataModule extends uBasicModule {
 		//		$tblInc = 1;
 
 		foreach ($this->fields as $alias => $fieldData) {
+			if (isset($fieldData['ismetadata'])) continue;
 			$str = $this->GetFieldLookupString($alias,$fieldData);
 			if (!empty($str)) $flds[] = $str;
 		}
@@ -2130,6 +2124,10 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($row as $rk => $rv) { // dont explode blob data
 				$fieldData = $this->fields[$rk];
 				if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true) && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
+				if (isset($row['__metadata']) && $row['__metadata']) {
+					$meta = utopia::jsonTryDecode($row['__metadata']);
+					if ($meta) $row = array_merge($row,$meta);
+				}
 			}
 			$rows[] = $row;
 		}
