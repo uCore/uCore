@@ -2185,7 +2185,7 @@ abstract class uDataModule extends uBasicModule {
 		switch ($forceType) {
 			case ftFILE:
 				$filename = '';
-				$link = $this->GetFileFromTable($fieldName,$this->fields[$fieldName]['vtable']['table'],$this->fields[$fieldName]['vtable']['pk'],$rec['_'.$this->fields[$fieldName]['vtable']['alias'].'_pk']);
+				$link = $this->GetFileFromTable($this->fields[$fieldName]['field'],$this->fields[$fieldName]['vtable']['table'],$this->fields[$fieldName]['vtable']['pk'],$rec['_'.$this->fields[$fieldName]['vtable']['alias'].'_pk']);
 				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a target="_blank" href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
 				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
