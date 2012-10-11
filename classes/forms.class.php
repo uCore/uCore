@@ -1367,7 +1367,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		// values here
 		if ($values === NULL) switch ($inputtype) {
-			case itNONE:
+			//case itNONE: // commented to prevent huge memory usage on BLOB fields.  Set Values to true if you need it!
 			case itCOMBO:
 			case itOPTION:
 			case itSUGGEST:
