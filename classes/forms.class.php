@@ -836,8 +836,10 @@ abstract class uDataModule extends uBasicModule {
 		// its a suggest, so lv should be information to lookup with ajax
 		// cannot place in switch due to spliting of shared properties (size/cols+rows)
 
-		if ($inputType == itSUGGEST || $inputType == itSUGGESTAREA)
-		$values = cbase64_encode(get_class($this).':'.$field);
+		if ($inputType == itSUGGEST || $inputType == itSUGGESTAREA) {
+			if (isset($values[$defaultValue])) $defaultValue = $values[$defaultValue];
+			$values = cbase64_encode(get_class($this).':'.$field);
+		}
 		//		else // dont want to set onchange for suggestions
 		//if (!array_key_exists('onchange',$attributes)) $attributes['onchange']='uf(this);';
 
@@ -2290,10 +2292,11 @@ abstract class uDataModule extends uBasicModule {
 			}
 		}
 
-		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA)
-			$vals = cbase64_encode(get_class($this)."|$fieldName");
-		else
-			$vals = $this->FindValues($fieldName,$filterInfo['values']);
+		$vals = $this->FindValues($fieldName,$filterInfo['values']);
+		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA) {
+			if (isset($values[$default])) $default = $values[$default];
+			$vals = cbase64_encode(get_class($this).':'.$fieldName);
+		}
 
 		if (!$attributes) $attributes = array();
 		$attributes['placeholder'] = strip_tags($emptyVal);
