@@ -810,8 +810,13 @@ abstract class uDataModule extends uBasicModule {
 		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field,$pkValue);
 
 		if (isset($this->fields[$field]['vtable']['parent']) && !is_a($this->fields[$field]['vtable']['tModule'],'iLinkTable',true) && $pkValue !== NULL) {
-			$rec = $this->LookupRecord($pkValue);
-			$defaultValue = $rec[$this->GetPrimaryKeyField($field)];
+			foreach ($this->fields[$field]['vtable']['joins'] as $from=>$to) {
+				if ($to == $field) {
+					$rec = $this->LookupRecord($pkValue);
+					$defaultValue = $rec[$this->GetPrimaryKeyField($field)];
+					break;
+				}
+			}
 		}
 
 		$prefix = NULL;
@@ -2427,7 +2432,7 @@ abstract class uDataModule extends uBasicModule {
 		$preModPk	= NULL;
 		if (array_key_exists('parent',$tbl)) {
 			foreach ($tbl['joins'] as $fromField=>$toField) {
-				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) { // if the table join is linked to the parents primary key, then updated that record
+				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) { // if the table join is linked to the parents primary key, then update that record
 					$tableObj = utopia::GetInstance($table);
 					// find target PK value
 					$row = $this->LookupRecord($pkVal);
@@ -2620,7 +2625,7 @@ abstract class uDataModule extends uBasicModule {
 		return $ret;
 	}
 
-  static $targetChildren = array();
+	static $targetChildren = array();
 	public function GetTargetURL($field,$row,$includeFilter = true) {
 		$fURL = $this->GetFieldProperty($field,'url');
 		if ($fURL) return $fURL;
