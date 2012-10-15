@@ -1,4 +1,4 @@
-body { position: relative; font-family: Arial, Helvetica, sans-serif; }
+body { position: relative; }
 body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 
@@ -83,7 +83,6 @@ ul.pagination li { list-style:none; float:left; }
 	padding: 5px;
 	vertical-align: top;
 	text-align: left;
-	font-family: Arial, sans-serif;
 	font-weight: normal;
 	font-size: 1em;
 }
@@ -103,7 +102,7 @@ ul.pagination li { list-style:none; float:left; }
 .inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
 .inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
 .inputtype-checkboxlist .inputtype.inputtype-checkbox { float:none; padding:0; margin-right:5px; height:auto; line-height:normal; }
-.inputtype-textarea { height:6em; line-height:normal; font-family: Arial, Helvetica, sans-serif; }
+.inputtype-textarea { height:6em; line-height:normal; }
 input.inputtype { padding-top:0; padding-bottom:0 }
 
 .layoutDetailSection .inputtype { width:300px; }
