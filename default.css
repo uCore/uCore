@@ -136,7 +136,7 @@ input.inputtype { padding-top:0; padding-bottom:0 }
 }
 .ui-combobox .ui-button.ui-combobox-toggle {
 	position: absolute;
-	top: 0; bottom: 0; right:0;
+	top: 0; bottom: 0; right:0; height:auto; width:31px;
 	padding: 0;	margin:0;
 	border-top: 0; border-right: 0; border-bottom: 0;
 }
