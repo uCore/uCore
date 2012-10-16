@@ -811,7 +811,7 @@ abstract class uDataModule extends uBasicModule {
 
 		if (isset($this->fields[$field]['vtable']['parent']) && !is_a($this->fields[$field]['vtable']['tModule'],'iLinkTable',true) && $pkValue !== NULL) {
 			foreach ($this->fields[$field]['vtable']['joins'] as $from=>$to) {
-				if ($to == $field) {
+				if ($from == $field) {
 					$rec = $this->LookupRecord($pkValue);
 					$defaultValue = $rec[$this->GetPrimaryKeyField($field)];
 					break;
