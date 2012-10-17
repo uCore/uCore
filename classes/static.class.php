@@ -881,12 +881,13 @@ class utopia {
 		$pr = rtrim(PATH_REL_ROOT,'/');
 		$string = preg_replace('/'.preg_quote($pr.$pr,'/').'/',$pr,$string);
 		
-		foreach (self::$templateParsers as $ident => $arr) {
-			if (preg_match_all('/(%7B|{)'.$ident.'(}|%7D)/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
-				$searchArr = $matches[0];
-				$varsArr = isset($matches[2]) ? $matches[2] : false;
-				foreach ($searchArr as $k => $search) {
-					if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
+		if (preg_match_all('/(%7B|{)(.+)(}|%7D)/Ui',$string,$matches,PREG_PATTERN_ORDER)) { // loop through all parser tags {.+}
+			$searchArr = $matches[0];
+			foreach ($searchArr as $k => $search) {
+				if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
+				foreach (self::$templateParsers as $ident => $arr) {
+					if (!preg_match('/(%7B|{)'.$ident.'(}|%7D)/Ui',$search,$match)) continue; // doesnt match this templateparser
+					$data = isset($match[2]) ? $match[2] : false;
 					$searchLen = strlen($search);
 					$offset = 0;
 					while (($pos = strpos($string, $search, $offset)) !== FALSE) {
@@ -905,7 +906,7 @@ class utopia {
 						//if (self::IsInsideNoProcess($string,$pos)) { $offset = $pos + $searchLen; continue; }
 
 						try {
-							$replace = self::RunTemplateParser($ident,$varsArr?$varsArr[$k]:null);
+							$replace = self::RunTemplateParser($ident,$data?$data:null);
 						} catch (Exception $e) { $replace = uErrorHandler::EchoException($e); }
 					
 						if ($replace === NULL || $replace === FALSE) {
@@ -913,10 +914,10 @@ class utopia {
 							continue;
 						}
 						$replaceLen = strlen($replace);
-
 						// $test either (doesnt contain a noprocess) OR (also contains the end tag)
 						$string = substr_replace($string, $replace, $pos, $searchLen); // str_replace($search,$replace,$contents);
 						$offset = $pos + $replaceLen;
+						return ($string !== $start);
 					}
 				}
 			}
@@ -932,6 +933,7 @@ class utopia {
 		$ident = preg_quote($ident);
 		if ($match === '.*') $ident .= '(?:\.('.$match.'))?';
 		elseif ($match) $ident .= '\.('.$match.')';
+		else $ident .= '()';
 		if (isset(self::$templateParsers[$ident])) { throw new Exception("$ident is already defined as a template parser."); }
 		self::$templateParsers[$ident] = array($function,$catchOutput);
 	}
