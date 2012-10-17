@@ -700,10 +700,10 @@ function makeHourglass(hourglassEle) {
 			
 			input = $( "<input>" )
 				.appendTo( wrapper )
-				.val( value )
 				.addClass(this.element.attr('class'))
 				.addClass( "ui-combobox-input" )
 				.attr('readonly','readonly')
+				.attr('placeholder',value)
 				.click(toggleDropdown)
 				.autocomplete({
 					delay: 0,
@@ -712,6 +712,8 @@ function makeHourglass(hourglassEle) {
 						var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
 						response( select.children( "option" ).map(function() {
 							var text = $( this ).text();
+							var val = text;
+							if (val == value) val = '';
 							if ( /*this.value &&*/ ( !request.term || matcher.test(text) ) )
 								return {
 									label: text.replace(
@@ -720,7 +722,7 @@ function makeHourglass(hourglassEle) {
 											$.ui.autocomplete.escapeRegex(request.term) +
 											")(?![^<>]*>)(?![^&;]+;)", "gi"
 										), "<strong>$1</strong>" ),
-									value: text,
+									value: val,
 									option: this
 								};
 						}) );
@@ -799,5 +801,5 @@ function makeHourglass(hourglassEle) {
 	});
 })( jQuery );
 $(function () {
-	InitJavascript.add(function() {$('select').combobox();});
+	InitJavascript.add(function() {$('select').combobox(); $('.ui-autocomplete-input').blur();});
 });
