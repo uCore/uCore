@@ -2538,7 +2538,7 @@ abstract class uDataModule extends uBasicModule {
 	
 	public function MergeFields(&$string,$row) {
 		$fields = $this->fields;
-		if (preg_match_all('/{([a-z])+\.([^}]+)}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
+		if (preg_match_all('/{([a-z]+)\.([^{]+)}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
 			$searchArr = $matches[0];
 			$typeArr = isset($matches[1]) ? $matches[1] : false;
 			$varsArr = isset($matches[2]) ? $matches[2] : false;
@@ -2556,18 +2556,22 @@ abstract class uDataModule extends uBasicModule {
 					case 'u':
 						$replace = $this->PreProcess($field,$row[$field],$row);
 						$replace = UrlReadable($replace);
+						$string = str_replace($search,$replace,$string);
 						break;
 					case 'd':
+						$replace = $this->GetCell($field,$row);
+						$string = str_replace($search,$replace,$string);
+						break;
+					case 'field':
 						$replace = $this->PreProcess($field,$row[$field],$row);
+						$string = str_replace($search,$replace,$string);
 						break;
 					default:
-						$replace = $this->GetCell($field,$row);
-						break;
 				}
-				$string = str_replace($search,$replace,$string);
 			}
 		}
 		$this->fields = $fields;
+		while (utopia::MergeVars($string));
 	}
 
 	public function GetCell($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
