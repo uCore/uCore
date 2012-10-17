@@ -50,6 +50,8 @@ class uUserLogin extends uDataModule {
 	}
 
 	public function SetupParents() {
+		uCSS::IncludeFile(dirname(__FILE__).'/login.css');
+
 		uEvents::AddCallback('BeforeRunModule',array($this,'checkLogin'),utopia::GetCurrentModule());
 		uEvents::AddCallback('AfterInit',array($this,'CheckSession'));
 
@@ -135,17 +137,18 @@ class uUserLogin extends uDataModule {
 	}
 	public static function LoginForm() {
 		if (self::IsLoggedIn()) return;
+		echo '<div id="login-wrap">';
 		echo '<h1>Please log in</h1>';
-		echo '<form id="loginForm" action="" method="POST"><table>';
+		echo '<form id="login-form" action="" method="POST"><table>';
 		echo '<tr><td align="right">Email:</td><td>{login_user}</td></tr>';
 		echo '<tr><td align="right">Password:</td><td>{login_pass}</td></tr>';
-		echo '<tr><td colspan="2" align="right"><label>Remember Me <input type="checkbox" value="1" name="remember_me"/></label></td></tr>';
+		echo '<tr><td colspan="2" align="right"><input type="checkbox" value="1" name="remember_me" id="remember_me"/><label for="remember_me"> Remember Me</label> '.utopia::DrawInput('',itSUBMIT,'Log In').'</td></tr>';
 		echo '<tr><td colspan="2" align="right">';
-		echo utopia::DrawInput('',itSUBMIT,'Log In');
 		uEvents::TriggerEvent('LoginButtons');
 		echo '</td></tr>';
 		echo '</table></form><script type="text/javascript">$(function (){$(\'#lu\').focus()})</script>';
 		uEvents::TriggerEvent('AfterShowLogin');
+		echo '</div>';
 	}
 }
 uEvents::AddCallback('AfterInit','uUserLogin::IsLoggedIn',-1000);
@@ -164,7 +167,7 @@ class uResetPassword extends uDataModule {
 		uEvents::AddCallback('LoginButtons',array($this,'forgottenPasswordButton'));
 	}
 	public function forgottenPasswordButton() {
-		echo '<a href="'.$this->GetURL(array()).'" class="left">Forgotten Password?</a>';
+		echo '<a href="'.$this->GetURL(array()).'" class="forgotten-password">Forgotten Password?</a>';
 	}
 
 	public function SetupFields() {
@@ -211,8 +214,8 @@ class uResetPassword extends uDataModule {
 		if (empty($email) || !$rec) {
 			if (!$rec && !empty($email)) echo $noticeBox.'No account was found with this email address. Please try again.</div>';
 			echo '<h1>Reset Password</h1>';
-			echo '<form id="loginForm" action="'.$this->GetURL(array()).'" method="post">';
-			echo '<div style="margin-top:10px">What is your email address?</div>';
+			echo '<form id="reset-password-form" action="'.$this->GetURL(array()).'" method="post">';
+			echo '<p>What is your email address?</p>';
 			echo '<div style="margin-left:20px;">My e-mail address is '.utopia::DrawInput('e',itTEXT).'</div>';
 			echo '<input type="submit" class="btn" value="Reset Password" />';
 			echo '</form>';
