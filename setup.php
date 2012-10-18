@@ -1,9 +1,7 @@
 <?php
 
-define('CFG_TYPE_TEXT',flag_gen('configType'));
 define('CFG_TYPE_PATH',flag_gen('configType'));
 define('CFG_TYPE_PASSWORD',flag_gen('configType'));
-define('CFG_TYPE_CALLBACK',flag_gen('configType'));
 
 uConfig::AddConfigVar('ADMIN_EMAIL','Admin Email');
 define('DB_TYPE','mysql');// uConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
@@ -16,13 +14,13 @@ uConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,NULL,CFG_TYPE_PASS
 uConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://php.net/manual/en/function.strftime.php">Date Format</a>','%d/%m/%Y');
 uConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://php.net/manual/en/function.strftime.php">Time Format</a>','%H:%M:%S');
 
-uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'styles/admin',array('utopia::GetTemplates',array(false)),CFG_TYPE_CALLBACK|CFG_TYPE_PATH);
+uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'styles/admin',array('utopia::GetTemplates',array(false)),CFG_TYPE_PATH);
 
 uConfig::ReadConfig();
 
 class uConfig {
 	static $configVars = array();
-	static function AddConfigVar($name,$readable,$default=NULL,$values=NULL,$type=CFG_TYPE_TEXT) {
+	static function AddConfigVar($name,$readable,$default=NULL,$values=NULL,$type=NULL) {
 		if (array_key_exists($name,self::$configVars)) { echo "Config variable $name already added." ; return false;}
 		self::$configVars[$name] = array('name'=>$readable,'default'=>$default,'values'=>$values,'type'=>$type);
 	}
@@ -65,7 +63,7 @@ class uConfig {
 				$arr[$key] = $info['default'];
 			}
 			$val = $arr[$key];
-			if (!$val && $info['type'] == CFG_TYPE_PASSWORD && isset(self::$oConfig[$key])) {
+			if (!$val && ($info['type'] & CFG_TYPE_PASSWORD) && isset(self::$oConfig[$key])) {
 				$val = self::$oConfig[$key];
 			}
 			define($key,$val);
@@ -98,7 +96,7 @@ class uConfig {
 			try {
 				sql_query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
 			} catch (Exception $e) {
-				self::$configVars['SQL_SERVER']['notice'] = $e->getMessage().' ('.$e->getCode().')';
+				self::$configVars['SQL_SERVER']['notice'] = $e->getMessage();
 			}
 		}
 
@@ -132,19 +130,14 @@ class uConfig {
 <form method="post" action="$frmAction">
 <input type="hidden" name="ucore_reconfig" value="true" />
 <table>
-	<colgroup>
-		<col align="right">
-		<col style="text-align: left; padding-left: 15px">
-	</colgroup>
 FIN;
 		foreach (self::$configVars as $key => $info) {
 			$val = defined($key) ? constant($key) : $info['default'];
-			echo '<tr><td>'.$info['name'].':</td>';
-			if (($info['type'] & CFG_TYPE_CALLBACK) && is_callable($info['values'][0])) {
+			echo '<tr><td class="config-field">'.$info['name'].':</td>';
+			if (isset($info['values'][0]) && is_callable($info['values'][0])) {
 				$info['values'] = call_user_func_array($info['values'][0],$info['values'][1]);
 			}
 			echo '<td>';
-			if (isset($info['notice'])) echo '<span style="color:red;font-size:0.8em">'.$info['notice'].'</span><br/>';
 			if (is_array($info['values'])) {
 				$assoc = is_assoc($info['values']);
 				echo '<select name="'.$key.'">';
@@ -164,6 +157,7 @@ FIN;
 				}
 				echo '<input name="'.$key.'" type="'.$type.'" size="40" value="'.$dVal.'">';
 			}
+			if (isset($info['notice'])) echo '<tr><td></td><td style="color:red;font-size:0.8em;padding-bottom:15px;height:auto;">'.$info['notice'].'</td></tr>';
 			echo '</td></tr>';
 		}
 		$_SESSION['__config_validate'] = true;
