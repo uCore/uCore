@@ -82,7 +82,7 @@ class uConfig {
 			$showConfig = false;
 			foreach (self::$configVars as $key => $info) {
 				$val = defined($key) ? constant($key) : null;
-				if (($info['type'] & CFG_TYPE_PASSWORD) && empty($val)) {
+				if (empty($val)) {
 					self::$configVars[$key]['notice'] = "Must not be empty.";
 				}
 				
