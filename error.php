@@ -27,7 +27,7 @@ class uErrorHandler {
 }
 
 function DebugMail($subject,$message) {
-	if (!defined('ERROR_EMAIL')) return;
+	if (!defined('ADMIN_EMAIL')) return;
 
 	if (!array_key_exists('dm_time',$_SESSION)) $_SESSION['dm_time'] = time();
 	if (!array_key_exists('dm_count',$_SESSION)) $_SESSION['dm_count'] = 0;
@@ -44,7 +44,7 @@ function DebugMail($subject,$message) {
 
 	$message = "$url$ref$ip$ua\n$message";
 	try {
-		mail(ERROR_EMAIL,$subject,$message);
+		mail(ADMIN_EMAIL,$subject,$message);
 	} catch (Exception $e) {
 		echo $e->getMessage();
 	}

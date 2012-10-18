@@ -5,7 +5,7 @@ define('CFG_TYPE_PATH',flag_gen('configType'));
 define('CFG_TYPE_PASSWORD',flag_gen('configType'));
 define('CFG_TYPE_CALLBACK',flag_gen('configType'));
 
-uConfig::AddConfigVar('ERROR_EMAIL','Email Address');
+uConfig::AddConfigVar('ADMIN_EMAIL','Admin Email');
 define('DB_TYPE','mysql');// uConfig::AddConfigVar('DB_TYPE','Database Type',NULL,array('mysql'));
 uConfig::AddConfigVar('SQL_SERVER','Database Host');
 uConfig::AddConfigVar('SQL_PORT','Database Port',3306);
@@ -88,6 +88,10 @@ class uConfig {
 				
 				if (($info['type'] & CFG_TYPE_PATH) && !is_dir(PATH_ABS_ROOT.$val)) {
 					self::$configVars[$key]['notice'] = "Must be a valid directory.";
+				}
+				
+				if ($key == 'ADMIN_EMAIL' && !preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$val)) {
+					self::$configVars[$key]['notice'] = "Must be a valid email address.";
 				}
 			}
 

@@ -117,7 +117,7 @@ class uEmailer extends uDataModule {
 		modOpts::AddOption('smtp_port','SMTP Port','Emails',25);
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
-		modOpts::AddOption('emailer_from','Mailer From','Emails','');
+		modOpts::AddOption('emailer_from','Mailer From','Emails',ADMIN_EMAIL);
 		uEvents::AddCallback('AfterInit',array($this,'InitialiseTemplates'));
 	}
 
