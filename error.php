@@ -1,6 +1,7 @@
 <?php
 error_reporting(-1);
 ini_set('display_errors','Off');
+ini_set('html_errors','Off');
 set_error_handler('uErrorHandler::ThrowException');
 set_exception_handler('uErrorHandler::exception_handler');
 
