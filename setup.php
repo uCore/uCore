@@ -81,17 +81,12 @@ class uConfig {
 		if (self::$oConfig || $_POST) { // only validate config if there is a config to validate.
 			$showConfig = false;
 			foreach (self::$configVars as $key => $info) {
-				if (!defined($key)) {
-					$showConfig = true;
-				}
 				$val = defined($key) ? constant($key) : null;
 				if (($info['type'] & CFG_TYPE_PASSWORD) && empty($val)) {
-					$showConfig = true;
 					self::$configVars[$key]['notice'] = "Must not be empty.";
 				}
 				
 				if (($info['type'] & CFG_TYPE_PATH) && !is_dir(PATH_ABS_ROOT.$val)) {
-					$showConfig = true;
 					self::$configVars[$key]['notice'] = "Must be a valid directory.";
 				}
 			}
@@ -101,12 +96,13 @@ class uConfig {
 			} catch (Exception $e) {
 				self::$configVars['SQL_SERVER']['notice'] = $e->getMessage().' ('.$e->getCode().')';
 			}
+		}
 
-			$changed = false;
-			foreach (self::$configVars as $key => $info) {
-				if (isset($info['notice'])) $showConfig = true;
-				if (!isset(self::$oConfig[$key]) || self::$oConfig[$key] !== constant($key)) $changed = true;
-			}
+		$changed = false;
+		foreach (self::$configVars as $key => $info) {
+			if (!defined($key)) $showConfig = true;
+			if (isset($info['notice'])) $showConfig = true;
+			if (!isset(self::$oConfig[$key]) || self::$oConfig[$key] !== constant($key)) $changed = true;
 		}
 
 		if ($showConfig) {
