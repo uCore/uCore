@@ -191,7 +191,7 @@ class uRegisterUser extends uDataModule {
 	public function RegisterLink() {
 		if (!modOpts::GetOption('open_user_registration')) return;
 		echo '<h2>New User?</h2>';
-		echo '<a class="btn register right" href="'.$this->GetURL().'">Click here to Register</a>';
+		echo '<a class="btn register right" href="'.$this->GetURL().'">Register</a>';
 //		echo '<p>Don&apos;t have an account?  <a href="'.$this->GetURL().'">Register</a> now.</p>';
 	}
 	public function RunModule() {
