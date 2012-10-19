@@ -121,7 +121,7 @@ ul.pagination li { list-style:none; float:left; }
 
 .inputtype.inputtype-combo.ui-combobox {
 	position: relative;
-	display: table-cell;
+	display: table;
 	padding: 0;
 	width: auto;
 	height: auto;
