@@ -121,12 +121,12 @@ ul.pagination li { list-style:none; float:left; }
 
 
 
-.ui-combobox {
+.inputtype.inputtype-combo.ui-combobox {
 	position: relative;
-	display: inline-block;
-	padding: 0 !important;
-	border: 1px solid #aaa; background:white; color:#362B36;
-	width: auto !important;
+	display: table-cell;
+	padding: 0;
+	width: auto;
+	height: auto;
 }
 .ui-combobox .ui-button.ui-combobox-toggle {
 	position: absolute;
@@ -137,7 +137,6 @@ ul.pagination li { list-style:none; float:left; }
 .ui-combobox .ui-combobox-input.ui-autocomplete-input {
 	display:block;
 	margin:0; border:0; background:transparent;
-	width:100%;
 }
 .ui-autocomplete.ui-menu {
 	overflow-x: hidden;

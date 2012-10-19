@@ -702,6 +702,7 @@ function makeHourglass(hourglassEle) {
 				.appendTo( wrapper )
 				.addClass(this.element.attr('class'))
 				.addClass( "ui-combobox-input" )
+				.addClass( "inputtype-text" )
 				.attr('readonly','readonly')
 				.attr('placeholder',value)
 				.click(toggleDropdown)
