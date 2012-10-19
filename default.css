@@ -94,15 +94,17 @@ ul.pagination li { list-style:none; float:left; }
 
 .layoutDetailSection td.fld { width:90px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
-.inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
-.inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
-.inputtype-checkboxlist .inputtype.inputtype-checkbox { float:none; padding:0; margin-right:5px; height:auto; line-height:normal; }
-.inputtype-textarea { height:6em; line-height:normal; }
+.inputtype.inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
+.inputtype.inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
+.inputtype.inputtype-checkboxlist .inputtype.inputtype-checkbox { float:none; padding:0; margin-right:5px; height:auto; line-height:normal; }
+.inputtype.inputtype-textarea { height:6em; line-height:normal; }
 
-.inputtype.inputtype-radio { min-width:0; width:auto; height:auto; }
-.inputtype.inputtype-button { min-width:0; width:auto; height:auto; }
-.inputtype.inputtype-submit { min-width:0; width:auto; height:auto; }
+.inputtype.inputtype-checkbox, .inputtype-checkboxlist .inputtype.inputtype-checkbox,
+.inputtype.inputtype-radio,
+.inputtype.inputtype-button,
+.inputtype.inputtype-submit,
 .inputtype.inputtype-reset { min-width:0; width:auto; height:auto; }
+
 
 
 .inputtype.inputtype-checkbox { min-width:0; width:auto; background:none; border:0; }

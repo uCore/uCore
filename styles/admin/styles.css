@@ -46,8 +46,6 @@ a:hover { color: #8CC63F }
 
 #footer { background:url(images/bottom-swoosh.gif) bottom center no-repeat; height:97px; }
 
-input, select, textarea { margin:2px; }
-
 .uWidgetPlaceholder {
 	background-color:#ccc;
 	border: 1px solid #999;
@@ -60,10 +58,13 @@ input, select, textarea { margin:2px; }
 }
 
 
-.inputtype { margin: 2px; padding:5px; border: 1px solid #aaa; background:white; color:#362B36; height:24px; line-height:24px; font-size:14px; }
-.layoutDetailSection .inputtype { width:300px; }
-.inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0 }
+input, select, textarea { margin:2px; }
 
+.inputtype { margin: 2px; padding:4px; border: 1px solid #aaa; background:white; color:#362B36; height:14px; line-height:14px; font-size:14px; }
+.inputtype-combo { padding:0; height: 24px; }
+.layoutDetailSection .inputtype { width:300px; }
+.layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; }
+.inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0 }
 
 .inputtype.inputtype-combo.ui-combobox {
 	border: 1px solid #aaa; background:white; color:#362B36;
