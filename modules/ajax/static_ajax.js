@@ -800,6 +800,10 @@ function makeHourglass(hourglassEle) {
 		}
 	});
 })( jQuery );
-$(function () {
-	InitJavascript.add(function() {$('select').combobox(); $('.ui-autocomplete-input').blur();});
-});
+
+var utopia = utopia ? utopia : {};
+utopia.CustomCombo = function() {
+	$(function () {
+		InitJavascript.add(function() {$('select').combobox(); $('.ui-autocomplete-input').blur();});
+	});
+}
