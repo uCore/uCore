@@ -57,3 +57,13 @@ a:hover { color: #8CC63F }
 .uWidgetPlaceholder div.uWidgetHeader {
 	margin:0; padding:0; border-bottom: solid 1px #999; font-size:1.2em; font-weight:bold;
 }
+
+
+.inputtype { margin: 2px; padding:5px; border: 1px solid #aaa; background:white; color:#362B36; height:24px; line-height:24px; font-size:14px; }
+.layoutDetailSection .inputtype { width:300px; }
+.inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0 }
+
+
+.inputtype.inputtype-combo.ui-combobox {
+	border: 1px solid #aaa; background:white; color:#362B36;
+}
