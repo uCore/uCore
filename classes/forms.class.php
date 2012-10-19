@@ -1381,9 +1381,6 @@ abstract class uDataModule extends uBasicModule {
 		}
 		$this->fields[$aliasName]['values'] = $values;
 
-		if ($this->fields[$aliasName]['tablename'] !== $this->sqlTableSetup['alias'] && $tableAlias && !is_a($this->fields[$aliasName]['vtable']['tModule'],'iLinkTable',true))
-			$this->fields[$aliasName]['foreign'] = true;
-		
 		if ($visiblename !== NULL) {
 			if (!$this->layoutSections) $this->NewSection('');
 			$this->fields[$aliasName]['layoutsection'] = $this->cLayoutSection;
