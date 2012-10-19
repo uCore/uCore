@@ -61,10 +61,11 @@ a:hover { color: #8CC63F }
 input, select, textarea { margin:2px; }
 
 .inputtype { margin: 2px; padding:4px; border: 1px solid #aaa; background:white; color:#362B36; height:14px; line-height:14px; font-size:14px; }
-.inputtype-combo { padding:0; height: 24px; }
 .layoutDetailSection .inputtype { width:300px; }
 .layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; }
-.inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0 }
+
+.inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0; }
+.inputtype-file, .inputtype-combo { padding:0; height:24px; }
 
 .inputtype.inputtype-combo.ui-combobox {
 	border: 1px solid #aaa; background:white; color:#362B36;
