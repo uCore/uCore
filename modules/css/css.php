@@ -80,7 +80,7 @@ class uCSS extends uBasicModule {
 
 		modOpts::AddOption('jQueryUI-Theme','jQuery UI Theme',null,'ui-lightness');
 		$jquitheme = modOpts::GetOption('jQueryUI-Theme');
-		self::LinkFile('//ajax.googleapis.com/ajax/libs/jqueryui/1/themes/'.$jquitheme.'/jquery-ui.css',-100);
+		self::LinkFile('//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/'.$jquitheme.'/jquery-ui.css',-100);
 		
 		self::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
