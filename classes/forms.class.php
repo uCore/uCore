@@ -1181,12 +1181,8 @@ abstract class uDataModule extends uBasicModule {
 			$pk = $obj->GetPrimaryKey();
 			$table = $tbl['table'];
 			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
-			if ($this->fields[$aliasName]['tablename'] === $this->sqlTableSetup['alias'] && $arr) {
+			if ($this->fields[$aliasName]['tablename'] === $this->sqlTableSetup['alias'] && $arr) 
 				$arr = array_combine(array_values($arr),array_values($arr));
-				$this->fields[$aliasName]['foreign'] = false;
-			} else {
-				$this->fields[$aliasName]['foreign'] = true;
-			}
 		}
 		
 		if ($stringify && is_array($arr) && $arr) {
@@ -1385,6 +1381,9 @@ abstract class uDataModule extends uBasicModule {
 		}
 		$this->fields[$aliasName]['values'] = $values;
 
+		if ($this->fields[$aliasName]['tablename'] !== $this->sqlTableSetup['alias'] && $tableAlias && !is_a($this->fields[$aliasName]['vtable']['tModule'],'iLinkTable',true))
+			$this->fields[$aliasName]['foreign'] = true;
+		
 		if ($visiblename !== NULL) {
 			if (!$this->layoutSections) $this->NewSection('');
 			$this->fields[$aliasName]['layoutsection'] = $this->cLayoutSection;
@@ -1843,7 +1842,7 @@ abstract class uDataModule extends uBasicModule {
 
 		$fieldToCompare = NULL;
 		if ($filterData['type'] == FILTER_WHERE) {
-			if (array_key_exists($fieldName,$this->fields)) {
+		if (array_key_exists($fieldName,$this->fields)) {
 				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0 || $this->fields[$fieldName]['foreign']) {
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`';
 				} else {
