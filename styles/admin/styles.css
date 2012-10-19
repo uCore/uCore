@@ -46,6 +46,7 @@ a:hover { color: #8CC63F }
 
 #footer { background:url(images/bottom-swoosh.gif) bottom center no-repeat; height:97px; }
 
+input, select, textarea { margin:2px; }
 
 .uWidgetPlaceholder {
 	background-color:#ccc;
