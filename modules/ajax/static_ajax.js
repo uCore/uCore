@@ -687,25 +687,29 @@ function makeHourglass(hourglassEle) {
 
 (function( $ ) {
 	$.widget( "ui.combobox", {
+		options: {icon:'ui-icon-triangle-1-s'},
+		
 		_create: function() {
 			var input,
 				self = this,
 				select = this.element.hide(),
 				selected = select.children( ":selected" ),
+				placeholder = $('option:first-child',select).text(),
 				value = selected.text(),
 				wrapper = this.wrapper = $( "<span>" )
 					.addClass(this.element.attr('class'))
 					.addClass( "ui-combobox" )
 					.insertAfter( select );
-			
+
 			input = $( "<input>" )
 				.appendTo( wrapper )
 				.addClass(this.element.attr('class'))
 				.addClass( "ui-combobox-input" )
 				.addClass( "inputtype-text" )
 				.attr('readonly','readonly')
-				.attr('placeholder',value)
+				.attr('placeholder',placeholder)
 				.click(toggleDropdown)
+				.val(value)
 				.autocomplete({
 					delay: 0,
 					minLength: 0,
@@ -713,8 +717,6 @@ function makeHourglass(hourglassEle) {
 						var matcher = new RegExp( $.ui.autocomplete.escapeRegex(request.term), "i" );
 						response( select.children( "option" ).map(function() {
 							var text = $( this ).text();
-							var val = text;
-							if (val == value) val = '';
 							if ( /*this.value &&*/ ( !request.term || matcher.test(text) ) )
 								return {
 									label: text.replace(
@@ -723,7 +725,7 @@ function makeHourglass(hourglassEle) {
 											$.ui.autocomplete.escapeRegex(request.term) +
 											")(?![^<>]*>)(?![^&;]+;)", "gi"
 										), "<strong>$1</strong>" ),
-									value: val,
+									value: text,
 									option: this
 								};
 						}) );
@@ -770,7 +772,7 @@ function makeHourglass(hourglassEle) {
 				.appendTo( wrapper )
 				.button({
 					icons: {
-						primary: "ui-icon-triangle-2-n-s"
+						primary: this.options.icon
 					},
 					text: false
 				})
@@ -793,6 +795,11 @@ function makeHourglass(hourglassEle) {
 				input.focus();
 			}
 		},
+		_setOptions: function() {
+			// _super and _superApply handle keeping the right this-context
+			this._superApply( arguments );
+			this._refresh();
+		},
 
 		destroy: function() {
 			this.wrapper.remove();
@@ -803,8 +810,8 @@ function makeHourglass(hourglassEle) {
 })( jQuery );
 
 var utopia = utopia ? utopia : {};
-utopia.CustomCombo = function() {
+utopia.CustomCombo = function(opt) {
 	$(function () {
-		InitJavascript.add(function() {$('select').combobox(); $('.ui-autocomplete-input').blur();});
+		InitJavascript.add(function() {$('select').combobox(opt); $('.ui-autocomplete-input').blur();});
 	});
 }
