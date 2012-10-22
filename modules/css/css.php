@@ -78,9 +78,7 @@ class uCSS extends uBasicModule {
 
 		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 
-		modOpts::AddOption('jQueryUI-Theme','jQuery UI Theme',null,'ui-lightness');
-		$jquitheme = modOpts::GetOption('jQueryUI-Theme');
-		self::LinkFile('//ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/'.$jquitheme.'/jquery-ui.css',-100);
+		self::LinkFile('//code.jquery.com/ui/1.9.0/themes/base/jquery-ui.css',-100);
 		
 		self::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
