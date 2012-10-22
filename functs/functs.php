@@ -192,17 +192,10 @@ function get_include_contents($filename) {
     return false;
 }
 
-function array_get_subkey($array,$key) {
-	$comp = array();
-	foreach ($array as $k=>$v) {
-		$comp[] = $v[$key];
-	}
-	return $comp;
-}
-function array_sort_subkey(&$array,$key,$asc=true) {
-	if ($asc == '>') $asc = false;
-	$comp = array_get_subkey($array,$key);
-	array_multisort($comp,$asc?SORT_ASC:SORT_DESC,$array);
+function array_sort_subkey(&$array,$key,$direction='<') {
+	$key = is_string($key) ? "'$key'" : $key;
+	$func = create_function('$a,$b','$c1 = $a['.$key.']; $c2 = $b['.$key.']; if ($c1 == $c2) return 0;  return $c1 '.$direction.' $c2 ? -1 : 1;');
+	uasort($array,$func);
 }
 
 // MODULE FUNCTIONS
