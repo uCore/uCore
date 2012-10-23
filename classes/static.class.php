@@ -295,6 +295,7 @@ class utopia {
 				else
 					$attributes['class'] = 'btn';
 				$attributes['class'] .= ' btn-'.$inputType;
+				$attributes['class'] = str_replace('inputtype ','',$attributes['class']);
 				$attr = BuildAttrString($attributes);
 				$out .= '<a '.$attr.' href="javascript:void(0)">'.$defaultValue.'</a>';
 				break;
