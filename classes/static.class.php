@@ -883,8 +883,10 @@ class utopia {
 		
 		if (preg_match_all('/(%7B|{)(.+)(}|%7D)/Ui',$string,$matches,PREG_PATTERN_ORDER)) { // loop through all parser tags {.+}
 			$searchArr = $matches[0];
-			foreach ($searchArr as $k => $search) {
-				if (strpos($search,'{',1) !== FALSE) continue; // if contains another pragma then skip it, pick up post-merged on next pass.
+			foreach ($searchArr as $search) {
+				// if contains another pragma then skip it, pick up post-merged on next pass.
+				while (preg_match('/(%7B|{)(.+)(}|%7D)/Ui',$search,$res,0,1)) $search = $res[0];
+
 				foreach (self::$templateParsers as $ident => $arr) {
 					if (!preg_match('/(%7B|{)'.$ident.'(}|%7D)/Ui',$search,$match)) continue; // doesnt match this templateparser
 					$data = isset($match[2]) ? $match[2] : false;
