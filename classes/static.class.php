@@ -846,20 +846,21 @@ class utopia {
 			$styles = $doc->getElementsByTagName('style');
 			for ($i = 0; $i < $styles->length; $i++) { $head->appendChild($styles->item(0)); }
 			
+			$ctNode = null;
+			foreach ($head->getElementsByTagName('meta') as $meta) {
+				if ($meta->hasAttribute('http-equiv') && strtolower($meta->getAttribute('http-equiv')) == 'content-type') { $ctNode = $meta; break; }
+			}
+			if (!$ctNode) {
+				$ctNode = $doc->createElement('meta');
+				$head->appendChild($ctNode);
+			}
+			$ctNode->setAttribute('http-equiv','content-type'); $ctNode->setAttribute('content','text/html;charset='.CHARSET_ENCODING);
+			if ($ctNode !== $head->firstChild) $head->insertBefore($ctNode,$head->firstChild);
+			
 			$doc->normalizeDocument();
 			if (strpos(strtolower($doc->doctype->publicId),' xhtml '))
 				$template = $doc->saveXML();
 			else {
-				$ctNode = null;
-				foreach ($head->getElementsByTagName('meta') as $meta) {
-					if ($meta->hasAttribute('http-equiv') && strtolower($meta->getAttribute('http-equiv')) == 'content-type') { $ctNode = $meta; break; }
-				}
-				if (!$ctNode) {
-					$ctNode = $doc->createElement('meta');
-					$head->appendChild($ctNode);
-				}
-				$ctNode->setAttribute('http-equiv','content-type'); $ctNode->setAttribute('content','text/html;charset='.CHARSET_ENCODING);
-				if ($ctNode !== $head->firstChild) $head->insertBefore($ctNode,$head->firstChild);
 				$template = $doc->saveHTML();
 			}
 			$template = preg_replace('/<\?xml encoding="UTF-8"\??>\n?/i','',$template);
