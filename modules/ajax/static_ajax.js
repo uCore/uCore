@@ -798,7 +798,6 @@ function makeHourglass(hourglassEle) {
 		_setOptions: function() {
 			// _super and _superApply handle keeping the right this-context
 			this._superApply( arguments );
-			this._refresh();
 		},
 
 		destroy: function() {
