@@ -852,14 +852,14 @@ class utopia {
 			else {
 				$ctNode = null;
 				foreach ($head->getElementsByTagName('meta') as $meta) {
-					if ($meta->hasAttribute('http-equiv') && $meta->getAttribute('http-equiv') == 'content-type') { $ctNode = $meta; break; }
+					if ($meta->hasAttribute('http-equiv') && strtolower($meta->getAttribute('http-equiv')) == 'content-type') { $ctNode = $meta; break; }
 				}
 				if (!$ctNode) {
 					$ctNode = $doc->createElement('meta');
-					$ctNode->setAttribute('http-equiv','Content-type'); $ctNode->setAttribute('content','text/html;charset='.CHARSET_ENCODING);
 					$head->appendChild($ctNode);
 				}
-				$head->insertBefore($ctNode,$head->firstChild);
+				$ctNode->setAttribute('http-equiv','content-type'); $ctNode->setAttribute('content','text/html;charset='.CHARSET_ENCODING);
+				if ($ctNode !== $head->firstChild) $head->insertBefore($ctNode,$head->firstChild);
 				$template = $doc->saveHTML();
 			}
 			$template = preg_replace('/<\?xml encoding="UTF-8"\??>\n?/i','',$template);
