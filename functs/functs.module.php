@@ -45,7 +45,7 @@ function &CallModuleFunc($classname,$funcname) {
 
 	if (!method_exists($classname,$funcname)) { return $null; }
 
-	$instance = utopia::GetInstance($classname);
+	$instance =& utopia::GetInstance($classname);
 
 	if ($instance == NULL) { ErrorLog("Error Calling {$classname}->{$funcname}"); return $null;}
 
@@ -57,7 +57,7 @@ function &CallModuleFunc($classname,$funcname) {
 function &GetModuleVar($classname,$varname) {
 	trigger_error("GetModuleVar is deprecated.", E_USER_DEPRECATED);
 	$null = NULL;
-	if (($instance = utopia::GetInstance($classname)) == NULL) return $null;
+	if (($instance =& utopia::GetInstance($classname)) == NULL) return $null;
 	if (!property_exists($instance,$varname)) return $null;
 
 	return $instance->$varname;
@@ -65,7 +65,7 @@ function &GetModuleVar($classname,$varname) {
 
 function SetModuleVar($classname,$varname,$value) {
 	trigger_error("SetModuleVar is deprecated.", E_USER_DEPRECATED);
-	if (($instance = utopia::GetInstance($classname)) == NULL) return NULL;
+	if (($instance =& utopia::GetInstance($classname)) == NULL) return NULL;
 
 	$instance->$varname = $value;
 }
@@ -123,7 +123,7 @@ function RunModule($module = NULL) {
 		utopia::PageNotFound();
 	}
 	utopia::SetVar('current_module',$module);
-	$obj = utopia::GetInstance($module);
+	$obj =& utopia::GetInstance($module);
 	utopia::SetVar('title',$obj->GetTitle());
 	// run module
 	if (!is_empty($module)) $obj->_RunModule();

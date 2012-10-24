@@ -71,13 +71,13 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$tabGroupName = utopia::Tab_InitGroup();
 		ob_start();
 
-		$obj = utopia::GetInstance('uCMS_Edit');
+		$obj =& utopia::GetInstance('uCMS_Edit');
 		$newUrl = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>1));
 		$relational = $this->GetNestedArray();
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
 		echo '<div style="white-space:nowrap"><a class="btn" href="'.$newUrl.'">New Page</a>';
 
-		$modOptsObj = utopia::GetInstance('modOptsList');
+		$modOptsObj =& utopia::GetInstance('modOptsList');
 		$row = $modOptsObj->LookupRecord('default_template');
 		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row);
 
@@ -86,7 +86,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		echo '</div></td>';
 		echo '<td style="width:100%;vertical-align:top; border-left:1px solid #333"><div style="width:100%" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
 
-		$editObj = utopia::GetInstance('uCMS_Edit');
+		$editObj =& utopia::GetInstance('uCMS_Edit');
 		$editLink = $editObj->GetURL();
 		$fid = $editObj->FindFilter('cms_id');
 		echo <<<FIN
@@ -139,7 +139,7 @@ FIN;
 	}
 	public static function RefreshList() {
 		if (utopia::GetCurrentModule() !== __CLASS__) return;
-		$obj = utopia::GetInstance(__CLASS__);
+		$obj =& utopia::GetInstance(__CLASS__);
 		$relational = $obj->GetNestedArray();
 		$r = $obj->GetChildren($relational);
 		// javascript: find open folders (visible ui-treesort-folder with visible ul)
@@ -152,9 +152,9 @@ FIN;
 	static function GetChildren($children) {
 		if (!$children) return '';
 		array_sort_subkey($children,'position');
-		$editObj = utopia::GetInstance('uCMS_Edit');
-		$listObj = utopia::GetInstance('uCMS_List');
-		$viewObj = utopia::GetInstance('uCMS_View');
+		$editObj =& utopia::GetInstance('uCMS_Edit');
+		$listObj =& utopia::GetInstance('uCMS_List');
+		$viewObj =& utopia::GetInstance('uCMS_View');
 
 		$ret = '<ul class="cmsTree">';
 		foreach ($children as $child) {
@@ -222,7 +222,7 @@ FIN;
 		if (!$_POST['data']) return;
 		foreach ($_POST['data'] as $cms_id => $val) {
 			list($newParent,$pos) = explode(':',$val);
-			$obj = utopia::GetInstance('uCMS_View');
+			$obj =& utopia::GetInstance('uCMS_View');
 			$oldURL = $obj->GetURL($cms_id);
 			$this->UpdateFields(array('parent'=>$newParent,'position'=>$pos),$cms_id);
 			$newURL = $obj->GetURL($cms_id);
@@ -269,7 +269,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		}
 
 		// preview, publish, revert (red)
-		$obj = utopia::GetInstance('uCMS_View');
+		$obj =& utopia::GetInstance('uCMS_View');
 		$preview = CreateNavButton('Preview',$obj->GetURL(array('cms_id'=>$pkVal,'preview'=>1)),array('target'=>'_blank','title'=>'Preview this page'));
 		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish'),itBUTTON);
 		$revert = $this->DrawSqlInput('revert','Revert',$pkVal,array('title'=>'Reset to published version','class'=>'page-revert'),itBUTTON);
@@ -295,7 +295,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			$id = $_GET['id'];
 		}
 
-		$obj = utopia::GetInstance('uWidgets');
+		$obj =& utopia::GetInstance('uWidgets');
 		$url = $obj->GetURL($id);
 
 		$rep = uWidgets::DrawWidget($id);
@@ -367,7 +367,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
 		
 		if ($pkVal !== $oPk) {
-			$o = utopia::GetInstance('uCMS_View');
+			$o =& utopia::GetInstance('uCMS_View');
 			$url = $o->GetURL(array('cms_id'=>$pkVal,'edit'=>1));
 			AjaxEcho("window.location.replace('$url');");
 		}
@@ -378,7 +378,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		return $ret;
 	}
 	public function getPossibleBlocks($val,$pk,$original) {
-		$obj = utopia::GetInstance('uWidgets_List');
+		$obj =& utopia::GetInstance('uWidgets_List');
 		$rows = $obj->GetRows();
 		foreach (uWidgets::$staticWidgets as $widgetID => $callback) $rows[]['block_id'] = $widgetID;
 		return '<span class="btn" onclick="ChooseWidget()">Insert Widget</span>';
@@ -428,7 +428,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$rec = uCMS_View::findPage();
 		if (!$rec) return;
 		if (!isset($_GET['edit'])) {
-			$obj = utopia::GetInstance('uCMS_View');
+			$obj =& utopia::GetInstance('uCMS_View');
 			$editURL = $obj->GetURL(array('cms_id'=>$rec['cms_id'],'edit'=>1));
 			uAdminBar::AddItem('<a href="'.$editURL.'">Edit Page</a>');
 			return;
@@ -460,7 +460,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$pubCell = '<span class="left" style="padding-left:10px">'.$this->GetCell('publishing',$rec).'</span>';
 
 		
-		$obj = utopia::GetInstance('uCMS_View');
+		$obj =& utopia::GetInstance('uCMS_View');
 		$url = $obj->GetURL(array('cms_id'=>$rec['cms_id']));
 
 		uAdminBar::AddItem('<span class="left">Edit Page Information</span>'.$pubCell,$c);
@@ -613,7 +613,7 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	static function GetHomepage() {
-		$obj = utopia::GetInstance('uCMS_View');
+		$obj =& utopia::GetInstance('uCMS_View');
 		$row = $obj->LookupRecord(array('is_home'=>'1'),true);
 		if (!$row) $row = $obj->LookupRecord();
 		if ($row) return $row;
@@ -631,7 +631,7 @@ class uCMS_View extends uSingleDataModule {
 
 		preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
 		if (array_key_exists(1,$matches)) {
-			$obj = utopia::GetInstance('uCMS_View');
+			$obj =& utopia::GetInstance('uCMS_View');
 			$row = $obj->LookupRecord($matches[1]);
 			if ($row) {
 				self::$currentPage = $row;
@@ -641,7 +641,7 @@ class uCMS_View extends uSingleDataModule {
 		
 		$cm = utopia::GetCurrentModule();
 		if ($cm && $cm !== __CLASS__) {
-			$o = utopia::GetInstance(utopia::GetCurrentModule());
+			$o =& utopia::GetInstance(utopia::GetCurrentModule());
 			$row = $obj->LookupRecord($o->GetUUID());
 			if ($row) {
 				self::$currentPage = $row;
@@ -684,7 +684,7 @@ class uCMS_View extends uSingleDataModule {
 	static function GetTemplate($id) {
 		$template = NULL;
 		while ($id != NULL) {
-			$obj = utopia::GetInstance('uCMS_View');
+			$obj =& utopia::GetInstance('uCMS_View');
 			$rec = $obj->LookupRecord($id);
 			if ($rec['template']) { $template = $rec['template']; break; }
 			$id = $rec['parent'];

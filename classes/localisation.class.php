@@ -292,7 +292,7 @@ class uLocale implements ArrayAccess {
 		if (!array_key_exists($key,$this->localisations)) {
 			$locale = self::FindLocale($key);
 			if ($locale == $this->locale) return $key;
-			$L = self::GetLocale($locale);
+			$L =& self::GetLocale($locale);
 			return $L[$key];
 		}
 		if ($this->localisations[$key] === true) return $key;

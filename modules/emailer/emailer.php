@@ -149,7 +149,7 @@ class uEmailer extends uDataModule {
 	}
 
 	public static function GetTemplate($ident) {
-		$obj = utopia::GetInstance(__CLASS__);
+		$obj =& utopia::GetInstance(__CLASS__);
 		$row = $obj->LookupRecord(array('ident'=>$ident));
 		// if no doc, create it and alert admin
 		if (!$row) {
@@ -173,7 +173,7 @@ class uEmailer extends uDataModule {
 
 		if (!is_array($attachments)) $attachments = array($attachments);
 
-		$obj = utopia::GetInstance('uEmailTemplateAttachmentList');
+		$obj =& utopia::GetInstance('uEmailTemplateAttachmentList');
 		$templateAttachments = $obj->GetRows(array('doc_id'=>$ident));
 		if ($templateAttachments) foreach ($templateAttachments as $attachment) {
 			$attachments[] = Swift_Attachment::newInstance($attachment['attachment'], $attachment['attachment_filename'], $attachment['attachment_filetype']);

@@ -39,7 +39,7 @@ timer_start('Module Initialise');
 $allmodules = utopia::GetModulesOf('uTableDef') + utopia::GetModulesOf('uBasicModule');
 foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to be setup fully
 	timer_start('Init: '.$row['module_name']);
-	$obj = utopia::GetInstance($row['module_name']);
+	$obj =& utopia::GetInstance($row['module_name']);
 	if (method_exists($obj,'Initialise'))
 		$obj->Initialise(); // setup Parents
 	timer_end('Init: '.$row['module_name']);

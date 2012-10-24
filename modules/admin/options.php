@@ -38,7 +38,7 @@ class modOpts extends uDataModule {
 		return self::GetOption($ident);
 	}
 	public static function GetOption($ident) {
-		$obj = utopia::GetInstance(__CLASS__);
+		$obj =& utopia::GetInstance(__CLASS__);
 		$rec = $obj->LookupRecord($ident);
 		if ($rec) return $rec['value'];
 		$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
@@ -46,7 +46,7 @@ class modOpts extends uDataModule {
 		return FALSE;
 	}
 	public static function SetOption($ident,$value) {
-		$obj = utopia::GetInstance(__CLASS__);
+		$obj =& utopia::GetInstance(__CLASS__);
 		$obj->UpdateField('value',$value,$ident);
 	}
 }

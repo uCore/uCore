@@ -13,7 +13,7 @@ class modLinks extends uBasicModule {
 
 		//$admin = true;
 		//if (class_exists($module)) {
-		//	$parentObj = utopia::GetInstance($module);
+		//	$parentObj =& utopia::GetInstance($module);
 		//	$admin = ($parentObj instanceof iAdminModule);
 		//}
 		//$isadmin = uUserLogin::IsLoggedIn();
@@ -25,7 +25,7 @@ class modLinks extends uBasicModule {
 				if ($specificOnly && $child['parent'] !== $module) continue;
 
 				if (isset($child['fieldLinks'])) {
-					$obj = utopia::GetInstance(utopia::GetCurrentModule());
+					$obj =& utopia::GetInstance(utopia::GetCurrentModule());
 					$fv = false;
 					if ($child['parentField'] !== null && $child['parentField'] !== '*') continue;
 					if ($obj instanceof uDataModule) foreach ($child['fieldLinks'] as $link) {
@@ -35,7 +35,7 @@ class modLinks extends uBasicModule {
 					if (!$fv) continue; // if fieldlinks and the linked field is not currently have a filtered.
 				}
 
-				$obj = utopia::GetInstance($child['moduleName']);
+				$obj =& utopia::GetInstance($child['moduleName']);
 				if ($obj->isDisabled) continue;
 				
 				$opts = $obj->GetOptions();
@@ -81,7 +81,7 @@ class modLinks extends uBasicModule {
 		
 		// if current module isnt in list, add it
 		if (!$foundCurrent) {
-			$obj = utopia::GetInstance(utopia::GetCurrentModule());
+			$obj =& utopia::GetInstance(utopia::GetCurrentModule());
 			$order = $obj->GetSortOrder();
 			$title = $obj->GetTitle();
 			$arr[] = array(

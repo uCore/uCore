@@ -136,7 +136,7 @@ class utopia {
 				$class['uuid'] = $class['module_name'];
 
 				if ($ref->isSubclassOf('uBasicModule')) {
-					$obj = utopia::GetInstance($class['module_name']);
+					$obj =& utopia::GetInstance($class['module_name']);
         	                        $class['uuid'] = $obj->GetUUID();
 				}
 				$rows[$class['module_name']] = $class;
@@ -185,7 +185,7 @@ class utopia {
 		if (!self::ModuleExists($module)) return;
 		
 		$cm = utopia::GetCurrentModule();
-		$o = utopia::GetInstance($cm);
+		$o =& utopia::GetInstance($cm);
 		if (flag_is_set($o->GetOptions(),PERSISTENT)) return;
 		
 		utopia::SetVar('current_module',$module);
@@ -230,7 +230,7 @@ class utopia {
 		}
 
 		utopia::SetVar('current_module',$module);
-		$obj = utopia::GetInstance($module);
+		$obj =& utopia::GetInstance($module);
 		utopia::SetVar('title',$obj->GetTitle());
 		// run module
 		$obj->_RunModule();

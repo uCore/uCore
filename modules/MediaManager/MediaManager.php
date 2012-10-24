@@ -56,7 +56,7 @@ FIN
 	}
 FIN
 );
-		$obj = utopia::GetInstance(__CLASS__);
+		$obj =& utopia::GetInstance(__CLASS__);
 		return array($obj->GetAjaxPath(),$obj->GetAjaxUploadPath());
 	}
 	function GetAjaxPath() {

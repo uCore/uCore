@@ -28,7 +28,7 @@ class module_Offline extends uBasicModule {
 
 		if (uUserRoles::IsAdmin()) return; // site admin
 			
-		$obj = utopia::GetInstance($parent);
+		$obj =& utopia::GetInstance($parent);
 		if ($obj instanceof iAdminModule) return;
 
 		//don't use SetCurrentModule because we don't want to redirect

@@ -5,7 +5,7 @@ class uBlob extends uBasicModule {
 	}
 	function GetUUID() { return 'blob'; }
 	function RunModule() {
-		$obj = utopia::GetInstance($_GET['module']);
+		$obj =& utopia::GetInstance($_GET['module']);
 		$rec = $obj->LookupRecord(mysql_real_escape_string($_GET['pk']),true);
 
 		if (!$rec || !isset($rec[$_GET['field']])) utopia::PageNotFound();
@@ -20,7 +20,7 @@ class uBlob extends uBasicModule {
 	}
 	function GetFileLink($module,$field,$pk,$filename=NULL) {
 		if ($filename === NULL) {
-			$obj = utopia::GetInstance($module);
+			$obj =& utopia::GetInstance($module);
 			$rec = $obj->LookupRecord($pk);
 			$filename = $rec[$field.'_filename'];
 		}

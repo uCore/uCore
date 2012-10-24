@@ -31,7 +31,7 @@ class uCustomWidget implements iWidget {
 		$rec = $obj->LookupRecord($pkVal);
 		if (!$rec || !isset($rec['module']) || !$rec['module']) return NULL;
 		if (!class_exists($rec['module'])) return NULL;
-		$obj = utopia::GetInstance($rec['module']);
+		$obj =& utopia::GetInstance($rec['module']);
 		if (!$obj) return NULL;
 		
 		$arr = array();
@@ -48,7 +48,7 @@ class uCustomWidget implements iWidget {
 	public static function getPossibleFields($originalVal,$pk,$processedVal,$rec) {
 		if (!$rec || !isset($rec['module']) || !$rec['module']) return 'Please select a Data Source.';
 		if (!class_exists($rec['module'])) return 'Data Source does not exist';
-		$obj = utopia::GetInstance($rec['module']);
+		$obj =& utopia::GetInstance($rec['module']);
 		if (!$obj) return '';
 		$fields = $obj->fields;
 		$ret = '';
@@ -68,7 +68,7 @@ class uCustomWidget implements iWidget {
 	static function DrawData($rec) {
 		if (!$rec['module'] || !class_exists($rec['module'])) return $rec['no_rows'];
 
-		if (!($instance = utopia::GetInstance($rec['module'],false))) {
+		if (!($instance =& utopia::GetInstance($rec['module'],false))) {
 			echo 'Could not load Data Source';
 			return;
 		}
@@ -217,7 +217,7 @@ class uCustomWidgetConverter extends uDataModule {
 		}
 
 		// update cms pages
-		$obj = utopia::GetInstance('uCMS_Edit');
+		$obj =& utopia::GetInstance('uCMS_Edit');
 		$filter = "content LIKE '%{block.%' OR content_published LIKE '%{block.%'";
 		$rows = $obj->GetRows(array($filter),true);
 		$pk = $obj->GetPrimaryKey();

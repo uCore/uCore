@@ -69,7 +69,7 @@ class uUserLogin extends uDataModule {
 	public static function GetLoginStatus() {
 		$u = self::IsLoggedIn();
 		if (!$u) return 'Login';
-		$o = utopia::GetInstance(__CLASS__);
+		$o =& utopia::GetInstance(__CLASS__);
 		$rec = $o->LookupRecord($u);
 		return $rec['username'];
 	}
@@ -80,11 +80,11 @@ class uUserLogin extends uDataModule {
 		$un = $_POST['__login_u']; $pw = $_POST['__login_p'];
 		unset($_POST['__login_u']); unset($_POST['__login_p']);
 
-		$obj = utopia::GetInstance(__CLASS__);
+		$obj =& utopia::GetInstance(__CLASS__);
 		$rec = $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)));
 		if ($rec) {
 			$_SESSION['current_user'] = $rec['user_id'];
-			$obj = utopia::GetInstance('uUserProfile');
+			$obj =& utopia::GetInstance('uUserProfile');
 			$obj->UpdateFieldRaw('last_login','NOW()',$rec['user_id']);
 			if (isset($_REQUEST['remember_me'])) {
 				session_set_cookie_params(604800,PATH_REL_ROOT);

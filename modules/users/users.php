@@ -109,19 +109,19 @@ class uAssertAdminUser extends uBasicModule {
 	}
 	public function AssertAdminUser() {
 		// admin user exists?
-		$obj = utopia::GetInstance('uUsersList');
+		$obj =& utopia::GetInstance('uUsersList');
 		$rec = $obj->LookupRecord(array('_roles_pk'=>-1,'validated'=>1),true);
 		if ($rec) return;
 
 		// module is persist?
-		$curr = utopia::GetInstance(utopia::GetCurrentModule());
+		$curr =& utopia::GetInstance(utopia::GetCurrentModule());
 		if (flag_is_set($curr->GetOptions(),PERSISTENT)) return;
 
 		// redirect to this module
 		$this->AssertURL(307,false);
 	}
 	public function RunModule() {
-		$obj = utopia::GetInstance('uUsersList');
+		$obj =& utopia::GetInstance('uUsersList');
 		$rec = $obj->LookupRecord(array('_roles_pk'=>-1,'validated'=>1),true);
 		if ($rec) {
 			header('Location: '.PATH_REL_CORE); die();
@@ -144,7 +144,7 @@ class uAssertAdminUser extends uBasicModule {
 		}
 		
 		// now register user
-		$regObj = utopia::GetInstance('uRegisterUser');
+		$regObj =& utopia::GetInstance('uRegisterUser');
 		$user_id = $regObj->RegisterForm();
 		// login as this user, then perform the update
 
@@ -249,7 +249,7 @@ class uRegisterUser extends uDataModule {
 				}
 				
 				// user already exists?
-				//$this = utopia::GetInstance('uUsersList');
+				//$this =& utopia::GetInstance('uUsersList');
 				$rec = $this->LookupRecord(array('username'=>$_POST['username']));
 				if ($rec) {
 					uNotices::AddNotice('Username already exists.',NOTICE_TYPE_ERROR);
@@ -312,12 +312,12 @@ class uVerifyEmail extends uDataModule {
 			$this->UpdateField('email_confirm_code',true,$rec['user_id']);
 			uUserLogin::SetLogin($rec['user_id']);
 			uNotices::AddNotice('Thank you!  Your email address has been successfully validated.');
-			$o = utopia::GetInstance('uUserProfile');
+			$o =& utopia::GetInstance('uUserProfile');
 			header('Location: '.$o->GetURL());
 		}
 	}
 	public static function VerifyAccount($user_id) {
-		$o = utopia::GetInstance(__CLASS__);
+		$o =& utopia::GetInstance(__CLASS__);
 		$rec = $o->LookupRecord($user_id);
 
 		// already verified
@@ -367,7 +367,7 @@ class uUserProfile extends uSingleDataModule {
 	public function RunModule() {
 		$l = uUserLogin::IsLoggedIn();
 		if (!$l) {
-			$obj = utopia::GetInstance('uUserLogin');
+			$obj =& utopia::GetInstance('uUserLogin');
 			$obj->_RunModule();
 			return;
 		}
@@ -375,7 +375,7 @@ class uUserProfile extends uSingleDataModule {
 		$this->ShowData();
 	}
 	public static function GetCurrentUser() {
-		$o = utopia::GetInstance(__CLASS__);
+		$o =& utopia::GetInstance(__CLASS__);
 		return $o->LookupRecord();
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {

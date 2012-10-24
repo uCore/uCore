@@ -67,7 +67,7 @@ function ses_write($ses_id, $data) {
 	$cp_up = ''; $title_up = ''; $title = ''; $current_page = '';
 	if (stristr($_SERVER['REQUEST_URI'],'__ajax=') === FALSE && utopia::GetCurrentModule() !== '') {
 		$current_page = $_SERVER['REQUEST_URI'];
-		$obj = utopia::GetInstance(utopia::GetCurrentModule());
+		$obj =& utopia::GetInstance(utopia::GetCurrentModule());
 		$title = $obj->GetTitle();
 		$cp_up = ", current_page='$current_page'";
 		$title_up = ", current_module='$title'";

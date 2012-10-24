@@ -63,7 +63,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 	public static function getUpload() {
 		//$module = utopia::UUIDExists($_GET['uuid']);
 		//print_r($module);
-		$obj = utopia::GetInstance(utopia::GetCurrentModule());
+		$obj =& utopia::GetInstance(utopia::GetCurrentModule());
 		$rec = $obj->LookupRecord($_GET['p']);
 		//print_r($rec);
 		if (!$rec) {
@@ -211,7 +211,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 					$string = cbase64_decode($enc_name);
 
 					InterpretSqlString($string, $module, $field, $pkVal);
-					$obj = utopia::GetInstance($module);
+					$obj =& utopia::GetInstance($module);
 					$obj->ProcessUpdates($enc_name,$field,$fileInfo,$pkVal,true);
 				}
 			}
@@ -224,7 +224,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 				$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
 				
 				InterpretSqlString($string, $module, $field, $pkVal);
-				$obj = utopia::GetInstance($module);
+				$obj =& utopia::GetInstance($module);
 				$obj->ProcessUpdates($enc_name,$field,$value,$pkVal);
 			}
 		}
@@ -238,12 +238,12 @@ class internalmodule_StaticAjax extends uBasicModule {
 		//if (!$tmp) return;
 		if (strpos($tmp,':') !== FALSE) {
 			list($module,$field) = explode(':',$tmp);
-			$obj = utopia::GetInstance($module);
+			$obj =& utopia::GetInstance($module);
 			$obj->_SetupFields();
 			$vals = $obj->GetValues($field);
 		} elseif (strpos($tmp,'|') !== FALSE) {
 			list($module,$field) = explode('|',$tmp);
-			$obj = utopia::GetInstance($module);
+			$obj =& utopia::GetInstance($module);
 			$obj->_SetupFields();
 			$fltr = $obj->FindFilter($field);
 			$vals = $fltr['values'];

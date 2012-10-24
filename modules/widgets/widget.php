@@ -43,7 +43,7 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 		array_sort_subkey($widgets,'block_type');
 		$rows = array_merge($rows,$widgets);
 
-		$obj = utopia::GetInstance('uWidgets');
+		$obj =& utopia::GetInstance('uWidgets');
 		$newUrl = $obj->GetURL();
 
 		$rows = array($newUrl, $rows);
@@ -108,7 +108,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 	}
 
 	static function DrawWidget($rec) {
-		$obj = utopia::GetInstance('uWidgets',false);
+		$obj =& utopia::GetInstance('uWidgets',false);
 		if (!is_array($rec)) {
 			if (self::StaticWidgetExists($rec)) return call_user_func(self::$staticWidgets[$rec]);
 

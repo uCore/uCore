@@ -12,13 +12,13 @@ class uDataOnly extends uBasicModule {
 	}
 
 	public static function inject($module) {
-		$obj = utopia::GetInstance(__CLASS__);
+		$obj =& utopia::GetInstance(__CLASS__);
 		$obj->AddParentCallback($module,array($obj,'inject_run'));
 	}
 
 	public function inject_run($parent) {
 		if (!is_subclass_of($parent,'uListDataModule')) return;
-		$obj = utopia::GetInstance($parent);
+		$obj =& utopia::GetInstance($parent);
 		$url = $obj->GetURL(array_merge($_GET,array('__ajax'=>'excel')));
 		utopia::LinkList_Add('list_functions:'.$parent,'Export to Excel',$url,10,NULL,array('class'=>'btn btn-csv'));
 
@@ -38,7 +38,7 @@ class uDataOnly extends uBasicModule {
 		utopia::Cache_Check($etag,'application/json','',NULL,$_GET['_expires']);
 		switch ($type) {
 			case 'json':
-				$obj = utopia::GetInstance(utopia::GetCurrentModule());
+				$obj =& utopia::GetInstance(utopia::GetCurrentModule());
 				$data = json_encode($obj->GetRawData());
 				utopia::Cache_Output($data,$etag,'application/json','',NULL,$_GET['_expires']);
 //				die();
@@ -64,7 +64,7 @@ class uDataOnly extends uBasicModule {
 		header("Cache-Control: no-store, no-cache, must-revalidate",true);
 		header("Cache-Control: post-check=0, pre-check=0", true);
 
-		$obj = utopia::GetInstance(utopia::GetCurrentModule());
+		$obj =& utopia::GetInstance(utopia::GetCurrentModule());
 
 		$fields = $obj->fields;
 		$layoutSections = $obj->layoutSections;
