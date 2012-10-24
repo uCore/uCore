@@ -5,10 +5,10 @@ $(function () {
 		$body.animate({height:'toggle',width:'toggle'});
 	});
 
-	setInterval(function setHtmlMargin() {
-		var top = parseInt($('html').css('padding-top'));
+	setInterval(function() {
+		var top = parseInt($('body').css('padding-top'));
 		if (!top) top = 0;
 		top += $('.admin-bar').outerHeight();
-		$('html').css('margin-top',top);
+		$('body').css('margin-top',top);
 	},5);
 });
