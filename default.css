@@ -52,7 +52,6 @@ ul.pagination li { list-style:none; float:left; }
 	vertical-align:top; padding:.5em 1em;
 }
 .layoutListSection td { vertical-align:middle; padding:4px; }
-.layoutListSection tr.ui-widget-header { font-weight:normal; background-image:none; }
 .layoutDetailSection,.layoutListSection {
 	/*margin: 10px;*/
 	padding: 5px;
@@ -63,7 +62,7 @@ ul.pagination li { list-style:none; float:left; }
 }
 
 .layoutDetailSection tr th {
-	font-size: 1.1em !important;
+	font-size: 1.1em;
 	color: #FFFFFF;
 	padding-left: 5px;
 	height: 15px;
@@ -71,7 +70,7 @@ ul.pagination li { list-style:none; float:left; }
 	background-repeat: repeat-x;
 }
 
-.layoutDetailSection td.fld { width:90px; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
+.layoutDetailSection td.fld { width:8em; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
 .inputtype.inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
 .inputtype.inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
