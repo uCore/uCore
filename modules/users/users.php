@@ -307,7 +307,7 @@ class uVerifyEmail extends uDataModule {
 		echo '<h1>Email Verification</h1>';
 		if (!isset($_GET['c']) || !($rec = $this->LookupRecord(array('email_confirm_code'=>$_GET['c'])))) { // reset pw
 			// no code given or code not found.
-			echo '<p>Could not validate your request.  If you are trying to change your email, please log in with your old credentials and re-submit the request.</p>';
+			echo '<p>Could not validate your request.  This could be because you have already validated your email.</p>';
 		} else {
 			$this->UpdateField('email_confirm_code',true,$rec['user_id']);
 			uUserLogin::SetLogin($rec['user_id']);
