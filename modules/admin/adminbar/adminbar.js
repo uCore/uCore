@@ -6,9 +6,9 @@ $(function () {
 	});
 
 	setInterval(function() {
-		var top = parseInt($('body').css('padding-top'));
+		var top = parseInt($('html').css('padding-top'));
 		if (!top) top = 0;
 		top += $('.admin-bar').outerHeight();
-		$('body').css('margin-top',top);
+		$('html').css('margin-top',top);
 	},5);
 });
