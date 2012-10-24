@@ -30,7 +30,7 @@ class uMenu {
 		
 		array_sort_subkey(self::$items[$group],'pos');
 		
-		$ret = '<ul class="u-menu">';
+		$ret = '<ul class="u-menu '.$group.'">';
 		foreach (self::$items[$group] as $item) {
 			$attrs = BuildAttrString($item['attr']);
 
