@@ -9,10 +9,15 @@ div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:le
 td { vertical-align: top }
 tr.odd { background-color: #ddd }
 
-
 th.sortable { cursor:pointer; }
 
 *:focus { outline: 1px; }
+
+
+.ui-helper-clearfix { /* fix for jquery panels extending to the height of adjacent floats */
+	overflow: hidden; /* or auto */
+	zoom: 1; /* required for ie hasLayout */
+}
 
 .btn { margin:1px 3px }
 .btn-edit { margin:0;width:16px;height:16px;padding:2px;background:url(images/edit.png) no-repeat center center white !important; }
