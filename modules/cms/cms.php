@@ -236,6 +236,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
+		$this->AddField('parent','parent','cms');
 		$this->AddField('link',"'View Page'",'cms','');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
 		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
@@ -333,7 +334,12 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			$this->UpdateField('is_published',0,$pkVal);
 			return;
 		}
-		if ($fieldAlias == 'cms_id') $newValue = UrlReadable($newValue);
+		if ($fieldAlias == 'cms_id') {
+			$newValue = UrlReadable($newValue);
+			// also update children's "parent" to this value
+			$children = $this->GetRows(array('parent'=>$pkVal),true);
+			foreach ($children as $child) $this->UpdateField('parent',$newValue,$child['cms_id']);
+		}
 		if (substr($fieldAlias,0,8) == 'content:') {
 			// replace uWidgetDiv with pragma
 			$html = str_get_html(stripslashes($newValue));
