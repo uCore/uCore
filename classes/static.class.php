@@ -137,7 +137,7 @@ class utopia {
 
 				if ($ref->isSubclassOf('uBasicModule')) {
 					$obj =& utopia::GetInstance($class['module_name']);
-        	                        $class['uuid'] = $obj->GetUUID();
+					$class['uuid'] = $obj->GetUUID();
 				}
 				$rows[$class['module_name']] = $class;
 			}
@@ -169,7 +169,7 @@ class utopia {
 		return $inputs;
 	}
 
-	static function GetRewriteSections() {
+	static function GetRewriteURL() {
 		$REQUESTED_URL = array_key_exists('HTTP_X_REWRITE_URL',$_SERVER) ? $_SERVER['HTTP_X_REWRITE_URL'] : $_SERVER['REQUEST_URI'];
 		$REQUESTED_URL = preg_replace('/\?.*/i','',$REQUESTED_URL);
 
@@ -177,8 +177,8 @@ class utopia {
 		$REQUESTED_URL = preg_replace('/^u\//','',$REQUESTED_URL);
 
 		$path = urldecode($REQUESTED_URL);
-
-		return explode('/',$path);
+		
+		return $path;
 	}
 
 	static function SetCurrentModule($module) {
@@ -201,10 +201,9 @@ class utopia {
 		}
 
 		// rewritten url?   /u/MOD/
-		$sections = self::GetRewriteSections();
-		if ($sections && isset($sections[0])) {
-			$m = utopia::UUIDExists($sections[0]);
-			if ($m) return $m['module_name'];
+		$u = self::GetRewriteURL();
+		foreach (self::GetModules() as $m) {
+			if (preg_match('/^'.preg_quote($m['uuid'],'/').'/',$u)) return $m['module_name'];
 		}
 
 		// admin root?

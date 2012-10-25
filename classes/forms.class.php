@@ -400,7 +400,6 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (is_string($mapping) && $mapping !== '') $mapping = array($mapping);
 		if ($mapping === true) $this->rewritePersistPath = true;
 		if (!is_array($mapping)) $mapping = array();
-		array_unshift($mapping,'{uuid}');
 
 		// defaults?
 
@@ -414,9 +413,13 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($this->rewriteMapping === NULL) return FALSE;
 		if (get_class($this) !== utopia::GetCurrentModule()) return FALSE;
 
-		$sections = utopia::GetRewriteSections();
+		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
+		
+		$sections = utopia::GetRewriteURL();
+		$sections = preg_replace('/^'.preg_quote($uuid.'/','/').'/','',$sections);
+		$sections = explode('/',$sections);
 		if (!$sections) return FALSE;
-
+		
 		$return = array();
 		foreach ($sections as $key => $value) {
 			$replace = array();
@@ -469,6 +472,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 		if (isset($filters['uuid'])) unset($filters['uuid']);
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
+		array_unshift($mapped,$uuid);
 
 		$newPath = PATH_REL_ROOT.join('/',$mapped);
 		$oldPath = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
