@@ -668,6 +668,7 @@ class uCMS_View extends uSingleDataModule {
 		utopia::SetVar('cms_id',$rec['cms_id']);
 		utopia::SetVar('cms_parent_id',$rec['parent']);
 		$path = $this->GetCmsParents($rec['cms_id']);
+		utopia::SetVar('cms_parents',$path);
 		utopia::SetVar('cms_root_id',reset($path));
 		
 		utopia::SetDescription($rec['description']);
