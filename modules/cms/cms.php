@@ -505,6 +505,14 @@ class uCMS_View extends uSingleDataModule {
 			$rec = self::findPage();
 		}
 		if (!$rec) return;
+
+		utopia::SetVar('cms_id',$rec['cms_id']);
+		utopia::SetVar('cms_parent_id',$rec['parent']);
+		$path = $this->GetCmsParents($rec['cms_id']);
+		utopia::SetVar('cms_parents',$path);
+		utopia::SetVar('cms_root_id',reset($path));
+		utopia::SetDescription($rec['description']);
+
 		if (!utopia::UsingTemplate()) return;
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 	}
@@ -665,13 +673,6 @@ class uCMS_View extends uSingleDataModule {
 		if (empty($rec)) utopia::PageNotFound();
 		if (!$rec['is_published'] && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') === FALSE) utopia::PageNotFound();
 
-		utopia::SetVar('cms_id',$rec['cms_id']);
-		utopia::SetVar('cms_parent_id',$rec['parent']);
-		$path = $this->GetCmsParents($rec['cms_id']);
-		utopia::SetVar('cms_parents',$path);
-		utopia::SetVar('cms_root_id',reset($path));
-		
-		utopia::SetDescription($rec['description']);
 		echo '<div class="cms-'.$rec['cms_id'].'">{content}</div>';
 	}
 	
