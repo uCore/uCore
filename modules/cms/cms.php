@@ -499,8 +499,9 @@ class uCMS_View extends uSingleDataModule {
 		if (self::$asserted) return;
 		self::$asserted = true;
 		$rec = self::findPage();
-		if (utopia::GetCurrentModule() !== __CLASS__ && isset($_GET['uuid']) && $rec) echo '{content}';
 		if (!$rec) return;
+
+		echo '<div class="cms-'.$rec['cms_id'].'">{content}</div>';
 
 		utopia::SetVar('cms_id',$rec['cms_id']);
 		utopia::SetVar('cms_parent_id',$rec['parent']);
@@ -663,13 +664,11 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	public function RunModule() {
-		// custom home breadcrumb
-		//breadcrumb::ShowHome(false);
 		$rec = self::findPage();
 		if (empty($rec)) utopia::PageNotFound();
 		if (!$rec['is_published'] && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') === FALSE) utopia::PageNotFound();
-
-		echo '<div class="cms-'.$rec['cms_id'].'">{content}</div>';
+		
+		// nothing further is required as the content is output by 'assertContent'
 	}
 	
 	public function GetCmsParents($cms_id,$includeSelf=true) {
