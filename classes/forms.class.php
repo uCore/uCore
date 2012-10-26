@@ -420,7 +420,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$sections = explode('/',$sections);
 		if (!$sections) return FALSE;
 		
-		$return = array();
+		$return = array('uuid'=>$uuid);
 		foreach ($sections as $key => $value) {
 			$replace = array();
 			if (!array_key_exists($key,$this->rewriteMapping)) continue;
