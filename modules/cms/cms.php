@@ -498,12 +498,8 @@ class uCMS_View extends uSingleDataModule {
 	public function assertContent() {
 		if (self::$asserted) return;
 		self::$asserted = true;
-		if (utopia::GetCurrentModule() !== __CLASS__ && isset($_GET['uuid'])) {
-			$rec = $this->LookupRecord($_GET['uuid']);
-			if ($rec) echo '{content}';
-		} else {
-			$rec = self::findPage();
-		}
+		$rec = self::findPage();
+		if (utopia::GetCurrentModule() !== __CLASS__ && isset($_GET['uuid']) && $rec) echo '{content}';
 		if (!$rec) return;
 
 		utopia::SetVar('cms_id',$rec['cms_id']);
