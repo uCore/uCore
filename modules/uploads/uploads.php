@@ -6,6 +6,7 @@ class uUploads extends uBasicModule {
 	}
 	function GetUUID() { return 'uploads'; }
 	function RunModule() {
+		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
 		$sections = utopia::GetRewriteURL();
 		$sections = preg_replace('/^'.preg_quote($uuid.'/','/').'/','',$sections); // shift uuid off the start
 		$path = urldecode(PATH_UPLOADS.'/'.$sections);
