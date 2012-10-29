@@ -86,7 +86,7 @@ class uJavascript extends uBasicModule {
 		self::LinkFile($this->GetURL(),-10);
 
 		self::LinkFile('//code.jquery.com/jquery-1.8.2.js',-100);
-		self::LinkFile('//code.jquery.com/ui/1.9.0/jquery-ui.js',-99);
+		self::LinkFile('//code.jquery.com/ui/1.9.1/jquery-ui.js',-99);
 
 		self::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
 		self::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');

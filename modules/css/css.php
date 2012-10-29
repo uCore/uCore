@@ -78,7 +78,7 @@ class uCSS extends uBasicModule {
 
 		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 
-		self::LinkFile('//code.jquery.com/ui/1.9.0/themes/base/jquery-ui.css',-100);
+		self::LinkFile('//code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css',-100);
 		
 		self::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 	}
