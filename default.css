@@ -120,7 +120,7 @@ ul.pagination li { list-style:none; float:left; }
 }
 .ui-combobox .ui-combobox-input.ui-autocomplete-input {
 	display:block;
-	margin:0;
+	margin:0; border:0;
 }
 .ui-autocomplete.ui-menu {
 	overflow-x: hidden;
