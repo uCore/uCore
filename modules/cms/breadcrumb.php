@@ -6,7 +6,7 @@ class uBreadcrumb {
 	static function AddCrumb($name,$url) {
 		self::$extras[] = array($name,$url);
 	}
-	static function GetTrail() {
+	static function GetTrail($start = null) {
 		$obj =& utopia::GetInstance('uCMS_List');
 		$arr = $obj->GetNestedArray();
 		$out = array();
@@ -31,6 +31,7 @@ class uBreadcrumb {
 			$build[] = '<a href="'.$k.'">'.$v.'</a>';
 		}
 		$build = array_unique($build);
+		if ($start) $build[] = $start;
 		if (count($build) <= 1) return '';
 
 		return '<div class="breadcrumb">'.implode(' &gt; ',array_reverse($build)).'</div>';
