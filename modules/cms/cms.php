@@ -337,8 +337,10 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		if ($fieldAlias == 'cms_id') {
 			$newValue = UrlReadable($newValue);
 			// also update children's "parent" to this value
-			$children = $this->GetRows(array('parent'=>$pkVal),true);
-			foreach ($children as $child) $this->UpdateField('parent',$newValue,$child['cms_id']);
+			if ($pkVal !== NULL) {
+				$children = $this->GetRows(array('parent'=>$pkVal),true);
+				foreach ($children as $child) $this->UpdateField('parent',$newValue,$child['cms_id']);
+			}
 		}
 		if (substr($fieldAlias,0,8) == 'content:') {
 			// replace uWidgetDiv with pragma
