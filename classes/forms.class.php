@@ -2135,7 +2135,7 @@ abstract class uDataModule extends uBasicModule {
 				$fieldData = $this->fields[$rk];
 				if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true) && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
 			}
-			$rows[] =& $row;
+			$rows[] = $row;
 		}
 		$this->filters = $fltrs;
 
