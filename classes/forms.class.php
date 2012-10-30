@@ -2127,15 +2127,15 @@ abstract class uDataModule extends uBasicModule {
 
 		$rows = array();
 		while (($row = mysql_fetch_assoc($dataset))) {
+			if (isset($row['__metadata']) && $row['__metadata']) {
+				$meta = utopia::jsonTryDecode($row['__metadata']);
+				if ($meta) $row = array_merge($row,$meta);
+			}
 			foreach ($row as $rk => $rv) { // dont explode blob data
 				$fieldData = $this->fields[$rk];
 				if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true) && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
-				if (isset($row['__metadata']) && $row['__metadata']) {
-					$meta = utopia::jsonTryDecode($row['__metadata']);
-					if ($meta) $row = array_merge($row,$meta);
-				}
 			}
-			$rows[] = $row;
+			$rows[] =& $row;
 		}
 		$this->filters = $fltrs;
 
