@@ -19,7 +19,7 @@ class uMenu {
 		);
 		return self::$items[$group][$id];
 	}
-	public static function &GetItem($id) {
+	public static function &GetItem($id,$group='') {
 		if (!isset(self::$items[$group][$id])) return;
 		return self::$items[$group][$id];
 	}
