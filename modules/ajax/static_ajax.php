@@ -88,29 +88,27 @@ class internalmodule_StaticAjax extends uBasicModule {
 		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
 	}
 	public static function getFile() {
-		$qry = "SELECT ".mysql_real_escape_string($_GET['f'])." as file, ".mysql_real_escape_string($_GET['f'])."_filetype as filetype, ".mysql_real_escape_string($_GET['f'])."_filename as filename FROM ".mysql_real_escape_string($_GET['t'])." WHERE ".mysql_real_escape_string($_GET['k'])." = ".mysql_real_escape_string($_GET['p']);
-		$result = sql_query($qry);
-		if ($result === FALSE || mysql_num_rows($result) <= 0) { die('No File Found.'); }
-		$data = mysql_result($result,0,'file');
-		$type = mysql_result($result,0,'filetype');
-		$name = mysql_result($result,0,'filename');
+		$o =& utopia::GetInstance($_GET['m']);
+		$rec = $o->LookupRecord($_GET['p']);
+		if (!$rec || !isset($rec[$_GET['f']])) {
+			utopia::UseTemplate();
+			utopia::PageNotFound();
+		}
+		$data = $rec[$_GET['f']];
+		$type = $rec[$_GET['f'].'_filetype'];
+		$name = $rec[$_GET['f'].'_filename'];
 
 		echo utopia::Cache_Output($data, sha1($data), $type, $name, NULL, 86400, $_GET['a']);
 	}
 
 	public static function getImage() {
-		$qry = "SELECT ".mysql_real_escape_string($_GET['f'])." as img FROM ".mysql_real_escape_string($_GET['t'])." WHERE ".mysql_real_escape_string($_GET['k'])." = ".mysql_real_escape_string($_GET['p']);
-		$data = '';
-		try {
-			$result = sql_query($qry);
-			if ($result !== FALSE && mysql_num_rows($result) > 0)
-				$data = mysql_result($result,0,'img');
-		} catch (Exception $e) {}
-
-		if (!$data) {
+		$o =& utopia::GetInstance($_GET['m']);
+		$rec = $o->LookupRecord($_GET['p']);
+		if (!$rec || !isset($rec[$_GET['f']])) {
 			utopia::UseTemplate();
 			utopia::PageNotFound();
 		}
+		$data = $rec[$_GET['f']];
 
 		$etag = sha1($_SERVER['REQUEST_URI'].'-'.$data);
 		utopia::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');

@@ -94,7 +94,7 @@ class uConfig {
 			}
 
 			try {
-				sql_query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
+				database::query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
 			} catch (Exception $e) {
 				self::$configVars['SQL_SERVER']['notice'] = $e->getMessage();
 			}

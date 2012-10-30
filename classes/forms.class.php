@@ -500,13 +500,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		return $url.$query;
 	}
 	public function IsInstalled() {
-		//check if its installed in the db
-		//$result = sql_query("SELECT * FROM internal_modules WHERE (`module_name` = '". get_class($this) ."')");
 		return utopia::ModuleExists(get_class($this));
-		//$row = $GLOBALS['modules'][get_class($this)];
-		//$row = GetRow($result);
-		//if ($row !== NULL) return $row;
-		//return false;
 	}
 	public function InstallModule() {
 		// module should be installed
@@ -521,30 +515,29 @@ abstract class uBasicModule implements iUtopiaModule {
 				//if (($row = $this->IsInstalled()) == FALSE) {
 				//DebugMail('not installed',get_class($this));
 				$active = flag_is_set($this->GetOptions(),INSTALL_INACTIVE) ? '0' : '1';
-				sql_query("INSERT INTO internal_modules (`uuid`,`module_name`,`module_active`) VALUES ('$uuid','". get_class($this) ."','$active')",false);
+				database::query('INSERT INTO internal_modules (`uuid`,`module_name`,`module_active`) VALUES (?,?,?)',array($uuid,get_class($this),$active));
 			} else {
-				//			$qry = "UPDATE db_modules SET `module_parent` = '".$this->module_parent."', `module_name` = '". get_class($this) ."'"; // removed because parent no longer used
-				$qry = "UPDATE internal_modules SET `uuid` = '".$uuid."', `module_name` = '". get_class($this) ."', `sort_order` = '".$this->GetSortOrder()."'";
+				$qry = 'UPDATE internal_modules SET `uuid` = ?, `module_name` = ?, `sort_order` = ?';
+				$args = array($uuid,get_class($this),$this->GetSortOrder);
 				if (flag_is_set($this->GetOptions(),ALWAYS_ACTIVE))
-					$qry .= ", `module_active` = '1'";
-				//			else
-				//				$qry .= ", `module_active` = '0'";
+					$qry .= ', `module_active` = 1';
 
-				//echo "$qry WHERE `module_name` = '{$row['module_name']}'\n";
-				sql_query("$qry WHERE `uuid` = '{$row['uuid']}'");
+				$qry .= ' WHERE `uuid = ?';
+				$args[] = $row['uuid'];
+				database::query($qry,$args);
 			}
 		}
 		//		$GLOBALS['modules'][$this->GetUUID()] = get_class($this);
 	}
 
-	public function GetFileFromTable($field,$table,$key,$pkVal,$att = 'inline') {
-		return PATH_REL_CORE."index.php?__ajax=getFile&f=$field&t=$table&k=$key&p=$pkVal&a=$att";
+	public function GetFileFromTable($field,$pkVal,$att = 'inline') {
+		return PATH_REL_CORE."index.php?__ajax=getFile&m=".get_class($this)."&f=$field&p=$pkVal&a=$att";
 	}
 
 	public function GetImageLinkFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL) {
 		if ($width) $width = "&w=$width";
 		if ($height) $height = "&h=$height";
-		return PATH_REL_CORE."index.php?__ajax=getImage&f=$field&t=$table&k=$key&p=$pkVal$width$height";
+		return PATH_REL_CORE."index.php?__ajax=getImage&m=".get_class($this)."&f=$field&p=$pkVal$width$height";
 	}
 
 	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {
@@ -1040,11 +1033,8 @@ abstract class uDataModule extends uBasicModule {
 		//$pk = $this->fields[$alias]['vtable']['pk'];
 
 		//		if (!$useCache || (!array_key_exists($table,$this->rvCache) || !array_key_exists($pkVal,$this->rvCache[$table]))) {
-		$query = "SELECT $field FROM $table WHERE $pk = '$pkVal'";
-		$row = GetRow(sql_query($query));
-		//			if ($useCache) $this->rvCache[$table][$pkVal] = $row;
-		//		} else
-		//			$row = $this->rvCache[$table][$pkVal];
+		$stm = database::query("SELECT $field FROM $table WHERE $pk = ?",array($pkVal));
+		$row = $stm->fetch();
 		return $row[$field];
 	}
 
@@ -1057,8 +1047,8 @@ abstract class uDataModule extends uBasicModule {
 		$table = $fieldData['vtable']['table'];
 		$pk = $fieldData['vtable']['pk'];
 
-		$qry = "SELECT $str FROM $table as {$fieldData['tablename']} WHERE $pk = '$pkValue'";
-		$row = GetRow(sql_query($qry));
+		$stm = database::query("SELECT $str FROM $table as {$fieldData['tablename']} WHERE $pk = ?",array($pkValue));
+		$row = $stm->fetch();
 
 		if (empty($row[$alias])) return $pkValue;
 
@@ -1170,8 +1160,8 @@ abstract class uDataModule extends uBasicModule {
 			$arr = $values;
 		} elseif (IsSelectStatement($values)) {
 			$arr = array();
-			$result = sql_query($values);
-			while ($result != false && (($row = mysql_fetch_row($result)) !== FALSE)) {
+			$result = database::query($values);
+			while ($result != false && (($row = $result->fetch(PDO::FETCH_NUM)) !== FALSE)) {
 				if (isset($row[1])) {
 					// key value pair
 					$arr[$row[0]] = $row[1];
@@ -1661,11 +1651,11 @@ abstract class uDataModule extends uBasicModule {
 		return $from;
 	}
 
-	public function GetSelectStatement() {//$filter = '',$sortColumn='') {
+	public function GetSelectStatement() {
 		// init fields, get primary key, its required by all tables anyway so force it...
 		//grab the table alias and primary key from the alias's tabledef
 
-		$flds = array();//$this->sqlTableSetup['alias'].".".$this->sqlTableSetup['pk']);
+		$flds = array();
 
 		//		$tblJoins = array();
 		//		$tblInc = 1;
@@ -1864,7 +1854,6 @@ abstract class uDataModule extends uBasicModule {
 		// set filter NAME
 
 		// if where, ignore type
-		$value = mysql_real_escape_string($value);
 		$fieldName = $this->FormatFieldName($fieldName, $fieldTypeOverride);
 
 		// do value
@@ -2023,9 +2012,7 @@ abstract class uDataModule extends uBasicModule {
 	public function &GetDataset() {
 		$query = $this->GetSqlQuery();
 
-		if ($this->explainQuery) print_r(GetRows(sql_query("EXPLAIN EXTENDED $query")));
-
-		$this->dataset = sql_query($query);
+		$this->dataset = database::query($query);
 
 		return $this->dataset;
 	}
@@ -2126,7 +2113,7 @@ abstract class uDataModule extends uBasicModule {
 		$dataset = $this->GetDataset();
 
 		$rows = array();
-		while (($row = mysql_fetch_assoc($dataset))) {
+		while (($row = $dataset->fetch())) {
 			if (isset($row['__metadata']) && $row['__metadata']) {
 				$meta = utopia::jsonTryDecode($row['__metadata']);
 				if ($meta) $row = array_merge($row,$meta);
@@ -2192,7 +2179,7 @@ abstract class uDataModule extends uBasicModule {
 		switch ($forceType) {
 			case ftFILE:
 				$filename = '';
-				$link = $this->GetFileFromTable($this->fields[$fieldName]['field'],$this->fields[$fieldName]['vtable']['table'],$this->fields[$fieldName]['vtable']['pk'],$rec['_'.$this->fields[$fieldName]['vtable']['alias'].'_pk']);
+				$link = $this->GetFileFromTable($fieldName,$rec[$this->GetPrimaryKey()]);
 				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a target="_blank" href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
 				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
@@ -2348,7 +2335,7 @@ abstract class uDataModule extends uBasicModule {
 		if (uEvents::TriggerEvent('BeforeDeleteRecord',$this,array($pkVal)) === FALSE) return FALSE;
 		
 		$table = TABLE_PREFIX.$this->GetTabledef();
-		sql_query("DELETE FROM $table WHERE `{$this->GetPrimaryKeyTable()}` = '$pkVal';");
+		database::query("DELETE FROM $table WHERE `{$this->GetPrimaryKeyTable()}` = ?",array($pkVal));
 		
 		uEvents::TriggerEvent('AfterDeleteRecord',$this,array($pkVal));
 		
@@ -2442,7 +2429,7 @@ abstract class uDataModule extends uBasicModule {
 						if (!is_array($newValue)) $newValue = array($newValue);
 						// do link table stuff
 						// delete all where tofield is oldpk
-						sql_query('DELETE FROM `'.$tableObj->tablename.'` WHERE `'.$toField.'` = \''.$oldPkVal.'\'');
+						database::query('DELETE FROM `'.$tableObj->tablename.'` WHERE `'.$toField.'` = ?',array($oldPkVal));
 						foreach ($newValue as $v) {
 							$n = null;
 							$tableObj->UpdateField($toField,$oldPkVal,$n); //set left

@@ -34,30 +34,6 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		utopia::RegisterAjax('toggleT',array($this,'toggleT'));
 		$this->UpdateHtaccess();
 	}
-	public function optimizeTables() {
-		echo '<h3>Optimise Tables</h3>';
-		echo '<pre>';
-		set_time_limit( 100 );
-
-		$time = microtime();
-		$time = explode(' ', $time);
-		$time = $time[1] + $time[0];
-		$start = $time;
-
-		$db_name = SQL_DBNAME;
-		echo "Database : $db_name \n";
-		$res = sql_query("SHOW TABLES FROM `" . $db_name . "`") or die('Query : ' . mysql_error());
-		while ( $rec = mysql_fetch_row($res) ) {
-			sql_query('OPTIMIZE TABLE `'.$rec[0].'`');
-		}
-
-		$time = microtime();
-		$time = explode(' ', $time);
-		$time = $time[1] + $time[0];
-		$finish = $time;
-		$total_time = round(($finish - $start), 6);
-		echo "\nTables optimised in $total_time secs\n</pre>";
-	}
 
 	public function toggleT() {
 		if (!array_key_exists('admin_showT',$_SESSION))

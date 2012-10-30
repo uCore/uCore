@@ -23,12 +23,12 @@ uEvents::TriggerEvent('ConfigDefined');
 
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
 
-$result = sql_query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
-if (!mysql_num_rows($result))
-        sql_query('CREATE TABLE __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40)) ENGINE='.MYSQL_ENGINE);
-else {
-        $r = mysql_fetch_assoc($result);
-        if ($r['Engine'] != MYSQL_ENGINE) sql_query('ALTER TABLE __table_checksum ENGINE='.MYSQL_ENGINE);
+$rows = 0;
+$result = database::query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
+if (!($r = $result->fetch())) {
+        database::query('CREATE TABLE __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40)) ENGINE='.MYSQL_ENGINE);
+} else {
+        if ($r['Engine'] != MYSQL_ENGINE) database::query('ALTER TABLE __table_checksum ENGINE='.MYSQL_ENGINE);
 }
 uTableDef::checksumValid(null,null); // cache table checksums
 uTableDef::TableExists(null); // cache table exists

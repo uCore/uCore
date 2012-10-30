@@ -179,7 +179,10 @@ abstract class uTableDef implements iUtopiaModule {
 
 	static $tableCache = NULL;
 	static function TableExists($tableName,$refresh=false) {
-		if ($refresh || self::$tableCache === NULL) self::$tableCache = GetRows(sql_query('SHOW TABLES'));
+		if ($refresh || self::$tableCache === NULL) {
+			$stm = database::query('SHOW TABLES');
+			self::$tableCache = $stm->fetchAll();
+		}
 		foreach (self::$tableCache as $tbl) {
 			if ($tbl['Tables_in_'.SQL_DBNAME] == $tableName) return TRUE;
 		}
@@ -188,7 +191,10 @@ abstract class uTableDef implements iUtopiaModule {
 
 	public static $tableChecksum = NULL;
 	public static function checksumValid($class,$checksum,$refresh=false) {
-		if ($refresh || self::$tableChecksum === NULL) self::$tableChecksum = GetRows(sql_query('SELECT * FROM `__table_checksum`'));
+		if ($refresh || self::$tableChecksum === NULL) {
+			$stm = database::query('SELECT * FROM `__table_checksum`');
+			self::$tableChecksum = $stm->fetchAll();
+		}
 		foreach (self::$tableChecksum as $row) {
 			if ($row['name'] == TABLE_PREFIX.$class) return $row['checksum'] === $checksum;
 		}
@@ -255,7 +261,8 @@ abstract class uTableDef implements iUtopiaModule {
 		$tableExists = self::TableExists($this->tablename);
 		$renamed = false;
 		if (!$tableExists) {
-			$tableExists = (sql_query('RENAME TABLE '.mysql_real_escape_string($oldTable).' TO '.$this->tablename,true)) ? true : false;
+			$stm = database::query('RENAME TABLE `'.$oldTable.'` TO `'.$this->tablename.'`');
+			$tableExists = ($stm->rowCount) ? true : false;
 			$renamed = true;
 		}
 
@@ -266,14 +273,14 @@ abstract class uTableDef implements iUtopiaModule {
 			// checksum
 			if (!$renamed && self::checksumValid(get_class($this),$checksum)) return;
 
-			$fullColumns = sql_query('SHOW FULL COLUMNS FROM `'.$this->tablename.'`',true);
-			$fullColumns = GetRows($fullColumns);
+			$stm = database::query('SHOW FULL COLUMNS FROM `'.$this->tablename.'`');
+			if ($stm) $fullColumns = $stm->fetchAll();
 
 			// update table
 			$this->RefreshTable($fullColumns);
 		}
 
-		sql_query('INSERT INTO `__table_checksum` VALUES (\''.$this->tablename.'\',\''.$checksum.'\') ON DUPLICATE KEY UPDATE `checksum` = \''.$checksum.'\'');
+		database::query('INSERT INTO `__table_checksum` VALUES (?,?) ON DUPLICATE KEY UPDATE `checksum` = ?',array($this->tablename,$checksum,$checksum));
 	}
 
 	function RefreshTable($rows) {
@@ -315,14 +322,14 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 
 		// change engine?
-		$row = GetRow(sql_query("SHOW TABLE STATUS LIKE '$this->tablename'"));
-		if ($row && $row['Engine'] != $this->engine) {
-			sql_query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
+		$stm = database::query('SHOW TABLE STATUS LIKE ?',array($this->tablename));
+		if ($stm && ($row = $stm->fetch()) && $row['Engine'] != $this->engine) {
+			database::query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
 		}
 
 		// update all indexes and keys
 		$idx = array(); $unq = array();
-		$indexes = GetRows(sql_query("SHOW INDEX FROM `$this->tablename`"));
+		$indexes = database::query("SHOW INDEX FROM `$this->tablename`")->fetchAll();
 		foreach ($indexes as $v) {
 			if ($v['Key_name'] == 'PRIMARY') {
 				$pri[] = $v['Column_name'];
@@ -373,7 +380,7 @@ abstract class uTableDef implements iUtopiaModule {
 		if (!$otherArray) return;
 
 		foreach ($otherArray as $qry) {
-			sql_query($qry);
+			database::query($qry);
 		}
 	}
 	private static function keyDiff($arr1,$arr2) {
@@ -407,7 +414,7 @@ abstract class uTableDef implements iUtopiaModule {
 
 		$qry .= join(",\n",$flds)."\n) CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION.";";
 		//echo "$qry\n";
-		sql_query($qry,true);
+		database::query($qry);
 
 	}
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
@@ -423,7 +430,6 @@ abstract class uTableDef implements iUtopiaModule {
 		
 		if (is_array($newValue)) $newValue = json_encode($newValue);
 		
-		if ($fieldType != ftRAW) $newValue = mysql_real_escape_string($newValue);
 		if ($newValue) switch ($fieldType) {
 			case ftRAW: break;
 			case ftDATE:
@@ -446,32 +452,29 @@ abstract class uTableDef implements iUtopiaModule {
 
 		if ($newValue === '' || $newValue === NULL)
 			$newValue = 'NULL';
-		else {
-			$dontQuoteTypes = array(ftRAW,ftCURRENCY,ftPERCENT,ftFLOAT,ftDECIMAL,ftBOOL,ftNUMBER);
-			if (!in_array($fieldType,$dontQuoteTypes)) {
-				$newValue = "'$newValue'";
-			}
-		}
 
 		$updateQry = array();
 
 		if ($pkVal === NULL) {
-			$query = 'INSERT INTO `'.$this->tablename.'` (`'.$fieldName.'`) VALUES ('.$newValue.')';
+			$query = 'INSERT INTO '.$this->tablename.' (`'.$fieldName.'`) VALUES (?)';
+			$args = array($newValue);
 		} else {
-			$query = 'UPDATE `'.$this->tablename.'` SET `'.$fieldName.'` = '.$newValue.' WHERE `'.$this->GetPrimaryKey().'` = \''.$pkVal.'\'';
+			$query = 'UPDATE '.$this->tablename.' SET `'.$fieldName.'` = ? WHERE `'.$this->GetPrimaryKey().'` = ?';
+			$args = array($newValue,$pkVal);
 		}
 		
-		sql_query($query);
+		database::query($query,$args);
 		if ($fieldName == $this->GetPrimaryKey()) {
 			// this allows us to get the real evaluated value of the new primary key
-			$row = GetRow(sql_query('SELECT '.$newValue.' AS new_pk'));
+			$stm = database::query('SELECT ? AS new_pk',args($newValue));
+			$row = $stm->fetch();
 			$pkVal = $row['new_pk'];
-		}
-		elseif ($pkVal === NULL) $pkVal = mysql_insert_id();
+		} elseif ($pkVal === NULL) $pkVal = database::connect()->lastInsertId();
 		uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 	}
 	public function LookupRecord($pkVal) {
-		$row = GetRow(sql_query('SELECT * FROM '.$this->tablename.' WHERE '.$this->GetPrimaryKey().' = \''.$pkVal.'\''));
+		$stm = database::query('SELECT * FROM '.$this->tablename.' WHERE '.$this->GetPrimaryKey().' = ?',array($pkVal));
+		$row = $stm->fetch();
 		return $row;
 	}
 }
