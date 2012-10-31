@@ -45,6 +45,9 @@ class module_TinyMCE extends uBasicModule {
 			$options['setup'] = 'tinyMceSetup';
 			$options['save_onsavecallback'] = 'onSave';
 
+			$options['paste_remove_styles_if_webkit'] = false;
+			$options['paste_retain_style_properties'] = 'all';
+
 			$options['valid_elements'] = '*[*]';
 			$options['extended_valid_elements'] = '*[*]';
 
