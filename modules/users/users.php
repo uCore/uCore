@@ -284,7 +284,7 @@ class uRegisterUser extends uDataModule {
 		</form>
 		<script>
 		function regValidate(){
-			$('#username2').css('border-color','initial');
+			$('#username2').css('border-color','');
 			if ($('#username2').val() == '') return;
 			if ($('#username2').val() !== $('#username').val()) {
 				$('#username2').css('border-color','#f00');
@@ -292,6 +292,7 @@ class uRegisterUser extends uDataModule {
 				$('#username2').css('border-color','#0f0');
 			}
 		};
+		$('#username').change(regValidate).change();
 		$('#username2').change(regValidate).change();
 		</script>
 		<?php
