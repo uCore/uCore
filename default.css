@@ -109,8 +109,8 @@ ul.pagination li { list-style:none; float:left; }
 	position: relative;
 	display: inline-block; zoom:1;
 	padding: 0;
-	width: auto;
-	height: auto;
+	width: auto !important;
+	height: auto !important;
 }
 .ui-combobox .ui-button.ui-combobox-toggle {
 	position: absolute;
