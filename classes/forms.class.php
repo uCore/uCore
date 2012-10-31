@@ -1655,7 +1655,7 @@ abstract class uDataModule extends uBasicModule {
 		// init fields, get primary key, its required by all tables anyway so force it...
 		//grab the table alias and primary key from the alias's tabledef
 
-		$flds = array();
+		$flds = array('count(*) as `__count`');
 
 		//		$tblJoins = array();
 		//		$tblInc = 1;
@@ -2119,6 +2119,7 @@ abstract class uDataModule extends uBasicModule {
 				if ($meta) $row = array_merge($row,$meta);
 			}
 			foreach ($row as $rk => $rv) { // dont explode blob data
+				if (!isset($this->fields[$rk])) continue;
 				$fieldData = $this->fields[$rk];
 				if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true) && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
 			}
