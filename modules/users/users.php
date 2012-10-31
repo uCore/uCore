@@ -241,13 +241,13 @@ class uRegisterUser extends uDataModule {
 					uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
 					break;
 				}
+				if ($_POST['username'] !== $_POST['username2']) {
+					uNotices::AddNotice('Emails do not match.',NOTICE_TYPE_ERROR);
+					break;
+				}
 				
 				if ($_POST['password'] === '') {
 					uNotices::AddNotice('Password cannot be blank.',NOTICE_TYPE_ERROR);
-					break;
-				}
-				if ($_POST['password'] !== $_POST['password2']) {
-					uNotices::AddNotice('Passwords do not match.',NOTICE_TYPE_ERROR);
 					break;
 				}
 				
@@ -276,12 +276,24 @@ class uRegisterUser extends uDataModule {
 		<form class="register-user left oh" action="" method="POST">
 			<label for="username">Email:</label>
 			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" />
+			<label for="username2">Confirm Email:</label>
+			<input type="text" name="username2" id="username2" value="<?php echo isset($_POST['username2']) ? htmlentities(utf8_decode($_POST['username2'])):''; ?>" />
 			<label for="password">Password:</label>
 			<input type="password" name="password" id="password" />
-			<label for="password2">Confirm Password:</label>
-			<input type="password" name="password2" id="password2" />
 			<label>&nbsp;</label><input class="btn right" style="float:right;width:auto" type="submit" value="Register" />
 		</form>
+		<script>
+		function regValidate(){
+			$('#username2').css('border-color','initial');
+			if ($('#username2').val() == '') return;
+			if ($('#username2').val() !== $('#username').val()) {
+				$('#username2').css('border-color','#f00');
+			} else {
+				$('#username2').css('border-color','#0f0');
+			}
+		};
+		$('#username2').change(regValidate).change();
+		</script>
 		<?php
 	}
 }
