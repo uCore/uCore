@@ -37,7 +37,11 @@ class database {
 		$GLOBALS['sql_queries'][$GLOBALS['sql_query_count']] = $query;
 	
 		$stm = $pdo->prepare($query);
-		if (!$stm->execute($args)) {
+		$ca = count($args);
+		for ($i = 1; $i <= $ca; $i++) {
+			$stm->bindValue($i,$args[$i-1],self::getType($args[$i-1]));
+		}
+		if (!$stm->execute()) {
 			$err = $stm->errorInfo();
 			if ( $err[0] != '00000' ) {
 				throw new Exception($err[2]);
@@ -47,6 +51,15 @@ class database {
 
 		$timetaken = timer_end($tID);
 		return $stm;
+	}
+	static function getType($val) {
+		if ($val === NULL) return PDO::PARAM_NULL;
+		if (is_bool($val)) return PDO::PARAM_BOOL;
+		if (is_int($val)) return PDO::PARAM_INT;
+		//if (is_numeric($val) || is_float($val)) //default str
+		if (is_resource($val)) return PDO::PARAM_LOB;
+
+		return PDO::PARAM_STR;
 	}
 }
 

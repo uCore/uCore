@@ -451,7 +451,7 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 
 		if ($newValue === '' || $newValue === NULL)
-			$newValue = 'NULL';
+			$newValue = NULL;
 
 		$updateQry = array();
 
