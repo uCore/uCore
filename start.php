@@ -59,6 +59,17 @@ ini_set('session.cookie_path',PATH_REL_ROOT);
 session_cache_limiter(false);
 session_name('ucore');
 session_start();
+$timeout = 3600; if (isset($_SESSION['SESSION_LIFETIME'])) $timeout = $_SESSION['SESSION_LIFETIME'];
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
+	session_unset();
+	session_destroy();
+}
+if (!isset($_SESSION['CREATED'])) $_SESSION['CREATED'] = time();
+if (time() - $_SESSION['CREATED'] > 1800) { // session started more than 30 minates ago
+	session_regenerate_id(true);
+	$_SESSION['CREATED'] = time();
+}
+$_SESSION['LAST_ACTIVITY'] = time();
 
 include('error.php');
 

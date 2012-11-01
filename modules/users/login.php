@@ -89,6 +89,7 @@ class uUserLogin extends uDataModule {
 			if (isset($_REQUEST['remember_me'])) {
 				session_set_cookie_params(604800,PATH_REL_ROOT);
 				session_regenerate_id(true);
+				$_SESSION['SESSION_LIFETIME'] = 604800;
 			}
 		} else {
 			uNotices::AddNotice('Username and password do not match.',NOTICE_TYPE_ERROR);
