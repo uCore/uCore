@@ -455,12 +455,15 @@ abstract class uTableDef implements iUtopiaModule {
 
 		$updateQry = array();
 
+		$raw = $fieldType == ftRAW;
+		$args = array();
 		if ($pkVal === NULL) {
-			$query = 'INSERT INTO '.$this->tablename.' (`'.$fieldName.'`) VALUES (?)';
-			$args = array($newValue);
+			$query = 'INSERT INTO '.$this->tablename.' (`'.$fieldName.'`) VALUES ('.($raw?$newValue:'?').')';
+			if (!$raw) $args[] = $newValue;
 		} else {
-			$query = 'UPDATE '.$this->tablename.' SET `'.$fieldName.'` = ? WHERE `'.$this->GetPrimaryKey().'` = ?';
-			$args = array($newValue,$pkVal);
+			$query = 'UPDATE '.$this->tablename.' SET `'.$fieldName.'` = '.($raw?$newValue:'?').' WHERE `'.$this->GetPrimaryKey().'` = ?';
+			if (!$raw) $args[] = $newValue;
+			$args[] = $pkVal;
 		}
 		
 		database::query($query,$args);
