@@ -1604,7 +1604,7 @@ abstract class uDataModule extends uBasicModule {
 		// init fields, get primary key, its required by all tables anyway so force it...
 		//grab the table alias and primary key from the alias's tabledef
 
-		$flds = array('count(*) as `__count`');
+		$flds = array();
 
 		//		$tblJoins = array();
 		//		$tblInc = 1;
