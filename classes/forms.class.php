@@ -416,7 +416,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
 		
 		$sections = utopia::GetRewriteURL();
-		$sections = preg_replace('/^'.preg_quote($uuid.'/','/').'/','',$sections);
+		$sections = preg_replace('/^'.preg_quote($uuid,'/').'\/?/','',$sections);
 		$sections = explode('/',$sections);
 		if (!$sections) return FALSE;
 		
