@@ -203,7 +203,7 @@ class utopia {
 		// rewritten url?   /u/MOD/
 		$u = self::GetRewriteURL();
 		foreach (self::GetModules() as $m) {
-			if (preg_match('/^'.preg_quote($m['uuid'],'/').'/',$u)) return $m['module_name'];
+			if (preg_match('/^'.preg_quote($m['uuid'].'/','/').'/i',$u.'/')) return $m['module_name'];
 		}
 
 		// admin root?
