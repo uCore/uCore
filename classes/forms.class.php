@@ -530,57 +530,6 @@ abstract class uBasicModule implements iUtopiaModule {
 		//		$GLOBALS['modules'][$this->GetUUID()] = get_class($this);
 	}
 
-	public function GetFileFromTable($field,$pkVal,$att = 'inline') {
-		return PATH_REL_CORE."index.php?__ajax=getFile&m=".get_class($this)."&f=$field&p=$pkVal&a=$att";
-	}
-
-	public function GetImageLinkFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL) {
-		if ($width) $width = "&w=$width";
-		if ($height) $height = "&h=$height";
-		return PATH_REL_CORE."index.php?__ajax=getImage&m=".get_class($this)."&f=$field&p=$pkVal$width$height";
-	}
-
-	public function DrawImageFromTable($field,$table,$key,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {
-		if (!is_array($attr)) $attr = array();
-		if (!array_key_exists('alt',$attr)) $attr['alt'] = '';
-		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
-		$attr = BuildAttrString($attr);
-
-		$url = $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$width,$height);
-		if (!$link) return "<img$attr src=\"$url\">";
-
-		if ($link === TRUE) $linkUrl = $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$linkW,$linkH);
-		else $linkUrl = $link;
-
-		$linkAttr = BuildAttrString($linkAttr);
-		return "<a$linkAttr href=\"$linkUrl\" target=\"_blank\"><img$attr src=\"$url\"></a>";
-	}
-
-	public function GetImageLink($fieldAlias,$pkVal,$width=NULL,$height=NULL) {
-		if ($pkVal == NULL) return '';
-		$field = $this->GetFieldProperty($fieldAlias ,'field');
-		$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
-		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
-
-		$table = $setup['table'];
-		$key = $setup['pk'];
-		return $this->GetImageLinkFromTable($field,$table,$key,$pkVal,$width,$height);
-	}
-
-	public function DrawSqlImage($fieldAlias,$rec,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE,$linkAttr=NULL) {
-		if ($rec == NULL) return '';
-		$field = $this->GetFieldProperty($fieldAlias ,'field');
-		$tableAlias = $this->GetFieldProperty($fieldAlias ,'tablename');
-		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
-		$setup = $this->GetFieldProperty($fieldAlias ,'vtable');
-		$table = $setup['table'];
-
-		$key = $this->GetPrimaryKeyTable($fieldAlias);
-		$pkVal = $table !== $this->GetPrimaryTable() ? $rec['_'.$tableAlias.'_pk'] : $rec[$key];
-
-		return $this->DrawImageFromTable($field,$table,$key,$pkVal,$width,$height,$attr,$link,NULL,NULL,$linkAttr);
-	}
-
 	public function HookEvent($eventName,$funcName) {
 		$GLOBALS['events'][$eventName][] = get_class($this).".$funcName";
 	}
@@ -2180,7 +2129,7 @@ abstract class uDataModule extends uBasicModule {
 		switch ($forceType) {
 			case ftFILE:
 				$filename = '';
-				$link = $this->GetFileFromTable($fieldName,$rec[$this->GetPrimaryKey()]);
+				$link = $this->GetFileLink($fieldName,$rec[$this->GetPrimaryKey()]);
 				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a target="_blank" href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
 				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
@@ -2562,6 +2511,44 @@ abstract class uDataModule extends uBasicModule {
 		while (utopia::MergeVars($string));
 	}
 
+	public function GetFileLink($fieldAlias,$pkVal,$att = 'inline') {
+		return PATH_REL_CORE."index.php?__ajax=getFile&m=".get_class($this)."&f=$fieldAlias&p=$pkVal&a=$att";
+	}
+
+	public function GetImageLink($fieldAlias,$pkVal,$width=NULL,$height=NULL) {
+		if ($pkVal == NULL) return '';
+		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
+		
+		if ($width) $width = "&w=$width";
+		if ($height) $height = "&h=$height";
+		return PATH_REL_CORE."index.php?__ajax=getImage&m=".get_class($this)."&f=$fieldAlias&p=$pkVal$width$height";
+	}
+
+	public function DrawImageFromTable($fieldAlias,$pkVal,$width=NULL,$height=NULL,$attr=NULL,$link=false,$linkW=NULL,$linkH=NULL,$linkAttr=NULL) {
+		if (!is_array($attr)) $attr = array();
+		if (!array_key_exists('alt',$attr)) $attr['alt'] = '';
+		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
+		$attr = BuildAttrString($attr);
+
+		$url = $this->GetImageLink($fieldAlias,$pkVal,$width,$height);
+		if (!$link) return "<img$attr src=\"$url\">";
+
+		if ($link === TRUE) $linkUrl = $this->GetImageLink($fieldAlias,$pkVal,$linkW,$linkH);
+		else $linkUrl = $link;
+
+		$linkAttr = BuildAttrString($linkAttr);
+		return "<a$linkAttr href=\"$linkUrl\" target=\"_blank\"><img$attr src=\"$url\"></a>";
+	}
+
+	public function DrawSqlImage($fieldAlias,$rec,$width=NULL,$height=NULL,$attr=NULL,$link=FALSE,$linkAttr=NULL) {
+		if ($rec == NULL) return '';
+		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
+
+		$pkVal = $rec[$this->GetPrimaryKey()];
+
+		return $this->DrawImageFromTable($fieldAlias,$pkVal,$width,$height,$attr,$link,NULL,NULL,$linkAttr);
+	}
+	
 	public function GetCell($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		if (is_array($row) && array_key_exists('__module__',$row) && $row['__module__'] != get_class($this)) {
 			$obj =& utopia::GetInstance($row['__module__']);
