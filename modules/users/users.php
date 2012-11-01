@@ -323,14 +323,14 @@ class uVerifyEmail extends uDataModule {
 		echo '<h1>Email Verification</h1>';
 		if (!isset($_GET['c']) || !($rec = $this->LookupRecord(array('email_confirm_code'=>$_GET['c'])))) { // reset pw
 			// no code given or code not found.
-			echo '<p>Could not validate your request.  This could be because you have already validated your email.</p>';
+			uNotices::AddNotice('Could not validate your request.  This could be because you have already validated your email.');
 		} else {
 			$this->UpdateField('email_confirm_code',true,$rec['user_id']);
 			uUserLogin::SetLogin($rec['user_id']);
 			uNotices::AddNotice('Thank you!  Your email address has been successfully validated.');
-			$o =& utopia::GetInstance('uUserProfile');
-			header('Location: '.$o->GetURL());
 		}
+		$o =& utopia::GetInstance('uUserProfile');
+		header('Location: '.$o->GetURL());
 	}
 	public static function VerifyAccount($user_id) {
 		$o =& utopia::GetInstance(__CLASS__);
