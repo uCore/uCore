@@ -260,7 +260,7 @@ abstract class uTableDef implements iUtopiaModule {
 		// checksum
 		$tableExists = self::TableExists($this->tablename);
 		$renamed = false;
-		if (!$tableExists && $oldTable) {
+		if (!$tableExists && $oldTable && self::TableExists($oldTable)) {
 			$stm = database::query('RENAME TABLE `'.$oldTable.'` TO `'.$this->tablename.'`');
 			$tableExists = ($stm->rowCount) ? true : false;
 			$renamed = true;
