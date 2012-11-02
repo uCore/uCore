@@ -190,6 +190,7 @@ class utopia {
 		
 		utopia::SetVar('current_module',$module);
 	}
+	private static $cmCache = array();
 	static function GetCurrentModule() {
 		// cm variable
 		if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
@@ -202,9 +203,14 @@ class utopia {
 
 		// rewritten url?   /u/MOD/
 		$u = self::GetRewriteURL();
-		foreach (self::GetModules() as $m) {
-			if (preg_match('/^'.preg_quote($m['uuid'].'/','/').'/i',$u.'/')) return $m['module_name'];
+		if (!isset(self::$cmCache[$u])) foreach (self::GetModules() as $m) {
+			if (preg_match('/^'.preg_quote($m['uuid'].'/','/').'/i',$u.'/')) {
+				self::$cmCache[$u] = $m['module_name'];
+				return $m['module_name'];
+			}
+			self::$cmCache[$u] = false;
 		}
+		if (self::$cmCache[$u]) return self::$cmCache[$u];
 
 		// admin root?
 		if (strpos($_SERVER['REQUEST_URI'],PATH_REL_CORE) === 0) return 'uDashboard';
