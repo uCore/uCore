@@ -194,20 +194,27 @@ class uLocale implements ArrayAccess {
 	private static function GetLocaleCache() {
 		return self::$locale_cache;
 	}
+	private static $listCache = null;
 	public static $defaultFormat = '%i (%l, %t)';
 	public static function ListLocale($format='',$keyFormat='%C',$noLimit=false) {
 		if ($format === '') $format = self::$defaultFormat;
+
+		$cacheid = json_encode(array($format,$keyFormat,$noLimit));
+		if (isset(self::$listCache[$cacheid])) return self::$listCache[$cacheid];
+
 		$locales = self::GetLocaleCache();
-		
 		$return = array();
 		// get requested format
 		if (!$noLimit && self::$locale_limit) {
-			foreach (self::$locale_limit as $limit) {
-				foreach ($locales as $code => $locale) {
-					$search = array($code,$locale['lang'],$locale['terr'],$locale['int_curr_symbol'],$locale['currency_symbol']);
+			foreach ($locales as $code => $locale) {
+				$key = self::localef($keyFormat,$locale);
+				if (isset($return[$key])) break;
+				$search = array($code,$locale['lang'],$locale['terr'],$locale['int_curr_symbol'],$locale['currency_symbol']);
+				foreach (self::$locale_limit as $limit) {
+					if (isset($return[$key])) break;
+					$pattern = preg_quote($limit,'/');
 					foreach ($search as $s) {
-						if (preg_match('/'.preg_quote($limit,'/').'/ui',$s)) {
-							$key = self::localef($keyFormat,$locale);
+						if (preg_match('/'.$pattern.'/ui',$s)) {
 							$return[$key] = self::localef($format,$locale);
 							break;
 						}
@@ -221,7 +228,8 @@ class uLocale implements ArrayAccess {
 			}
 			asort($return);
 		}
-		
+
+		self::$listCache[$cacheid] = $return;		
 		return $return;
 	}
 	private static function localef($format,$locale) {
