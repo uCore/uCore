@@ -7,6 +7,7 @@ body { text-align:left !important; text-align:center; margin:0; font-family: Ari
 
 a, a:link, a:visited { color: #333; text-decoration:none }
 a:hover { color: #8CC63F }
+a.ui-state-hover:hover { color: #333; }
 
 #header { background: url(images/header-grad-bg.gif) top center repeat-x #F0F0F0; }
 #innerheader { min-height:98px; height: auto !important; height: 98px; position:relative;
@@ -69,4 +70,11 @@ input, select, textarea { margin:2px; }
 
 .inputtype.inputtype-combo.ui-combobox {
 	border: 1px solid #aaa; background:white; color:#362B36;
+}
+
+.ui-button, #nav li, #nav li a, #nav li ul {
+	transition: 0.15s;
+	-moz-transition: 0.15s; /* Firefox 4 */
+	-webkit-transition: 0.15s; /* Safari and Chrome */
+	-o-transition: 0.15s; /* Opera */
 }

@@ -2853,7 +2853,7 @@ abstract class uListDataModule extends uDataModule {
 		$sectionFieldTitles = array();
 		// TODO: pagination for list record display
 		if (!flag_is_set($this->GetOptions(),LIST_HIDE_HEADER)) {
-			echo '<thead class="ui-tabs ui-widget-content ui-corner-all">';
+			echo '<thead>';
 
 			ob_start();
 			// start of SECTION headers

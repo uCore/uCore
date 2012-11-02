@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="robots" content="noindex"/>
-<?php uCSS::LinkFile(dirname(__FILE__).'/jquery-ui/jquery-ui-1.8.21.ucore.css',0);?>
+<?php uCSS::LinkFile(dirname(__FILE__).'/jquery-ui/jquery-ui-1.9.1.custom.min.css',0);?>
 </head>
 <body>
 <div id="wrap">
