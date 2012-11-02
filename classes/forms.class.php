@@ -1771,8 +1771,7 @@ abstract class uDataModule extends uBasicModule {
 		return $fieldName;
 	}
 
-	public function GetFilterString($uid,$fieldNameOverride=NULL,$fieldTypeOverride=NULL){//,$filterSection) {
-		//		echo get_class($this).".GetFilterString($uid)\n";
+	public function GetFilterString($uid,&$args,$fieldNameOverride=NULL,$fieldTypeOverride=NULL){//,$filterSection) {
 		$filterData = $this->GetFilterInfo($uid);
 		if (!is_array($filterData)) return '';
 		$fieldName = $fieldNameOverride ? $fieldNameOverride : $filterData['fieldName'];
@@ -1782,15 +1781,13 @@ abstract class uDataModule extends uBasicModule {
 
 		$fieldToCompare = NULL;
 		if ($filterData['type'] == FILTER_WHERE) {
-		if (array_key_exists($fieldName,$this->fields)) {
+			if (array_key_exists($fieldName,$this->fields)) {
 				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0 || $this->fields[$fieldName]['foreign']) {
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`';
 				} else {
 					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['field'].'`';
 				}
-			} else if (!IsSelectStatement($fieldName))
-			return '';
-			//	ErrorLog("Unable to clearly define where statement for field ($fieldName)");
+			} else if (!IsSelectStatement($fieldName)) return '';
 		}
 
 		$value = $this->GetFilterValue($uid);//$filterData['value'];
@@ -1811,24 +1808,25 @@ abstract class uDataModule extends uBasicModule {
 				$constants = get_defined_constants(true);
 				foreach ($constants['user'] as $cName => $cVal) {
 					if (strtolower(substr($cName,0,2))=='ct' && stripos($value,$cVal) !== FALSE) {
-						$val = "$value";
+						$val = "?";
 						break;
 					}
 				}
-				$val = $val ? $val : "= '$value'";
+				$val = $val ? $val : "= ?";
 				break;
 			case $compareType == ctIS:
 			case $compareType == ctISNOT:
 			case is_numeric($value):
-				$val = $value; break;
+				$val = '?'; break;
 				// convert dates to mysql version for filter
-			case ($inputType==itDATE): $val = "(STR_TO_DATE('$value', '".FORMAT_DATE."'))"; break;
-			case ($inputType==itTIME): $val = "(STR_TO_DATE('$value', '".FORMAT_TIME."'))"; break;
-			case ($inputType==itDATETIME): $val = "(STR_TO_DATE('$value', '".FORMAT_DATETIME."'))"; break;
+			case ($inputType==itDATE): $val = "(STR_TO_DATE(?, '".FORMAT_DATE."'))"; break;
+			case ($inputType==itTIME): $val = "(STR_TO_DATE(?, '".FORMAT_TIME."'))"; break;
+			case ($inputType==itDATETIME): $val = "(STR_TO_DATE(?, '".FORMAT_DATETIME."'))"; break;
 			default:
-				$val = "'$value'";
+				$val = '?';
 				break;
 		}
+		$args[] = $value;
 
 		$fieldToCompare = $fieldToCompare ? $fieldToCompare : $fieldName;
 		if ($compareType == ctIN) {
@@ -1842,8 +1840,8 @@ abstract class uDataModule extends uBasicModule {
 		return trim("$fieldToCompare $compareType $val");
 	}
 
-  public $extraWhere = NULL;
-	public function GetWhereStatement() {
+	public $extraWhere = NULL;
+	public function GetWhereStatement(&$args) {
 		//		echo get_class($this).".GetWhereStatement()\n";
 		$filters = $this->filters;
 		//print_r($filters);
@@ -1859,39 +1857,30 @@ abstract class uDataModule extends uBasicModule {
 
 				// if the field doesnt exist in the primary table. -- should be ANY table used. and if more than one, should be specific.
 
-				if (($filterString = $this->GetFilterString($fData['uid'])) !== '')
+				if (($filterString = $this->GetFilterString($fData['uid'],$args)) !== '')
 					$setParts[] = "($filterString)";
 			}
 			if (count($setParts) >0) $where[] = '('.join(' AND ',$setParts).')';
 		}
-    $ret = join(' AND ',$where);
-    if (empty($this->extraWhere)) return $ret;
+		$ret = join(' AND ',$where);
+		if (empty($this->extraWhere)) return $ret;
     
 		if (is_array($this->extraWhere)) {
-      $extraWhere = array();
+			$extraWhere = array();
 			foreach ($this->extraWhere as $field => $value) {
-				$value = is_numeric($value) ? $value : "'$value'";
-				$extraWhere[] = "($field = $value)";
+				$args[] = $value;
+				$extraWhere[] = "($field = ?)";
 			}
-      return "($ret) AND (".implode(' AND ',$extraWhere).")";
+			return "($ret) AND (".implode(' AND ',$extraWhere).")";
 		} elseif (is_string($this->extraWhere)) {
-		  return "($ret) AND (".$this->extraWhere.")";
+			return "($ret) AND (".$this->extraWhere.")";
 		}
 
-    return $ret;
-
-/*		if (empty($where) && empty($extraWhere)) return '';
-
-		if (count($where) > 0)
-		array_push($extraWhere,join(' OR ',$where));
-
-		$state = join(' AND ',$extraWhere);
-
-		return $state;*/
+		return $ret;
 	}
 
   public $extraHaving = NULL;
-	public function GetHavingStatement($onlyFilters = FALSE) {
+	public function GetHavingStatement(&$args) {
 		$filters = $this->filters;
 
 		$having = array();
@@ -1900,7 +1889,6 @@ abstract class uDataModule extends uBasicModule {
 			$setParts = array();
 			if (!is_array($filterset)) continue;
 			foreach ($filterset as $fData) { // loop each field in set
-				if ($onlyFilters && $fData['it'] == itNONE) continue;
 				if ($fData['type'] !== FILTER_HAVING) continue;
 				$fieldName = $fData['fieldName'];
 				// perhaps its a subquery?
@@ -1908,7 +1896,7 @@ abstract class uDataModule extends uBasicModule {
 				//				if (empty($fData['value'])) continue;
 				//				if ($fData['value'] == "%%" && $fData['ct'] == ctLIKE) continue;
 
-				if (($filterString = $this->GetFilterString($fData['uid'])) !== '')
+				if (($filterString = $this->GetFilterString($fData['uid'],$args)) !== '')
 					$setParts[] = "($filterString)";
 			}
 			if (count($setParts) >0) $having[] = '('.join(' AND ',$setParts).')';
@@ -1921,8 +1909,8 @@ abstract class uDataModule extends uBasicModule {
 		if (is_array($this->extraHaving)) {
 			$extraWhere = array();
 			foreach ($this->extraHaving as $field => $value) {
-				$value = is_numeric($value) ? $value : "'$value'";
-				$extraWhere[] = "($field = $value)";
+				$args = $value;
+				$extraWhere[] = "($field = ?)";
 			}
 			if (count($extraWhere) > 0) return "$ret (".implode(' AND ',$extraWhere).")";
 		} elseif (is_string($this->extraHaving) && $this->extraHaving) {
@@ -1959,23 +1947,24 @@ abstract class uDataModule extends uBasicModule {
 	 * @returns MySQL Dataset
 	 */
 	public function &GetDataset() {
-		$query = $this->GetSqlQuery();
+		$args = array();
+		$query = $this->GetSqlQuery($args);
 
-		$this->dataset = database::query($query);
+		$this->dataset = database::query($query,$args);
 
 		return $this->dataset;
 	}
-	public function GetSqlQuery() {
+	public function GetSqlQuery(&$args) {
 		$this->_SetupFields();
 
 		// GET SELECT
 		$select = $this->GetSelectStatement();
 		// GET WHERE
-		$where = $this->GetWhereStatement(); $where = $where ? " WHERE $where" : ''; // uses WHERE modifier
+		$where = $this->GetWhereStatement($args); $where = $where ? " WHERE $where" : ''; // uses WHERE modifier
 		// GET GROUPING
 		$group = $this->GetGrouping(); $group = $group ? " GROUP BY $group" : '';
 		// GET HAVING
-		$having = $this->GetHavingStatement(); $having = $having ? " HAVING $having" : ''; // uses HAVING modifier to account for aliases
+		$having = $this->GetHavingStatement($args); $having = $having ? " HAVING $having" : ''; // uses HAVING modifier to account for aliases
 		// GET ORDER
 		$order = $this->GetOrderBy(); $order = $order ? " ORDER BY $order" : '';
 
@@ -1984,14 +1973,13 @@ abstract class uDataModule extends uBasicModule {
 		$query = "($select$where$group$having1$order1)";
 
 		if (is_array($this->UnionModules)) {
-			//		$havingFilters = $this->GetHavingStatement(TRUE); $havingFilters = $havingFilters ? " HAVING $having" : ''; // uses HAVING modifier to account for aliases
 			foreach ($this->UnionModules as $moduleName) {
 				$obj =& utopia::GetInstance($moduleName);
 				$obj->_SetupFields();
 				$select2 = $obj->GetSelectStatement();
-				$where2 = $obj->GetWhereStatement(); $where2 = $where2 ? " WHERE $where2" : '';
+				$where2 = $obj->GetWhereStatement($args); $where2 = $where2 ? " WHERE $where2" : '';
 				$group2 = $obj->GetGrouping(); $group2 = $group2 ? " GROUP BY $group2" : '';
-				$having2 = $obj->GetHavingStatement();
+				$having2 = $obj->GetHavingStatement($args);
 				$having2 = $having2 ? $having.' AND ('.$having2.')' : $having;
 				//				if (!empty($having2)) $having2 = $having.' AND ('.$having2.')';
 				//				else $having2 = $having;
