@@ -1,4 +1,4 @@
-.mceContentBody { background-image: none; border:0; padding:0; margin:0; overflow:auto; }
+.mceContentBody { background: none; border:0; padding:0; margin:0; overflow:auto; }
 .mceContentBody.centerWrap { text-align:left }
 .mceContentBody.left, .mceContentBody.right { float:none }
 
