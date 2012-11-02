@@ -1808,25 +1808,23 @@ abstract class uDataModule extends uBasicModule {
 				$constants = get_defined_constants(true);
 				foreach ($constants['user'] as $cName => $cVal) {
 					if (strtolower(substr($cName,0,2))=='ct' && stripos($value,$cVal) !== FALSE) {
-						$val = "?";
+						$val = $value;
 						break;
 					}
 				}
-				$val = $val ? $val : "= ?";
+				if (!$val) { $val = "= ?"; $args[] = $value; }
 				break;
 			case $compareType == ctIS:
 			case $compareType == ctISNOT:
-			case is_numeric($value):
-				$val = '?'; break;
+				$val = $value; break;
 				// convert dates to mysql version for filter
-			case ($inputType==itDATE): $val = "(STR_TO_DATE(?, '".FORMAT_DATE."'))"; break;
-			case ($inputType==itTIME): $val = "(STR_TO_DATE(?, '".FORMAT_TIME."'))"; break;
-			case ($inputType==itDATETIME): $val = "(STR_TO_DATE(?, '".FORMAT_DATETIME."'))"; break;
+			case ($inputType==itDATE): $val = "(STR_TO_DATE(?, '".FORMAT_DATE."'))"; $args[] = $value; break;
+			case ($inputType==itTIME): $val = "(STR_TO_DATE(?, '".FORMAT_TIME."'))"; $args[] = $value; break;
+			case ($inputType==itDATETIME): $val = "(STR_TO_DATE(?, '".FORMAT_DATETIME."'))"; $args[] = $value; break;
 			default:
-				$val = '?';
+				$val = '?'; $args[] = $value;
 				break;
 		}
-		$args[] = $value;
 
 		$fieldToCompare = $fieldToCompare ? $fieldToCompare : $fieldName;
 		if ($compareType == ctIN) {
