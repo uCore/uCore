@@ -755,7 +755,7 @@ abstract class uDataModule extends uBasicModule {
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
 		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field,$pkValue);
 
-		if (isset($this->fields[$field]['vtable']['parent']) && !is_a($this->fields[$field]['vtable']['tModule'],'iLinkTable',true) && $pkValue !== NULL) {
+		if (isset($this->fields[$field]['vtable']['parent']) && !is_subclass_of($this->fields[$field]['vtable']['tModule'],'iLinkTable') && $pkValue !== NULL) {
 			foreach ($this->fields[$field]['vtable']['joins'] as $from=>$to) {
 				if ($from == $field) {
 					$rec = $this->LookupRecord($pkValue);
@@ -1076,7 +1076,7 @@ abstract class uDataModule extends uBasicModule {
 			// not found.. throw error
 			ErrorLog("Cannot find $parent");
 		}
-		if (is_a($tableModule,'iLinkTable',true) && !preg_match('/_ufullconcat$/',$alias)) {
+		if (is_subclass_of($tableModule,'iLinkTable') && !preg_match('/_ufullconcat$/',$alias)) {
 			$this->CreateTable($alias.'_ufullconcat', $tableModule, $parent, $joins, $joinType);
 		}
 	}
@@ -1575,7 +1575,7 @@ abstract class uDataModule extends uBasicModule {
 		 */
 		 
 		$chr1 = substr($fieldName,0,1);
-		if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true)) {
+		if (isset($fieldData['vtable']) && is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable')) {
 			$toAdd = 'GROUP_CONCAT(DISTINCT `'.$fieldData['tablename'].'_ufullconcat`.`'.$fieldName.'` SEPARATOR 0x1F)';
 		} elseif (!preg_match('/{[^}]+}/',$fieldData['field'])) {
 			if ($chr1 == '(' || $chr1 == "'" || $chr1 == '"')
@@ -2055,8 +2055,11 @@ abstract class uDataModule extends uBasicModule {
 			}
 			foreach ($row as $rk => $rv) { // dont explode blob data
 				if (!isset($this->fields[$rk])) continue;
+				if (strpos($rv,"\x1F") === FALSE) continue;
 				$fieldData = $this->fields[$rk];
-				if (isset($fieldData['vtable']) && is_a($fieldData['vtable']['tModule'],'iLinkTable',true) && strpos($rv,"\x1F") !== FALSE) $row[$rk] = explode("\x1F",$rv);
+				if (!isset($fieldData['vtable'])) continue;
+				if (!is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable')) continue;
+				$row[$rk] = explode("\x1F",$rv);
 			}
 			$rows[] = $row;
 		}
