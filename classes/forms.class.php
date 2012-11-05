@@ -1817,6 +1817,13 @@ abstract class uDataModule extends uBasicModule {
 			case $compareType == ctIS:
 			case $compareType == ctISNOT:
 				$val = $value; break;
+			case $compareType == ctIN:
+				if (IsSelectStatement($fieldName)) return trim("$val $compareType $fieldName");
+				$vals = explode(',',$value);
+				$args += $vals;
+				foreach ($vals as $k=>$v) $vals[$k] = '?';
+				$val = "('".join("','",$vals)."')";
+				break;
 				// convert dates to mysql version for filter
 			case ($inputType==itDATE): $val = "(STR_TO_DATE(?, '".FORMAT_DATE."'))"; $args[] = $value; break;
 			case ($inputType==itTIME): $val = "(STR_TO_DATE(?, '".FORMAT_TIME."'))"; $args[] = $value; break;
@@ -1827,13 +1834,6 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		$fieldToCompare = $fieldToCompare ? $fieldToCompare : $fieldName;
-		if ($compareType == ctIN) {
-			if (IsSelectStatement($fieldName))
-				return trim("$val $compareType $fieldName");
-			$vals = explode(',',$value);
-			$val = "('".join("','",$vals)."')";
-			return trim("$fieldToCompare $compareType $val");
-		}
 
 		return trim("$fieldToCompare $compareType $val");
 	}
