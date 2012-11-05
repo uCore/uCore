@@ -138,9 +138,13 @@ abstract class sqlSchema extends PDO {
 			$stmt->execute();
 		} catch(Exception $e) {} // allow error handling below to return real error
 		
-		$err = $stmt->errorInfo();
-		if ($err && $err[0] !== '00000') {
-			throw new Exception($err[2],$err[1]);
+		if ($stmt->errorCode() !== '00000') {
+			$err = $stmt->errorInfo();
+			if (!$err[1]) {
+				throw new Exception ($qry.PHP_EOL.var_export($this->params,true),$err[0]);
+			} else {
+				throw new Exception($err[2],$err[1]);
+			}
 			return false;
 		}
 		
