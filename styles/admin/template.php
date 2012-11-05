@@ -4,7 +4,7 @@
 <meta name="robots" content="noindex"/>
 <?php uCSS::LinkFile(dirname(__FILE__).'/jquery-ui/jquery-ui-1.9.1.custom.min.css',0);?>
 </head>
-<body>
+<body class="u-admin">
 <div id="wrap">
 	<div id="header"><div id="innerheader">
 	</div></div>
