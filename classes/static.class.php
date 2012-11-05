@@ -954,11 +954,20 @@ class utopia {
 			return $parser[0];
 		}
 
+		$data = html_entity_decode($data);
+		$args = array();
+		$pairs = explode('&',$data);
+		foreach ($pairs as $pair) {
+			if (strpos($pair,'=') === FALSE) {
+				$args[] = $pair; continue;
+			}
+			list($key,$val) = explode('=',$pair);
+			$args[$key] = $val;
+		}
+		if (is_assoc($args)) $args = array($args);
+		
 		if ($parser[1]) ob_start();
-		if ($data)
-			$replace = call_user_func($parser[0],$data);
-		else
-			$replace = call_user_func($parser[0]);
+		$replace = call_user_func_array($parser[0],$args);
 
 		if ($parser[1]) {
 			$replace = ob_get_contents();
