@@ -986,9 +986,7 @@ class utopia {
 	static function parseConst($id) { return defined($id) ? constant($id) : ''; }
 
 	static function SetRequest($query) {
-		$query = html_entity_decode($query);
-		parse_str($query,$arr);
-		foreach ($arr as $k=>$v) $_REQUEST[$k] = $v;
+		foreach ($query as $k=>$v) $_REQUEST[$k] = $v;
 		return '';
 	}
 	
