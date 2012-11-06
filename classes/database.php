@@ -28,7 +28,7 @@ class database {
 			$GLOBALS['sql_query_count']++;
 
 
-		$tID='QRY: '.$query;
+		$tID='QRY: '.$query.PHP_EOL.var_export($args,true);
 		timer_start($tID);
 		$GLOBALS['sql_queries'][$GLOBALS['sql_query_count']] = $query;
 	
