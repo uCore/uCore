@@ -1820,9 +1820,9 @@ abstract class uDataModule extends uBasicModule {
 			case $compareType == ctIN:
 				if (IsSelectStatement($fieldName)) return trim("$val $compareType $fieldName");
 				$vals = explode(',',$value);
-				$args += $vals;
+				$args = array_merge($args,$vals);
 				foreach ($vals as $k=>$v) $vals[$k] = '?';
-				$val = "('".join("','",$vals)."')";
+				$val = '('.join(',',$vals).')';
 				break;
 				// convert dates to mysql version for filter
 			case ($inputType==itDATE): $val = "(STR_TO_DATE(?, '".FORMAT_DATE."'))"; $args[] = $value; break;
