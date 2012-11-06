@@ -20,7 +20,6 @@ th.sortable { cursor:pointer; }
 	zoom: 1; /* required for ie hasLayout */
 }
 
-.btn { margin:1px 3px }
 .btn-edit { margin:0;width:16px;height:16px;padding:2px;background:url(images/edit.png) no-repeat center center white !important; }
 .btn-del  { margin:0;width:16px;height:16px;padding:2px;background:url(images/delete.png) no-repeat center center white !important; }
 
