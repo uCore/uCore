@@ -956,13 +956,15 @@ class utopia {
 
 		$data = html_entity_decode($data);
 		$args = array();
-		$pairs = explode('&',$data);
-		foreach ($pairs as $pair) {
-			if (strpos($pair,'=') === FALSE) {
-				$args[] = $pair; continue;
+		if ($data !== '') {
+			$pairs = explode('&',$data);
+			foreach ($pairs as $pair) {
+				if (strpos($pair,'=') === FALSE) {
+					$args[] = $pair; continue;
+				}
+				list($key,$val) = explode('=',$pair);
+				$args[$key] = $val;
 			}
-			list($key,$val) = explode('=',$pair);
-			$args[$key] = $val;
 		}
 		if (is_assoc($args)) $args = array($args);
 		
