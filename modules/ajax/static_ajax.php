@@ -88,6 +88,10 @@ class internalmodule_StaticAjax extends uBasicModule {
 		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
 	}
 	public static function getFile() {
+		if (!isset($_GET['m']) || !isset($_GET['p']) || !isset($_GET['f'])) {
+			utopia::UseTemplate();
+			utopia::PageNotFound();
+		}
 		$o =& utopia::GetInstance($_GET['m']);
 		$rec = $o->LookupRecord($_GET['p']);
 		if (!$rec || !isset($rec[$_GET['f']])) {
@@ -102,6 +106,10 @@ class internalmodule_StaticAjax extends uBasicModule {
 	}
 
 	public static function getImage() {
+		if (!isset($_GET['m']) || !isset($_GET['p']) || !isset($_GET['f'])) {
+			utopia::UseTemplate();
+			utopia::PageNotFound();
+		}
 		$o =& utopia::GetInstance($_GET['m']);
 		$rec = $o->LookupRecord($_GET['p']);
 		if (!$rec || !isset($rec[$_GET['f']])) {
