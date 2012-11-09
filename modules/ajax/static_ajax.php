@@ -15,8 +15,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 		utopia::RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
 		utopia::RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
 		utopia::RegisterAjax('showQueries','internalmodule_StaticAjax::showQueries');
-		utopia::RegisterAjax('getImage','internalmodule_StaticAjax::getImage');
-		utopia::RegisterAjax('getFile','internalmodule_StaticAjax::getFile');
 		utopia::RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
 		utopia::RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
 		utopia::RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
@@ -86,56 +84,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 		utopia::Cache_Check($etag,$cType,basename($path),$fileMod);
 
 		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
-	}
-	public static function getFile() {
-		if (!isset($_GET['m']) || !isset($_GET['p']) || !isset($_GET['f'])) {
-			utopia::UseTemplate();
-			utopia::PageNotFound();
-		}
-		$o =& utopia::GetInstance($_GET['m']);
-		$rec = $o->LookupRecord($_GET['p']);
-		if (!$rec || !isset($rec[$_GET['f']])) {
-			utopia::UseTemplate();
-			utopia::PageNotFound();
-		}
-		$data = $rec[$_GET['f']];
-		$type = $rec[$_GET['f'].'_filetype'];
-		$name = $rec[$_GET['f'].'_filename'];
-
-		echo utopia::Cache_Output($data, sha1($data), $type, $name, NULL, 86400, $_GET['a']);
-	}
-
-	public static function getImage() {
-		if (!isset($_GET['m']) || !isset($_GET['p']) || !isset($_GET['f'])) {
-			utopia::UseTemplate();
-			utopia::PageNotFound();
-		}
-		$o =& utopia::GetInstance($_GET['m']);
-		$rec = $o->LookupRecord($_GET['p']);
-		if (!$rec || !isset($rec[$_GET['f']])) {
-			utopia::UseTemplate();
-			utopia::PageNotFound();
-		}
-		$data = $rec[$_GET['f']];
-
-		$etag = sha1($_SERVER['REQUEST_URI'].'-'.$data);
-		utopia::Cache_Check($etag,'image/png',$_GET['p'].$_GET['f'].'.png');
-
-		$src = imagecreatefromstring($data);
-
-		$width = isset($_GET['w']) ? $_GET['w'] : NULL;
-		$height = isset($_GET['h']) ? $_GET['h'] : NULL;
-
-		$img = utopia::constrainImage($src,$width,$height);
-
-		//    Image output
-		ob_start();
-		imagepng($img);
-		imagedestroy($img);
-		$c = ob_get_contents();
-		ob_end_clean();
-
-		utopia::Cache_Output($c,$etag,'image/png',$_GET['p'].$_GET['f'].'.png');
 	}
 
 	public static function showQueries() {
