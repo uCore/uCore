@@ -5,11 +5,6 @@ class tabledef_Widgets extends uTableDef {
 	public function SetupFields() {
 		$this->AddField('block_id',ftVARCHAR,150);
 		$this->AddField('block_type',ftVARCHAR,150);
-		$this->AddField('module',ftTEXT);
-		$this->AddField('content',ftTEXT);
-		$this->AddField('filter',ftTEXT);
-		$this->AddField('order',ftVARCHAR,30);
-		$this->AddField('limit',ftVARCHAR,10);
 
 		$this->AddField('display',ftTEXT);
 
