@@ -643,15 +643,6 @@ class uCMS_View extends uSingleDataModule {
 		if (strpos($uri,PATH_REL_CORE.'index.php') === 0) return FALSE;
 		
 		$obj =& utopia::GetInstance('uCMS_View');
-
-		preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
-		if (array_key_exists(1,$matches)) {
-			$row = $obj->LookupRecord($matches[1]);
-			if ($row) {
-				self::$currentPage = $row;
-				return $row;
-			}
-		}
 		
 		$cm = utopia::GetCurrentModule();
 		if ($cm && $cm !== __CLASS__) {
@@ -660,6 +651,16 @@ class uCMS_View extends uSingleDataModule {
 			$uuid = explode('/',$uuid);
 			$uuid = end($uuid);
 			$row = $obj->LookupRecord($uuid);
+			if ($row) {
+				self::$currentPage = $row;
+				return $row;
+			}
+			return false;
+		}
+		
+		preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
+		if (array_key_exists(1,$matches)) {
+			$row = $obj->LookupRecord($matches[1]);
 			if ($row) {
 				self::$currentPage = $row;
 				return $row;
