@@ -1575,7 +1575,7 @@ abstract class uDataModule extends uBasicModule {
 		 */
 		 
 		$chr1 = substr($fieldName,0,1);
-		if (isset($fieldData['vtable']) && is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable')) {
+		if (isset($fieldData['vtable']) && is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable') && $this->sqlTableSetup['alias'] !== $fieldData['tablename']) {
 			$toAdd = 'GROUP_CONCAT(DISTINCT `'.$fieldData['tablename'].'_ufullconcat`.`'.$fieldName.'` SEPARATOR 0x1F)';
 		} elseif (!preg_match('/{[^}]+}/',$fieldData['field'])) {
 			if ($chr1 == '(' || $chr1 == "'" || $chr1 == '"')
