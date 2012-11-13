@@ -1,6 +1,7 @@
 <?php
 abstract class sqlSchema extends PDO {
 	protected $servername	= '';
+	protected $port			= 3306;
 	protected $dbname		= '';
 	protected $username		= '';
 	protected $password		= '';
