@@ -42,8 +42,11 @@ define('PATH_ABS_CORE',fix_path(dirname(__FILE__).DIRECTORY_SEPARATOR));
 define('PATH_ABS_ROOT',fix_path(realpath(PATH_ABS_CORE.'..').DIRECTORY_SEPARATOR));
 define('PATH_ABS_SELF',fix_path(realpath($_SERVER['PHP_SELF'])));
 
-$coreDiff = fix_path(str_replace(PATH_ABS_ROOT,'',PATH_ABS_CORE),'/');
-$relroot = substr($_SERVER['SCRIPT_NAME'],0,strpos($_SERVER['SCRIPT_NAME'],$coreDiff)); if (!$relroot) $relroot = '/';
+$coreDiff = fix_path(preg_replace('/^'.preg_quote(PATH_ABS_ROOT,'/').'/','',PATH_ABS_CORE),'/');
+$called = get_included_files(); $called = $called[0];
+$diff = preg_replace('/^'.preg_quote(PATH_ABS_ROOT,'/').'/','',$called);
+$relroot = preg_replace('/'.preg_quote($diff,'/').'$/','',$_SERVER['SCRIPT_NAME']);
+
 define('PATH_REL_ROOT',$relroot);
 define('PATH_REL_CORE',fix_path(PATH_REL_ROOT.$coreDiff,'/'));
 define('PATH_REL_SELF',fix_path(PATH_REL_ROOT.basename(PATH_ABS_SELF),'/'));
