@@ -28,6 +28,7 @@ function moveMceToolbars(event,ed) {
 		span.parentsUntil('body').parent().andSelf().each(function () {
 			var style = {
 				background: $(this).css('background'),
+				font: $(this).css('font'),
 				color: $(this).css('color')
 			}
 			body.css(style);
