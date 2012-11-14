@@ -13,8 +13,6 @@ th.sortable { cursor:pointer; }
 
 *:focus { outline: 1px; }
 
-#tinymce.mceContentBody { font-size: inherit; }
-
 .ui-helper-clearfix { /* fix for jquery panels extending to the height of adjacent floats */
 	overflow: hidden; /* or auto */
 	zoom: 1; /* required for ie hasLayout */

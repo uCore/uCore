@@ -442,16 +442,17 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			return;
 		}
 		
-		utopia::AddJSFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.js'));
-		utopia::AddCSSFile(utopia::GetRelativePath(dirname(__FILE__).'/mce_style.css'));
+		uJavascript::LinkFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.js'),9999);
+		uCSS::LinkFile(utopia::GetRelativePath(dirname(__FILE__).'/mce_style.css'),9999);
 
-		$t = uCMS_View::GetTemplate($rec['cms_id']);
-		$cssfiles = utopia::GetTemplateCSS(utopia::GetTemplateDir($t));
+		/* commented out in favour of javascript automatically pulling all stylesheets from current page
+		$cssfiles = array();
 		$cssfiles[] = PATH_ABS_CORE.'default.css';
 		$cssfiles[] = dirname(__FILE__).'/mce_style.css';
 		$cssfiles = array_map('utopia::GetRelativePath',$cssfiles);
 		$cssfiles = $cssfiles ? ','.json_encode(array('content_css'=>implode(',',$cssfiles))) : '';
-		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false}'.$cssfiles.');');
+		*/
+		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false});');
 
 		uAdminBar::AddItem('',FALSE,10000,'defaultSkin mceToolbarContainer');
 

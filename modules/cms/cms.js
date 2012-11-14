@@ -20,18 +20,27 @@ function moveMceToolbars(event,ed) {
 		// copy all parents into the editor dom
 		var body = $(ed.getDoc().body);
 		var span = $(ed.getElement()).parent();
-		span.parentsUntil('body').each(function () {
+
+		var head = $(ed.getDoc().getElementsByTagName('HEAD')[0]);
+		$('head link').clone(false).appendTo(head);
+		var html = $(ed.getDoc().getElementsByTagName('HTML')[0]);
+		
+		span.parentsUntil('body').parent().andSelf().each(function () {
+			var style = {
+				background: $(this).css('background'),
+				color: $(this).css('color')
+			}
+			body.css(style);
 			body.addClass($(this)[0].className);
 		});
-		body.css({margin:0,padding:0,display:'block','float':'none', width:'auto',
-			'-moz-transform':'none',
-			'-webkit-transform':'none',
-			'-o-transform':'none',
-			'-ms-transform':'none',
-			'transform':'none',
+		
+		var styles = { 'background':'none',margin:0,padding:0,display:'block','float':'none', width:'auto',
+//			'-moz-transform':'none', '-webkit-transform':'none', '-o-transform':'none', '-ms-transform':'none', 'transform':'none',
 			'min-width':0
-		});
-
+		};
+		body.css(styles);
+		html.css(styles);
+		
 /*		$('body').append(exposeMce);
 		var cont = $('.mceLayout',ed.getContainer());
 		cont.parents().each(function() {

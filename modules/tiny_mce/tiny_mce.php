@@ -37,7 +37,7 @@ class module_TinyMCE extends uBasicModule {
 			$options['plugin_preview_pageurl'] = $previewUrl;
 			$options['theme_advanced_toolbar_location'] = "top";
 			$options['theme_advanced_toolbar_align'] = "left";
-			$options['theme_advanced_statusbar_location'] = "bottom";
+			$options['theme_advanced_statusbar_location'] = "none";
 			$options['theme_advanced_resizing'] = true;
 			$options['forced_root_block'] = false;
 			$options['preformatted'] = true;
