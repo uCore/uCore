@@ -23,7 +23,8 @@ class uBreadcrumb {
 		do {
 			if (!$row) break;
 			$url = $obj->GetURL($row['cms_id']);
-			$out[$url] = $row['title'];//'<a href="'.$url.'">'.$row['title'].'</a>';
+			$title = $row['nav_text'] ? $row['nav_text'] : $row['title'];
+			$out[$url] = $title;
 		} while ($row['parent'] && ($row = uCMS_List::findKey($arr,$row['parent'])));
 
 		$build = array();
