@@ -2055,6 +2055,7 @@ abstract class uDataModule extends uBasicModule {
 			}
 			foreach ($row as $rk => $rv) { // dont explode blob data
 				if (!isset($this->fields[$rk])) continue;
+				if (!is_string($rv)) continue;
 				if (strpos($rv,"\x1F") === FALSE) continue;
 				$fieldData = $this->fields[$rk];
 				if (!isset($fieldData['vtable'])) continue;
