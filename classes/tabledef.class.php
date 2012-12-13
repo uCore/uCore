@@ -57,6 +57,7 @@ abstract class uTableDef implements iUtopiaModule {
 	public $primary = array();
 	public $engine = NULL;
 	public $auto_increment = null;
+	protected $customscript = '';
 	public abstract function SetupFields();
 
 	private $isDisabled = false;
@@ -266,7 +267,7 @@ abstract class uTableDef implements iUtopiaModule {
 			$renamed = true;
 		}
 
-		$checksum = sha1($oldTable.$this->tablename.$this->engine.print_r($this->fields,true).print_r($this->primary,true).print_r($this->unique,true).print_r($this->index,true));
+		$checksum = sha1($oldTable.$this->tablename.$this->engine.print_r($this->fields,true).print_r($this->primary,true).print_r($this->unique,true).print_r($this->index,true).print_r($this->customscript,true));
 		if (!$tableExists) { // create table
 			$this->CreateTable();
 		} else {
@@ -280,6 +281,7 @@ abstract class uTableDef implements iUtopiaModule {
 			$this->RefreshTable($fullColumns);
 		}
 
+		if ($this->customscript) database::query($this->customscript);
 		database::query('INSERT INTO `__table_checksum` VALUES (?,?) ON DUPLICATE KEY UPDATE `checksum` = ?',array($this->tablename,$checksum,$checksum));
 	}
 
