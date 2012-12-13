@@ -1447,7 +1447,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function &AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
-		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE)
+		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE && isset($this->fields[$fieldName]['vtable']))
 			return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 
 		//	if (!array_key_exists($fieldName,$this->fields)) { ErrorLog("Cannot add HAVING filter on field '$fieldName' as the field does not exist.");ErrorLog(print_r(useful_backtrace(),true)); return; }
