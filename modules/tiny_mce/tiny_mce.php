@@ -50,6 +50,7 @@ class module_TinyMCE extends uBasicModule {
 
 			$options['valid_elements'] = '*[*]';
 			$options['extended_valid_elements'] = '*[*]';
+			$options['valid_children'] = '+body[style]';
 
 			$richOpts = array();
 			$richOpts['plugins'] = "paste,inlinepopups,spellchecker,save";
