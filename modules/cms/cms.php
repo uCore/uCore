@@ -29,6 +29,16 @@ class tabledef_CMS extends uTableDef {
 		$this->SetIndexField('position');
 	}
 	public $auto_increment = 'position';
+	
+	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
+		// if pk is null, update the pk to random string
+		if ($pkVal === null) parent::UpdateField('cms_id','newpage_'.rand(),$pkVal);
+		
+		// if field is pk and newvalue is empty, return
+		if ($fieldName == 'cms_id' && !$newValue) return;
+		
+		parent::UpdateField($fieldName,$newValue,$pkVal,$fieldType);
+	}
 }
 
 class uCMS_List extends uDataModule implements iAdminModule {
