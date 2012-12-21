@@ -4,20 +4,20 @@ define('NOTICE_TYPE_INFO'	, 'info');
 define('NOTICE_TYPE_WARNING', 'warning');
 define('NOTICE_TYPE_ERROR'	, 'error');
 
-utopia::AddTemplateParser('notices','uNotices::ShowNotices','',true);
 class uNotices extends uBasicModule {
 	public function SetupParents() {
 		uCSS::IncludeFile(dirname(__FILE__).'/notices.css');
+		uJavascript::IncludeFile(dirname(__FILE__).'/notices.js');
 	}
 
 	public static function AddNotice($message,$type=NOTICE_TYPE_INFO) {
-		if (!AjaxEcho('var msg = Base64.decode("'.base64_encode(self::GetNotice($message,$type)).'"); if ($(\'.uNotices\').length) $(\'.uNotices\').append(msg); else alert(Base64.decode("'.base64_encode($message).'"));'))
+		if (!AjaxEcho('var msg = Base64.decode("'.base64_encode(self::GetNotice($message,$type)).'"); utopia.ShowNotice(msg);'))
 			$_SESSION['notices'][] = array('message'=>$message, 'type'=>$type);
 	}
 
 	public static function GetNotice($message,$type=NOTICE_TYPE_INFO) {
 		$icon = $type === NOTICE_TYPE_WARNING || $type === NOTICE_TYPE_ERROR ? 'alert' : 'info';
-		return '<div class="uNotice uNotice-'.$type.'"><p><span class="ui-icon ui-icon-'.$icon.'" style="float: left; margin-right: .3em;"></span>'.$message.'</p></div>';
+		return '<div class="uNotice uNotice-'.$type.'">'.$message.'</div>';
 	}
 	public function RunModule() {
 		self::ShowNotices();

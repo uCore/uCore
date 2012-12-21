@@ -1,23 +1,39 @@
-.uNotices { overflow:hidden; }
+.uNotices-wrap { overflow:hidden; position:fixed; top:0; left:0; width:100%; z-index: 999999; }
+.uNotices { width:600px; margin: 0 auto; background:black; 
+	-webkit-border-bottom-right-radius: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	overflow:hidden;
+}
 .uNotices .uNotice {
 	display:block;
 	padding: 1px 10px;
-	border-radius: 10px;
-	margin:0.1em;
+	margin:0;
+	
+	-moz-box-shadow: inset 0px -3px 8px 0px rgba(0, 0, 0, 0.6);
+	-webkit-box-shadow: inset 0px -3px 8px 0px rgba(0, 0, 0, 0.6);
+	box-shadow: inset 0px -3px 8px 0px rgba(0, 0, 0, 0.6);
+	
+	text-align:center;
+
+	font-size: 16px; padding:0.5em 2em 1em 2em; color:white;
+	border-top:none !important;
 }
-.uNotices .uNotice p { font-size: 12px; padding:0.5em 0; margin:0; color:black; }
 
 .uNotices .uNotice.uNotice-info {
-	background-color:#d0e5f5;
-	border:1px solid #4297d7;
+	background-color:#26A9F3;
+	border:1px solid #1773A7;
 }
 
 .uNotices .uNotice.uNotice-warning {
-	background-color:#f9fbb1;
-	border:1px solid #FAD42E;
+	background-color:#E9A326;
+	border:1px solid #976C20;
 }
 
 .uNotices .uNotice.uNotice-error {
-	background-color:#feecec;
-	border:1px solid #CD0A0A;
+	background-color:#F32626;
+	border:1px solid #7A1919;
 }
