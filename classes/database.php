@@ -20,6 +20,8 @@ class database {
 
 		return self::$conn;
 	}
+	
+	static $queryCount = 0;
 	static function &query($query, $args=NULL) { $false = FALSE;
 		if (empty($query)) return $false;
 		if (!isset($GLOBALS['sql_query_count']))
@@ -37,8 +39,11 @@ class database {
 		if (is_array($args)) foreach ($args as $a) {
 			$pdo->addByVal($a,self::getType($a));
 		}
-		$stm = $pdo->call($query);
-		$stm->setFetchMode(PDO::FETCH_ASSOC);
+		try {
+			self::$queryCount++;
+			$stm = $pdo->call($query);
+			$stm->setFetchMode(PDO::FETCH_ASSOC);
+		} catch (Exception $e) { $timetaken = timer_end($tID); throw $e;}
 
 		$timetaken = timer_end($tID);
 		return $stm;
