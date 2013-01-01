@@ -11,7 +11,6 @@
 	<div id="contentWrap">
 		<div id="nav">{UTOPIA.modlinks}</div>
 		<div id="content">
-			{notices}
 			{utopia.content}
 		</div>
 	</div>

@@ -5,10 +5,9 @@
 </head>
 
 <body>
-{notices}
-<div style="background-color:#efefef;width:96%;margin:0 auto">
-{UTOPIA.breadcrumb}
-{UTOPIA.content}
-</div>
+	<div style="background-color:#efefef;width:96%;margin:0 auto">
+		{UTOPIA.breadcrumb}
+		{UTOPIA.content}
+	</div>
 </body>
 </html>
