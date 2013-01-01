@@ -1,4 +1,10 @@
 <?php
+global $ucore_start_time;
+$ucore_start_time = microtime(true);
+
+function shutdownErrorHandler() { error_reporting(0); }
+register_shutdown_function('shutdownErrorHandler');
+
 if (PHP_SAPI == "cli") {
 	$_SERVER['HTTP_HOST'] = 'cli';
 	$_SERVER['REQUEST_URI'] = $argv[1];
@@ -21,14 +27,6 @@ if (!ini_get('output_buffering')) ob_start();
 $enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
 define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
 if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
-
-function runtimeHeader($startTime) {
-	error_reporting(0);
-	$endTime = microtime(true);
-	header('X-Runtime: '.($endTime-$startTime));
-}
-$startTime = microtime(true);
-register_shutdown_function('runtimeHeader',$startTime);
 
 date_default_timezone_set('GMT');
 

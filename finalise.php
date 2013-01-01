@@ -12,4 +12,7 @@ if (isset($GLOBALS['timers']) && isset($_SESSION['admin_showT']) && $_SESSION['a
 	echo '</table></pre>';
 }
 
+global $ucore_start_time;
+header('X-Runtime: '.(microtime(true)-$ucore_start_time));
+
 die();
