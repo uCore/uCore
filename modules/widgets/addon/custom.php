@@ -73,52 +73,50 @@ class uCustomWidget implements iWidget {
 			return;
 		}
 	
-		{ // get rows
-			$instance->_SetupParents(); $instance->_SetupFields();
-			foreach ($instance->fields as $fieldName => $fieldInfo) {
-				if (isset($fieldInfo['ismetadata']) && !isset($rec[$fieldName])) $rec[$fieldName] = null;
-			}
-			
-			// clear filters
-			$rec['clear_filter'] = utopia::jsonTryDecode($rec['clear_filter']);
-			if (!is_array($rec['clear_filter'])) $rec['clear_filter'] = array($rec['clear_filter']);
-			foreach ($rec['clear_filter'] as $uid) {
-				$instance->RemoveFilter($uid);
-			}
-			
-			// add filters
-			utopia::MergeVars($rec['filter']);
-			if ($rec['filter']) $instance->AddFilter($rec['filter'],ctCUSTOM);
-
-			// add Order
-			utopia::MergeVars($rec['order']);
-			if ($rec['order']) {
-				$instance->ordering = NULL;
-				$instance->AddOrderBy($rec['order']);
-			}
-
-			// init limit
-			$page = NULL;
-			$limit = NULL;
-			utopia::MergeVars($rec['limit']);
-			$instance->GetLimit($rec['limit'],$_,$rec['limit']);
-			$rec['limit'] = trim($rec['limit']);
-			if ($rec['limit'] && strpos($rec['limit'],',')===FALSE && stripos($rec['content'],'{pagination}') !== FALSE) {
-				$page = isset($_GET['_p_'.$rec['block_id']]) ? $_GET['_p_'.$rec['block_id']] : 0;
-				$limit = $rec['limit'];
-				$rec['limit'] = ($limit*$page).','.$rec['limit'];
-			}
-			
-			// get rows
-			$rows = array();
-			$rows = $instance->GetRows();
+		$instance->_SetupParents(); $instance->_SetupFields();
+		foreach ($instance->fields as $fieldName => $fieldInfo) {
+			if (isset($fieldInfo['ismetadata']) && !isset($rec[$fieldName])) $rec[$fieldName] = null;
 		}
 		
-		if (!$rows) return $rec['no_rows'];
+		// clear filters
+		$rec['clear_filter'] = (array)utopia::jsonTryDecode($rec['clear_filter']);
+		foreach ($rec['clear_filter'] as $uid) {
+			$instance->RemoveFilter($uid);
+		}
+		
+		// add filters
+		utopia::MergeVars($rec['filter']);
+		if ($rec['filter']) $instance->AddFilter($rec['filter'],ctCUSTOM);
 
-		// process limit
-		$total = count($rows);
-		$instance->ApplyLimit($rows,$rec['limit']);
+		// add Order
+		utopia::MergeVars($rec['order']);
+		if ($rec['order']) {
+			$instance->ordering = NULL;
+			$instance->AddOrderBy($rec['order']);
+		}
+		
+		$dataset = $instance->GetDataset();
+		
+		// init limit
+		utopia::MergeVars($rec['limit']);
+		$rec['limit'] = trim($rec['limit']);
+		$instance->GetLimit($limit,$page); // page is governed by a different query arg for widgets, below
+		$page = (stripos($rec['content'],'{pagination}') !== FALSE) && isset($_GET['_p_'.$rec['block_id']]) ? $_GET['_p_'.$rec['block_id']] : 0;
+		$offset = $limit * $page;
+		if ($rec['limit']) {
+			if (strpos($rec['limit'],',')===FALSE) {
+				$limit = $rec['limit'];
+				$offset = $limit * $page;
+			} else {
+				list($offset,$limit) = explode(',',$rec['limit']);
+				$offset = trim($offset); $limit = trim($limit);
+			}
+		}
+		
+		if (!($total = $dataset->CountRecords())) return $rec['no_rows'];
+
+		// get rows
+		$rows = $dataset->GetOffset($offset,$limit);
 		
 		// get content
 		$content = $append = $prepend = '';

@@ -34,7 +34,7 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 			$rows[] = array('block_id'=>$name,'block_type'=>'Fixed Widgets');
 		}
 		// widgets
-		$widgets = $this->GetRows();
+		$widgets = $this->GetDataset()->fetchAll();
 		array_sort_subkey($widgets,'block_type');
 		$rows = array_merge($rows,$widgets);
 
@@ -49,7 +49,7 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 	public function RunModule() {
 		$this->ShowData();
 		// show conclicts between static block ids and custom ids
-		$rows = $this->GetRows();
+		$rows = $this->GetDataset()->fetchAll();
 		foreach ($rows as $row) {
 			if (uWidgets::StaticWidgetExists($row['block_id'])) echo "Conflict: Widget ({$row['block_id']}) already exists as a static Widget.  Please rename it.";
 		}

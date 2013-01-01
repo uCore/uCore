@@ -174,7 +174,7 @@ class uEmailer extends uDataModule {
 		if (!is_array($attachments)) $attachments = array($attachments);
 
 		$obj =& utopia::GetInstance('uEmailTemplateAttachmentList');
-		$templateAttachments = $obj->GetRows(array('doc_id'=>$ident));
+		$templateAttachments = $obj->GetDataset(array('doc_id'=>$ident))->GetFirst();
 		if ($templateAttachments) foreach ($templateAttachments as $attachment) {
 			$attachments[] = Swift_Attachment::newInstance($attachment['attachment'], $attachment['attachment_filename'], $attachment['attachment_filetype']);
 		}

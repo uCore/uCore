@@ -66,8 +66,10 @@ class modOptsList extends uListDataModule implements iAdminModule {
 	public function SetupParents() {
 		$this->AddParent('/');
 	}
-	public function GetRows($filter=NULL,$clearFilters=false) {
-		$rows = parent::GetRows($filter,$clearFilters);
+	public function RunModule() {
+		$dataset = $this->GetDataset();
+		$rows = $dataset->fetchAll();
+		
 		foreach ($rows as $k=>$row) {
 			foreach (modOpts::$types as $id=>$t) {
 				if ($id == $row['ident']) {
@@ -76,10 +78,7 @@ class modOptsList extends uListDataModule implements iAdminModule {
 				}
 			}
 		}
-		return $rows;
-	}
-	public function RunModule() {
-		$rows = $this->GetRows();
+		
 		array_sort_subkey($rows,'group');
 		$grouped = array();
 		

@@ -191,10 +191,10 @@ FIN;
 	}
 
 	public function GetNestedArray($parent='') {
-		$rows = $this->GetRows();
+		$dataset = $this->GetDataset();
 
 		$relational = array();
-		foreach ($rows as $row) {
+		while ($row = $dataset->fetch()) {
 			$row['children'] = array();
 			$relational[$row['cms_id']] = $row;
 		}
@@ -348,8 +348,8 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			$newValue = UrlReadable($newValue);
 			// also update children's "parent" to this value
 			if ($pkVal !== NULL) {
-				$children = $this->GetRows(array('parent'=>$pkVal),true);
-				foreach ($children as $child) $this->UpdateField('parent',$newValue,$child['cms_id']);
+				$dataset = $this->GetDataset(array('parent'=>$pkVal),true);
+				while ($child = $dataset->fetch()) $this->UpdateField('parent',$newValue,$child['cms_id']);
 			}
 		}
 		if (substr($fieldAlias,0,8) == 'content:') {
@@ -397,7 +397,8 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	}
 	public function getPossibleBlocks($val,$pk,$original) {
 		$obj =& utopia::GetInstance('uWidgets_List');
-		$rows = $obj->GetRows();
+		$ds = $obj->GetDataset();
+		$rows = $ds->fetchAll();
 		foreach (uWidgets::$staticWidgets as $widgetID => $callback) $rows[]['block_id'] = $widgetID;
 		return '<span class="btn" onclick="ChooseWidget()">Insert Widget</span>';
 	}
@@ -532,7 +533,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->RewriteFilters($filters);
 
 		if (isset($filters['cms_id']))
-			$rec = $this->LookupRecord($filters);
+			$rec = $this->LookupRecord($filters['cms_id']);
 		else
 			$rec = self::findPage();
 
@@ -614,7 +615,8 @@ class uCMS_View extends uSingleDataModule {
 		}
 	}
 	function InitSitemap() {
-		$rows = $this->GetRows(NULL,true);
+		$ds = $this->GetDataset(NULL,true);
+		$rows = $ds->ds()->fetchAll();
 
 		foreach ($rows as $row) {
 			// is published

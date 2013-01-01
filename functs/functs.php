@@ -205,7 +205,7 @@ function GetFilterArray() {
 	foreach ($_GET as $key=>$val) {
 		if (substr($key,0,3) != '_f_') continue;
 		$newKey = substr($key,3);
-		$arr[$newKey] = $val;
+		$arr[$newKey] = urldecode($val);
 	}
 	return $arr;
 }

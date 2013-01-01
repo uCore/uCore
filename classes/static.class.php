@@ -1358,4 +1358,24 @@ class utopia {
 		}
 		return true;
 	}
+	
+	static function GetGlobalSearch($val,&$args) {
+		$q = array();
+
+		// match phrases
+		preg_match_all('/".+"/',$val,$matches);
+		foreach ($matches[0] as $v) {
+			$val = str_replace($v,'',$val);
+			$v = trim($v,'"');
+			$args[] = $v;
+			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
+		}
+		
+		preg_match_all('/\w+/',$val,$matches);
+		foreach ($matches[0] as $v) {
+			$args[] = $v;
+			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
+		}
+		return implode(' AND ',$q);
+	}
 }

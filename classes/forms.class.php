@@ -29,7 +29,10 @@ define('itSCAN'		,'scan');
 define('itCUSTOM'	,'~~custom~~');
 
 //--  FilterCompareType
-define('ctCUSTOM'   ,'{custom}');
+define('ctCUSTOM'	,'{custom}');
+define('ctIGNORE'	,'{ignore}');
+define('ctMATCH'	,'{MATCH}');
+define('ctMATCHBOOLEAN'	,'{MATCH_BOOLEAN}');
 define('ctANY'		,'');
 define('ctEQ'		,'=');
 define('ctNOTEQ'	,'!=');
@@ -88,6 +91,88 @@ define('LIST_HIDE_STATUS',flag_gen());
 define('DEFAULT_OPTIONS',ALLOW_FILTER);
 
 // START CLASSES
+
+class uDataset {
+	private $module = null;
+	private $query = null;
+	private $args = array();
+	private $recordCount = null;
+	
+	public function __construct($query, $args, $module) {
+		// initialise count
+		$this->module = $module;
+		$this->query = $query;
+		$this->args = $args;
+	}
+	public function DebugDump() {
+		return $this->query."\n".var_export($this->args,true);
+	}
+	
+	public function CountPages($items_per_page=10) {
+		return (int)ceil($this->CountRecords() / $items_per_page);
+	}
+	public function CountRecords() {
+		if ($this->recordCount === null) $this->recordCount = (int)database::query('SELECT COUNT(*) FROM '.$this->query.' as `__`',$this->args)->fetchColumn();
+		return $this->recordCount;
+	}
+	
+	public function GetFirst() {
+		$rows = $this->GetOffset(0,1);
+		return reset($rows);
+	}
+	
+	/* page is zero indexed */
+	public function GetPage($page, $items_per_page=10) {
+		$limit = '';
+		if ($items_per_page > 0) {
+			$start = $items_per_page * $page;
+			$limit = ' LIMIT '.$start.','.$items_per_page;
+		}
+		return $this->GetOffset($start,$items_per_page);
+	}
+	
+	public function GetOffset($offset,$count) {
+		$limit = ' LIMIT '.$offset.','.$count;
+		return $this->CreateRecords(database::query($this->query.$limit,$this->args)->fetchAll());
+	}
+	
+	private $ds = null;
+	public function fetch() { return $this->CreateRecord($this->ds()->fetch()); }
+	public function fetchAll() { return $this->CreateRecords($this->ds()->fetchAll()); }
+	public function ds() {
+		if ($this->ds === null) $this->ds = database::query($this->query,$this->args);
+		return $this->ds;
+	}
+	
+	public function CreateRecords($rows) {
+		if (!is_array($rows)) return $rows;
+		$rc = count($rows);
+		for ($i = 0; $i < $rc; $i++) {
+			$rows[$i] = $this->CreateRecord($rows[$i]);
+		}
+		return $rows;
+	}
+	public function CreateRecord($row) {
+		if (!is_array($row)) return $row;
+		if (isset($row['__metadata']) && $row['__metadata']) {
+			$meta = utopia::jsonTryDecode($row['__metadata']);
+			if ($meta) $row = array_merge($row,$meta);
+		}
+		
+		// make link tables into array
+		foreach ($row as $field=>$val) {
+			if (!isset($this->module->fields[$field])) continue;
+			if (!is_string($val)) continue;
+			if (strpos($val,"\x1F") === FALSE) continue;
+			$fieldData = $this->module->fields[$field];
+			if (!isset($fieldData['vtable'])) continue;
+			if (!is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable')) continue;
+			$row[$field] = explode("\x1F",$val);
+		}
+		return $row;
+	}
+}
+
 
 /**
  * Basic Utopia module. Enables use of adding parents and module to be installed and run.
@@ -497,6 +582,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		
 		$query = http_build_query($filters);
 		if ($query) $query = '?'.$query;
+		
 		return $url.$query;
 	}
 	public function IsInstalled() {
@@ -638,6 +724,19 @@ abstract class uDataModule extends uBasicModule {
 			$obj->_SetupFields();
 		}
 		uEvents::TriggerEvent('AfterSetupFields',$this);
+		
+		$fields = $this->GetStringFields();
+		$this->AddField('__global__','(CAST(CONCAT_WS(\' \','.$fields.') AS CHAR))','');
+	}
+	public function GetStringFields() {	
+		$ignoreTypes = array(ftIMAGE,ftFILE);		
+		$fields = array();
+		foreach ($this->fields as $alias => $info) {
+			if (in_array($this->GetFieldType($alias),$ignoreTypes)) continue;
+			$str = $this->GetFieldLookupString($alias,$info);
+			$fields[] = $str;
+		}
+		return implode(',',$fields);
 	}
 
 	public function ParseRewrite($caseSensative = false) {
@@ -663,23 +762,39 @@ abstract class uDataModule extends uBasicModule {
 		return parent::RewriteURL($filters);
 		}*/
 
+	public function MergeRewriteFilters(&$filters,$rec) {
+		if (!is_array($filters)) return false;
+		if (!$this->HasRewrite()) return false;
+		if (!$rec) return false;
+		foreach ($this->rewriteMapping as $seg) {
+			if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
+				foreach ($matches[1] as $match) {
+					if (isset($filters[$match])) continue;
+					if (array_key_exists($match,$rec)) $filters[$match] = $rec[$match];
+				}
+			}
+		}
+		return true;
+	}
 	public function RewriteFilters(&$filters = NULL) {
 		if (!is_array($filters)) return false;
 		if (!$this->HasRewrite()) return false;
 		foreach ($filters as $uid => $val) {
 			$fltr = $this->GetFilterInfo(substr($uid,3));
 			if (!$fltr) continue;
+			if ($fltr['default'] == $fltr['value']) continue;
 			$filters[$fltr['fieldName']] = $val;
 			unset($filters[$uid]);
 		}
 		if (array_key_exists($this->GetPrimaryKey(), $filters)) {
-			$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()],true);
-			if (!$rec) return;
-			$fields = array();
 			foreach ($this->rewriteMapping as $seg) {
 				if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
 					foreach ($matches[1] as $match) {
-						if (array_key_exists($match,$this->fields)) $filters[$match] = $rec[$match];
+						if (isset($filters[$match])) continue;
+						$rec = $this->LookupRecord($filters[$this->GetPrimaryKey()],true);
+						if (!$rec) return;
+						$this->MergeRewriteFilters($filters,$rec);
+						return;
 					}
 				}
 			}
@@ -991,7 +1106,7 @@ abstract class uDataModule extends uBasicModule {
 		if (empty($pkValue)) return;
 		$this->_SetupFields();
 		$fieldData = $this->fields[$alias];
-		$str = $this->GetFieldLookupString($alias,$this->fields[$alias]);
+		$str = $this->GetFieldLookupString($alias,$this->fields[$alias])." as `$alias`";
 
 		$table = $fieldData['vtable']['table'];
 		$pk = $fieldData['vtable']['pk'];
@@ -1447,6 +1562,12 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function &AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
+		if (preg_match_all('/{([^}]+)}/',$fieldName,$matches)) {
+			foreach ($matches[1] as $match) {
+				if (isset($this->fields[$match])) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
+			}
+		}
+
 		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE && isset($this->fields[$fieldName]['vtable']))
 			return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 
@@ -1455,22 +1576,18 @@ abstract class uDataModule extends uBasicModule {
 		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$title);
 	}
 
-	private $filterUID = array();
+	private $filterCount = 0;
 	public function GetNewUID($fieldName) {
-		if (!isset($this->filterUID[$fieldName])) $this->filterUID[$fieldName] = 0;
-		$this->filterUID[$fieldName]++;
-		
-		$count = $this->filterUID[$fieldName]-1 > 0 ? '_'.$this->filterUID[$fieldName] : '';
-		return $this->GetModuleId().'_'.$fieldName.$count;
+		$this->filterCount++;
+		return $this->GetModuleId().'_'.$this->filterCount;
 	}
 
 	// private - must use addfilter or addfilterwhere.
 	private function &AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) {
 		// if no filter, or filter has default, or filter is link - create new filter
-		$fd =& $this->FindFilter($fieldName,$compareType,$inputType,$filterType);
+		$fd =& $this->FindFilter($fieldName,$compareType,$inputType);
 		if (!$fd || $fd['default'] !== NULL) {
 			$uid = $this->GetNewUID($fieldName);
-
 			if ($filterType == NULL) // by default, filters are HAVING unless otherwise specified
 				$filterset =& $this->filters[FILTER_HAVING];
 			else
@@ -1495,8 +1612,8 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		$value = $dvalue;
-		if ($inputType !== itNONE && $value === NULL && array_key_exists($fieldName,$_GET))
-			$value = $_GET[$fieldName];
+//		if ($inputType !== itNONE && $value === NULL && array_key_exists($fieldName,$_GET))
+//			$value = $_GET[$fieldName];
 		
 		$fieldData['fieldName'] = $fieldName;
 		$fieldData['type'] = $filterType;
@@ -1566,7 +1683,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function GetFieldLookupString($alias,$fieldData) {
 		$fieldName = $fieldData['field'];
-		if (empty($fieldName)) return "'' as `$alias`";
+		if (empty($fieldName)) return "''";
 		if ($fieldData['tablename'] === NULL) return;
 
 		/* THIS FUNCTION HAS BEEN SIMPLIFIED!
@@ -1588,7 +1705,7 @@ abstract class uDataModule extends uBasicModule {
 			$toAdd = CreateConcatString($fieldName, $fieldData['tablename']);
 		}
 
-		return "$toAdd as `$alias`";
+		return "$toAdd";
 	}
 
 	public function GetFromClause() {
@@ -1611,7 +1728,7 @@ abstract class uDataModule extends uBasicModule {
 
 		foreach ($this->fields as $alias => $fieldData) {
 			$str = $this->GetFieldLookupString($alias,$fieldData);
-			if (!empty($str)) $flds[] = $str;
+			if (!empty($str)) $flds[] = $str." as `$alias`";
 		}
 
 		// table joins should be grouped by the link field.... eg:
@@ -1683,68 +1800,52 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function GetFilterValue($uid, $refresh = FALSE) {
-		//		ErrorLog(get_class($this).".GetFilterValue($uid)");
 		$filterData = $this->GetFilterInfo($uid);
-		//        ErrorLog(print_r($filterData,true));
+		if (!is_array($filterData)) return NULL;
 
 		// ptime static filter value
 		// this line grabs STATIC filters (filters set by code), this enforced if the input type is null
-		if (isset($filterData['default'])) return $filterData['default'];
-		$defaultValue = (is_array($filterData) && array_key_exists('value',$filterData)) ? $filterData['value'] : NULL;
+		//if (isset($filterData['default'])) $defaultValue = $filterData['default'];
+		$defaultValue = array_key_exists('value',$filterData) ? $filterData['value'] : $filterData['default'];
 
-		if (is_array($filterData) && $filterData['it'] == itNONE) {
-			// for union modules, we cannot get a value form currentmodule because it is itself, part of the query
-			if (utopia::GetCurrentModule() !== get_class($this) && (!isset($this->UNION_MODULE) || $this->UNION_MODULE !== TRUE)) {
-				if (array_key_exists('linkFrom',$filterData)) {
-					list($linkParent,$linkFrom) = explode(':',$filterData['linkFrom']);
-					// linkparent is loaded?  if not then we dont really want to use it as a filter.....
-					if ($linkParent == utopia::GetCurrentModule()) {
-						$linkParentObj =& utopia::GetInstance($linkParent);
-						$row = $linkParentObj->GetCurrentRecord($refresh);
-						if (!$row && !$refresh) $row = $linkParentObj->GetCurrentRecord(true);
+		// for union modules, we cannot get a value form currentmodule because it is itself, part of the query
+		if ($filterData['it'] === itNONE && utopia::GetCurrentModule() !== get_class($this) && (!isset($this->UNION_MODULE) || $this->UNION_MODULE !== TRUE)) {
+			if (array_key_exists('linkFrom',$filterData)) {
+				list($linkParent,$linkFrom) = explode(':',$filterData['linkFrom']);
+				// linkparent is loaded?  if not then we dont really want to use it as a filter.....
+				if ($linkParent == utopia::GetCurrentModule()) {
+					$linkParentObj =& utopia::GetInstance($linkParent);
+					$row = $linkParentObj->GetCurrentRecord($refresh);
+					if (!$row && !$refresh) $row = $linkParentObj->GetCurrentRecord(true);
 
-						if (is_array($row) && array_key_exists($linkFrom,$row)) {
-							return $row[$linkFrom];
-							//					else {
-							//						ErrorLog(get_class($this).': Cant find '.$filterData['linkFrom']);
-							//						errorLog(print_r(useful_backtrace(1,5),true));
-							//					}
-						} else {// if the filter value of the parent is null (if we're updating for example), then we want to get the value of the filter
-							$fltrLookup =& $linkParentObj->FindFilter($linkFrom,ctEQ);
-							$val = NULL;
-							// stop lookup callbacks
-							if (is_array($fltrLookup) && array_key_exists('linkFrom',$fltrLookup) && stristr($fltrLookup['linkFrom'],get_class($this)) === FALSE )
-								$val = $linkParentObj->GetFilterValue($fltrLookup['uid']);
-							//ErrorLog($val);
-							if ($val!==NULL) return $val;
-							//if ($fltrLookup['value']) return $fltrLookup['value'];
+					if (is_array($row) && array_key_exists($linkFrom,$row)) {
+						return $row[$linkFrom];
+					} else {// if the filter value of the parent is null (if we're updating for example), then we want to get the value of the filter
+						$fltrLookup =& $linkParentObj->FindFilter($linkFrom,ctEQ);
+						$val = NULL;
+						// stop lookup callbacks
+						if (is_array($fltrLookup) && array_key_exists('linkFrom',$fltrLookup) && stristr($fltrLookup['linkFrom'],get_class($this)) === FALSE)
+							$val = $linkParentObj->GetFilterValue($fltrLookup['uid']);
 
-							//$uid = $uid['uid'];
-						}
+						if ($val!==NULL) return $val;
 					}
-				} //else
-				//						ErrorLog('Cant find linkFrom in GetFilterValue: '.print_r($filterData,true));
+				}
 			}
-			if (!empty($defaultValue)) return $defaultValue;
 		}
-
+		
 		$filters = GetFilterArray();
-		if (!is_array($filters) || !array_key_exists($uid,$filters)) {
-			return $defaultValue;
-		}
+		if (isset($filters[$uid])) return $filters[$uid];
 
-		return urldecode($filters[$uid]);
+		return $defaultValue;
 	}
 
 	public function GetTableProperty($alias,$property) {
-		//		if (!$this->AssertField($alias,$alias.'.'.$property)) return NULL;
 		if (!isset($this->fields[$alias])) return NULL;
 		if (!isset($this->fields[$alias]['vtable'])) return NULL;
 
 		$tabledef = $this->fields[$alias]['vtable']['tModule'];
-		//		$fieldName = $this->GetRootField($alias);
 		$fieldName = $this->fields[$alias]['field'];
-		//echo "finding prop $property for field $fieldName in $tabledef<br/>";
+		
 		$obj =& utopia::GetInstance($tabledef);
 		return $obj->GetFieldProperty($fieldName,$property);
 	}
@@ -1752,7 +1853,6 @@ abstract class uDataModule extends uBasicModule {
 	// filterSection = [where|having]
 
 	public function FormatFieldName($fieldName, $fieldType = NULL) {
-//	return $fieldName;
 		if ($fieldType === NULL)
 		$fieldType = $this->GetFieldType($fieldName);
 
@@ -1762,10 +1862,6 @@ abstract class uDataModule extends uBasicModule {
 			case ('time'): $fieldName = "(STR_TO_DATE($fieldName,'".FORMAT_TIME."'))"; break;
 			case ('datetime'):
 			case ('timestamp'): $fieldName = "(STR_TO_DATE($fieldName,'".FORMAT_DATETIME."'))"; break;
-			/*            case ('date'): $fieldName = "DATE($fieldName)"; break;
-			 case ('time'): $fieldName = "TIME($fieldName)"; break;
-			 case ('datetime'):
-			 case ('timestamp'): $fieldName = "TIMESTAMP($fieldName)"; break;*/
 			default: break;
 		}
 		return $fieldName;
@@ -1777,24 +1873,35 @@ abstract class uDataModule extends uBasicModule {
 		$fieldName = $fieldNameOverride ? $fieldNameOverride : $filterData['fieldName'];
 		$compareType=$filterData['ct'];
 		$inputType=$filterData['it'];
-		if ($compareType == ctCUSTOM) return $filterData['fieldName'];
 
-		$fieldToCompare = NULL;
+		if ($compareType === ctIGNORE) return '';
+		
+		$value = $this->GetFilterValue($uid);//$filterData['value'];
+
+		$fieldToCompare = $fieldName;
+		
+		if (is_callable($fieldToCompare)) return call_user_func_array($fieldToCompare,array($value,&$args));
+
 		if ($filterData['type'] == FILTER_WHERE) {
-			if (array_key_exists($fieldName,$this->fields)) {
-				if (preg_match('/{[^}]+}/',$this->fields[$fieldName]['field']) > 0 || $this->fields[$fieldName]['foreign']) {
-					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['vtable']['pk'].'`';
-				} else {
-					$fieldToCompare = '`'.$this->fields[$fieldName]['vtable']['alias'].'`.`'.$this->fields[$fieldName]['field'].'`';
+			if (isset($this->fields[$fieldToCompare])) $fieldToCompare = '{'.$fieldToCompare.'}';
+			if (preg_match_all('/{([^}]+)}/',$fieldToCompare,$matches)) {
+				foreach ($matches[1] as $match) {
+					if (!isset($this->fields[$match])) continue;
+					$replace = null;
+					if (preg_match('/{[^}]+}/',$this->fields[$match]['field']) > 0 || $this->fields[$match]['foreign']) {
+						$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['vtable']['pk'].'`';
+					} else {
+						$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
+					}
+					if ($replace !== null) $fieldToCompare = str_replace('{'.$match.'}',$replace,$fieldToCompare);
 				}
-			} else if (!IsSelectStatement($fieldName)) return '';
+			}
 		}
 
-		$value = $this->GetFilterValue($uid);//$filterData['value'];
 		//echo "$uid::$value<br/>";
-		if ($value === NULL && (!isset($filterData['linkFrom']) || !$filterData['linkFrom'] || (!isset($_REQUEST['_f_'.$uid])))) return '';
+		if (($value === NULL && $compareType !== ctCUSTOM) && (!isset($filterData['linkFrom']) || !$filterData['linkFrom'] || (!isset($_REQUEST['_f_'.$uid])))) return '';
 		// set filter VALUE
-		if ($compareType == ctLIKE && strpos($value,'%') === FALSE ) $value = "%$value%";
+		if ($compareType === ctLIKE && strpos($value,'%') === FALSE ) $value = "%$value%";
 
 		// find field type from tabledef
 		// set filter NAME
@@ -1804,6 +1911,33 @@ abstract class uDataModule extends uBasicModule {
 
 		// do value
 		switch (true) {
+			case $compareType == ctMATCH:
+				// any fields
+				$args = array_merge($args, (array)$value);
+				return 'MATCH ('.$fieldToCompare.') AGAINST (?)';
+				break;
+			case $compareType == ctMATCHBOOLEAN:
+				// any fields
+				$args = array_merge($args, (array)$value);
+				return 'MATCH ('.$fieldToCompare.') AGAINST (? IN BOOLEAN MODE)';
+				break;
+			case $compareType == ctCUSTOM:
+				if (($count = preg_match_all('/(?<!\\\)\?/',$fieldToCompare,$_))) { // has unescaped slashes, add values to args
+					$value = (array)$value;
+					$vcount = count($value);
+					if ($count === 1 && $vcount > 1) { // if count ==1 and count($value) > 1, repeat fTC and values for count(value)
+						$f = array();
+						for ($i = 0; $i < $vcount; $i++) $f[] = $fieldToCompare;
+						$fieldToCompare = '('.implode(' OR ',$f).')';
+					} else if ($count > 1 && $vcount === 1) { // if count >1 and count(value) 1, repeat value in args
+						$v = array();
+						for ($i = 0; $i < $count; $i++) $v[] = $value[0];
+						$value = $v;
+					}
+					$args = array_merge($args, $value);
+				}
+				return $fieldToCompare;
+				break;
 			case $compareType == ctANY:
 				$constants = get_defined_constants(true);
 				foreach ($constants['user'] as $cName => $cVal) {
@@ -1833,17 +1967,15 @@ abstract class uDataModule extends uBasicModule {
 				break;
 		}
 
-		$fieldToCompare = $fieldToCompare ? $fieldToCompare : $fieldName;
+	//	$fieldToCompare = $fieldToCompare ? $fieldToCompare : $fieldName;
 
 		return trim("$fieldToCompare $compareType $val");
 	}
 
 	public $extraWhere = NULL;
 	public function GetWhereStatement(&$args) {
-		//		echo get_class($this).".GetWhereStatement()\n";
 		$filters = $this->filters;
-		//print_r($filters);
-		//		ErrorLog('moo'.print_r($filters[FILTER_WHERE],true));
+
 		$where = array();
 		if (isset($filters[FILTER_WHERE]))
 		foreach ($filters[FILTER_WHERE] as $filterset) {
@@ -1889,10 +2021,6 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($filterset as $fData) { // loop each field in set
 				if ($fData['type'] !== FILTER_HAVING) continue;
 				$fieldName = $fData['fieldName'];
-				// perhaps its a subquery?
-				if (!isset($this->fields[$fieldName]) && $this->GetPrimaryKey() != $fieldName && !IsSelectStatement($fieldName) && ($fData['ct'] != ctCUSTOM)) continue;
-				//				if (empty($fData['value'])) continue;
-				//				if ($fData['value'] == "%%" && $fData['ct'] == ctLIKE) continue;
 
 				if (($filterString = $this->GetFilterString($fData['uid'],$args)) !== '')
 					$setParts[] = "($filterString)";
@@ -1944,11 +2072,32 @@ abstract class uDataModule extends uBasicModule {
 	 * Get a dataset based on setup.
 	 * @returns MySQL Dataset
 	 */
-	public function &GetDataset() {
-		$args = array();
-		$query = $this->GetSqlQuery($args);
-
-		$this->dataset = database::query($query,$args);
+	public function &GetDataset($filter=null,$clearFilters=false) {
+		$this->_SetupParents();
+		$this->_SetupFields();
+		if ($filter===NULL) $filter = array();
+		if (!is_array($filter)) $filter = array($this->GetPrimaryKey()=>$filter);
+		$fltrs = $this->filters;
+		if ($clearFilters) $this->ClearFilters();
+		foreach ($filter as $field => $val) {
+			if (is_numeric($field)) { // numeric key is custom filter
+				$this->AddFilter($val,ctCUSTOM);
+				continue;
+			}
+			if (($fltr =& $this->GetFilterInfo($field))) { // filter uid exists
+				$fltr['value'] = $val;
+				continue;
+			}
+			if (is_array($val)) {
+				$fltr = $this->AddFilter($field,$val['ct'],itNONE,$val['val']);
+				continue;
+			}
+			$this->AddFilter($field,ctEQ,itNONE,$val);
+		}
+		$args = array(); $query = $this->GetSqlQuery($args);
+		$this->dataset = new uDataset($query,$args,$this);
+		
+		$this->filters = $fltrs;
 
 		return $this->dataset;
 	}
@@ -1989,37 +2138,22 @@ abstract class uDataModule extends uBasicModule {
 		return $query;
 	}
 
-	public function GetLimit(&$limitRet=null,&$pageRet=null,$limit=null) {
+	public function GetLimit(&$limit=null,&$page=null) {
 		if ($limit === '') $limit = NULL;
 		if ($limit === null) {
 			$limitKey = '_l_'.$this->GetModuleId();
 			if (isset($_GET[$limitKey])) $limit = $_GET[$limitKey];
 		}
 		if ($limit === null) $limit = $this->limit;
-		if ($limit === null) return NULL;
-		
-		$a = explode(',',$limit);
-		if (count($a) > 1) {
-			list($pageRet,$limitRet) = $a;
-			$pageRet = floor($pageRet / $limitRet);
-		} else
-			$limitRet = intval($a[0]);
-			
-		if (!is_numeric($limitRet) || !$limitRet) $limitRet = NULL;
-	}
-	public function ApplyLimit(&$rows,$limit=null) {
-		$this->GetLimit($limit,$page,$limit);
+		if ($limit === null) $limit = 10;
 		
 		$pageKey = '_p_'.$this->GetModuleId();
-		if ($page === NULL) $page = isset($_GET[$pageKey]) ? $_GET[$pageKey] : 0;
+		if ($page === NULL) $page = isset($_GET[$pageKey]) ? (int)$_GET[$pageKey] : 0;
 		
-		if (!$limit) return;
-
-		$total = count($rows);
-		$pages = ceil(max(0,$total / $limit));
-		if ($page >= $pages) $page = $pages-1;
-		
-		$rows = array_slice($rows,$page * $limit,$limit);
+		if (!is_numeric($limit) || !$limit) $limit = NULL;
+	}
+	public function ApplyLimit(&$rows,$limit=null) {
+		// deprecated
 	}
 
 	public function GetCurrentRecord($refresh = FALSE) {
@@ -2031,48 +2165,10 @@ abstract class uDataModule extends uBasicModule {
 		return $this->currentRecord;
 	}
 
-	public function GetRows($filter=NULL,$clearFilters=false) {
-		$this->_SetupParents();
-		$this->_SetupFields();
-		if ($filter===NULL) $filter = array();
-		if (!is_array($filter)) $filter = array($this->GetPrimaryKey()=>$filter);
-		$fltrs = $this->filters;
-		if ($clearFilters) $this->ClearFilters();
-		foreach ($filter as $field => $val) {
-			// does filter exist already?
-			if (!is_numeric($field))
-				$this->AddFilter($field,ctEQ,itNONE,$val);
-			else
-				$this->AddFilter($val,ctCUSTOM);
-		}
-		$dataset = $this->GetDataset();
-
-		$rows = array();
-		while (($row = $dataset->fetch())) {
-			if (isset($row['__metadata']) && $row['__metadata']) {
-				$meta = utopia::jsonTryDecode($row['__metadata']);
-				if ($meta) $row = array_merge($row,$meta);
-			}
-			foreach ($row as $rk => $rv) { // dont explode blob data
-				if (!isset($this->fields[$rk])) continue;
-				if (!is_string($rv)) continue;
-				if (strpos($rv,"\x1F") === FALSE) continue;
-				$fieldData = $this->fields[$rk];
-				if (!isset($fieldData['vtable'])) continue;
-				if (!is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable')) continue;
-				$row[$rk] = explode("\x1F",$rv);
-			}
-			$rows[] = $row;
-		}
-		$this->filters = $fltrs;
-
-		return $rows;
-	}
-
 	public function LookupRecord($filter=NULL,$clearFilters=false) {
-		$rows = $this->GetRows($filter,$clearFilters);
-		if (!$rows) return NULL;
-		$row = reset($rows);
+		$ds = $this->GetDataset($filter,$clearFilters);
+		if (!$ds->CountRecords()) return NULL;
+		$row = $ds->GetFirst();
 		if ($filter===NULL && $clearFilters === FALSE) $this->currentRecord = $row;
 		return $row;
 	}
@@ -2096,7 +2192,7 @@ abstract class uDataModule extends uBasicModule {
 			$fieldDefinitions[$fieldAlias] = array('title'=>$fieldData['visiblename'],'type'=>$fieldData['inputtype']);
 		}
 		
-		$data = $this->GetRows($filters);
+		$data = $this->GetDataset($filters)->fetchAll();
 		
 		return array(
 			'definition' => array('title'=>$title,'fields'=>$fieldDefinitions,'pk'=>$pk),
@@ -2602,15 +2698,12 @@ abstract class uDataModule extends uBasicModule {
 
 		if ($includeFilter) {
 			$targetFilter = $this->GetTargetFilters($field,$row);
-			//if (!$targetFilter) $targetFilter = $this->GetTargetFilter('*',$row);
-		} else
-		$targetFilter = NULL;
-		//print_r($targetFilter);
-		//print_r($this->filters);
+		} else {
+			$targetFilter = NULL;
+		}
+		
 		$obj =& utopia::GetInstance($info['moduleName']);
 		return $obj->GetURL($targetFilter);
-
-		//return (!$targetFilter) ? $targetUrl : "$targetUrl&amp;$targetFilter";
 	}
 
 	public function GetTargetFilters($field,$row) {
@@ -2766,7 +2859,7 @@ abstract class uListDataModule extends uDataModule {
 
 	public function CheckMaxRows($mod = 0) {
 		AjaxEcho('// max recs: '.$this->GetMaxRows());
-		$rows = count($this->GetRows());
+		$rows = $this->GetDataset()->CountRecords();
 		if (!$this->GetMaxRows() || $rows + $mod < $this->GetMaxRows()) {
 			AjaxEcho('$(".newRow").show();');
 			return TRUE;
@@ -2786,10 +2879,10 @@ abstract class uListDataModule extends uDataModule {
 		//	echo "showdata ".get_class($this)."\n";
 		array_sort_subkey($this->fields,'order');
 
-		if (!$rows) $rows = $this->GetRows();
-		$num_rows = count($rows);
-		$this->ApplyLimit($rows);
-		
+		$dataset = $this->GetDataset();
+		$num_rows = $dataset->CountRecords();
+		$this->GetLimit($limit,$page);
+		if (!$rows) $rows = $dataset->GetPage($page,$limit);
 		if (!$tabTitle) $tabTitle = $this->GetTitle();
 		if (!$tabOrder) $tabOrder = $this->GetSortOrder();
 		
@@ -2917,7 +3010,6 @@ abstract class uListDataModule extends uDataModule {
 			ob_end_clean();
 			
 			$pagination = '';
-			$this->GetLimit($limit);
 			if ($limit) {
 				$pages = max(ceil($num_rows / $limit),1);
 				ob_start();
@@ -3128,11 +3220,9 @@ abstract class uSingleDataModule extends uDataModule {
 		$row = null;
 		$num_rows = 0;
 		if (!isset($_GET['_n_'.$this->GetModuleId()])) {
-			$rows = $this->GetRows();
-			$num_rows = count($rows);
-			$this->ApplyLimit($rows);
-			
-			$row = reset($rows);
+			$dataset = $this->GetDataset();
+			$num_rows = $dataset->CountRecords();
+			$row = $dataset->GetFirst();
 		}
 
 		$pagination = '';

@@ -66,8 +66,8 @@ class uSearch extends uBasicModule {
 			$fields = $info[0];
 			$obj =& utopia::GetInstance($module);
 			$pk = $obj->GetPrimaryKey();
-			$rows = $obj->GetRows();
-			foreach ($rows as $row) {
+			$dataset = $obj->GetDataset();
+			while (($row = $dataset->fetch())) {
 				$score = 0;
 				foreach ($fields as $field) {
 					if (!isset($row[$field])) continue;
