@@ -19,6 +19,7 @@ class uNotices {
 			if (preg_match('/^location:/i',$h)) return;
 		}
 		
+		if (!isset($_SESSION['notices'])) return;
 		$scripts = '$(function(){'.implode(PHP_EOL,$_SESSION['notices']).'});';
 		$_SESSION['notices'] = array();
 		uJavascript::AddText($scripts);
