@@ -123,7 +123,7 @@ abstract class sqlSchema extends PDO {
 
 		// add return value parameter
 		if (!is_null($this->hasReturn))
-		$stmt->bindParam(1,&$this->returnValue,$this->hasReturn[0] | PDO::PARAM_INPUT_OUTPUT,$this->hasReturn[1]);
+		$stmt->bindParam(1,$this->returnValue,$this->hasReturn[0] | PDO::PARAM_INPUT_OUTPUT,$this->hasReturn[1]);
 
 		// add other parameters in order
 		$paramCount = count($this->params);
