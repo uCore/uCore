@@ -350,7 +350,8 @@ class utopia {
 			case itTEXTAREA:
 				//sanitise value.
 				if (!utopia::SanitiseValue($defaultValue,'string') && !utopia::SanitiseValue($defaultValue,'NULL')) $defaultValue = 'Value has been sanitised: '.var_export($defaultValue,true);
-				$defaultValue = htmlspecialchars($defaultValue);
+				if (is_string($defaultValue)) $defaultValue = mb_convert_encoding($defaultValue, CHARSET_ENCODING, 'HTML-ENTITIES');
+				$defaultValue = htmlentities($defaultValue,ENT_COMPAT,CHARSET_ENCODING);
 				$out .= "<textarea $attr>$defaultValue</textarea>";
 				break;
 			case itCOMBO:
