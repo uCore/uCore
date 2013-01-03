@@ -1372,7 +1372,7 @@ class utopia {
 			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
 		}
 		
-		preg_match_all('/\w+/',$val,$matches);
+		preg_match_all('/[\w\+\']+/',$val,$matches);
 		foreach ($matches[0] as $v) {
 			$args[] = $v;
 			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
