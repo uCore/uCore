@@ -1378,7 +1378,7 @@ abstract class uDataModule extends uBasicModule {
 		$this->AddField($aliasName,$fieldName,$tableAlias,$visiblename,$inputtype,$values);
 		$this->fields[$aliasName]['foreign'] = true;
 	}
-	public function AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
+	public function &AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
 		
@@ -1443,7 +1443,7 @@ abstract class uDataModule extends uBasicModule {
 			if (!$this->layoutSections) $this->NewSection('');
 			$this->fields[$aliasName]['layoutsection'] = $this->cLayoutSection;
 		}
-		return TRUE;
+		return $this->fields[$aliasName];
 	}
 	private $insertBefore = null;
 	public function SetAddFieldPosition($before=null) {
