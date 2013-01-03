@@ -17,9 +17,11 @@ class tabledef_Users extends uTableDef {
 		// 
 
 		$this->SetPrimaryKey('user_id');
+		$this->SetIndexField(array('username','password'));
 		$this->SetIndexField('username');
 		$this->SetIndexField('password');
 		$this->SetIndexField('email_confirm_code');
+		$this->SetIndexField('role');
 	}
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
 		if ($fieldName == 'username') {
