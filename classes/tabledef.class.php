@@ -88,7 +88,6 @@ abstract class uTableDef implements iUtopiaModule {
 			$this->fields[$v]['null'] = SQL_NOT_NULL;
 		}
 		$this->primary = $name;
-
 	}
 	public function SetUniqueField($name) {
 		if (!is_array($name)) $name = array($name);
@@ -109,6 +108,14 @@ abstract class uTableDef implements iUtopiaModule {
 
 	public function GetPrimaryKey() {
 		return reset($this->primary);
+	}
+	
+	public function IsIndex($field) {
+		$field = (array)$field;
+		if ($this->primary == $field) return true;
+		foreach ($this->index as $f) if ($f == $field) return true;
+		foreach ($this->unique as $f) if ($f == $field) return true;
+		return false;
 	}
 
 	public function GetLookupData($fieldName) {

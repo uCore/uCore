@@ -1167,13 +1167,13 @@ abstract class uDataModule extends uBasicModule {
 
 		// $fromField in $this->sqlTableSetupFlat[$parent]['tModule']
 		if (is_string($joins)) $joins = array($joins=>$joins);
-		if (is_array($joins)) foreach ($joins as $fromField => $toField) {
-			$tModObj =& utopia::GetInstance($this->sqlTableSetupFlat[$parent]['tModule']);
-			if ($fromField[0] !== "'" && $fromField[0] !== '"' && stristr($fromField,'.') === FALSE &&
-				$tModObj->GetFieldProperty($fromField,'pk') !== true &&
-				$tModObj->GetFieldProperty($fromField,'unique') !== true &&
-				$tModObj->GetFieldProperty($fromField,'index') !== true)
-			ErrorLog("Field ($fromField) used as lookup but NOT an indexed field in table (".$this->sqlTableSetupFlat[$parent]['tModule'].").");
+		if (is_array($joins)) {
+			$fromTable =& utopia::GetInstance($this->sqlTableSetupFlat[$parent]['tModule']);
+			$toTable =& utopia::GetInstance($tableModule);
+			foreach ($joins as $fromField => $toField) {
+				if (!$fromTable->IsIndex($fromField)) error_log("Field `$fromField` used as lookup but NOT an indexed field in table `".$this->sqlTableSetupFlat[$parent]['tModule'].'`.');
+				if (!$toTable->IsIndex($toField)) error_log("Field `$toField` used as lookup but NOT an indexed field in table `".$tableModule.'`.');
+			}
 		}
 		//$newTable['fromField'] = $fromField;
 		//$newTable['toField'] = $toField;
