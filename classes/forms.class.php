@@ -2149,7 +2149,7 @@ abstract class uDataModule extends uBasicModule {
 		$pageKey = '_p_'.$this->GetModuleId();
 		if ($page === NULL) $page = isset($_GET[$pageKey]) ? (int)$_GET[$pageKey] : 0;
 		
-		if (!is_numeric($limit) || !$limit) $limit = NULL;
+		if (!is_numeric($limit)) $limit = NULL;
 	}
 	public function ApplyLimit(&$rows,$limit=null) {
 		// deprecated

@@ -39,6 +39,7 @@ if (!$.support.placeholder) {
 }
 
 // Filters
+$(function(){ $('.uFilter').each(function(){ $(this).data('ov',$(this).val()); }) });
 $(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
 $(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
 // allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
@@ -52,12 +53,8 @@ function ReloadFilters() {
 	$(".uFilter").each(function () {
 		var name = $(this).attr('name');
 		if (empty(name)) return;
-		if ($(this).val() == $(this)[0].defaultValue) return;
-		//processed.push(name);
-		//alert(gup(escape(name)));
-		//oldVal = decodeURIComponent(gup(escape(name))).replace(/\+/g, ' ');
-		//if (oldVal == '')
-		//	oldVal = decodeURIComponent(gup(name)).replace(/\+/g, ' ');
+		if ($(this).val() == $(this).data('ov')) return;
+		
 		var oldVal = gup(name);
 		var newVal;
 
