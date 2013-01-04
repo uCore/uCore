@@ -358,8 +358,10 @@ class utopia {
 				if (empty($possibleValues)) $possibleValues = array();
 				$defaultExists = false;
 				$blankVal = isset($possibleValues['']) ? $possibleValues[''] : FALSE;
-				if ($blankVal === FALSE && isset($attributes['placeholder'])) $blankVal = $attributes['placeholder'];
-				else $blankVal = '&nbsp;';
+				if ($blankVal === FALSE) {
+					if (isset($attributes['placeholder']) && $attributes['placeholder']) $blankVal = $attributes['placeholder'];
+					else $blankVal = '&nbsp;';
+				}
 				$out .= "<select $attr><option value=\"\">$blankVal</option>";
 				if (is_array($possibleValues)) foreach ($possibleValues as $key => $val) {
 					if ((string)$key === '') continue;

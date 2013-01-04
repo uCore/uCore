@@ -2329,7 +2329,7 @@ abstract class uDataModule extends uBasicModule {
 
 		if (!$attributes) $attributes = array();
 		if (isset($filterInfo['attributes'])) $attributes = array_merge((array)$filterInfo['attributes'],$attributes);
-		$attributes['placeholder'] = strip_tags($emptyVal);
+		$attributes['placeholder'] = trim(strip_tags($emptyVal));
 		if (array_key_exists('class',$attributes)) $attributes['class'] .= ' uFilter';
 		else $attributes['class'] = 'uFilter';
 
