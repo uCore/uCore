@@ -15,17 +15,20 @@ $(function () {
 });
 
 // Placeholders - legacy
-if (!$.support.placeholder) {
 	function PlaceholderEnter(sender) {
-		if (sender.tagName == 'SELECT') return;
+		if ($.support.placeholder && sender.tagName != 'SELECT') return;
 		$(sender).removeClass('utopia-placeholder');
+		if (sender.tagName == 'SELECT') return;
 		if (sender.value == $(sender).attr('placeholder'))
 			sender.value = '';
 	}
 	function PlaceholderLeave(sender) {
-		if (sender.tagName == 'SELECT') return;
-		if ($(sender).val() == '') $(sender).val($(sender).attr('placeholder'));
-		if ($(sender).val() == $(sender).attr('placeholder')) $(sender).addClass('utopia-placeholder');
+		if ($.support.placeholder && sender.tagName != 'SELECT') return;
+		var val = $(sender).val();
+		if (sender.tagName == 'SELECT') val = $(':selected',sender).text();
+		console.log(sender,val);
+		if (val == '') $(sender).val($(sender).attr('placeholder'));
+		if (val == $(sender).attr('placeholder')) $(sender).addClass('utopia-placeholder');
 	}
 	$(function () {
 		$(".uFilter, :input[placeholder]").each(function() {
@@ -36,7 +39,6 @@ if (!$.support.placeholder) {
 	$(document).on('blur',':input[placeholder]',function (event) {var sender = this; setTimeout(function(){PlaceholderLeave(sender);},50);});
 
 	$(document).on('submit','form',function (event) { $(".uFilter, :input[placeholder]").each(function() { PlaceholderEnter(this); }); });
-}
 
 // Filters
 $(function(){ $('.uFilter').each(function(){ $(this).data('ov',$(this).val()); }) });

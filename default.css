@@ -100,7 +100,17 @@ ul.pagination li { list-style:none; float:left; }
 .uSearch .searchResult a { padding-bottom: 5px; font-size:1.1em }
 .uSearch .searchResult { margin-bottom: 30px; }
 
-.utopia-placeholder { color: #AAA; }
+.utopia-placeholder { color: #999 !important; }
+::-webkit-input-placeholder {
+    color:    #999;
+}
+:-moz-placeholder,
+::-moz-placeholder {
+    color:    #999;
+}
+:-ms-input-placeholder {
+    color:    #999;
+}
 
 
 
