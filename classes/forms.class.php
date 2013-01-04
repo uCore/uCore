@@ -736,7 +736,7 @@ abstract class uDataModule extends uBasicModule {
 			$str = $this->GetFieldLookupString($alias,$info);
 			$fields[] = $str;
 		}
-		return implode(',',$fields);
+		return implode(', ',$fields);
 	}
 
 	public function ParseRewrite($caseSensative = false) {
