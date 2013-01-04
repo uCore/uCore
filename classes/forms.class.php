@@ -734,6 +734,7 @@ abstract class uDataModule extends uBasicModule {
 		$fields = array();
 		foreach ($this->fields as $alias => $info) {
 			if (in_array($this->GetFieldType($alias),$ignoreTypes)) continue;
+			if (preg_match('/^\'.*\'$/',$info['field'])) continue;
 			$str = $this->GetFieldLookupString($alias,$info);
 			$fields[] = $str;
 		}
