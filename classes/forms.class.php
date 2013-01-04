@@ -125,9 +125,9 @@ class uDataset {
 		$limit = '';
 		if ($items_per_page > 0) {
 			$start = $items_per_page * $page;
-			$limit = ' LIMIT '.$start.','.$items_per_page;
+			return $this->GetOffset($start,$items_per_page);
 		}
-		return $this->GetOffset($start,$items_per_page);
+		return $this->fetchAll();
 	}
 	
 	public function GetOffset($offset,$count) {
