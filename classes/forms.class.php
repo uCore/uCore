@@ -112,8 +112,7 @@ class uDataset {
 		return (int)ceil($this->CountRecords() / $items_per_page);
 	}
 	public function CountRecords() {
-		if ($this->recordCount === null) $this->recordCount = (int)database::query('SELECT COUNT(*) FROM '.$this->query.' as `__`',$this->args)->fetchColumn();
-		return $this->recordCount;
+		return $this->ds()->rowCount();
 	}
 	
 	public function GetFirst() {
@@ -139,8 +138,8 @@ class uDataset {
 	private $ds = null;
 	public function fetch() { return $this->CreateRecord($this->ds()->fetch()); }
 	public function fetchAll() { return $this->CreateRecords($this->ds()->fetchAll()); }
-	public function ds() {
-		if ($this->ds === null) $this->ds = database::query($this->query,$this->args);
+	public function &ds() {
+		if ($this->ds === null) $this->ds =& database::query($this->query,$this->args);
 		return $this->ds;
 	}
 	

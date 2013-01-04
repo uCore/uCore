@@ -11,7 +11,7 @@ class database {
 	static function connect() {
 		if (self::$conn) return self::$conn;
 
-		self::$conn = new mainSchema(array(PDO::ATTR_PERSISTENT => true, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
+		self::$conn = new mainSchema(array(PDO::ATTR_PERSISTENT => true, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', PDO::MYSQL_ATTR_FOUND_ROWS => true));
 	
 		if (!self::$conn) {
 			echo "Cannot connect to SQL server.<br>";
