@@ -726,6 +726,8 @@ abstract class uDataModule extends uBasicModule {
 		
 		$fields = $this->GetStringFields();
 		$this->AddField('__global__','(CAST(CONCAT_WS(\' \','.$fields.') AS CHAR))','');
+		$fltr =& $this->AddFilter('utopia::GetGlobalSearch',ctCUSTOM,itTEXT,null,null,'Global Search');
+		$fltr['attributes']['class'] = 'uGlobalSearch';
 	}
 	public function GetStringFields() {	
 		$ignoreTypes = array(ftIMAGE,ftFILE);		
@@ -2326,8 +2328,9 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		if (!$attributes) $attributes = array();
+		if (isset($filterInfo['attributes'])) $attributes = array_merge((array)$filterInfo['attributes'],$attributes);
 		$attributes['placeholder'] = strip_tags($emptyVal);
-		if (array_key_exists('class',$attributes)) $attributes['class'] .= 'uFilter';
+		if (array_key_exists('class',$attributes)) $attributes['class'] .= ' uFilter';
 		else $attributes['class'] = 'uFilter';
 
 		if ($filterInfo['it'] == itDATE) {
@@ -2878,10 +2881,13 @@ abstract class uListDataModule extends uDataModule {
 		//	echo "showdata ".get_class($this)."\n";
 		array_sort_subkey($this->fields,'order');
 
-		$dataset = $this->GetDataset();
-		$num_rows = $dataset->CountRecords();
-		$this->GetLimit($limit,$page);
-		if (!$rows) $rows = $dataset->GetPage($page,$limit);
+		
+		if (!$rows) {
+			$dataset = $this->GetDataset();
+			$num_rows = $dataset->CountRecords();
+			$this->GetLimit($limit,$page);
+			$rows = $dataset->GetPage($page,$limit);
+		}
 		if (!$tabTitle) $tabTitle = $this->GetTitle();
 		if (!$tabOrder) $tabOrder = $this->GetSortOrder();
 		
@@ -2983,24 +2989,6 @@ abstract class uListDataModule extends uDataModule {
 
 				// title
 				echo nl2br(htmlentities_skip($fieldData['visiblename'],'<>"'));
-
-				// filters
-				ob_start();
-				if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
-					foreach ($this->filters as $fType) {
-						foreach ($fType as $filterset) { //flag_is_set($fieldData['options'],ALLOW_FILTER)) {
-							foreach ($filterset as $filterInfo) {
-								if ($fieldName != $filterInfo['fieldName']) continue;
-								if ($filterInfo['it'] === itNONE) continue;
-								echo $this->GetFilterBox($filterInfo);
-							}
-						}
-					}
-				}
-				$c = ob_get_contents();
-				ob_end_clean();
-				if ($c) echo '<div class="cb">'.$c.'</div>';
-
 				echo "</th>";
 			}
 			echo '</tr>'; // close column headers
@@ -3019,9 +3007,27 @@ abstract class uListDataModule extends uDataModule {
 			
 			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
-			$pager = '<div class="pagination right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itTEXT,$limit,NULL,array('class'=>'uFilter uLimit')).' per page</div>';
+			$pager = '<div class="pagination right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itCOMBO,$limit,array(25=>'25 per page',50=>'50 per page',150=>'150 per page',0=>'Show All'),array('class'=>'uFilter uLimit')).'</div>';
 			if (!flag_is_set($this->GetOptions(),LIST_HIDE_STATUS)) {
 				echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
+			}
+			
+			if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
+				echo '<tr><td class="uFilters" colspan="'.$colcount.'">';
+			//	$v = isset($_GET['_g_'.$this->GetModuleId()]) ? $_GET['_g_'.$this->GetModuleId()] : '';
+			//	echo utopia::DrawInput('_g_'.$this->GetModuleId(),itTEXT,$v,null,array('class'=>'uFilter'));
+				
+				// other filters
+				foreach ($this->filters as $fType) {
+					foreach ($fType as $filterset) { //flag_is_set($fieldData['options'],ALLOW_FILTER)) {
+						foreach ($filterset as $filterInfo) {
+							if ($filterInfo['it'] === itNONE) continue;
+							echo $this->GetFilterBox($filterInfo);
+						}
+					}
+				}
+				
+				echo '</td></tr>';
 			}
 
 			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD) || $this->hasEditableFilters === true) echo $c;

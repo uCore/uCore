@@ -358,12 +358,13 @@ class utopia {
 				if (empty($possibleValues)) $possibleValues = array();
 				$defaultExists = false;
 				$blankVal = isset($possibleValues['']) ? $possibleValues[''] : FALSE;
-				if ($blankVal === FALSE) $blankVal = '&nbsp;';
+				if ($blankVal === FALSE && isset($attributes['placeholder'])) $blankVal = $attributes['placeholder'];
+				else $blankVal = '&nbsp;';
 				$out .= "<select $attr><option value=\"\">$blankVal</option>";
 				if (is_array($possibleValues)) foreach ($possibleValues as $key => $val) {
-					if ($key === '') continue;
+					if ((string)$key === '') continue;
 					$selected = '';
-					if ($defaultValue !== '' && ((is_array($defaultValue) && in_array($key,$defaultValue)) || (strcasecmp($key,$defaultValue) ===0))) {
+					if ($defaultValue !== '' && ((is_array($defaultValue) && in_array($key,$defaultValue)) || ((string)$key === (string)$defaultValue))) {
 						$defaultExists = true;
 						$selected = ' selected="selected"';
 					}
@@ -1361,22 +1362,26 @@ class utopia {
 	}
 	
 	static function GetGlobalSearch($val,&$args) {
-		$q = array();
+		$all = array();
+		$q = array(); $all[] =& $q;
 
 		// match phrases
-		preg_match_all('/".+"/',$val,$matches);
+		preg_match_all('/(".+")|([\w\+\']+)/',$val,$matches);
 		foreach ($matches[0] as $v) {
-			$val = str_replace($v,'',$val);
 			$v = trim($v,'"');
+			if (strtolower($v) == 'or') {
+				$q = array(); $all[] =& $q;
+				continue;
+			}
 			$args[] = $v;
 			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
 		}
 		
-		preg_match_all('/[\w\+\']+/',$val,$matches);
-		foreach ($matches[0] as $v) {
-			$args[] = $v;
-			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
+		$a = array();
+		foreach ($all as $or) {
+			$a[] = implode(' AND ',$or);
 		}
-		return implode(' AND ',$q);
+		
+		return implode(' OR ',$a);
 	}
 }
