@@ -48,7 +48,8 @@ ul.pagination li { list-style:none; float:left; }
 	list-style: none;
 	display: inline;
 }
-.layoutListSection ul.pagination { float:left; margin:0 10px 0 0; }
+.layoutListSection div.pagination { white-space:nowrap; }
+.layoutListSection ul.pagination { float:left; margin:0 10px 0 0; overflow:visible }
 .layoutListSection td.uFilters { text-align:right; padding: 10px 0; }
 .layoutListSection td.uFilters .uGlobalSearch { float:left; }
 /*.layoutListSection .uLimit { width: 3em}*/
