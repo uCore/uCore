@@ -2311,13 +2311,13 @@ abstract class uDataModule extends uBasicModule {
 			switch ($filterInfo['ct']) {
 				case ctGT:
 				case ctGTEQ:
-					$emptyVal = 'From'; break;
+					$emptyVal = $this->fields[$fieldName]['visiblename'].' After'; break;
 				case ctLT:
 				case ctLTEQ:
-					$emptyVal = 'To'; break;
+					$emptyVal = $this->fields[$fieldName]['visiblename'].' Before'; break;
 				case ctEQ:
 				case ctLIKE:
-					$emptyVal = 'Search'; break;
+					$emptyVal = $this->fields[$fieldName]['visiblename']; break;
 				default:
 					$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']); break;
 			}
