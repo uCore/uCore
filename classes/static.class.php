@@ -1371,9 +1371,9 @@ class utopia {
 		preg_match_all('/(".+")|([\w\+\']+)/',$val,$matches);
 		foreach ($matches[0] as $v) {
 			$v = trim($v,'"');
-			if (strtolower($v) == 'or') {
-				$q = array(); $all[] =& $q;
-				continue;
+			switch (strtolower($v)) {
+				case 'or':	$q = array(); $all[] =& $q;
+				case 'and':	continue 2;
 			}
 			$args[] = $v;
 			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
