@@ -1364,19 +1364,19 @@ class utopia {
 	}
 	
 	static function GetGlobalSearch($val,&$args) {
-		$all = array();
-		$q = array(); $all[] =& $q;
+		$all = array(array());
+		$cAll = count($all);
 
 		// match phrases
 		preg_match_all('/(".+")|([\w\+\']+)/',$val,$matches);
 		foreach ($matches[0] as $v) {
 			$v = trim($v,'"');
 			switch (strtolower($v)) {
-				case 'or':	$q = array(); $all[] =& $q;
+				case 'or':	$all[] = array(); $cAll = count($all);
 				case 'and':	continue 2;
 			}
 			$args[] = $v;
-			$q[] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
+			$all[$cAll-1][] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
 		}
 		
 		$a = array();
