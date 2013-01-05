@@ -235,12 +235,10 @@ class uEmailer extends uDataModule {
 
 		$message->setTo($to);
 		$failures = array();
-		try {
-			if (is_callable($messageCallback)) call_user_func_array($messageCallback,array(&$message));
-			$mailer->send($message,$failures);
-		} catch (Exception $e) {
-			 DebugMail('Email Error',$e->getMessage());
-		}
+
+		if (is_callable($messageCallback)) call_user_func_array($messageCallback,array(&$message));
+		$mailer->send($message,$failures);
+
 		return $failures;
 	}
 
