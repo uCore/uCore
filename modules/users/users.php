@@ -77,7 +77,6 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->AddField('email_confirm_code','email_confirm_code','users');
 		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users','Validate');
 		$this->AddPreProcessCallback('validated',array($this,'ValidateButtons'));
-		$this->AddFilter('username',ctLIKE,itTEXT);
 	}
 
 	public function SetupParents() {
