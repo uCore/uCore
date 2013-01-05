@@ -80,6 +80,12 @@ function ReloadFilters() {
 }
 
 
+$(function() {
+	$('.uPaginationLink').each(function(){
+		$(this).attr('href',$(this).attr('href')+window.location.hash);
+	});
+});
+
 
 $(document).on('click','.btn-del',function(event) {
 	if (confirm('Are you sure you wish to delete this record?')) {

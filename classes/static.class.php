@@ -1325,7 +1325,7 @@ class utopia {
 			$rel = array('prev');
 			if (!$args[$pageKey]) unset($args[$pageKey]);
 			if ($page-1 == 0) $rel[] = 'first';
-			echo '<li class="previous"><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Previous</a></li>';
+			echo '<li class="previous"><a rel="'.implode(' ',$rel).'" class="btn uPaginationLink" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Previous</a></li>';
 		}
 		
 		$prespace = false; $postspace=false;
@@ -1339,14 +1339,14 @@ class utopia {
 			if ($i == $page+1) $rel[] = 'next';
 			if ($i == 0) $rel[] = 'first';
 			if ($i == $pages-1) $rel[] = 'last';
-			echo '<li><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">'.($i+1).'</a></li>';
+			echo '<li><a rel="'.implode(' ',$rel).'" class="btn uPaginationLink" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">'.($i+1).'</a></li>';
 		}
 	
 		if ($page < $pages-1) { // next
 			$args[$pageKey] = $page +1;
 			$rel = array('next');
 			if ($page+1 == $pages-1) $rel[] = 'last';
-			echo '<li class="next"><a rel="'.implode(' ',$rel).'" class="btn" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Next</a></li>';
+			echo '<li class="next"><a rel="'.implode(' ',$rel).'" class="btn uPaginationLink" href="'.$parsed['path'].($args ? '?'.http_build_query($args) :'').'">Next</a></li>';
 		}
 		echo '</ul>';
 		return $page+1;
