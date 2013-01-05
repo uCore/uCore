@@ -2884,11 +2884,13 @@ abstract class uListDataModule extends uDataModule {
 		array_sort_subkey($this->fields,'order');
 
 		
+		$this->GetLimit($limit,$page);
 		if (!$rows) {
 			$dataset = $this->GetDataset();
 			$num_rows = $dataset->CountRecords();
-			$this->GetLimit($limit,$page);
 			$rows = $dataset->GetPage($page,$limit);
+		} else {
+			$num_rows = count($rows);
 		}
 		if (!$tabTitle) $tabTitle = $this->GetTitle();
 		if (!$tabOrder) $tabOrder = $this->GetSortOrder();
