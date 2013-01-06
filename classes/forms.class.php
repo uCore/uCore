@@ -2192,6 +2192,7 @@ abstract class uDataModule extends uBasicModule {
 	public function LookupRecord($filter=NULL,$clearFilters=false) {
 		if ($filter===NULL && $clearFilters===false && isset($_GET['_n_'.$this->GetModuleId()])) return NULL;
 		$ds = $this->GetDataset($filter,$clearFilters);
+		if (!$ds->CountRecords()) return NULL;
 		$row = $ds->GetFirst();
 		if (!$row) return NULL;
 		if ($filter===NULL && $clearFilters === FALSE) $this->currentRecord = $row;
