@@ -95,13 +95,13 @@ define('DEFAULT_OPTIONS',ALLOW_FILTER);
 class uDataset {
 	private $module = null;
 	private $query = null;
+	private $countQuery = null;
 	private $args = array();
 	private $recordCount = null;
 	
 	public function __construct($module,$filter,$clearFilters) {
 		// initialise count
 		$this->module = $module;
-		
 		
 		if ($filter===NULL) $filter = array();
 		if (!is_array($filter)) $filter = array($this->module->GetPrimaryKey()=>$filter);
@@ -123,11 +123,11 @@ class uDataset {
 			$this->module->AddFilter($field,ctEQ,itNONE,$val);
 		}
 		
-		$this->query = $this->GetSqlQuery($this->args);
+		$this->BuildSqlQuery($this->args);
 		
 		$this->module->filters = $fltrs;
 	}
-	public function GetSqlQuery(&$args) {
+	public function BuildSqlQuery(&$args) {
 		$this->module->_SetupFields();
 
 		// GET SELECT
@@ -145,8 +145,8 @@ class uDataset {
 
 		$having1 = $this->module->GetFromClause() ? $having : '';
 		$order1 = $this->module->GetFromClause() ? $order : '';
-		$query = "($select$from$where$group$having1$order1)";
 
+		$union = '';
 		if (is_array($this->module->UnionModules)) {
 			foreach ($this->module->UnionModules as $moduleName) {
 				$obj =& utopia::GetInstance($moduleName);
@@ -160,11 +160,13 @@ class uDataset {
 				//				if (!empty($having2)) $having2 = $having.' AND ('.$having2.')';
 				//				else $having2 = $having;
 				$order2 = $obj->GetOrderBy(); $order2 = $order2 ? "\n ORDER BY $order2" : '';
-				$query .= "\nUNION\n($select2$from2$where2$group2$having2$order2)";
+				$union .= "\nUNION\n($select2$from2$where2$group2$having2$order2)";
 			}
-			$query .= " $order";
+			$union .= " $order";
 		}
-		return $query;
+		
+		$this->query = "($select$from$where$group$having1$order1)$union";
+		$this->countQuery = "(SELECT COUNT(*) FROM (SELECT 1$from$where$group ORDER BY NULL) as `__`)";
 	}
 	
 	
@@ -176,7 +178,10 @@ class uDataset {
 		return (int)ceil($this->CountRecords() / $items_per_page);
 	}
 	public function CountRecords() {
-		return $this->ds()->rowCount();
+		if ($this->recordCount === NULL) {
+			$this->recordCount = database::query($this->countQuery,$this->args)->fetchColumn();
+		}
+		return $this->recordCount;
 	}
 	
 	public function GetFirst() {
