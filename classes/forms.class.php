@@ -1580,14 +1580,14 @@ abstract class uDataModule extends uBasicModule {
 		$original = $this->fields[$alias];
 		$this->AddField("distinct_$alias",'count('.$original['tablename'].'.'.$original['field'].')','',"count($alias)");
 		$this->AddFilter("distinct_$alias",ctGTEQ,itNONE,1);
-		//	$this->AddGrouping("$alias");
 	}
 
 	public $grouping = NULL;
 	public function AddGrouping($alias,$clear = false) {
 		if (!$this->grouping || $clear) $this->grouping = array();
-		//	$this->grouping[] = (array_key_exists($alias,$this->fields) ? $this->fields[$alias]['tablename'].'.' : '')."$alias $direction";
-		$this->grouping[] = "`$alias`";
+		if (isset($this->fields[$alias])) $alias = '`'.$this->fields[$alias]['tablename'].'`.`'.$alias.'`';
+		else $alias = '`'.$alias.'`';
+		$this->grouping[] = $alias;
 	}
 
 	public $ordering = NULL;
