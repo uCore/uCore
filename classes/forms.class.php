@@ -2230,19 +2230,20 @@ abstract class uDataModule extends uBasicModule {
 
   // sends ARGS,originalValue,pkVal,processedVal
 	public function PreProcess($fieldName,$value,$rec=NULL,$forceType = NULL) {
+		$realType = $this->GetFieldType($fieldName);
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
-		if (is_string($value)) $value = mb_convert_encoding($value, 'HTML-ENTITIES', CHARSET_ENCODING);
+		if (is_string($value) && $realType !== ftFILE) $value = mb_convert_encoding($value, 'HTML-ENTITIES', CHARSET_ENCODING);
 		$originalValue = $value;
 		if (isset($this->fields[$fieldName]['ismetadata'])) {
 			$value = utopia::jsonTryDecode($value);
 		}
 		$suf = ''; $pre = ''; $isNumeric=true;
-		if ($forceType === NULL) $forceType = $this->GetFieldType($fieldName);
+		if ($forceType === NULL) $forceType = $realType;
 		switch ($forceType) {
 			case ftFILE:
 				$filename = '';
 				$link = uBlob::GetLink(get_class($this),$fieldName,$pkVal);
-				if ($rec && array_key_exists($fieldName.'_filename',$rec) && $rec[$fieldName.'_filename']) $filename = '<b><a target="_blank" href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
+				if ($rec && isset($rec[$fieldName.'_filename']) && $rec[$fieldName.'_filename']) $filename = '<b><a target="_blank" href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
 				if (!strlen($value)) $value = '';
 				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
 				break;
@@ -2672,7 +2673,8 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
-		$value = (is_array($row) && array_key_exists($fieldName,$row)) ? $row[$fieldName] : '';
+		$value = '';
+		if (isset($row[$fieldName])) $value = $row[$fieldName];
 		if ($value === '' && isset($this->fields[$fieldName]) && preg_match('/^\'(.+?)\'/', $this->fields[$fieldName]['field'],$match)) $value = $match[1];
 		$value = $this->PreProcess($fieldName,$value,$row);
 		
@@ -3187,16 +3189,13 @@ abstract class uListDataModule extends uDataModule {
 		$pk = $row[$this->GetPrimaryKey()];
 		$body = '<tr class="'.cbase64_encode(get_class($this).':'.$pk).'">';
 		if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) {
-			//$delbtn = utopia::DrawInput($this->CreateSqlField('delete',$row[$this->GetPrimaryKey()],'del'),itBUTTON,'x',NULL,array('class'=>'btn btn-del','onclick'=>'if (!confirm(\'Are you sure you wish to delete this record?\')) return false; uf(this);'));
 			$delbtn = $this->GetDeleteButton($row[$this->GetPrimaryKey()]);
 			$body .= '<td style="width:1px">'.$delbtn.'</td>';
 		}
 		foreach ($this->fields as $fieldName => $fieldData) {
 			if ($fieldData['visiblename'] === NULL) continue;
 			$targetUrl = $this->GetTargetUrl($fieldName,$row);
-			$classes=array();
-			$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
-			$body .= '<td>'.$this->GetCell($fieldName,$row,$targetUrl).'</td>'; //"<td$class$hval$fUrl$fltr id=\"$fldId\">$cellData</td>";
+			$body .= '<td>'.$this->GetCell($fieldName,$row,$targetUrl).'</td>';
 		}
 		$body .= "</tr>\n";
 		return $body;
