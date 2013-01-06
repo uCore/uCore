@@ -2190,6 +2190,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function LookupRecord($filter=NULL,$clearFilters=false) {
+		if ($filter===NULL && $clearFilters===false && isset($_GET['_n_'.$this->GetModuleId()])) return NULL;
 		$ds = $this->GetDataset($filter,$clearFilters);
 		$row = $ds->GetFirst();
 		if (!$row) return NULL;
