@@ -1635,7 +1635,8 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function &AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
-		if (isset($this->fields[$fieldName])) $fieldName = '{'.$fieldName.'}';
+		if (isset($this->fields[$fieldName])) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
+		
 		if (preg_match_all('/{([^}]+)}/',$fieldName,$matches)) {
 			foreach ($matches[1] as $match) {
 				if (isset($this->fields[$match])) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
