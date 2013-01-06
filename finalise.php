@@ -3,7 +3,7 @@
 utopia::OutputTemplate();
 
 if (isset($GLOBALS['timers']) && isset($_SESSION['admin_showT']) && $_SESSION['admin_showT'] === true) {
-	echo '<pre><table>';
+	echo '<pre class="uDebug"><table>';
 	foreach ($GLOBALS['timers'] as $name => $info) {
 		if (!is_array($info)) continue;
 		$time = !array_key_exists('time_taken',$info) ? timer_end($name) : $info['time_taken'];

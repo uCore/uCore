@@ -2,6 +2,8 @@ body { position: relative; }
 body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 
+.uDebug { white-space:pre-wrap; background:white; color:black; text-align:left; }
+
 .left { float:left } .right { float:right } .oh { overflow:hidden }
 .cl { clear:left } .cr { clear:right } .cb { clear:both }
 .aw { width:auto }
