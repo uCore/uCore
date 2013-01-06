@@ -1376,7 +1376,7 @@ class utopia {
 				case 'and':	continue 2;
 			}
 			$args[] = $v;
-			$all[$cAll-1][] = '`__global__` LIKE CONCAT(\'%\',?,\'%\')';
+			$all[$cAll-1][] = '{__global__} LIKE CONCAT(\'%\',?,\'%\')';
 		}
 		
 		$a = array();

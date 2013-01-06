@@ -98,12 +98,76 @@ class uDataset {
 	private $args = array();
 	private $recordCount = null;
 	
-	public function __construct($query, $args, $module) {
+	public function __construct($module,$filter,$clearFilters) {
 		// initialise count
 		$this->module = $module;
-		$this->query = $query;
-		$this->args = $args;
+		
+		
+		if ($filter===NULL) $filter = array();
+		if (!is_array($filter)) $filter = array($this->module->GetPrimaryKey()=>$filter);
+		$fltrs = $this->module->filters;
+		if ($clearFilters) $this->module->ClearFilters();
+		foreach ($filter as $field => $val) {
+			if (is_numeric($field)) { // numeric key is custom filter
+				$this->module->AddFilter($val,ctCUSTOM);
+				continue;
+			}
+			if (($fltr =& $this->module->GetFilterInfo($field))) { // filter uid exists
+				$fltr['value'] = $val;
+				continue;
+			}
+			if (is_array($val)) {
+				$fltr = $this->module->AddFilter($field,$val['ct'],itNONE,$val['val']);
+				continue;
+			}
+			$this->module->AddFilter($field,ctEQ,itNONE,$val);
+		}
+		
+		$this->query = $this->GetSqlQuery($this->args);
+		
+		$this->module->filters = $fltrs;
 	}
+	public function GetSqlQuery(&$args) {
+		$this->module->_SetupFields();
+
+		// GET SELECT
+		$select = $this->module->GetSelectStatement();
+		// GET FROM
+		$from = ' FROM '.$this->module->GetFromClause();
+		// GET WHERE
+		$where = $this->module->GetWhereStatement($args); $where = $where ? "\n WHERE $where" : ''; // uses WHERE modifier
+		// GET GROUPING
+		$group = $this->module->GetGrouping(); $group = $group ? "\n GROUP BY $group" : '';
+		// GET HAVING
+		$having = $this->module->GetHavingStatement($args); $having = $having ? "\n HAVING $having" : ''; // uses HAVING modifier to account for aliases
+		// GET ORDER
+		$order = $this->module->GetOrderBy(); $order = $order ? "\n ORDER BY $order" : '';
+
+		$having1 = $this->module->GetFromClause() ? $having : '';
+		$order1 = $this->module->GetFromClause() ? $order : '';
+		$query = "($select$from$where$group$having1$order1)";
+
+		if (is_array($this->module->UnionModules)) {
+			foreach ($this->module->UnionModules as $moduleName) {
+				$obj =& utopia::GetInstance($moduleName);
+				$obj->_SetupFields();
+				$select2 = $obj->GetSelectStatement();
+				$from2 = ' FROM '.$this->module->GetFromClause();
+				$where2 = $obj->GetWhereStatement($args); $where2 = $where2 ? "\n WHERE $where2" : '';
+				$group2 = $obj->GetGrouping(); $group2 = $group2 ? "\n GROUP BY $group2" : '';
+				$having2 = $obj->GetHavingStatement($args);
+				$having2 = $having2 ? $having.' AND ('.$having2.')' : $having;
+				//				if (!empty($having2)) $having2 = $having.' AND ('.$having2.')';
+				//				else $having2 = $having;
+				$order2 = $obj->GetOrderBy(); $order2 = $order2 ? "\n ORDER BY $order2" : '';
+				$query .= "\nUNION\n($select2$from2$where2$group2$having2$order2)";
+			}
+			$query .= " $order";
+		}
+		return $query;
+	}
+	
+	
 	public function DebugDump() {
 		return $this->query."\n".var_export($this->args,true);
 	}
@@ -733,11 +797,12 @@ abstract class uDataModule extends uBasicModule {
 	public function GetStringFields() {	
 		$ignoreTypes = array(ftIMAGE,ftFILE);		
 		$fields = array();
-		foreach ($this->fields as $alias => $info) {
-			if (in_array($this->GetFieldType($alias),$ignoreTypes)) continue;
-			if (preg_match('/^\'.*\'$/',$info['field'])) continue;
-			$str = $this->GetFieldLookupString($alias,$info);
-			$fields[] = $str;
+		foreach ($this->sqlTableSetupFlat as $t) {
+			$o =& utopia::GetInstance($t['tModule']);
+			foreach ($o->fields as $f => $finfo) {
+				if (in_array($finfo['type'],$ignoreTypes)) continue;
+				$fields[] = "`{$t['alias']}`.`{$f}`";
+			}
 		}
 		return implode(', ',$fields);
 	}
@@ -1109,7 +1174,7 @@ abstract class uDataModule extends uBasicModule {
 		if (empty($pkValue)) return;
 		$this->_SetupFields();
 		$fieldData = $this->fields[$alias];
-		$str = $this->GetFieldLookupString($alias,$this->fields[$alias])." as `$alias`";
+		$str = $this->GetFieldLookupString($alias)." as `$alias`";
 
 		$table = $fieldData['vtable']['table'];
 		$pk = $fieldData['vtable']['pk'];
@@ -1565,14 +1630,18 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function &AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
+		if (isset($this->fields[$fieldName])) $fieldName = '{'.$fieldName.'}';
 		if (preg_match_all('/{([^}]+)}/',$fieldName,$matches)) {
 			foreach ($matches[1] as $match) {
 				if (isset($this->fields[$match])) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 			}
 		}
+		
+		if (is_callable($fieldName)) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 
-		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE && isset($this->fields[$fieldName]['vtable']))
-			return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
+		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE && isset($this->fields[$fieldName]['vtable'])) {
+			return $this->AddFilterWhere($this->GetFieldLookupString($fieldName),$compareType,$inputType,$value,$values,$title);
+		}
 
 		//	if (!array_key_exists($fieldName,$this->fields)) { ErrorLog("Cannot add HAVING filter on field '$fieldName' as the field does not exist.");ErrorLog(print_r(useful_backtrace(),true)); return; }
 		if (!isset($this->filters[FILTER_HAVING]) || count(@$this->filters[FILTER_HAVING]) == 0) $this->NewFiltersetHaving();
@@ -1684,7 +1753,8 @@ abstract class uDataModule extends uBasicModule {
 		$this->hideFilters = TRUE;
 	}
 
-	public function GetFieldLookupString($alias,$fieldData) {
+	public function GetFieldLookupString($alias) {
+		$fieldData = $this->fields[$alias];
 		$fieldName = $fieldData['field'];
 		if (empty($fieldName)) return "''";
 		if ($fieldData['tablename'] === NULL) return;
@@ -1730,7 +1800,7 @@ abstract class uDataModule extends uBasicModule {
 		//		$tblInc = 1;
 
 		foreach ($this->fields as $alias => $fieldData) {
-			$str = $this->GetFieldLookupString($alias,$fieldData);
+			$str = $this->GetFieldLookupString($alias);
 			if (!empty($str)) $flds[] = $str." as `$alias`";
 		}
 
@@ -1745,11 +1815,9 @@ abstract class uDataModule extends uBasicModule {
 		//		}
 
 		// now create function to turn the sqlTableSetup into a FROM clause
-		$from = $this->GetFromClause();
 
 		$distinct = flag_is_set($this->GetOptions(),DISTINCT_ROWS) ? ' DISTINCT' : '';
 		$qry = "SELECT$distinct ".join(",\n",$flds);
-		if ($from) $qry .= " \nFROM ".$from;//$this->GetPrimaryTable().$joins;
 		return $qry;
 	}
 
@@ -1869,6 +1937,23 @@ abstract class uDataModule extends uBasicModule {
 		}
 		return $fieldName;
 	}
+	
+	public function ReplaceFields($fieldToCompare) {
+		if (isset($this->fields[$fieldToCompare])) $fieldToCompare = '{'.$fieldToCompare.'}';
+		if (preg_match_all('/{([^}]+)}/',$fieldToCompare,$matches)) {
+			foreach ($matches[1] as $match) {
+				if (!isset($this->fields[$match])) continue;
+				$replace = null;
+				if ($this->fields[$match]['foreign']) {
+					$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
+				} else {
+					$replace = $this->GetFieldLookupString($match);//'`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
+				}
+				if ($replace !== null) $fieldToCompare = str_replace('{'.$match.'}',$replace,$fieldToCompare);
+			}
+		}
+		return $fieldToCompare;
+	}
 
 	public function GetFilterString($uid,&$args,$fieldNameOverride=NULL,$fieldTypeOverride=NULL){//,$filterSection) {
 		$filterData = $this->GetFilterInfo($uid);
@@ -1883,22 +1968,10 @@ abstract class uDataModule extends uBasicModule {
 
 		$fieldToCompare = $fieldName;
 		
-		if (is_callable($fieldToCompare)) return call_user_func_array($fieldToCompare,array($value,&$args));
+		if (is_callable($fieldToCompare)) return $this->ReplaceFields(call_user_func_array($fieldToCompare,array($value,&$args)));
 
 		if ($filterData['type'] == FILTER_WHERE) {
-			if (isset($this->fields[$fieldToCompare])) $fieldToCompare = '{'.$fieldToCompare.'}';
-			if (preg_match_all('/{([^}]+)}/',$fieldToCompare,$matches)) {
-				foreach ($matches[1] as $match) {
-					if (!isset($this->fields[$match])) continue;
-					$replace = null;
-					if (preg_match('/{[^}]+}/',$this->fields[$match]['field']) > 0 || $this->fields[$match]['foreign']) {
-						$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['vtable']['pk'].'`';
-					} else {
-						$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
-					}
-					if ($replace !== null) $fieldToCompare = str_replace('{'.$match.'}',$replace,$fieldToCompare);
-				}
-			}
+			$fieldToCompare = $this->ReplaceFields($fieldToCompare);
 		}
 
 		//echo "$uid::$value<br/>";
@@ -2078,67 +2151,10 @@ abstract class uDataModule extends uBasicModule {
 	public function &GetDataset($filter=null,$clearFilters=false) {
 		$this->_SetupParents();
 		$this->_SetupFields();
-		if ($filter===NULL) $filter = array();
-		if (!is_array($filter)) $filter = array($this->GetPrimaryKey()=>$filter);
-		$fltrs = $this->filters;
-		if ($clearFilters) $this->ClearFilters();
-		foreach ($filter as $field => $val) {
-			if (is_numeric($field)) { // numeric key is custom filter
-				$this->AddFilter($val,ctCUSTOM);
-				continue;
-			}
-			if (($fltr =& $this->GetFilterInfo($field))) { // filter uid exists
-				$fltr['value'] = $val;
-				continue;
-			}
-			if (is_array($val)) {
-				$fltr = $this->AddFilter($field,$val['ct'],itNONE,$val['val']);
-				continue;
-			}
-			$this->AddFilter($field,ctEQ,itNONE,$val);
-		}
-		$args = array(); $query = $this->GetSqlQuery($args);
-		$this->dataset = new uDataset($query,$args,$this);
 		
-		$this->filters = $fltrs;
+		$this->dataset = new uDataset($this,$filter,$clearFilters);
 
 		return $this->dataset;
-	}
-	public function GetSqlQuery(&$args) {
-		$this->_SetupFields();
-
-		// GET SELECT
-		$select = $this->GetSelectStatement();
-		// GET WHERE
-		$where = $this->GetWhereStatement($args); $where = $where ? " WHERE $where" : ''; // uses WHERE modifier
-		// GET GROUPING
-		$group = $this->GetGrouping(); $group = $group ? " GROUP BY $group" : '';
-		// GET HAVING
-		$having = $this->GetHavingStatement($args); $having = $having ? " HAVING $having" : ''; // uses HAVING modifier to account for aliases
-		// GET ORDER
-		$order = $this->GetOrderBy(); $order = $order ? " ORDER BY $order" : '';
-
-		$having1 = $this->GetFromClause() ? $having : '';
-		$order1 = $this->GetFromClause() ? $order : '';
-		$query = "($select$where$group$having1$order1)";
-
-		if (is_array($this->UnionModules)) {
-			foreach ($this->UnionModules as $moduleName) {
-				$obj =& utopia::GetInstance($moduleName);
-				$obj->_SetupFields();
-				$select2 = $obj->GetSelectStatement();
-				$where2 = $obj->GetWhereStatement($args); $where2 = $where2 ? " WHERE $where2" : '';
-				$group2 = $obj->GetGrouping(); $group2 = $group2 ? " GROUP BY $group2" : '';
-				$having2 = $obj->GetHavingStatement($args);
-				$having2 = $having2 ? $having.' AND ('.$having2.')' : $having;
-				//				if (!empty($having2)) $having2 = $having.' AND ('.$having2.')';
-				//				else $having2 = $having;
-				$order2 = $obj->GetOrderBy(); $order2 = $order2 ? " ORDER BY $order2" : '';
-				$query .= "\nUNION\n($select2$where2$group2$having2$order2)";
-			}
-			$query .= " $order";
-		}
-		return $query;
 	}
 
 	public function GetLimit(&$limit=null,&$page=null) {
