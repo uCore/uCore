@@ -111,26 +111,6 @@ function &recurseSqlSetupSearch(&$searchin,$searchfor) {
 	return $false;
 }
 
-function GetCurrentModule() {
-	trigger_error("GetCurrentModule is deprecated.  Use utopia::GetCurrentModule().", E_USER_DEPRECATED);
-	return utopia::GetCurrentModule();
-}
-
-function RunModule($module = NULL) {
-	if ($module == NULL) $module = utopia::GetCurrentModule();
-
-	if (!utopia::ModuleExists($module)) {
-		utopia::PageNotFound();
-	}
-	utopia::SetVar('current_module',$module);
-	$obj =& utopia::GetInstance($module);
-	utopia::SetVar('title',$obj->GetTitle());
-	// run module
-	if (!is_empty($module)) $obj->_RunModule();
-
-	utopia::Finish();
-}
-
 function retTrue() { return true; }
 function &ref_call_user_func_array($callable, $args)
 {

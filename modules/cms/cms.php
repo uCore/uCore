@@ -59,6 +59,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('content','content','cms');
 		$this->AddField('content_time','content_time','cms');
 		$this->AddField('content_published','content_published','cms');
+		$this->AddField('content_published_time','content_published_time','cms');
 		$this->AddField('is_published','is_published','cms');
 	}
 	public function SetupParents() {
@@ -170,7 +171,7 @@ FIN;
 		foreach ($children as $child) {
 			$hide = $child['hide'] ? ' hiddenItem' : '';
 
-			$info = (!$child['is_published']) ? '<span class="ui-icon ui-icon-info" title="Unpublished"></span>' : '';
+			$info = (!$child['is_published'] || ($child['content_time'] != $child['content_published_time'])) ? '<span class="ui-icon ui-icon-info" title="Unpublished"></span>' : '';
 			$editLink = $editObj->GetURL(array('cms_id'=>$child['cms_id']));
 			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
 			//$info .= $child['dataModule'] ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
@@ -275,7 +276,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddFilter('cms_id',ctEQ);
 	}
 	public function publishLinks($field,$pkVal,$v,$rec) {
-		if ($rec['is_published']) {
+		if ($rec['is_published'] && $rec['content_time'] == $rec['content_published_time']) {
 			return utopia::DrawInput('published',itBUTTON,'Published').$this->DrawSqlInput('unpublish','Unpublish',$pkVal,array('title'=>'Remove this page from public view','class'=>'page-unpublish'),itBUTTON);
 		}
 
@@ -331,7 +332,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		if ($fieldAlias == 'revert') {
 			$rec = $this->LookupRecord($pkVal);
 			$this->UpdateField('content',$rec['content_published'],$pkVal);
-			$this->UpdateField('is_published',1,$pkVal);
+			$this->UpdateFieldRaw('content_published_time','`content_time`',$pkVal);
 			AjaxEcho('window.location.reload();');
 			return;
 		}
@@ -342,6 +343,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		}
 		if ($fieldAlias == 'unpublish') {
 			$this->UpdateField('is_published',0,$pkVal);
+			$this->UpdateField('content_published_time',null,$pkVal);
 			return;
 		}
 		if ($fieldAlias == 'cms_id') {
@@ -372,12 +374,10 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 
 			$this->SetFieldType('content_time',ftRAW);
 			$this->UpdateField('content_time','NOW()',$pkVal);
-
-			$this->UpdateField('is_published',0,$pkVal);
 		}
 		if ($fieldAlias == 'content_published') {
 			$this->SetFieldType('content_published_time',ftRAW);
-			$this->UpdateField('content_published_time','NOW()',$pkVal);
+			$this->UpdateFieldRaw('content_published_time','`content_time`',$pkVal);
 			$this->UpdateField('is_published',1,$pkVal);
 		}
 
@@ -497,7 +497,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	}
 }
 utopia::AddTemplateParser('content',array(utopia::GetInstance('uCMS_Edit'),'getEditor'),'.*');
-uEvents::AddCallback('AfterRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'));
+uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'));
 
 uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'));
 class uCMS_View extends uSingleDataModule {
@@ -514,6 +514,9 @@ class uCMS_View extends uSingleDataModule {
 		self::$asserted = true;
 		$rec = self::findPage();
 		if (!$rec) return;
+		$canEdit = (uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') !== FALSE);
+		if (!$canEdit && !$rec['is_published']) utopia::PageNotFound();
+		if (!isset($_GET['preview']) &&!isset($_GET['edit']) && !$rec['is_published']) utopia::PageNotFound();
 
 		echo '<div class="cms-'.$rec['cms_id'].'">{content}</div>';
 
@@ -575,6 +578,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('content','content','cms','content');
 		$this->AddField('content_time','content_time','cms');
 		$this->AddField('content_published','content_published','cms','content');
+		$this->AddField('content_published_time','content_published_time','cms');
 		$this->AddField('is_published','is_published','cms','published');
 		$this->AddField('is_home','(({parent} = \'\' OR {parent} IS NULL) AND ({position} IS NULL OR {position} = 0))','cms');
 		$this->AddField('noindex','noindex','cms','noindex');
@@ -684,11 +688,7 @@ class uCMS_View extends uSingleDataModule {
 	}
 
 	public function RunModule() {
-		$rec = self::findPage();
-		if (empty($rec)) utopia::PageNotFound();
-		if (!$rec['is_published'] && uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') === FALSE) utopia::PageNotFound();
-		
-		// nothing further is required as the content is output by 'assertContent'
+		// nothing is required here as the content is output by 'assertContent'
 	}
 	
 	public function GetCmsParents($cms_id,$includeSelf=true) {
