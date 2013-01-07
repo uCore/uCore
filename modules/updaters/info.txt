@@ -1,0 +1,2 @@
+Scripts in here are temporary helpers designed to assist migration between updates in uCore.
+They should not be relied upon and may be removed at any time.
