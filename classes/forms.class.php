@@ -180,7 +180,9 @@ class uDataset {
 	}
 	public function CountRecords() {
 		if ($this->recordCount === NULL) {
-			$this->recordCount = database::query($this->countQuery,$this->args)->fetchColumn();
+			try {
+				$this->recordCount = database::query($this->countQuery,$this->args)->fetchColumn();
+			} catch (Exception $e) { return 0; }
 		}
 		return $this->recordCount;
 	}
