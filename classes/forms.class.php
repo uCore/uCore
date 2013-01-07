@@ -1652,7 +1652,7 @@ abstract class uDataModule extends uBasicModule {
 			return $this->AddFilterWhere($this->GetFieldLookupString($fieldName),$compareType,$inputType,$value,$values,$title);
 		}
 
-		//	if (!array_key_exists($fieldName,$this->fields)) { ErrorLog("Cannot add HAVING filter on field '$fieldName' as the field does not exist.");ErrorLog(print_r(useful_backtrace(),true)); return; }
+		if ($compareType !== ctIGNORE) error_log('Using HAVING filter in `'.get_class($this).'` on field `'.$fieldName.'`.  Please use {field} tags where possible.');
 		if (!isset($this->filters[FILTER_HAVING]) || count(@$this->filters[FILTER_HAVING]) == 0) $this->NewFiltersetHaving();
 		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$title);
 	}
