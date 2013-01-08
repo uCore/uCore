@@ -141,12 +141,12 @@ class uJavascript extends uBasicModule {
 	static function BuildJavascript($minify=true) {
 		$body = self::GetJavascriptConstants();
 
+		$body .= self::$includeText;
+		
 		foreach (self::$includeFiles as $filename) {
 			if (!file_exists($filename)) continue;
 			$body .= file_get_contents($filename).";\n\n";
 		}
-
-		$body .= self::$includeText;
     
 		if ($minify) $body = JSMin::minify($body);
 
@@ -154,7 +154,7 @@ class uJavascript extends uBasicModule {
 	}
 }
 
-uJavascript::IncludeFile(dirname(__FILE__).'/javascript.js');
+uJavascript::IncludeText(file_get_contents(dirname(__FILE__).'/javascript.js'));
 uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
