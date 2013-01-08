@@ -2887,7 +2887,7 @@ abstract class uListDataModule extends uDataModule {
 
 	public function SendHideRow($pk) {
 		$rowclass = cbase64_encode(get_class($this).':'.$pk);
-		AjaxEcho("$('tr.$rowclass').hide();");
+		AjaxEcho("$('tr.$rowclass').remove();");
 	}
 
 	public function CheckMaxRows($mod = 0) {
