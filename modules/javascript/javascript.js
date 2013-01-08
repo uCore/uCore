@@ -12,4 +12,4 @@ utopia.Initialise = {
 	}
 }
 $(function(){utopia.Initialise.run();});
-$(document).ajaxComplete(function() {alert('ac');utopia.Initialise.run();});
+$(document).ajaxComplete(function() {utopia.Initialise.run();});
