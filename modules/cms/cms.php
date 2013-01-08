@@ -513,7 +513,10 @@ class uCMS_View extends uSingleDataModule {
 		if (self::$asserted) return;
 		self::$asserted = true;
 		$rec = self::findPage();
-		if (!$rec) return;
+		if (!$rec) {
+			if (utopia::GetCurrentModule() == __CLASS__) utopia::PageNotFound();
+			return;
+		}
 		$canEdit = (uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') !== FALSE);
 		if (!$canEdit && !$rec['is_published']) utopia::PageNotFound();
 		if (!isset($_GET['preview']) &&!isset($_GET['edit']) && !$rec['is_published']) utopia::PageNotFound();
