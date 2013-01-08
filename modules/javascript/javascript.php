@@ -88,12 +88,6 @@ class uJavascript extends uBasicModule {
 		self::LinkFile('//code.jquery.com/jquery-1.8.2.js',-100);
 		self::LinkFile('//code.jquery.com/ui/1.9.1/jquery-ui.js',-99);
 
-		self::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
-		self::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
-		self::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
-		self::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
-		self::IncludeFile(dirname(__FILE__).'/js/functs.js');
-
 		// commented because if a user enters an incorrect version (too high for example) they can not change it back.
 //		modOpts::AddOption('jquery_version','jQuery Version',NULL,1);
 //		$jq  = modOpts::GetOption('jQuery');
@@ -147,15 +141,22 @@ class uJavascript extends uBasicModule {
 	static function BuildJavascript($minify=true) {
 		$body = self::GetJavascriptConstants();
 
-		$body .= self::$includeText;
-
 		foreach (self::$includeFiles as $filename) {
 			if (!file_exists($filename)) continue;
 			$body .= file_get_contents($filename).";\n\n";
 		}
+
+		$body .= self::$includeText;
     
 		if ($minify) $body = JSMin::minify($body);
 
 		return $body;
 	}
 }
+
+uJavascript::IncludeFile(dirname(__FILE__).'/javascript.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/js/ajaxfileupload.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/js/sqlDate.js');
+uJavascript::IncludeFile(dirname(__FILE__).'/js/functs.js');

@@ -42,7 +42,7 @@ $(document).on('blur',':input[placeholder]',function (event) {var sender = this;
 $(document).on('submit','form',function (event) { $(".uFilter, :input[placeholder]").each(function() { PlaceholderEnter(this); }); });
 
 // Filters
-$(function(){ $('.uFilter').each(function(){ $(this).data('ov',$(this).val()); }) });
+utopia.Initialise.add(function(){ $('.uFilter').each(function(){ if ($(this).data('ov')) return; $(this).data('ov',$(this).val()); }) });
 $(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
 $(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
 // allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
@@ -80,9 +80,9 @@ function ReloadFilters() {
 }
 
 
-$(function() {
+utopia.Initialise.add(function() {
 	$('.uPaginationLink').each(function(){
-		$(this).attr('href',$(this).attr('href')+window.location.hash);
+		$(this).attr('href',$(this).attr('href').replace(/#.+$/,'')+window.location.hash);
 	});
 });
 
@@ -176,19 +176,17 @@ $(document).ready(function(){
 	$("[name^=usql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
 });
 
-function RefreshTableSorters() {
-	$('.datalist:has(SPAN.pager)').each(function () {
-		var pagerSpan = $('SPAN.pager',this);
-		$(this).tablesorterPager({positionFixed:false,container: $("#"+pagerSpan.attr('id'))});
-	});
-}
-
+utopia.Initialise.add(RefreshTables);
 function RefreshTables() {
-	$('TR:even','.datalist TBODY').removeClass('odd').addClass('even');
-	$('TR:odd','.datalist TBODY').removeClass('even').addClass('odd');
+	$('.layoutListSection TBODY TR').removeClass('odd even');
+	$('.layoutListSection TBODY TR:odd').addClass('odd');
+	$('.layoutListSection TBODY TR:even').addClass('even');
 }
 
+utopia.Initialise.add(UpdateSelectedLinks);
 function UpdateSelectedLinks() {
+	$('.active-link').removeClass('active-link');
+	$('.active-link-parent').removeClass('active-link-parent');
 	var uuid = getParameterByName('uuid');
 	var queryArgs = window.location.search.substring(1).split('&');
 	$('a').each(function() {
@@ -238,31 +236,12 @@ function UpdateSelectedLinks() {
 	});
 }
 
+utopia.Initialise.add(UIButtons);
 function UIButtons() {
 	$('.btn').not('.ui-button').button();
 }
 
-var InitJavascript = {
-	_functs: [],
-	add: function (f) {
-		if ($.inArray(f,this._functs) > -1) return;
-		this._functs.push(f);
-		f();
-	},
-	run: function () {
-		for (f in this._functs) {
-			this._functs[f]();
-		}
-	}
-}
-$(function () {
-	InitJavascript.add(InitDatePickers);
-	InitJavascript.add(InitAutocomplete);
-	InitJavascript.add(RefreshTables);
-	InitJavascript.add(UpdateSelectedLinks);
-	InitJavascript.add(UIButtons);
-});
-
+utopia.Initialise.add(InitDatePickers);
 function InitDatePickers() {
 	$('.dPicker').each(function () {
 		if ($(this).attr('hasDatepicker') != undefined) return;
@@ -279,6 +258,7 @@ function DatePickerFormatDate (format, date, dayNamesShort, dayNames, monthNames
 	return date.sqlFormat(format);
 }
 
+utopia.Initialise.add(InitAutocomplete);
 function InitAutocomplete() {
 	var cache = {};
 	$('.autocomplete').autocomplete({
@@ -595,7 +575,7 @@ function _uf(ele,hourglass) {
 			dataType: "script",
 			success: function (msg) {
 				eval(msg);
-				InitJavascript.run();
+				utopia.Initialise.run();
 				$(hourglass).remove();
 
 				StoppedUpdating(ele);
@@ -618,7 +598,7 @@ function _uf(ele,hourglass) {
 		dataType: "script"
 	}).done(function(msg){
 		$(hourglass).remove();
-		InitJavascript.run();
+		utopia.Initialise.run();
 	}).fail(function(obj,type,e){
 		$(hourglass).remove();
 		if (empty(e)) return;
@@ -643,7 +623,7 @@ function _ufData(eleData,hourglass) {
 		dataType: "script"
 	}).done(function(msg){
 		$(hourglass).remove();
-		InitJavascript.run();
+		utopia.Initialise.run();
 	}).fail(function(obj,type,e){
 		$(hourglass).remove();
 	}).always(function(){
@@ -815,9 +795,8 @@ function makeHourglass(hourglassEle) {
 	});
 })( jQuery );
 
-var utopia = utopia ? utopia : {};
 utopia.CustomCombo = function(opt) {
 	$(function () {
-		InitJavascript.add(function() {$('select').combobox(opt); $('.ui-autocomplete-input').blur();});
+		utopia.Initialise.add(function() {$('select').combobox(opt); $('.ui-autocomplete-input').blur();});
 	});
 }
