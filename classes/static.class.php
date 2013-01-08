@@ -690,8 +690,7 @@ class utopia {
 		switch (self::$usedTemplate) {
 			case NULL:
 			case TEMPLATE_BLANK:
-				$templateDir = PATH_ABS_CORE.'styles/default/';
-				break;
+				return false;
 			default:
 				$templateDir = PATH_ABS_ROOT.self::$usedTemplate.'/';
 				break;
@@ -744,42 +743,52 @@ class utopia {
 	private static $doneCSS = false;
 	public static function OutputTemplate() {
 		uEvents::TriggerEvent('BeforeOutputTemplate');
+		if (!self::UsingTemplate()) {
+			ob_end_clean();
+			echo utopia::GetVar('content');
+			return;
+		}
+		if (self::UsingTemplate(TEMPLATE_BLANK)) {
+			ob_end_clean();
+			$template = utopia::GetVar('content');
+			while (self::MergeVars($template));
+			echo $template;
+			return;
+		}
 		$template = '';
-		if (self::UsingTemplate()) {
-			$css = self::GetTemplateCSS();
-			foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
-				
-			// first get list of parents
-			$templates = array();
-			$templateDir = utopia::GetTemplateDir(true);
-			if (!file_exists($templateDir)) $templateDir = utopia::GetAbsolutePath($templateDir);
-			$templates[] = $templateDir;
-			while (file_exists($templateDir.'/template.ini')) {
-				$inifile = parse_ini_file($templateDir.'/template.ini');
-				if (!isset($inifile['parent'])) break;
-				if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {
-					$templateDir = PATH_ABS_ROOT.$inifile['parent'];
-				} else {
-					$templateDir = dirname($templateDir).'/'.$inifile['parent'];
-				}
-				$templates[] = $templateDir;
-			}
+		$css = self::GetTemplateCSS();
+		foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
 			
-			foreach ($templates as $templateDir) {
-				// set templatedir
-				self::SetVar('templatedir',self::GetRelativePath($templateDir));
-				// read template (mobile?)
-				if (utopia::IsMobile() && file_exists($templateDir.'/mobile.php')) {
-					$templatePath = $templateDir.'/mobile.php';
-				} else {
-					$templatePath = $templateDir.'/template.php';
-				}
-				$template = get_include_contents($templatePath);
-				// mergevars
-				while (self::MergeVars($template));
-				// setvar
-				self::SetVar('content',$template);
+		// first get list of parents
+		$templates = array();
+		$templateDir = utopia::GetTemplateDir(true);
+		if (!file_exists($templateDir)) $templateDir = utopia::GetAbsolutePath($templateDir);
+		if (file_exists($templateDir)) $templates[] = $templateDir;
+		while (file_exists($templateDir.'/template.ini')) {
+			$inifile = parse_ini_file($templateDir.'/template.ini');
+			if (!isset($inifile['parent'])) break;
+			if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {
+				$templateDir = PATH_ABS_ROOT.$inifile['parent'];
+			} else {
+				$templateDir = dirname($templateDir).'/'.$inifile['parent'];
 			}
+			$templates[] = $templateDir;
+		}
+		
+		foreach ($templates as $templateDir) {
+			// set templatedir
+			self::SetVar('templatedir',self::GetRelativePath($templateDir));
+			// read template (mobile?)
+			if (utopia::IsMobile() && file_exists($templateDir.'/mobile.php')) {
+				$templatePath = $templateDir.'/mobile.php';
+			} else {
+				$templatePath = $templateDir.'/template.php';
+			}
+			$template = get_include_contents($templatePath);
+			// mergevars
+			while (self::MergeVars($template));
+			// setvar
+			self::SetVar('content',$template);
 		}
 		if (!$template) $template = '{utopia.content}';
 		ob_end_clean();
