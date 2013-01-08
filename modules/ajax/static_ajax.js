@@ -575,7 +575,6 @@ function _uf(ele,hourglass) {
 			dataType: "script",
 			success: function (msg) {
 				eval(msg);
-				utopia.Initialise.run();
 				$(hourglass).remove();
 
 				StoppedUpdating(ele);
@@ -598,7 +597,6 @@ function _uf(ele,hourglass) {
 		dataType: "script"
 	}).done(function(msg){
 		$(hourglass).remove();
-		utopia.Initialise.run();
 	}).fail(function(obj,type,e){
 		$(hourglass).remove();
 		if (empty(e)) return;
@@ -623,7 +621,6 @@ function _ufData(eleData,hourglass) {
 		dataType: "script"
 	}).done(function(msg){
 		$(hourglass).remove();
-		utopia.Initialise.run();
 	}).fail(function(obj,type,e){
 		$(hourglass).remove();
 	}).always(function(){
