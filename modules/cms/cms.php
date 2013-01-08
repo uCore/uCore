@@ -625,7 +625,7 @@ class uCMS_View extends uSingleDataModule {
 		foreach ($rows as $row) {
 			// is published
 			if ($row['content_time'] == '0000-00-00 00:00:00' && !$row['is_published']) continue;
-			if (!$row['is_published'] && !$row['content']) continue;
+			if (!$row['is_published']) continue;
 
 			$title = $row['nav_text'] ? $row['nav_text'] : $row['title'];
 			$url = $this->GetURL($row['cms_id']);
