@@ -83,7 +83,7 @@ class uUserLogin extends uDataModule {
 		$obj =& utopia::GetInstance(__CLASS__);
 		$rec = $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)));
 		if ($rec) {
-			$_SESSION['current_user'] = $rec['user_id'];
+			self::SetLogin($rec['user_id']);
 			$obj =& utopia::GetInstance('uUserProfile');
 			$obj->UpdateFieldRaw('last_login','NOW()',$rec['user_id']);
 			if (isset($_REQUEST['remember_me'])) {
@@ -91,6 +91,7 @@ class uUserLogin extends uDataModule {
 				session_regenerate_id(true);
 				$_SESSION['SESSION_LIFETIME'] = 604800;
 			}
+			uEvents::TriggerEvent('AfterLogin');
 		} else {
 			uNotices::AddNotice('Username and password do not match.',NOTICE_TYPE_ERROR);
 		}
