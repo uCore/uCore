@@ -530,7 +530,7 @@ class uCMS_View extends uSingleDataModule {
 		utopia::SetVar('cms_root_id',reset($path));
 		utopia::SetDescription($rec['description']);
 
-		if (!utopia::UsingTemplate()) return;
+		if (!utopia::UsingTemplate() || utopia::UsingTemplate() == TEMPLATE_BLANK) return;
 		utopia::UseTemplate(self::GetTemplate($rec['cms_id']));
 	}
 	public function GetURL($filters = NULL) {
