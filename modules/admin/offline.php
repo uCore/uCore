@@ -37,9 +37,6 @@ class module_Offline extends uBasicModule {
 	}
 
 	public function RunModule() {
-		header("HTTP/1.0 503 Service Temporarily Unavailable",true,503);
-		header("Status: 503 Service Temporarily Unavailable",true,503);
-		echo '<h1>Site is offline for maintenance.</h1>';
-		utopia::Finish();
+		uConfig::DownMaintenance();
 	}
 }
