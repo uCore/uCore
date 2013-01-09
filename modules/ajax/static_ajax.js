@@ -578,11 +578,9 @@ function _uf(ele,hourglass) {
 			success: function (msg) {
 				eval(msg);
 				$(hourglass).remove();
-
 				StoppedUpdating(ele);
 				$('.auto-complete-list').hide();
 				ReFocus();
-//				$('.uf').change(_fieldChange);
 			}
 		});
 		return;
