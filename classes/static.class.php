@@ -15,7 +15,7 @@ utopia::AddTemplateParser('domain','utopia::GetDomainName','');
 
 utopia::AddTemplateParser('home_url',PATH_REL_ROOT,'');
 utopia::AddTemplateParser('home_url_abs','utopia::GetSiteURL','');
-utopia::AddTemplateParser('inline','inline=true','');
+utopia::AddTemplateParser('inline','inline=0','');
 
 utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
@@ -748,13 +748,16 @@ class utopia {
 			echo utopia::GetVar('content');
 			return;
 		}
-		if (self::UsingTemplate(TEMPLATE_BLANK)) {
+		if (isset($_GET['inline']) && !is_numeric($_GET['inline'])) $_GET['inline'] = 0;
+		if (self::UsingTemplate(TEMPLATE_BLANK) || (isset($_GET['inline']) && $_GET['inline'] == 0)) {
 			ob_end_clean();
 			$template = utopia::GetVar('content');
 			while (self::MergeVars($template));
 			echo $template;
 			return;
 		}
+		$tCount = -1; // do all by default
+		if (isset($_GET['inline'])) $tCount = $_GET['inline']-1;
 		$template = '';
 		$css = self::GetTemplateCSS();
 		foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
@@ -764,7 +767,7 @@ class utopia {
 		$templateDir = utopia::GetTemplateDir(true);
 		if (!file_exists($templateDir)) $templateDir = utopia::GetAbsolutePath($templateDir);
 		if (file_exists($templateDir)) $templates[] = $templateDir;
-		while (file_exists($templateDir.'/template.ini')) {
+		while ($tCount-- && file_exists($templateDir.'/template.ini')) {
 			$inifile = parse_ini_file($templateDir.'/template.ini');
 			if (!isset($inifile['parent'])) break;
 			if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {

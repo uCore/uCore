@@ -57,4 +57,4 @@ if (array_key_exists('__ajax',$_REQUEST)) {
 	utopia::RunAjax($ajaxIdent);
 }
 
-utopia::UseTemplate(isset($_GET['inline']) ? TEMPLATE_BLANK : TEMPLATE_DEFAULT);
+utopia::UseTemplate(TEMPLATE_DEFAULT);
