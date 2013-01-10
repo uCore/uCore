@@ -805,14 +805,14 @@ class utopia {
 			$template = str_replace('http://'.self::GetDomainName(),'https://'.self::GetDomainName(),$template);
 		}
 		do if (self::UsingTemplate() && class_exists('DOMDocument')) {
+			libxml_use_internal_errors(true);
 			$doc = new DOMDocument();
 			$doc->formatOutput = true;
 			$doc->preserveWhiteSpace = false;
 			$doc->validateOnParse = true;
 
-			try {
-				if (!$doc->loadHTML('<?xml encoding="UTF-8">'.utf8_decode($template))) break;
-			} catch (Exception $e) { }
+			if (!$doc->loadHTML('<?xml encoding="UTF-8">'.utf8_decode($template))) break;
+			$isSnip = (stripos($template,'<html') === false);
 			$doc->encoding = 'UTF-8';
 			
 			// no html tag?  break out.
@@ -880,15 +880,26 @@ class utopia {
 			if ($ctNode !== $head->firstChild) $head->insertBefore($ctNode,$head->firstChild);
 			
 			$doc->normalizeDocument();
-			if (strpos(strtolower($doc->doctype->publicId),' xhtml '))
+			if (strpos(strtolower($doc->doctype->publicId),' xhtml ')) {
 				$template = $doc->saveXML();
-			else {
+			} else {
 				$template = $doc->saveHTML();
 			}
 			$template = preg_replace('/<\?xml encoding="UTF-8"\??>\n?/i','',$template);
+			if ($isSnip) {
+				$template = preg_replace('/.*<body[^>]*>\s*/ims', '',$template); // remove everything up to and including the body open tag
+				$template = preg_replace('/\s*<\/body>.*/ims', '',$template); // remove everything after and including the body close tag
+			}
 		} while (false);
 		
 		while (self::MergeVars($template));
+		
+		if (isset($_GET['inline'])) {
+			$template = json_encode(array(
+				'title'	=> self::GetTitle(true),
+				'content'	=> $template,
+			));
+		}
 		
 		echo $template;
 	}
