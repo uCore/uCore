@@ -1235,7 +1235,6 @@ abstract class uDataModule extends uBasicModule {
 
 			$this->AddField($this->GetPrimaryKeyTable(),$this->GetPrimaryKeyTable(),$alias);
 			$this->AddField('_module',"'".get_class($this)."'",$alias);
-			$this->AddGrouping($this->GetPrimaryKeyTable());
 			return;
 		} else {
 			$newTable['parent'] = $parent;
@@ -1269,6 +1268,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		if (is_subclass_of($tableModule,'iLinkTable') && !preg_match('/_ufullconcat$/',$alias)) {
 			$this->CreateTable($alias.'_ufullconcat', $tableModule, $parent, $joins, $joinType);
+			$this->AddGrouping($this->GetPrimaryKeyTable());
 		}
 	}
 
