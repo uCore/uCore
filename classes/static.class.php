@@ -1,6 +1,5 @@
 <?php
 define('TEMPLATE_BLANK','__blank__');
-//define('TEMPLATE_ADMIN','__admin__');
 define('TEMPLATE_DEFAULT','__default__');
 
 utopia::AddTemplateParser('utopia','utopia::parseVars');

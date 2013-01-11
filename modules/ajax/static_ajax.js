@@ -793,7 +793,5 @@ function makeHourglass(hourglassEle) {
 })( jQuery );
 
 utopia.CustomCombo = function(opt) {
-	$(function () {
-		utopia.Initialise.add(function() {$('select').combobox(opt); $('.ui-autocomplete-input').blur();});
-	});
+	utopia.Initialise.add(function() {$('select').combobox(opt); $('.ui-autocomplete-input').blur();});
 }
