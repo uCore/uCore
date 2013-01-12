@@ -522,13 +522,14 @@ abstract class uBasicModule implements iUtopiaModule {
 		$uuid = preg_replace('((.{8})(.{4})(.{4})(.{4})(.+))','$1-$2-$3-$4-$5',md5(get_class($this)));
 		return $uuid;
 	}
-  private $mID = NULL;
-  public function GetModuleId() {
-    if ($this->mID !== NULL) return $this->mID;
-    $m = utopia::ModuleExists(get_class($this));
-    $this->mID = $m['module_id'];
-    return $this->mID;
-  }
+	
+	private $mID = NULL;
+	public function GetModuleId() {
+		if ($this->mID !== NULL) return $this->mID;
+		$m = utopia::ModuleExists(get_class($this));
+		$this->mID = $m['module_id'];
+		return $this->mID;
+	}
   
 	public $rewriteMapping=NULL;
 	public $rewriteURLReadable=NULL;
