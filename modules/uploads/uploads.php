@@ -4,7 +4,7 @@ class uUploads extends uBasicModule {
 	function SetupParents() {
 		$this->SetRewrite(TRUE);
 	}
-	function GetUUID() { return 'uploads'; }
+	public static $uuid = 'uploads';
 	function RunModule() {
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
 		$sections = utopia::GetRewriteURL();

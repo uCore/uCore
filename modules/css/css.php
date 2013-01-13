@@ -54,7 +54,7 @@ class uCSS extends uBasicModule {
 		}
 	}
 	public function GetOptions() { return PERSISTENT; }
-	public function GetUUID() { return 'styles.css'; }
+	public static $uuid = 'styles.css';
 	private static $includeFiles = array();
 	public static function IncludeFile($path) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME

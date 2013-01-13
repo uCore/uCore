@@ -7,7 +7,7 @@ class uSearch extends uBasicModule {
 	public function GetURL($filters = NULL) {
 		return str_replace('//','/',parent::GetURL($filters));
 	}
-	function GetUUID() { return 'search'; }
+	public static $uuid = 'search';
 	function GetTitle() { return (isset($_GET['q']) ? $_GET['q'].' - ' : '').utopia::GetDomainName().' search'; }
 	private static $recipients = array();
 	static function AddSearchRecipient($module, $searchFields, $titleField, $descField) {

@@ -78,7 +78,7 @@ class uJavascript extends uBasicModule {
 	public static function AddText($text) {
 		self::$script_include .= "\n$text";
 	}
-	public function GetUUID() { return 'javascript.js'; }
+	public static $uuid = 'javascript.js';
 
 	public function SetupParents() {
 		module_Offline::IgnoreClass(__CLASS__);

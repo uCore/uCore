@@ -12,7 +12,6 @@ class module_Offline extends uBasicModule {
 		modOpts::AddOption('site_online','Site Online',NULL,0,itYESNO);
 		uEvents::AddCallback('CanAccessModule',array($this,'siteOffline'),utopia::GetCurrentModule());
 	}
-	public function GetUUID() { return 'site-offline'; }
 
 	private static $states = array();
 	public static function IgnoreClass($class,$state=true) {

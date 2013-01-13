@@ -4,7 +4,7 @@ class adminLogout extends uBasicModule {
 	public function GetOptions() { return PERSISTENT; }
 	public function GetTitle() { return 'Logout'; }
 	public function GetSortOrder() { return -9900; }
-	public function GetUUID() { return 'logout'; }
+	public static $uuid = 'logout';
 	public function SetupParents() {
 		$this->SetRewrite(true);
 		utopia::AddTemplateParser('logout','<a href="'.$this->GetURL().'">Logout</a>','');
@@ -39,7 +39,7 @@ class uUserLogin extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'User Login'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT | NO_NAV; }
-	public function GetUUID() { return 'login'; }
+	public static $uuid = 'login';
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function SetupFields() {
 		$this->CreateTable('users','tabledef_Users');
@@ -159,7 +159,7 @@ class uResetPassword extends uDataModule {
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetOptions() { return PERSISTENT | ALLOW_EDIT; }
 
-	public function GetUUID() { return 'reset-password'; }
+	public static $uuid = 'reset-password';
 
 	public function SetupParents() {
 		$this->SetRewrite(array('{e}','{c}'));

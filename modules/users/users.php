@@ -197,7 +197,7 @@ class uRegisterUser extends uDataModule {
 		uEvents::AddCallback('AfterShowLogin',array($this,'RegisterLink'));
 		modOpts::AddOption('open_user_registration','Allow User Registrations',NULL,false,itYESNO);
 	}
-	public function GetUUID() { return 'register'; }
+	public static $uuid = 'register';
 	public function RegisterLink() {
 		if (!modOpts::GetOption('open_user_registration')) return;
 		echo '<h2>New User?</h2>';
@@ -311,7 +311,7 @@ class uVerifyEmail extends uDataModule {
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetOptions() { return ALLOW_EDIT | PERSISTENT; }
 
-	public function GetUUID() { return 'verify-email'; }
+	public static $uuid = 'verify-email';
 
 	public function SetupParents() {
 		$this->SetRewrite(array('{c}'));
@@ -383,7 +383,7 @@ class uUserProfile extends uSingleDataModule {
 		$l = uUserLogin::IsLoggedIn();
 		$this->AddFilter('user_id',ctEQ,itNONE,$l);
 	}
-	public function GetUUID() { return 'user-profile'; }
+	public static $uuid = 'user-profile';
 	public function SetupParents() {
 		$this->SetRewrite(true);
 	}

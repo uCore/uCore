@@ -503,7 +503,6 @@ uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'a
 class uCMS_View extends uSingleDataModule {
 	public function GetOptions() { return ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
-	public function GetUUID() { return 'cms'; }
 	static function last_updated() {
 		$page = self::findPage();
 		return $page['updated'];

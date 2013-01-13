@@ -3,7 +3,7 @@ class uBlob extends uBasicModule {
 	function SetupParents() {
 		$this->SetRewrite(array('{module}','{field}','{pk}','{filename}'));
 	}
-	function GetUUID() { return 'blob'; }
+	public static $uuid = 'blob';
 	function RunModule() {
 		if (!isset($_REQUEST['module']) || !class_exists($_REQUEST['module']) || !isset($_REQUEST['pk']) || !isset($_REQUEST['field'])) utopia::PageNotFound();
 
