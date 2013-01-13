@@ -337,7 +337,6 @@ class utopia {
 				if (!$defaultExists && ($defaultValue != ''))
 				$out .= "<input type=\"radio\" $attr value=\"$val\" checked=\"true\">$defaultValue";
 				break;
-			case itMD5:
 			case itPASSWORD:
 			case itPLAINPASSWORD:
 				$out .= "<input type=\"password\" $attr value=\"\"/>";

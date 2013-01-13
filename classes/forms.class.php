@@ -11,7 +11,6 @@ define('itRESET'	,'reset');
 define('itCHECKBOX'	,'checkbox');
 define('itOPTION'	,'option');
 
-define('itMD5'		,'password');
 define('itPASSWORD'	,'password');
 define('itPLAINPASSWORD','plain_password');
 
@@ -2456,7 +2455,7 @@ abstract class uDataModule extends uBasicModule {
 			$srch = array_search($newValue, $valSearch);
 			if ($srch !== FALSE) $newValue = $srch;
 		}*/
-		if ($this->fields[$fieldAlias]['inputtype'] == itMD5 || $this->fields[$fieldAlias]['inputtype'] == itPASSWORD) {
+		if ($this->fields[$fieldAlias]['inputtype'] == itPASSWORD) {
 			if (empty($newValue)) return FALSE;
 			$newValue = uCrypt::Encrypt($newValue);
 		}
