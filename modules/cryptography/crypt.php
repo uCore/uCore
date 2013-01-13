@@ -87,7 +87,6 @@ class uCrypt {
 		return $str;
 	}
 	public static function Encrypt($string) {
-		asort(self::$classes);
 		foreach (self::$classes as $class=>$order) {
 			$result = call_user_func($class.'::Encrypt',$string);
 			if ($result && strlen($result) > 13) return $result;
@@ -96,7 +95,6 @@ class uCrypt {
 		return crypt($string);
 	}
 	public static function Test($string,$digest) {
-		asort(self::$classes);
 		foreach (self::$classes as $class=>$order) {
 			$result = call_user_func($class.'::Test',$string,$digest);
 			if ($result === true) return true;
@@ -109,6 +107,7 @@ class uCrypt {
 		if (!call_user_func($class.'::CanUse')) return false;
 		if ($order === null) $order = count(self::$classes);
 		self::$classes[$class] = $order;
+		asort(self::$classes);
 		return true;
 	}
 }
