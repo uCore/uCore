@@ -107,6 +107,13 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$rec = $obj->LookupRecord(array('username'=>$username));
 		if (!$rec) return false;
 		if (!uCrypt::Test($password,$rec['password'])) return false;
+		
+		// check if password is the most secure we can have.
+		if (!uCrypt::IsStrongest($password,$rec['password'])) {
+			$pk = $rec['user_id'];
+			$obj->UpdateField('password',$password,$pk);
+		}
+		
 		return $rec['user_id'];
 	}
 }

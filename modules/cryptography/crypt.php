@@ -101,6 +101,12 @@ class uCrypt {
 		}
 		return false;
 	}
+	public static function IsStrongest($string,$digest) { // only works if combination is correct
+		reset(self::$classes);
+		$class = key(self::$classes);
+		$result = call_user_func($class.'::Test',$string,$digest);
+		return ($result === true);
+	}
 	
 	private static $classes = array();
 	public static function RegisterClass($class, $order=null) {
