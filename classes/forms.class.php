@@ -957,25 +957,6 @@ abstract class uDataModule extends uBasicModule {
 			}
 		}
 
-		$prefix = NULL;
-
-		switch ($inputType) {
-			case itMD5:
-			case itPASSWORD:	$prefix = 'md5';
-			case itTEXT:
-			case itSUGGEST:
-				//if (is_numeric($length) && $length > 0) $attributes['size'] = floor($length*0.75);
-				break;
-				//case itRICHTEXT:
-			case itTEXTAREA:
-			case itSUGGESTAREA:
-				//$attributes['style'] = "width:100%";
-				//if (is_numeric($length) && $length > 0) { $attributes['cols'] = floor($length*0.12); $attributes['rows'] = floor($length*0.01); }
-				break;
-			case itFILE:		$prefix = 'file'; break;
-			break;
-		}
-
 		// its a suggest, so lv should be information to lookup with ajax
 		// cannot place in switch due to spliting of shared properties (size/cols+rows)
 
