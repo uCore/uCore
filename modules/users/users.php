@@ -4,7 +4,7 @@ class tabledef_Users extends uTableDef {
 	public function SetupFields() {
 		$this->AddField('user_id',ftNUMBER);
 		$this->AddField('username',ftVARCHAR,100);
-		$this->AddField('password',ftVARCHAR,100);
+		$this->AddField('password',ftVARCHAR,250);
 		$this->AddField('role',ftNUMBER);
 		
 		$this->AddField('email_confirm',ftVARCHAR,150);
@@ -17,9 +17,7 @@ class tabledef_Users extends uTableDef {
 		// 
 
 		$this->SetPrimaryKey('user_id');
-		$this->SetIndexField(array('username','password'));
 		$this->SetIndexField('username');
-		$this->SetIndexField('password');
 		$this->SetIndexField('email_confirm_code');
 		$this->SetIndexField('role');
 	}
@@ -41,7 +39,7 @@ class tabledef_Users extends uTableDef {
 			}
 			return TRUE;
 		}
-		if ($pkVal === NULL) parent::UpdateField('username','unverified_'.genRandom(75),$pkVal);
+		if ($pkVal === NULL) parent::UpdateField('username','unverified_'.uCrypt::GetRandom(75),$pkVal);
 		if ($fieldName == 'email_confirm_code' && $newValue === true) {
 			// get old username
 			$r = database::query('SELECT username, email_confirm FROM `'.$this->tablename.'` WHERE user_id = ?',array($pkVal));
@@ -102,6 +100,14 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		if ($fieldAlias == '_validate_user') return $this->UpdateField('email_confirm_code',true,$pkVal);
 		if ($fieldAlias == '_validate_send') { uVerifyEmail::VerifyAccount($pkVal); return; }
 		parent::UpdateField($fieldAlias,$newValue,$pkVal);
+	}
+	
+	public static function TestCredentials($username,$password) {
+		$obj =& utopia::GetInstance(__CLASS__);
+		$rec = $obj->LookupRecord(array('username'=>$username));
+		if (!$rec) return false;
+		if (!uCrypt::Test($password,$rec['password'])) return false;
+		return $rec['user_id'];
 	}
 }
 
@@ -341,7 +347,7 @@ class uVerifyEmail extends uDataModule {
 		if (!$rec['email_confirm']) return true;
 
 		// account email changed, send 
-		$randKey = genRandom(20);
+		$randKey = uCrypt::GetRandom(20);
 		$o->UpdateField('email_confirm_code',$randKey,$user_id);
 		$url = $o->GetURL(array('c'=>$randKey));
 		$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
@@ -400,14 +406,15 @@ class uUserProfile extends uSingleDataModule {
 		if ($fieldAlias == 'username') {
 			$newValue = trim($newValue);
 			if ($newValue === $cUser['username']) return;
-			if ($cUser['password'] !== md5($_POST[$this->CreateSqlField('current_password_email',$pkVal)])) {
-				uNotices::AddNotice('The password you entered does not match our records.',NOTICE_TYPE_ERROR);
-				return;
-			}
 			if (!preg_match('/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i',$newValue)) {
 				uNotices::AddNotice('You must enter a valid email address.',NOTICE_TYPE_ERROR);
 				return;
 			}
+			if (uUsersList::TestCredentials($cUser['username'],$_POST[$this->CreateSqlField('current_password_email',$pkVal)]) === false) {
+				uNotices::AddNotice('The password you entered does not match our records.',NOTICE_TYPE_ERROR);
+				return;
+			}
+			uNotices::AddNotice('You must validate your new email address before you are able to log in with it.');
 		}
 		if ($fieldAlias == 'password') {
 			if (!$newValue) return;
@@ -415,7 +422,7 @@ class uUserProfile extends uSingleDataModule {
 				uNotices::AddNotice('Password confirmation did not match, please try again.',NOTICE_TYPE_WARNING);
 				return;
 			}
-			if ($cUser['password'] !== md5($_POST[$this->CreateSqlField('current_password',$pkVal)])) {
+			if (uUsersList::TestCredentials($cUser['username'],$_POST[$this->CreateSqlField('current_password',$pkVal)]) === false) {
 				uNotices::AddNotice('The password you entered does not match our records.',NOTICE_TYPE_ERROR);
 				return;
 			}

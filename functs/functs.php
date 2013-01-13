@@ -347,15 +347,6 @@ function flag_is_set($var,$flag) {
 	return ($var & $flag) === $flag;
 }
 
-function genRandom($length,$charset = "abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789") {
-	srand((double)microtime()*1000000); // start the random generator
-	$str=""; // set the inital variable
-	for ($i=0;$i<$length;$i++)  // loop and create password
-	$str .= substr ($charset, rand() % strlen($charset), 1);
-
-	return $str;
-}
-
 function is_empty( $var ) {
 	return empty($var);
 }

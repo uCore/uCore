@@ -2458,7 +2458,7 @@ abstract class uDataModule extends uBasicModule {
 		}*/
 		if ($this->fields[$fieldAlias]['inputtype'] == itMD5 || $this->fields[$fieldAlias]['inputtype'] == itPASSWORD) {
 			if (empty($newValue)) return FALSE;
-			$newValue = md5($newValue);
+			$newValue = uCrypt::Encrypt($newValue);
 		}
 		$originalValue = $newValue;
 

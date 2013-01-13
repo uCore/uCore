@@ -80,12 +80,10 @@ class uUserLogin extends uDataModule {
 		$un = $_POST['__login_u']; $pw = $_POST['__login_p'];
 		unset($_POST['__login_u']); unset($_POST['__login_p']);
 
-		$obj =& utopia::GetInstance(__CLASS__);
-		$rec = $obj->LookupRecord(array('username'=>$un,'password'=>md5($pw)));
-		if ($rec) {
-			self::SetLogin($rec['user_id']);
+		if (($userID = uUsersList::TestCredentials($un,$pw)) !== false) {
+			self::SetLogin($userID);
 			$obj =& utopia::GetInstance('uUserProfile');
-			$obj->UpdateFieldRaw('last_login','NOW()',$rec['user_id']);
+			$obj->UpdateFieldRaw('last_login','NOW()',$userID);
 			if (isset($_REQUEST['remember_me'])) {
 				session_set_cookie_params(604800,PATH_REL_ROOT);
 				session_regenerate_id(true);
@@ -194,7 +192,7 @@ class uResetPassword extends uDataModule {
 			return;
 		}
 		
-		$randKey = genRandom(20);
+		$randKey = uCrypt::GetRandom(20);
 		$this->UpdateField('email_confirm_code',$randKey,$rec['user_id']);
 
 		//email out verification
