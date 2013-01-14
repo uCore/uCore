@@ -74,6 +74,7 @@ class uUserLogin extends uDataModule {
 		return $rec['username'];
 	}
 	public static function TryLogin() {
+		if (isset($_SESSION['current_user'])) return;
 		// login not attempted.
 		if (!array_key_exists('__login_u',$_POST)) return;
 
