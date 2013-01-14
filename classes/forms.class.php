@@ -1571,7 +1571,7 @@ abstract class uDataModule extends uBasicModule {
 	public $grouping = NULL;
 	public function AddGrouping($alias,$clear = false) {
 		if (!$this->grouping || $clear) $this->grouping = array();
-		if (isset($this->fields[$alias])) $alias = '`'.$this->fields[$alias]['tablename'].'`.`'.$alias.'`';
+		if (isset($this->fields[$alias])) $alias = '`'.$this->fields[$alias]['tablename'].'`.`'.$this->fields[$alias]['field'].'`';
 		else $alias = '`'.$alias.'`';
 		$this->grouping[] = $alias;
 	}
