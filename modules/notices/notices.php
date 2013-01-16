@@ -15,6 +15,7 @@ class uNotices {
 	}
 	public static function ShowNotices() {
 		// is redirect issued?  If so, don't draw now.
+		if (!utopia::UsingTemplate()) return;
 		foreach (headers_list() as $h) {
 			if (preg_match('/^location:/i',$h)) return;
 		}
