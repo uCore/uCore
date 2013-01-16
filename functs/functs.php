@@ -351,10 +351,11 @@ function is_empty( $var ) {
 	return empty($var);
 }
 
-function AjaxEcho($text) {
+function AjaxEcho($text=null) {
 	// only reset field if this is performed inside an ajax routine (javascript)
 	//if (utopia::UsingTemplate()) return;
 	if (!array_key_exists('__ajax',$_REQUEST)) return false;
+	if (!$text) return true;
 	$text = trim($text,"\n;");
 	echo "\n$text;";
 	return true;
