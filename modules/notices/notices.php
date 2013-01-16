@@ -15,15 +15,15 @@ class uNotices {
 	}
 	public static function ShowNotices() {
 		// is redirect issued?  If so, don't draw now.
-		if (!utopia::UsingTemplate()) return;
 		foreach (headers_list() as $h) {
 			if (preg_match('/^location:/i',$h)) return;
 		}
+		if (!utopia::UsingTemplate() && !AjaxEcho()) return;
 		
 		if (!isset($_SESSION['notices'])) return;
-		$scripts = '$(function(){'.implode(PHP_EOL,$_SESSION['notices']).'});';
+		$scripts = implode(PHP_EOL,$_SESSION['notices']);
 		$_SESSION['notices'] = array();
-		uJavascript::AddText($scripts);
+		if (!AjaxEcho($scripts)) uJavascript::AddText('$(function(){'.$scripts.'});');
 	}
 	public static function Init() {
 		uCSS::IncludeFile(dirname(__FILE__).'/notices.css');
@@ -33,3 +33,4 @@ class uNotices {
 
 uEvents::AddCallback('AfterInit','uNotices::Init');
 uEvents::AddCallback('BeforeOutputTemplate','uNotices::ShowNotices');
+utopia::RegisterAjax('getNotices','uNotices::ShowNotices');
