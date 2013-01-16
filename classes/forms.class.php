@@ -378,7 +378,9 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function _SetupParents() {
 		if ($this->parentsAreSetup) return;
 		$this->parentsAreSetup = true;
+		uEvents::TriggerEvent('BeforeSetupParents',$this);
 		$this->SetupParents();
+		uEvents::TriggerEvent('AfterSetupParents',$this);
 	}
 
 	public $parents = array();
