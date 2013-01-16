@@ -100,49 +100,9 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$editObj =& utopia::GetInstance('uCMS_Edit');
 		$editLink = $editObj->GetURL();
 		$fid = $editObj->FindFilter('cms_id');
-		echo <<<FIN
-	<script type="text/javascript">
-		function RefreshIcons() {
-			$('.ui-treesort-item:not(.ui-treesort-folder) > .cmsParentToggle').remove();
-			$('.ui-treesort-folder').each(function () {
-				var icon = $('.cmsParentToggle',this);
-				if (!icon.length) icon = $('<span class="cmsParentToggle ui-widget ui-icon" style="width:16px; float:left"/>').prependTo(this);
-				if ($('ul:visible',this).length)
-					icon.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-				else
-					icon.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-			});
-		}
-		function dropped() {
-			RefreshIcons();
-			data = serialiseTree();
-			$.post('?__ajax=reorderCMS',{data:data});
-		}
-		function serialiseTree() {
-			var data = {};
-			$('#tree li').each(function () {
-				var parent = $(this).parents('.ui-treesort-item:first').attr('id');
-				if (!parent) parent = '';
-				data[$(this).attr('id')] = parent+':'+$(this).parents('ul:first').children('li').index(this);
-			});
-			return data;
-		}
-		function InitialiseTree() {
-			$('#tree ul').not($('#tree ul:first')).hide();
-			$('#tree').treeSort({init:RefreshIcons,change:dropped});
-		}
-		$('.cmsParentToggle').live('click',function (e) {
-			$(this).parent('li').children('ul').toggle();
-			RefreshIcons();
-			e.stopPropagation();
-		});
-		$('.cmsItemText').live('click',function (e) {
-			window.location = PATH_REL_ROOT+$(this).closest('.cmsItem').attr('id')+'?edit=1';
-			e.stopPropagation();
-		});
-		InitialiseTree();
-	</script>
-FIN;
+
+		uJavascript::LinkFile(dirname(__FILE__).'/page_list.js');
+		
 		$c = ob_get_contents();
 		ob_end_clean();
 		utopia::Tab_Add('Page Editor',$c,$this->GetModuleId(),$tabGroupName,false);
@@ -172,7 +132,7 @@ FIN;
 			$hide = $child['hide'] ? ' hiddenItem' : '';
 
 			$info = (!$child['is_published'] || ($child['content_time'] != $child['content_published_time'])) ? '<span class="ui-icon ui-icon-info" title="Unpublished"></span>' : '';
-			$editLink = $editObj->GetURL(array('cms_id'=>$child['cms_id']));
+			$editLink = $viewObj->GetURL(array('cms_id'=>$child['cms_id'],'edit'=>1));
 			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
 			//$info .= $child['dataModule'] ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
 
@@ -182,7 +142,7 @@ FIN;
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			$ret .= $listObj->GetDeleteButton($child['cms_id']);
 			$ret .= '</div>';
-			$ret .= $editObj->PreProcess('title',$child['title'],$child).$info;
+			$ret .= '<a class="cmsItemLink" href="'.$editLink.'">'.$editObj->PreProcess('title',$child['title'],$child).$info.'</a>';
 			$ret .= '</div>';
 			$ret .= self::GetChildren($child['children'],$child['cms_id']);
 			$ret .= '</li>';

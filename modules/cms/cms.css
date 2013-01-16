@@ -2,11 +2,15 @@
 
 .cmsTree { list-style-type: none; margin:0; padding:0 }
 
-.cmsItem { margin-top:1px; padding:1px 0 0 16px; min-height:23px; line-height:23px; position:relative; cursor:pointer; }
-.cmsItemText { overflow:hidden; }
+.cmsItem { margin-top:1px; padding:1px 0 0 16px; position:relative; cursor:pointer; }
+.cmsItemText { overflow:hidden; padding:3px 0 3px 0; }
 .cmsItemText:hover { background-color: #D5E2EA; }
+.cmsItemText a.cmsItemLink { display:block; padding-left:3px; }
+.cmsItemText a.cmsItemLink:hover { color:black; }
 .cmsItemActions { float:right; padding-left:10px; position:relative; }
 .cmsItemActions a { background-color:white !important; }
+.cmsItemLink .ui-icon { vertical-align:bottom; margin-left:3px; }
+
 
 .cmsItem .cmsItem { padding-top:1px; min-height:18px; }
 .cmsItem .cmsParentToggle { margin-left:-16px }
