@@ -86,7 +86,7 @@ class uJavascript extends uBasicModule {
 		self::LinkFile($this->GetURL(),-10);
 
 		self::LinkFile('//code.jquery.com/jquery-1.9.0.js',-100);
-		self::LinkFile('//code.jquery.com/ui/1.9.1/jquery-ui.js',-99);
+		self::LinkFile('//code.jquery.com/ui/1.10.0/jquery-ui.js',-99);
 
 		// commented because if a user enters an incorrect version (too high for example) they can not change it back.
 //		modOpts::AddOption('jquery_version','jQuery Version',NULL,1);
