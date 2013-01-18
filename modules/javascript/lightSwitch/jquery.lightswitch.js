@@ -68,7 +68,7 @@
 				});
 				$(this).next('span.switch').css({'background-position': $(this).is(':checked') ? o.onShift : o.offShift }); // setup default states
 
-				$('input + span').live("click", function() { return false; });
+				$(document).on('click','input + span',function() { return false; });
 
 				$(this).change(function(){
 					radioGroupName = $(this).attr('name');

@@ -123,7 +123,7 @@ $(document).ready(function(){
 		nodes.attr('id',ui.tab.hash.replace('#','')); // re-establish ID
 	});
 	
-	$('th.sortable').live('click',function (e) {
+	$(document).on('click','th.sortable',function (e) {
 		var fieldname = $(this).attr('rel');
 		if (!fieldname) return;
 
