@@ -287,10 +287,10 @@ function InitAutocomplete() {
 		},
 		minLength:0,delay:200
 	}).each(function () {
-		$(this).data( "autocomplete" )._renderItem = function( ul, item ) {
+		$(this).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
 			var desc = item.desc ? '<br><span style="font-size:0.7em">' + item.desc + '</span>' : '';
 			return $( "<li></li>" )
-				.data( "item.autocomplete", item )
+				.data( "ui-autocomplete-item", item )
 				.append( "<a>" + item.label + desc + "</a>" )
 				.appendTo( ul );
 		};
@@ -735,7 +735,7 @@ function makeHourglass(hourglassEle) {
 								// remove invalid value, as it didn't match anything
 								$( this ).val( "" );
 								select.val( "" );
-								input.data( "autocomplete" ).term = "";
+								input.data( "ui-autocomplete" ).term = "";
 								return false;
 							}
 						}
@@ -743,9 +743,9 @@ function makeHourglass(hourglassEle) {
 				});
 				//.addClass( "ui-widget ui-widget-content ui-corner-left" );
 
-			input.data( "autocomplete" )._renderItem = function( ul, item ) {
+			input.data( "ui-autocomplete" )._renderItem = function( ul, item ) {
 				return $( "<li"+($(item.option).val() == select.val() ? ' class="ui-state-highlight"' : '')+"></li>" )
-					.data( "item.autocomplete", item )
+					.data( "ui-autocomplete-item", item )
 					.append( "<a>" + item.label + "</a>" )
 					.appendTo( ul );
 			};
