@@ -744,45 +744,42 @@ class utopia {
 		}
 		if (isset($_GET['inline']) && !is_numeric($_GET['inline'])) $_GET['inline'] = 0;
 		if (self::UsingTemplate(TEMPLATE_BLANK) || (isset($_GET['inline']) && $_GET['inline'] == 0)) {
-			ob_end_clean();
 			$template = utopia::GetVar('content');
-			while (self::MergeVars($template));
-			echo $template;
-			return;
-		}
-		$tCount = -1; // do all by default
-		if (isset($_GET['inline'])) $tCount = $_GET['inline']-1;
-		$template = '';
-		$css = self::GetTemplateCSS();
-		foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
-			
-		// first get list of parents
-		$templates = array();
-		$templateDir = utopia::GetTemplateDir(true);
-		if (!file_exists($templateDir)) $templateDir = utopia::GetAbsolutePath($templateDir);
-		if (file_exists($templateDir)) $templates[] = $templateDir;
-		while ($tCount-- && file_exists($templateDir.'/template.ini')) {
-			$inifile = parse_ini_file($templateDir.'/template.ini');
-			if (!isset($inifile['parent'])) break;
-			if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {
-				$templateDir = PATH_ABS_ROOT.$inifile['parent'];
-			} else {
-				$templateDir = dirname($templateDir).'/'.$inifile['parent'];
+		} else {
+			$tCount = -1; // do all by default
+			if (isset($_GET['inline'])) $tCount = $_GET['inline']-1;
+			$template = '';
+			$css = self::GetTemplateCSS();
+			foreach ($css as $cssfile) uCSS::LinkFile($cssfile);
+				
+			// first get list of parents
+			$templates = array();
+			$templateDir = utopia::GetTemplateDir(true);
+			if (!file_exists($templateDir)) $templateDir = utopia::GetAbsolutePath($templateDir);
+			if (file_exists($templateDir)) $templates[] = $templateDir;
+			while ($tCount-- && file_exists($templateDir.'/template.ini')) {
+				$inifile = parse_ini_file($templateDir.'/template.ini');
+				if (!isset($inifile['parent'])) break;
+				if (file_exists(PATH_ABS_ROOT.$inifile['parent'])) {
+					$templateDir = PATH_ABS_ROOT.$inifile['parent'];
+				} else {
+					$templateDir = dirname($templateDir).'/'.$inifile['parent'];
+				}
+				$templates[] = $templateDir;
 			}
-			$templates[] = $templateDir;
+			
+			foreach ($templates as $templateDir) {
+				// set templatedir
+				self::SetVar('templatedir',self::GetRelativePath($templateDir));
+				$templatePath = $templateDir.'/template.php';
+				$template = get_include_contents($templatePath);
+				// mergevars
+				while (self::MergeVars($template));
+				// setvar
+				self::SetVar('content',$template);
+			}
+			if (!$template) $template = '{utopia.content}';
 		}
-		
-		foreach ($templates as $templateDir) {
-			// set templatedir
-			self::SetVar('templatedir',self::GetRelativePath($templateDir));
-			$templatePath = $templateDir.'/template.php';
-			$template = get_include_contents($templatePath);
-			// mergevars
-			while (self::MergeVars($template));
-			// setvar
-			self::SetVar('content',$template);
-		}
-		if (!$template) $template = '{utopia.content}';
 		ob_end_clean();
 
 		while (self::MergeVars($template));
@@ -883,14 +880,26 @@ class utopia {
 		
 		while (self::MergeVars($template));
 		
-		if (isset($_GET['inline'])) {
-			$template = json_encode(array(
-				'title'	=> self::GetTitle(true),
-				'content'	=> $template,
-			));
-		}
+		if (isset($_GET['inline'])) return self::OutputInline($template);
 		
 		echo $template;
+	}
+	static function OutputInline($content) {
+	//	while (self::MergeVars($content));
+		
+		header('Content-Type: application/json');
+		$output = json_encode(array(
+			'title'	=> self::GetTitle(true),
+			'content'	=> $content,
+		));
+		
+		if (isset($_GET['callback'])) {
+			header('Content-Type: application/javascript');
+			echo $_GET['callback'].'('.$output.')';
+			return;
+		}
+		
+		echo $output;
 	}
 
 	static function IsInsideNoProcess($fullString,$position) {
