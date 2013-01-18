@@ -1368,6 +1368,14 @@ class utopia {
 		return true;
 	}
 	
+	static function IsAjaxRequest() {
+		if (array_key_exists('__ajax',$_REQUEST)) return true;
+		foreach (headers_list() as $h) {
+			if (preg_match('/^X-Requested-With:\s*XMLHttpRequest/i',$h)) return true;
+		}
+		return false;
+	}
+
 	static function GetGlobalSearch($val,&$args) {
 		$all = array(array());
 		$cAll = count($all);
