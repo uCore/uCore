@@ -885,7 +885,10 @@ class utopia {
 		echo $template;
 	}
 	static function OutputInline($content) {
-	//	while (self::MergeVars($content));
+		if ($_GET['inline'] === 0) {
+			echo $content;
+			return;
+		}
 		
 		header('Content-Type: application/json');
 		$output = json_encode(array(
