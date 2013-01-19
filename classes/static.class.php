@@ -885,7 +885,7 @@ class utopia {
 		echo $template;
 	}
 	static function OutputInline($content) {
-		if ($_GET['inline'] === 0) {
+		if ((string)$_GET['inline'] === '0') {
 			echo $content;
 			return;
 		}
