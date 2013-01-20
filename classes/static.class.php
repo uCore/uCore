@@ -880,29 +880,17 @@ class utopia {
 		
 		while (self::MergeVars($template));
 		
-		if (isset($_GET['inline'])) return self::OutputInline($template);
-		
-		echo $template;
-	}
-	static function OutputInline($content) {
-		if ((string)$_GET['inline'] === '0') {
-			echo $content;
-			return;
-		}
-		
-		header('Content-Type: application/json');
-		$output = json_encode(array(
-			'title'	=> self::GetTitle(true),
-			'content'	=> $content,
-		));
-		
 		if (isset($_GET['callback'])) {
+			$output = json_encode(array(
+				'title'	=> self::GetTitle(true),
+				'content'	=> $template,
+			));
 			header('Content-Type: application/javascript');
 			echo $_GET['callback'].'('.$output.')';
 			return;
 		}
 		
-		echo $output;
+		echo $template;
 	}
 
 	static function IsInsideNoProcess($fullString,$position) {
