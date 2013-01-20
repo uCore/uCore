@@ -316,6 +316,7 @@ class utopia {
 					$out .= '<span'.$at.' class="inputtype inputtype-checkboxlist">';
 					foreach ($possibleValues as $key => $val) {
 						$checked = ((string)$key === $defaultValue || (is_array($defaultValue) && in_array($key,$defaultValue))) ? ' checked="checked"' : '';
+						$val = htmlentities($val,ENT_COMPAT,CHARSET_ENCODING);
 						$out .= "<label><input$attr type=\"checkbox\"$checked value=\"$key\"/>$val</label>";
 					}
 					$out .= '</span>';
