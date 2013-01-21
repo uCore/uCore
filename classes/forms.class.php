@@ -2408,9 +2408,9 @@ abstract class uDataModule extends uBasicModule {
 			$this->UpdateField($fieldAlias,$filename,$pkVal);
 		} else {
 			$value = file_get_contents($fileInfo['tmp_name']);
+			$this->UpdateField($fieldAlias,$value,$pkVal);
 			$this->UpdateField($fieldAlias.'_filename',$fileInfo['name'],$pkVal);
 			$this->UpdateField($fieldAlias.'_filetype',$fileInfo['type'],$pkVal);
-			$this->UpdateField($fieldAlias,$value,$pkVal);
 		}
 		
 		if (uEvents::TriggerEvent('AfterUploadFile',$this,array($fieldAlias,$fileInfo,&$pkVal)) === FALSE) return FALSE;
