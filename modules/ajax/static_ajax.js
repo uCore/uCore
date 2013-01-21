@@ -100,6 +100,11 @@ utopia.Initialise.add(function() { // auto append submit buttons
 	$('form:not(:has(:submit))').append('<input type="submit" style="width:0;height:0;border:0;padding:0;margin:0;position:absolute;" value="" />');
 });
 
+$(document).on('click','.icon-document-upload',function() {
+	$(this).next('input:file').click();
+	return false;
+});
+
 $(document).ready(function(){
 	//$('.btn').button();
 	// preload hourglass image

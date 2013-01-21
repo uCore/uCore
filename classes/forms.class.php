@@ -2676,8 +2676,25 @@ abstract class uDataModule extends uBasicModule {
 		
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
 		if ($inputType !== itNONE && (($row !== NULL && flag_is_set($this->GetOptions(),ALLOW_EDIT)) || ($row === NULL  && flag_is_set($this->GetOptions(),ALLOW_ADD)))) {
-			$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
-			$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
+			if ($inputType === itFILE) {
+				$ret = '';
+				if (!$value) {
+					$ret .= '<span class="icon-document-delete uDesaturate"></span>';
+					$ret .= '<span class="icon-document-view uDesaturate"></span>';
+					$ret .= '<span class="icon-document-download uDesaturate"></span>';
+				} else {
+					$id = $this->CreateSqlField($fieldName,$pkVal);
+					$ret .= '<a href="javascript:uf(\''.$id.'\', \'\')" class="uf icon-document-delete"></a>';
+					$link = uBlob::GetLink(get_class($this),$fieldName,$pkVal,$row[$fieldName.'_filename']);
+					$ret .= '<a target="_blank" href="'.$link.'" class="icon-document-view"></a>';
+					$ret .= '<a href="'.$link.'?attach=attachment" class="icon-document-download"></a>';
+				}
+				$ret .= '<a href="#" class="icon-document-upload"></a>';
+				$ret .= $this->DrawSqlInput($fieldName,$value,$pkVal,array('class'=>'uHidden'),$inputType,$valuesOverride);
+			} else {
+				$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
+				$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
+			}
 		} else {
 			if ($url) {
 				$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
