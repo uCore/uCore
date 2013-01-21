@@ -2684,12 +2684,12 @@ abstract class uDataModule extends uBasicModule {
 					$ret .= '<span class="icon-document-download uDesaturate"></span>';
 				} else {
 					$id = $this->CreateSqlField($fieldName,$pkVal);
-					$ret .= '<a href="javascript:uf(\''.$id.'\', \'\')" class="uf icon-document-delete"></a>';
+					$ret .= '<a title="Delete File" href="javascript:uf(\''.$id.'\', \'\')" class="uf icon-document-delete"></a>';
 					$link = uBlob::GetLink(get_class($this),$fieldName,$pkVal,$row[$fieldName.'_filename']);
-					$ret .= '<a target="_blank" href="'.$link.'" class="icon-document-view"></a>';
-					$ret .= '<a href="'.$link.'?attach=attachment" class="icon-document-download"></a>';
+					$ret .= '<a title="View File" target="_blank" href="'.$link.'" class="icon-document-view"></a>';
+					$ret .= '<a title="Download File" href="'.$link.'?attach=attachment" class="icon-document-download"></a>';
 				}
-				$ret .= '<a href="#" class="icon-document-upload"></a>';
+				$ret .= '<a title="Upload File" href="#" class="icon-document-upload"></a>';
 				$ret .= $this->DrawSqlInput($fieldName,$value,$pkVal,array('class'=>'uHidden'),$inputType,$valuesOverride);
 			} else {
 				$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
