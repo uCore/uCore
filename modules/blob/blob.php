@@ -24,7 +24,13 @@ class uBlob extends uBasicModule {
 		if ($isImg && ($width || $height)) $filetype = 'image/png';
 		
 		$etag = sha1($_SERVER['REQUEST_URI'].'-'.$data);
-		utopia::Cache_Check($etag,$filetype,$filename);
+		
+		$attach = 'inline';
+		if (isset($_REQUEST['attach'])) {
+			$attach = $_REQUEST['attach'];
+		}
+		
+		utopia::Cache_Check($etag,$filetype,$filename,0,2592000,$attach);
 
 		if ($isImg && ($width || $height)) {
 			$src = imagecreatefromstring($data);
@@ -37,7 +43,7 @@ class uBlob extends uBasicModule {
 			ob_end_clean();
 		}
 		
-		utopia::Cache_Output($data,$etag,$filetype,$filename);
+		utopia::Cache_Output($data,$etag,$filetype,$filename,0,2592000,$attach);
 	}
 	static function GetLink($module,$field,$pk,$filename=NULL) {
 		if ($filename === NULL) {
