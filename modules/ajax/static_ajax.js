@@ -96,12 +96,6 @@ $(document).on('click','.btn-del',function(event) {
 	return false;
 });
 
-$(window).bind('hashchange', function() {
-	var hash = window.location.hash.replace('#','');
-	$('[href="#'+hash+'"]').closest('.tabGroup').tabs('select',hash);
-});
-
-
 utopia.Initialise.add(function() { // auto append submit buttons
 	$('form:not(:has(:submit))').append('<input type="submit" style="width:0;height:0;border:0;padding:0;margin:0;position:absolute;" value="" />');
 });
@@ -116,11 +110,12 @@ $(document).ready(function(){
 	$('li:last-child').addClass('last-child');
 
 	$(".tabGroup").tabs();
-	$(".tabGroup").bind('tabsshow', function(event, ui) { // bind after creation to stop immediate redirection to first hash
-		var nodes = $(ui.tab.hash);
+	$(document).on('tabsactivate', function(event, ui) { // bind after creation to stop immediate redirection to first hash
+		var hash = ui.newTab.attr('aria-controls');
+		var nodes = $('#'+hash);
 		nodes.removeAttr('id'); // remove ID to stop scrolling
-		window.location.hash = ui.tab.hash;
-		nodes.attr('id',ui.tab.hash.replace('#','')); // re-establish ID
+		window.location.hash = '#'+hash;
+		nodes.attr('id',hash); // re-establish ID
 	});
 	
 	$(document).on('click','th.sortable',function (e) {
