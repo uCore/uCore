@@ -2848,7 +2848,8 @@ abstract class uListDataModule extends uDataModule {
 			// add the row
 			$newRec = $this->LookupRecord($pkVal);
 			$ov = base64_encode($this->DrawRow($newRec));
-			AjaxEcho("$('.$enc_name').each(function(){ $(this).closest('TABLE.datalist').children('TBODY').append(Base64.decode('$ov'));});\n");
+			$class = get_class($this);
+			AjaxEcho("$('TABLE.$class:has(.$enc_name)').children('TBODY').append(Base64.decode('$ov'));\n");
 		}
 
 		return $ret;
