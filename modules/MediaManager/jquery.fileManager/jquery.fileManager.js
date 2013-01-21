@@ -35,6 +35,7 @@
 	};
 
 	$.fn.fileManager = function(settings, pluploadOptions) {
+		var self = this;
 		var mbOptions = $.extend({}, optionDefaults, settings);
 		if (!mbOptions.ajaxPath) {
 			alert('ajaxPath not specified'); return;
@@ -47,6 +48,7 @@
 		this.each(function () { // swap with getJSON so not duplicating ajax
 			var $sel = $(this);
 			$.ajax({url:mbOptions.ajaxPath,dataType:'json',type:'POST',data:query,success:function(data, status) {
+				$(self).trigger('changed',data);
 				if (!data) {
 					$sel.append('No data received. Please ensure ProcessAjax is called in your ajax script.');
 					return;
@@ -60,7 +62,6 @@
 				$sel.empty();
 
 				if (!mbOptions.readonly) {
-					$sel.append('<div>Path: '+data.rootPath+data.path+'</div>');
 					if (data.path && !mbOptions.fixedPath) DrawItem($sel,{path:'..',title:'..',type:1});
 					DrawItem($sel,{path:'',title:'',type:2});
 				}

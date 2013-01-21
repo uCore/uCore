@@ -70,14 +70,21 @@ FIN
 		ob_start();
 		list($path,$pathUpload) = self::Init();
 
-		echo '<div id="fileMan"></div>';
+		echo '<div>Uploads <span id="mediaPath"></span></div><div id="fileMan"></div>';
 		$includeOpts = '';
 		if (class_exists('uPlupload')) {
 			$jsOptionVar = 'filemanagerOptions';
 			uPlupload::Init($jsOptionVar,$pathUpload);
 			$includeOpts = ','.$jsOptionVar;
 		}
-		uJavascript::AddText("$(document).ready(function() { $('#fileMan').fileManager({ajaxPath:'$path',upload:true,events:{dblclick:FileManagerItemClick}}$includeOpts);});");
+		uJavascript::AddText(<<<FIN
+	$(function(){
+		$('#fileMan')
+			.fileManager({ajaxPath:'$path',upload:true,events:{dblclick:FileManagerItemClick}}$includeOpts)
+			.on('changed',function(event, data){ console.log(data);$('#mediaPath').text(data.path.replace(/\//g,' > ')); });
+	});
+FIN
+);
 
 		$out = ob_get_contents();
 		ob_end_clean();
