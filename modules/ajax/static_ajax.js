@@ -57,12 +57,11 @@ function ReloadFilters() {
 		var name = $(this).attr('name');
 		if (empty(name)) return;
 		if ($(this).val() == $(this).data('ov')) return;
-		if ($(this).val() == $(this).attr('placeholder')) return;
 		
 		var oldVal = gup(name);
 		var newVal;
 
-		if (($(this).val() == $(this).attr('title')) || ($(this).attr('type') == 'checkbox' && !$(this).attr('checked')) || ($(this).attr('type') == 'radio' && !$(this).attr('checked')))
+		if (($(this).val() == $(this).attr('title')) || ($(this).val() == $(this).attr('placeholder')) || ($(this).attr('type') == 'checkbox' && !$(this).attr('checked')) || ($(this).attr('type') == 'radio' && !$(this).attr('checked')))
 			newVal = '';
 		else
 			newVal = String($(this).val());
