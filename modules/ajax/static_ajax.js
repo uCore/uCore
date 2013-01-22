@@ -57,6 +57,7 @@ function ReloadFilters() {
 		var name = $(this).attr('name');
 		if (empty(name)) return;
 		if ($(this).val() == $(this).data('ov')) return;
+		if ($(this).val() == $(this).attr('placeholder')) return;
 		
 		var oldVal = gup(name);
 		var newVal;
