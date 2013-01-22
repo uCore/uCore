@@ -43,7 +43,7 @@ $(document).on('submit','form',function (event) { $(".uFilter, :input[placeholde
 
 // Filters
 utopia.Initialise.add(function(){ $('.uFilter').each(function(){ if ($(this).data('ov')) return; $(this).data('ov',$(this).val()); }) });
-$(document).on('click','.uFilter',function (event) {if (!$.browser.msie) this.focus(); event.stopPropagation(); return false;});
+$(document).on('click','.uFilter',function (event) {this.focus(); event.stopPropagation(); return false;});
 $(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
 // allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
 $(document).on('selectstart','.uFilter',function (event) {event.stopPropagation(); return true;});
