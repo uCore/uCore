@@ -1,6 +1,9 @@
 <?php
 
+uCSS::IncludeFile(dirname(__FILE__).'/jQuery/jquery-ui.css');
 uCSS::IncludeFile(PATH_REL_CORE.'default.css');
+uCSS::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
+
 uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
 uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument','',99999);
 class uCSS extends uBasicModule {
@@ -76,11 +79,7 @@ class uCSS extends uBasicModule {
 		$this->SetRewrite(true);
 		self::LinkFile($this->GetURL(),-10);
 
-		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
-
-		self::LinkFile('//code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css',-100);
-		
-		self::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
+		uCSS::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 	}
 
 	public function RunModule() {

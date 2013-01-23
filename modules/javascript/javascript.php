@@ -84,16 +84,6 @@ class uJavascript extends uBasicModule {
 		module_Offline::IgnoreClass(__CLASS__);
 		$this->SetRewrite(true);
 		self::LinkFile($this->GetURL(),-10);
-
-		self::LinkFile('//code.jquery.com/jquery-1.9.0.js',-100);
-		self::LinkFile('//code.jquery.com/ui/1.10.0/jquery-ui.js',-99);
-
-		// commented because if a user enters an incorrect version (too high for example) they can not change it back.
-//		modOpts::AddOption('jquery_version','jQuery Version',NULL,1);
-//		$jq  = modOpts::GetOption('jQuery');
-
-//		modOpts::AddOption('jquery_ui_version','jQuery UI Version',NULL,1);
-//		$jqui = modOpts::GetOption('jquery_ui_version');
 	}
 
 	public function RunModule() {
@@ -154,6 +144,8 @@ class uJavascript extends uBasicModule {
 	}
 }
 
+uJavascript::LinkFile(dirname(__FILE__).'/jQuery/jquery-1.9.0.min.js',-100);
+uJavascript::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui-1.10.0.min.js',-99);
 uJavascript::IncludeText(file_get_contents(dirname(__FILE__).'/javascript.js'));
 uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
 uJavascript::IncludeFile(dirname(__FILE__).'/carousel/jquery.jcarousel.min.js');
