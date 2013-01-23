@@ -55,6 +55,7 @@ define('PATH_ABS_CONFIG',fix_path(PATH_ABS_ROOT.'uConfig.php'));
 
 define('PATH_ABS_MODULES',fix_path(PATH_ABS_ROOT.'uModules').'/');
 define('PATH_ABS_TEMPLATES',fix_path(PATH_ABS_ROOT.'uTemplates').'/');
+define('PATH_ABS_THEMES',fix_path(PATH_ABS_ROOT.'uThemes').'/');
 
 ini_set('session.cookie_path',PATH_REL_ROOT);
 session_cache_limiter(false);

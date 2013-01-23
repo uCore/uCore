@@ -639,7 +639,9 @@ class utopia {
 	/* TEMPLATE */
 	public static function GetTemplates($includeDefault=false,$includeCore=true) {
 		$userTemplates = glob(PATH_ABS_TEMPLATES.'*'); // find all user templates
-		$adminTemplates = glob(PATH_ABS_CORE.'styles/*'); // find all admin templates
+		$userTemplates = array_merge($userTemplates,glob(PATH_ABS_THEMES.'*')); // find all user templates
+
+		$adminTemplates = glob(PATH_ABS_CORE.'themes/*'); // find all admin templates
 		$nTemplates = array();
 		if ($includeDefault) $nTemplates[''] = 'Default Template';
 
@@ -669,23 +671,29 @@ class utopia {
 	private static $usedTemplate = NULL;
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_clean(); if (!$justClean) self::$usedTemplate = NULL; }
 	public static function UseTemplate($template = TEMPLATE_DEFAULT) {
+		$ret = true;
+
+		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template.'/template.php')) {
+			$template = TEMPLATE_DEFAULT;
+			$ret = false;
+		}
+
 		if ($template == TEMPLATE_DEFAULT) {
 			if (self::GetCurrentModule() && self::GetInstance(self::GetCurrentModule()) instanceof iAdminModule) $template = TEMPLATE_ADMIN;
 			else $template = modOpts::GetOption('default_template');
 		}
-		if (!$template) $template = TEMPLATE_BLANK;
-		$ret = true;
 
-		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template.'/template.php')) {
+		if (!$template){
 			$template = TEMPLATE_BLANK;
 			$ret = false;
 		}
+
 		self::$usedTemplate = $template;
 		return $ret;
 	}
 	public static function UsingTemplate($compare = NULL) { if ($compare === NULL) return (self::$usedTemplate !== NULL); else return (self::$usedTemplate === $compare); }
 	public static function GetTemplateDir($relative=false) {
-		$templateDir = PATH_ABS_CORE.'styles/default/';
+		$templateDir = PATH_ABS_CORE.'themes/default/';
 		switch (self::$usedTemplate) {
 			case NULL:
 			case TEMPLATE_BLANK:
@@ -708,8 +716,8 @@ class utopia {
 		// if we have a parent, get its css
 		$inifile = $template.'/template.ini';
 		if (file_exists($inifile)) {
-			$inifile = parse_ini_file($inifile);
-			if (isset($inifile['parent'])) $cssfiles = self::GetTemplateCSS(PATH_ABS_TEMPLATES.$inifile['parent']);
+			$inifilearr = parse_ini_file($inifile);
+			if (isset($inifilearr['parent'])) $cssfiles = self::GetTemplateCSS(dirname(dirname($inifile)).'/'.$inifilearr['parent']);
 		}
 		
 		$namedcss = $template.'/styles.css';

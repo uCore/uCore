@@ -14,7 +14,7 @@ uConfig::AddConfigVar('SQL_PASSWORD','Database Password',NULL,NULL,CFG_TYPE_PASS
 uConfig::AddConfigVar('FORMAT_DATE','<a target="_blank" href="http://php.net/manual/en/function.strftime.php">Date Format</a>','%d/%m/%Y');
 uConfig::AddConfigVar('FORMAT_TIME','<a target="_blank" href="http://php.net/manual/en/function.strftime.php">Time Format</a>','%H:%M:%S');
 
-uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'styles/admin',array('utopia::GetTemplates',array(false)),CFG_TYPE_PATH);
+uConfig::AddConfigVar('TEMPLATE_ADMIN','Admin Template',PATH_REL_CORE.'themes/admin',array('utopia::GetTemplates',array(false)),CFG_TYPE_PATH);
 
 uConfig::ReadConfig();
 
@@ -57,6 +57,12 @@ class uConfig {
 			$arr = $_POST;
 			unset($_SESSION['__config_validate']);
 		}
+
+		// upgrade /styles/ to /themes/
+		if (isset($arr['TEMPLATE_ADMIN'])) {
+			$arr['TEMPLATE_ADMIN'] = preg_replace('/^'.preg_quote(PATH_REL_CORE.'styles/','/').'/i',PATH_REL_CORE.'themes/',$arr['TEMPLATE_ADMIN']);
+		}
+
 		foreach (self::$configVars as $key => $info) {
 			if (!isset($arr[$key])) {
 				if (!$info['default']) continue;
@@ -120,7 +126,7 @@ class uConfig {
 	static function ShowConfig() {
 		if (!self::$isValid) {
 			$rc = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
-			utopia::UseTemplate($rc.'styles/install');
+			utopia::UseTemplate($rc.'themes/install');
 			utopia::SetTitle('uCore Installation');
 			echo '<h1>uCore Installation</h1>';
 		}
@@ -166,7 +172,7 @@ FIN;
 	}
 	static function DownMaintenance() {
 		$rc = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
-		utopia::UseTemplate($rc.'styles/install');
+		utopia::UseTemplate($rc.'themes/install');
 
 		header("HTTP/1.0 503 Service Unavailable",true,503);
 		utopia::SetTitle('Website Down For Maintenance');

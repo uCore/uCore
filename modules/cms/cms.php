@@ -66,7 +66,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		uCSS::IncludeFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
 
 		$nTemplates = utopia::GetTemplates(false,true);
-		$dTemplate = '/'.basename(PATH_REL_CORE).'/styles/default';
+		$dTemplate = '/'.basename(PATH_REL_CORE).'/themes/default';
 		modOpts::AddOption('default_template','Default Template',NULL,$dTemplate,itCOMBO,$nTemplates);
 
 		$this->AddParent('/');
@@ -134,7 +134,6 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			$info = (!$child['is_published'] || ($child['content_time'] != $child['content_published_time'])) ? '<span class="ui-icon ui-icon-info" title="Unpublished"></span>' : '';
 			$editLink = $viewObj->GetURL(array('cms_id'=>$child['cms_id'],'edit'=>1));
 			$delLink = $listObj->CreateSqlField('del',$child['cms_id'],'del');
-			//$info .= $child['dataModule'] ? ' <img title="Database Link ('.$child['dataModule'].')" style="vertical-align:bottom;" src="styles/images/data16.png">' : '';
 
 			$ret .= '<li id="'.$child['cms_id'].'" class="cmsItem'.$hide.'">';
 			$ret .= '<div class="cmsItemText">';
