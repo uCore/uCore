@@ -671,25 +671,16 @@ class utopia {
 	private static $usedTemplate = NULL;
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_clean(); if (!$justClean) self::$usedTemplate = NULL; }
 	public static function UseTemplate($template = TEMPLATE_DEFAULT) {
-		$ret = true;
-
-		if ($template != TEMPLATE_BLANK && !file_exists(PATH_ABS_ROOT.$template.'/template.php')) {
-			$template = TEMPLATE_DEFAULT;
-			$ret = false;
+		if (self::GetCurrentModule() && self::GetInstance(self::GetCurrentModule()) instanceof iAdminModule) $template = TEMPLATE_ADMIN;
+		switch ($template) {
+			case TEMPLATE_BLANK: break;
+			case TEMPLATE_ADMIN: break;
+			case TEMPLATE_DEFAULT: break;
+			default:
+				if (!file_exists(PATH_ABS_ROOT.$template.'/template.php')) return false;
 		}
-
-		if ($template == TEMPLATE_DEFAULT) {
-			if (self::GetCurrentModule() && self::GetInstance(self::GetCurrentModule()) instanceof iAdminModule) $template = TEMPLATE_ADMIN;
-			else $template = modOpts::GetOption('default_template');
-		}
-
-		if (!$template){
-			$template = TEMPLATE_BLANK;
-			$ret = false;
-		}
-
 		self::$usedTemplate = $template;
-		return $ret;
+		return true;
 	}
 	public static function UsingTemplate($compare = NULL) { if ($compare === NULL) return (self::$usedTemplate !== NULL); else return (self::$usedTemplate === $compare); }
 	public static function GetTemplateDir($relative=false) {
@@ -698,8 +689,17 @@ class utopia {
 			case NULL:
 			case TEMPLATE_BLANK:
 				return false;
+			case TEMPLATE_ADMIN:
+				$templateDir = rtrim(PATH_ABS_ROOT,'/').self::$usedTemplate.'/';
+				if (!file_exists($templateDir)) $templateDir = PATH_ABS_CORE.'themes/admin/';
+				break;
+			case TEMPLATE_DEFAULT:
+				$templateDir = rtrim(PATH_ABS_ROOT,'/').modOpts::GetOption('default_template').'/';
+				if (!file_exists($templateDir)) $templateDir = PATH_ABS_CORE.'themes/default/';
+				break;
 			default:
-				$templateDir = PATH_ABS_ROOT.self::$usedTemplate.'/';
+				$templateDir = rtrim(PATH_ABS_ROOT,'/').self::$usedTemplate.'/';
+				if (!file_exists($templateDir)) $templateDir = PATH_ABS_CORE.'themes/default/';
 				break;
 		}
 		$path = realpath($templateDir);
