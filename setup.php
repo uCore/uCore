@@ -60,7 +60,8 @@ class uConfig {
 
 		// upgrade /styles/ to /themes/
 		if (isset($arr['TEMPLATE_ADMIN'])) {
-			$arr['TEMPLATE_ADMIN'] = preg_replace('/^'.preg_quote(PATH_REL_CORE.'styles/','/').'/i',PATH_REL_CORE.'themes/',$arr['TEMPLATE_ADMIN']);
+			$self = '/'.basename(dirname(__FILE__));
+			$arr['TEMPLATE_ADMIN'] = preg_replace('/^'.preg_quote($self.'/styles/','/').'/i',$self.'/themes/',$arr['TEMPLATE_ADMIN']);
 		}
 
 		foreach (self::$configVars as $key => $info) {
