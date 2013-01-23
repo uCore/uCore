@@ -1,6 +1,6 @@
 <?php
 
-uCSS::IncludeFile(dirname(__FILE__).'/jQuery/jquery-ui.css');
+uCSS::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui.min.css',-99);
 uCSS::IncludeFile(PATH_REL_CORE.'default.css');
 uCSS::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 
