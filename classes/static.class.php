@@ -1379,9 +1379,8 @@ class utopia {
 	
 	static function IsAjaxRequest() {
 		if (array_key_exists('__ajax',$_REQUEST)) return true;
-		foreach (headers_list() as $h) {
-			if (preg_match('/^X-Requested-With:\s*XMLHttpRequest/i',$h)) return true;
-		}
+		if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest') return true;
+
 		return false;
 	}
 
