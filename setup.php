@@ -172,7 +172,7 @@ FIN;
 		if (!self::$isValid) utopia::Finish();
 	}
 	static function DownMaintenance() {
-		$rc = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
+		$rc = '/'.ltrim(preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE),'/');
 		utopia::UseTemplate($rc.'themes/install');
 
 		header("HTTP/1.0 503 Service Unavailable",true,503);
