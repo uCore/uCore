@@ -81,7 +81,7 @@ FIN
 	$(function(){
 		$('#fileMan')
 			.fileManager({ajaxPath:'$path',upload:true,events:{dblclick:FileManagerItemClick}}$includeOpts)
-			.on('changed',function(event, data){ console.log(data);$('#mediaPath').text(data.path.replace(/\//g,' > ')); });
+			.on('changed',function(event, data){ $('#mediaPath').text(data.path.replace(/\//g,' > ')); });
 	});
 FIN
 );
