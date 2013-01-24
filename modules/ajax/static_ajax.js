@@ -97,12 +97,7 @@ $(document).on('click','.btn-del',function(event) {
 });
 
 utopia.Initialise.add(function() { // auto append submit buttons
-	$('form:not(:has(:submit))').append('<input type="submit" style="width:0;height:0;border:0;padding:0;margin:0;position:absolute;" value="" />');
-});
-
-$(document).on('click','.icon-document-upload',function() {
-	$(this).next('input:file').click();
-	return false;
+	$('form:not(:has(:submit))').append('<input type="submit" class="uHidden" value="" />');
 });
 
 $(document).ready(function(){

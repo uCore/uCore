@@ -2689,8 +2689,7 @@ abstract class uDataModule extends uBasicModule {
 					$ret .= '<a title="View File" target="_blank" href="'.$link.'" class="icon-document-view"></a>';
 					$ret .= '<a title="Download File" href="'.$link.'?attach=attachment" class="icon-document-download"></a>';
 				}
-				$ret .= '<a title="Upload File" href="#" class="icon-document-upload"></a>';
-				$ret .= $this->DrawSqlInput($fieldName,$value,$pkVal,array('class'=>'uHidden'),$inputType,$valuesOverride);
+				$ret .= '<span title="Upload File" class="icon-document-upload">'.$this->DrawSqlInput($fieldName,$value,$pkVal,null,$inputType,$valuesOverride).'</span>';
 			} else {
 				$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
 				$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
