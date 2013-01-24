@@ -25,18 +25,22 @@ function moveMceToolbars(event,ed) {
 		$('head link').clone(false).appendTo(head);
 		var html = $(ed.getDoc().getElementsByTagName('HTML')[0]);
 		
+		var bg = null;
 		span.parentsUntil('body').parent().andSelf().each(function () {
 			var style = {
 				background: $(this).css('background'),
 				font: $(this).css('font'),
 				color: $(this).css('color')
 			}
+			if ($(this).css('background-color') != 'rgba(0, 0, 0, 0)') bg = $(this).css('background-color');
 			body.css(style);
 			body.addClass($(this)[0].className);
 		});
+		if (bg == 'rgba(0, 0, 0, 0)') bg = $('body').css('background-color');
+		if (bg == 'rgba(0, 0, 0, 0)') bg = $('html').css('background-color');
 		
 		var styles = { 'background':'none',margin:0,padding:0,display:'block','float':'none', width:'auto',
-//			'-moz-transform':'none', '-webkit-transform':'none', '-o-transform':'none', '-ms-transform':'none', 'transform':'none',
+			'-moz-transform':'none', '-webkit-transform':'none', '-o-transform':'none', '-ms-transform':'none', 'transform':'none',
 			'min-width':0
 		};
 		body.css(styles);
@@ -51,7 +55,7 @@ function moveMceToolbars(event,ed) {
 			if ($(this).css('-o-transform') !== 'none' && $(this).css('-o-transform') !== null) $(this).css('-o-transform','none');
 			if ($(this).css('-ms-transform') !== 'none' && $(this).css('-ms-transform') !== null) $(this).css('-ms-transform','none');
 		});
-		cont.css({'position':'relative','z-index':1001});
+		cont.css({'position':'relative','z-index':1001,'background':bg});
 */
 		
 		// wake up the autoresize plugin
