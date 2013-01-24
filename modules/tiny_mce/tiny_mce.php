@@ -93,7 +93,7 @@ class module_TinyMCE extends uBasicModule {
 			fltr = '.jpeg|.jpg|.png|.gif|.tif|.tiff';
 
 		mb.fileManager({ajaxPath:'$fileManagerPath',upload:true,get:{filter:fltr},mceInfo:{field_name:field_name,win:win,type:type},events:{click:doClick}}$includeOpts);
-		mb.dialog({modal:false,width:'60%',height:500,zIndex:999999});
+		mb.dialog({modal:false,width:'60%',height:500});
 	}
 	function doClick(event) {
 		var item = $(this).data('item');
@@ -155,5 +155,13 @@ FIN
 		if ($o->fields[$fieldAlias]['inputtype'] == itHTML) return FALSE;
 		if ($o->fields[$fieldAlias]['inputtype'] == itRICHTEXT) return FALSE;
 	}
+	
+	public static function AddExternalPlugins() {
+		$plugins = glob(dirname(__FILE__).'/plugins/*.js');
+		foreach ($plugins as $file) {
+			uJavascript::IncludeFile($file);
+		}
+	}
 }
 uEvents::AddCallback('BeforeResetField','module_TinyMCE::CanResetField');
+uEvents::AddCallback('AfterInit','module_TinyMCE::AddExternalPlugins');
