@@ -40,7 +40,7 @@ img { border: none }
 .icon-document-view { background: url(images/icon-document-view.png) left center no-repeat; height:32px; padding-left:36px; display: inline-block; vertical-align:top; }
 .icon-document-delete { background: url(images/icon-document-delete.png) left center no-repeat; height:32px; padding-left:36px; display: inline-block; vertical-align:top; }
 .icon-document-upload { background: url(images/icon-document-upload.png) left center no-repeat; height:32px; padding-left:36px; display: inline-block; vertical-align:top; position:relative; overflow:hidden; }
-.icon-document-upload input {  overflow:hidden; cursor:pointer; height:32px; border:0; position:absolute; right:0; margin:0; opacity:0; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; filter: alpha(opacity=0); background: transparent; }
+.icon-document-upload input, .icon-document-upload input[type=file] {  overflow:hidden; cursor:pointer; height:32px; width: 100%; border:0; position:absolute; right:0; margin:0; opacity:0; -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; filter: alpha(opacity=0); background: transparent; }
 
 .shadeRow { background-color:#e0e0e0; }
 .new-ident { background-image:url(images/newrec-ident.gif); background-position:center; background-repeat:no-repeat; width:25px}
