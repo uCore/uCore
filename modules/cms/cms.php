@@ -141,7 +141,10 @@ class uCMS_List extends uDataModule implements iAdminModule {
 			//echo '<a class="btn btn-edit" href="'.$editLink.'" title="Edit \''.$child['cms_id'].'\'"></a>';
 			$ret .= $listObj->GetDeleteButton($child['cms_id']);
 			$ret .= '</div>';
-			$ret .= '<a class="cmsItemLink" href="'.$editLink.'">'.$editObj->PreProcess('title',$child['title'],$child).$info.'</a>';
+			
+			$text = $child['title'] ? $child['title'] : $child['cms_id'];
+			
+			$ret .= '<a class="cmsItemLink" href="'.$editLink.'">'.$editObj->PreProcess('title',$text,$child).$info.'</a>';
 			$ret .= '</div>';
 			$ret .= self::GetChildren($child['children'],$child['cms_id']);
 			$ret .= '</li>';

@@ -3,9 +3,9 @@
 .cmsTree { list-style-type: none; margin:0; padding:0 }
 
 .cmsItem { margin-top:1px; padding:1px 0 0 16px; position:relative; cursor:pointer; }
-.cmsItemText { overflow:hidden; padding:3px 0 3px 0; }
+.cmsItemText { overflow:hidden; }
 .cmsItemText:hover { background-color: #D5E2EA; }
-.cmsItemText a.cmsItemLink { display:block; padding-left:3px; }
+.cmsItemText a.cmsItemLink { display:block; padding:3px 0 3px 3px; }
 .cmsItemText a.cmsItemLink:hover { color:black; }
 .cmsItemActions { float:right; padding-left:10px; position:relative; }
 .cmsItemActions a { background-color:white !important; }
