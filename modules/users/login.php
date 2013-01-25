@@ -1,6 +1,6 @@
 <?php
 
-class adminLogout extends uBasicModule {
+class adminLogout extends uBasicModule implements iAdminModule {
 	public function GetOptions() { return PERSISTENT; }
 	public function GetTitle() { return 'Logout'; }
 	public function GetSortOrder() { return -9900; }
@@ -28,13 +28,18 @@ class adminLogout extends uBasicModule {
 		header('Location: '.$ref);
 		die();
 	}
+	public static function NoRole() {
+		uUserRoles::NoRole('adminLogout');
+	}
 }
+uEvents::AddCallback('AfterInit','adminLogout::NoRole');
 
 
 utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
 utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
 utopia::AddTemplateParser('login_status','uUserLogin::GetLoginStatus','');
 utopia::AddTemplateParser('login','uUserLogin::LoginForm','',true);
+uEvents::AddCallback('BeforeRunModule','uUserLogin::checkLogin');
 class uUserLogin extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'User Login'; }
@@ -52,7 +57,6 @@ class uUserLogin extends uDataModule {
 	public function SetupParents() {
 		uCSS::IncludeFile(dirname(__FILE__).'/login.css');
 
-		uEvents::AddCallback('BeforeRunModule',array($this,'checkLogin'),utopia::GetCurrentModule());
 		uEvents::AddCallback('AfterInit',array($this,'CheckSession'));
 
 		$this->SetRewrite(true);
@@ -106,7 +110,7 @@ class uUserLogin extends uDataModule {
 		$_SESSION['current_user'] = $id;
 	}
 
-	public function checkLogin($object) {
+	public static function checkLogin($object) {
 		if (flag_is_set($object->GetOptions(), PERSISTENT)) return;
 		if (uEvents::TriggerEvent('CanAccessModule',$object) !== FALSE) return;
 		
@@ -117,7 +121,8 @@ class uUserLogin extends uDataModule {
 
 		$parent = get_class($object);
 		if ($parent == utopia::GetCurrentModule() && $parent !== __CLASS__ && !AjaxEcho('window.location.reload();')) {
-			$this->_RunModule();
+			$obj =& utopia::GetInstance(__CLASS__);
+			$obj->_RunModule();
 		}
 		return FALSE;
 	}
