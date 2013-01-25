@@ -14,8 +14,8 @@ class tabledef_UserRoles extends uTableDef  {
 /* Admin is a fixed role */
 uEvents::AddCallback('CanAccessModule','uUserRoles::checkPermission');
 class uUserRoles extends uListDataModule implements iAdminModule {
-	public function GetTitle() { return 'User Roles'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT | PERSISTENT; }
+	public function GetTitle() { return 'Role Management'; }
+	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT; }
 
 	public function GetTabledef() { return 'tabledef_UserRoles'; }
 	public function SetupFields() {	
@@ -121,8 +121,8 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	}
 	public static function NoRole($module) {
 		self::InitModules();
-		foreach (self::$modules as $t => $mod) {
-			if ($mod === $module) unset(self::$modules[$t]);
+		foreach (self::$modules as $mod => $title) {
+			if ($mod === $module) unset(self::$modules[$mod]);
 		}
 		self::AddCustomRole($module,'uUserRoles::RetTrue');
 	}
