@@ -29,7 +29,8 @@ a.ui-state-hover:hover { color: #333; }
 	background-color:#6d6f71; border-color:#6d6f71;
 }
 #nav li ul { padding-left: 15px; display:none; }
-#nav li:hover ul, #nav li.active-link ul, #nav li.active-link-parent ul { display:block; }
+/*#nav li:hover ul,*/
+ #nav li.active-link ul, #nav li.active-link-parent ul { display:block; }
 #nav li ul { border:1px solid #ccc; background-color:#f6f6f6; margin-left:20px; padding-left:0; }
 #nav li ul li a { border-radius:0; line-height:1.3em; padding-left:5px; }
 #nav li.active-link li a { background:transparent; border:1px transparent solid; }
