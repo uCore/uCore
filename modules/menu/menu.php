@@ -30,16 +30,23 @@ class uMenu {
 		
 		array_sort_subkey(self::$items[$group],'pos');
 		
-		$ret = '<ul class="u-menu '.$group.'">';
+		$lastWasBlank = true;
+		$items = array();
 		foreach (self::$items[$group] as $item) {
+			if (empty($item['url']) && $lastWasBlank) continue;
 			$attrs = BuildAttrString($item['attr']);
 
-			$ret .= '<li '.$attrs.'>';
-			$ret .= '<a href="'.$item['url'].'" title="'.$item['text'].'">'.$item['text'].'</a>';
+			$ret = '<li '.$attrs.'>';
+			if (!empty($item['url']))
+				$ret .= '<a href="'.$item['url'].'" title="'.$item['text'].'">'.$item['text'].'</a>';
+			else
+				$ret .= '&nbsp;';
 			if ($level !== 0) $ret .= self::GetMenu($item['id'],$level);
 			$ret .= '</li>';
+			$items[] = $ret;
+			$lastWasBlank = empty($item['url']);
 		}
-		$ret .= '</ul>';
+		$ret = '<ul class="u-menu '.$group.'">'.implode('',$items).'</ul>';
 		return $ret;
 	}
 	static function GetNestedMenu($group='') {
