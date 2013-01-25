@@ -888,8 +888,6 @@ abstract class uDataModule extends uBasicModule {
 		if ($filters === FALSE) return parent::GetURL($filters);
 		if (!is_array($filters) && $filters !== NULL) $filters = array($this->GetPrimaryKey()=>$filters);
 
-		$this->RewriteFilters($filters);
-
 		$filArr = array();
 		if (is_array($filters)) foreach ($filters as $fieldName => $val) {
 			$filArr[$fieldName] = $val;
@@ -900,6 +898,7 @@ abstract class uDataModule extends uBasicModule {
 				foreach ($filterSet as $filter) {
 					$val = $this->GetFilterValue($filter['uid']);
 					if (isset($filters[$filter['fieldName']])) $val = $filters[$filter['fieldName']];
+					if (isset($filters['_f_'.$filter['uid']])) $val = $filters['_f_'.$filter['uid']];
 					
 					if (!empty($filter['default']) && $val == $filter['default']) {
 						unset($filters[$filter['fieldName']]);
@@ -911,6 +910,7 @@ abstract class uDataModule extends uBasicModule {
 					if ($this->HasRewrite($filter['fieldName'])) {
 						if (isset($filters[$filter['fieldName']])) continue;
 						$filArr[$filter['fieldName']] = $val;
+						unset($filArr['_f_'.$filter['uid']]);
 						continue;
 					}
 					$filArr['_f_'.$filter['uid']] = $val;
@@ -918,6 +918,7 @@ abstract class uDataModule extends uBasicModule {
 				}
 			}
 		}
+		$this->RewriteFilters($filArr);
 		return parent::GetURL($filArr);
 	}
 
