@@ -2692,7 +2692,15 @@ abstract class uDataModule extends uBasicModule {
 				}
 				$ret .= '<span title="Upload File" class="icon-document-upload">'.$this->DrawSqlInput($fieldName,$value,$pkVal,null,$inputType,$valuesOverride).'</span>';
 			} else {
-				$attr = !empty($url) ? array('ondblclick'=>'javascript:nav(\''.$url.'\')') : NULL;
+				$attr = array();
+				if ($pkVal === NULL) {
+					$dv = $this->GetDefaultValue($fieldName);
+					$vals = $valuesOverride;
+					if (!$vals) $vals = $this->GetValues($fieldName,$pkVal);
+					if ($vals && isset($vals[$dv])) $dv = $vals[$dv];
+					$attr['placeholder'] = $dv;
+				}
+				if (!empty($url)) $attr['ondblclick'] = "javascript:nav('$url')";
 				$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 			}
 		} else {
