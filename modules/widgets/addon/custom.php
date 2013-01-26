@@ -3,9 +3,11 @@
 class uCustomWidget implements iWidget {
 	static function Initialise($sender) {
 		$installed = array();
-		$classes = get_declared_classes();
-		foreach ($classes as $classname){ // install tables
-			if ($classname == 'uDataModule' || $classname == 'uListDataModule' || $classname == 'uSingleDataModule' || !is_subclass_of($classname,'uDataModule')) continue;
+		$classes = utopia::GetModulesOf('uDataModule');
+		foreach ($classes as $classname=>$info) { // install tables
+			if (is_subclass_of($classname,'iAdminModule')) continue;
+			$o =& utopia::GetInstance($classname);
+			if (!$o->HasRewrite()) continue;
 			$installed[$classname] = $classname;
 		}
 		$sender->AddMetaField('module','Data Source',itCOMBO,$installed);
