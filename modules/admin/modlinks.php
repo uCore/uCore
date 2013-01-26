@@ -8,13 +8,13 @@ class modLinks {
 		if (isset(self::$done[$module])) return;
 		self::$done[$module] = true;
 		
-		$cmAdmin = is_a($cm,'iAdminModule',true);
+		$cmAdmin = is_subclass_of($cm,'iAdminModule');
 		
 		$modules = utopia::GetChildren($module);
 		$highestpos = 0;
 		foreach ($modules as $mid=>$children) {
-			if ($cmAdmin && !is_a($mid,'iAdminModule',true)) continue;
-			if (!$cmAdmin && is_a($mid,'iAdminModule',true)) continue;
+			if ($cmAdmin && !is_subclass_of($mid,'iAdminModule')) continue;
+			if (!$cmAdmin && is_subclass_of($mid,'iAdminModule')) continue;
 			foreach ($children as $child) {
 				
 				if (isset($child['callback'])) continue;
