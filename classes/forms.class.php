@@ -2696,10 +2696,11 @@ abstract class uDataModule extends uBasicModule {
 				$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 			}
 		} else {
+			$ret = '';
+			$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
 			if ($url) {
-				$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
 				$ret = "<a$class href=\"$url\">$value</a>";
-			} else {
+			} elseif (!$class) {
 				$ret = $value;
 			}
 		}
