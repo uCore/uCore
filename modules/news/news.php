@@ -21,6 +21,8 @@ class tabledef_NewsTable extends uTableDef {
 		$this->AddField('text',ftLONGTEXT);
 		$this->AddField('image',ftIMAGE);
 		$this->AddField('archive',ftBOOL);
+
+		$this->AddField('author',ftNUMBER);
 		
 		$this->AddField('featured',ftBOOL);
 
@@ -38,7 +40,10 @@ class module_NewsAdmin extends uListDataModule implements iAdminModule {
 	public function GetTabledef() { return 'tabledef_NewsTable'; }
 	public function SetupFields() {
 		$this->CreateTable('news');
+		$this->CreateTable('author','tabledef_Users','news',array('author'=>'user_id'));
 		$this->AddField('time','time','news','Posted');
+		$this->AddField('author','username','author','Author');
+
 		$this->AddField('heading','heading','news','Title');
 		$this->AddField('featured','featured','news','Featured',itCHECKBOX);
 		
@@ -60,7 +65,12 @@ class module_NewsAdminDetail extends uSingleDataModule implements iAdminModule {
 	public function SetupFields() {
 		$this->CreateTable('news');
 		$this->CreateTable('tags','tabledef_NewsTags','news','news_id');
+		$this->CreateTable('author','tabledef_Users','news',array('author'=>'user_id'));
+
 		$this->AddField('time','time','news','Post Date',itDATE);
+		$this->AddField('author','username','author','Author',itSUGGEST);
+		$this->SetDefaultValue('author',uUserLogin::IsLoggedIn());
+
 		$this->AddField('heading','heading','news','Title',itTEXT);
 		$this->AddField('description','description','news','Description',itTEXT);
 		$this->FieldStyles_Set('description',array('width'=>'60%'));
