@@ -18,10 +18,8 @@ a.ui-state-hover:hover { color: #333; }
 #quicklinks { position:absolute; top:6px; left:40px }
 #quicklinks a { color:#8CC63F; }
 
-#nav { position:relative; width:200px; float:left; border-right:1px solid #8CC63F; }
-* #nav { display:inline; margin-right:-4px; height:1%; } /* collapse divider bar : 3 pixel jog */
-#nav li { height:1%; } /* collapse divider bar : 3 pixel jog */
-#nav ul { list-style:none; padding:0; margin:0;}
+#nav { position:absolute; left:0; width:200px; float:left; border-right:1px solid #8CC63F; }
+#nav ul { list-style:none; padding:0; margin:0; }
 #nav li a { text-decoration:none; font-size:1.2em; padding:3px 5px 3px 10px; line-height:1.6em; display:block;
 	border-top-left-radius: 15px; border-bottom-left-radius: 15px; border: 1px solid white; border-right:none;
 }
