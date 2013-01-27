@@ -323,5 +323,5 @@ class uLocale implements ArrayAccess {
 		if (self::$locale_limit === NULL) uLocale::LimitLocale(array(DEFAULT_LOCALE));
 	}
 }
-uConfig::AddConfigVar('DEFAULT_LOCALE','Default Locale','en_GB',uLocale::ListLocale());
+uConfig::AddConfigVar('DEFAULT_LOCALE','Default Locale','en_GB',uLocale::ListLocale('%t, %l'));
 uEvents::AddCallback('ConfigDefined','uLocale::InitLocale');
