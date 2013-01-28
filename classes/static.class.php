@@ -802,8 +802,8 @@ class utopia {
 		do if (self::UsingTemplate() && class_exists('DOMDocument')) {
 			libxml_use_internal_errors(true);
 			$doc = new DOMDocument();
-			$doc->formatOutput = true;
-			$doc->preserveWhiteSpace = false;
+			$doc->formatOutput = false;
+			$doc->preserveWhiteSpace = true;
 			$doc->validateOnParse = true;
 
 			if (!$doc->loadHTML('<?xml encoding="UTF-8">'.utf8_decode($template))) break;
