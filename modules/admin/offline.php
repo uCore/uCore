@@ -1,6 +1,5 @@
 <?php
 
-
 // This module controls access to any modules that do not implement iAdminModule 
 // anyone who doesnt have site admin role will see the offline message
 // 
@@ -10,7 +9,6 @@ class module_Offline extends uBasicModule {
 	public function GetOptions() { return NO_NAV; }
 	public function SetupParents() {
 		modOpts::AddOption('site_online','Site Online',NULL,0,itYESNO);
-		uEvents::AddCallback('CanAccessModule',array($this,'siteOffline'),utopia::GetCurrentModule());
 	}
 
 	private static $states = array();
@@ -18,24 +16,20 @@ class module_Offline extends uBasicModule {
 		self::$states[$class] = $state;
 	}
 
-	public function siteOffline($object) {
+	public static function siteOffline($object) {
+		if (modOpts::GetOption('site_online')) return;
+		
 		if (flag_is_set($object->GetOptions(), PERSISTENT)) return;
 		$parent = get_class($object);
 		if (isset(self::$states[$parent]) && self::$states[$parent]) return;
 
-		if (modOpts::GetOption('site_online')) return;
-
 		if (uUserRoles::IsAdmin()) return; // site admin
-			
-		$obj =& utopia::GetInstance($parent);
-		if ($obj instanceof iAdminModule) return;
 
-		//don't use SetCurrentModule because we don't want to redirect
-		$this->RunModule();
-		return FALSE;
-	}
-
-	public function RunModule() {
+		if ($object instanceof iAdminModule) return;
 		uConfig::DownMaintenance();
 	}
+
+	public function RunModule() { uConfig::DownMaintenance(); }
 }
+
+uEvents::AddCallback('BeforeRunModule','module_Offline::siteOffline');
