@@ -27,6 +27,7 @@ class tabledef_NewsTable extends uTableDef {
 		$this->AddField('featured',ftBOOL);
 
 		$this->SetPrimaryKey('news_id');
+		$this->SetIndexField('author');
 	}
 }
 
