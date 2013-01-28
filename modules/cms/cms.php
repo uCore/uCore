@@ -639,7 +639,7 @@ class uCMS_View extends uSingleDataModule {
 			return false;
 		}
 		
-		preg_match('/([^\/]+)(\.php)?$/Ui',$uri,$matches);
+		preg_match('/([^\/]+)(\/)?(\.php)?$/Ui',$uri,$matches);
 		if (array_key_exists(1,$matches)) {
 			$row = $obj->LookupRecord($matches[1]);
 			if ($row) {
