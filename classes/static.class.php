@@ -671,7 +671,7 @@ class utopia {
 	private static $usedTemplate = NULL;
 	public static function CancelTemplate($justClean=false) { if (!self::UsingTemplate()) return; ob_clean(); if (!$justClean) self::$usedTemplate = NULL; }
 	public static function UseTemplate($template = TEMPLATE_DEFAULT) {
-		if (self::GetCurrentModule() && self::GetInstance(self::GetCurrentModule()) instanceof iAdminModule) $template = TEMPLATE_ADMIN;
+		if ($template === TEMPLATE_DEFAULT && self::GetCurrentModule() && self::GetInstance(self::GetCurrentModule()) instanceof iAdminModule) $template = TEMPLATE_ADMIN;
 		switch ($template) {
 			case TEMPLATE_BLANK: break;
 			case TEMPLATE_ADMIN: break;
