@@ -391,6 +391,7 @@ abstract class uTableDef implements iUtopiaModule {
 		foreach ($otherArray as $qry) {
 			database::query($qry);
 		}
+		uEvents::TriggerEvent('TableChanged',$this);
 	}
 	private static function keyDiff($arr1,$arr2) {
 		$diff = array();
@@ -425,6 +426,7 @@ abstract class uTableDef implements iUtopiaModule {
 		//echo "$qry\n";
 		database::query($qry);
 
+		uEvents::TriggerEvent('TableCreated',$this);
 	}
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
 	public function AddInputDate($fieldName = 'input_date',$update=false) {
