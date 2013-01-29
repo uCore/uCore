@@ -392,6 +392,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		}
 		
 		$content = $content[$id];
+		$content = $this->PreProcess('content',$content,$rec);
 		utopia::MergeVars($content);
 			
 		return $content;
