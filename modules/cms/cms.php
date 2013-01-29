@@ -215,7 +215,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
 		$templates = utopia::GetTemplates(true);
 		$this->AddField('template','template','cms','Template',itCOMBO,$templates);
-//		$this->AddField('position','position','cms','Navigation Position',itTEXT);
+		$this->AddField('position','position','cms');
 		$this->AddField('hide','hide','cms','Hide from Menus',itCHECKBOX);
 		$this->AddField('noindex','noindex','cms','noindex',itCHECKBOX);
 		$this->AddField('nofollow','nofollow','cms','nofollow',itCHECKBOX);
@@ -458,7 +458,17 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	public static function StopNoProcess() {
 		echo '<!-- /NoProcess -->';
 	}
+	public static function DefaultPages() {
+		$o = utopia::GetInstance(__CLASS__);
+		$pk = NULL;
+		$o->UpdateField('cms_id','index',$pk);
+		$o->UpdateField('title','Welcome Willkommen Bienvenue Bienvenido 歡迎光臨 ようこそ',$pk);
+		$o->UpdateField('content','<h1>Welcome Willkommen Bienvenue Bienvenido 歡迎光臨 ようこそ</h1><p>Hello and welcome to your new website.</p><p>We have marked your template as offline for now.  Once you have finished editing your pages you can turn it on in the <a href="'.PATH_REL_CORE.'">uCore Dashboard</a>.</p>',$pk);
+		$o->UpdateField('position',0,$pk);
+		$o->UpdateField('publish',true,$pk);
+	}
 }
+uEvents::AddCallback('TableCreated','uCMS_Edit::DefaultPages','tabledef_CMS');
 utopia::AddTemplateParser('content',array(utopia::GetInstance('uCMS_Edit'),'getEditor'),'.*');
 uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'));
 
