@@ -28,8 +28,16 @@ class module_Offline extends uBasicModule {
 		if ($object instanceof iAdminModule) return;
 		uConfig::DownMaintenance();
 	}
+	public static function DashboardWidget() {
+		if (modOpts::GetOption('site_online')) return;
+		
+		$modOptsObj =& utopia::GetInstance('modOptsList');
+		$row = $modOptsObj->LookupRecord('site_online');
+		echo '<p>This website is currently offline. Go Online? '.$modOptsObj->GetCell('value',$row).'</p>';
+	}
 
 	public function RunModule() { uConfig::DownMaintenance(); }
 }
 
 uEvents::AddCallback('BeforeRunModule','module_Offline::siteOffline');
+uEvents::AddCallback('ShowDashboard','module_Offline::DashboardWidget',null,-999);
