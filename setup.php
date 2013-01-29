@@ -126,7 +126,7 @@ class uConfig {
 	}
 	static function ShowConfig() {
 		if (!self::$isValid) {
-			$rc = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
+			$rc = '/'.ltrim(preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE),'/');
 			utopia::UseTemplate($rc.'themes/install');
 			utopia::SetTitle('uCore Installation');
 			echo '<h1>uCore Installation</h1>';
