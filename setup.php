@@ -125,11 +125,13 @@ class uConfig {
 		return true;
 	}
 	static function ShowConfig() {
+		$submitText = 'Make It So!';
 		if (!self::$isValid) {
 			$rc = '/'.ltrim(preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE),'/');
 			utopia::UseTemplate($rc.'themes/install');
 			utopia::SetTitle('uCore Installation');
 			echo '<h1>uCore Installation</h1>';
+			$submitText = 'Install uCore';
 		}
 
 		$frmAction = DEFAULT_FILE;
@@ -168,7 +170,7 @@ FIN;
 			echo '</td></tr>';
 		}
 		$_SESSION['__config_validate'] = true;
-		echo '</table><input type="submit" value="Make It So!"></form>';
+		echo '</table><input type="submit" value="'.$submitText.'"></form>';
 		if (!self::$isValid) utopia::Finish();
 	}
 	static function DownMaintenance() {
