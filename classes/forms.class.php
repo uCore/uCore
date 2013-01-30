@@ -2850,32 +2850,21 @@ abstract class uDataModule extends uBasicModule {
  * Default module for displaying results in a list format. Good for statistics and record searches.
  */
 abstract class uListDataModule extends uDataModule {
-	public $injectionFields = array();
-
-	//private $maxRecs = NULL;
-	//public function SetMaxRecords($value) {
-//		$this->maxRecs = $value;
-//	}
-
 	public function UpdateField($fieldAlias,$newValue,&$pkVal = NULL) {
 		$isNew = ($pkVal === NULL);
 
-		if ($isNew && !$this->CheckMaxRows(1)) {
+		if (!$this->CheckMaxRows(1)) {
 			$this->ResetField($fieldAlias,NULL); // reset the "new record" field
 			return;
 		}
 
 		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
-		if ($ret === FALSE) return $ret;
 
-		$enc_name = $this->GetEncodedFieldName($fieldAlias);
-		if ($isNew) { // && $ret !== FALSE
-			//AjaxEcho("//$fieldAlias: pk=$pkVal\n");
-			// add the row
+		if ($pkVal !== NULL && $isNew) {
 			$newRec = $this->LookupRecord($pkVal);
 			$ov = base64_encode($this->DrawRow($newRec));
 			$class = get_class($this);
-			AjaxEcho("$('TABLE.$class:has(.$enc_name)').children('TBODY').append(Base64.decode('$ov'));\n");
+			AjaxEcho("$('TABLE.$class').children('TBODY').append(Base64.decode('$ov'));\n");
 		}
 
 		return $ret;
