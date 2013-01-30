@@ -576,6 +576,7 @@ function _uf(ele,hourglass) {
 				$(hourglass).remove();
 				StoppedUpdating(ele);
 				$('.auto-complete-list').hide();
+				utopia.Initialise.run();
 				ReFocus();
 			}
 		});
