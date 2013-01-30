@@ -2363,6 +2363,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function ProcessUpdates($sendingField,$fieldAlias,$value,&$pkVal=NULL,$isFile=false) {
 		$this->_SetupFields();
+		$opk = NULL;
 		
 		// can we access this field?
 		if ($pkVal === NULL || $this->LookupRecord($pkVal)) {
@@ -2375,6 +2376,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 	
 		// reset all fields.
+		if ($opk !== $pkVal) $this->ResetField($fieldAlias,$opk);
 		$this->ResetField($fieldAlias,$pkVal);
 		foreach ($this->fields as $alias => $field) {
 			if (!isset($field['preprocess']) && (isset($this->fields[$fieldAlias]) && $field['field'] !== $this->fields[$fieldAlias]['field'])) continue;
