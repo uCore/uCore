@@ -2894,7 +2894,6 @@ abstract class uListDataModule extends uDataModule {
 	}
 
 	public function CheckMaxRows($mod = 0) {
-		AjaxEcho('// max recs: '.$this->GetMaxRows());
 		$rows = $this->GetDataset()->CountRecords();
 		if (!$this->GetMaxRows() || $rows + $mod < $this->GetMaxRows()) {
 			AjaxEcho('$(".newRow").show();');
