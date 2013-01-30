@@ -2685,7 +2685,7 @@ abstract class uDataModule extends uBasicModule {
 					$ret .= '<span class="icon-document-download uDesaturate"></span>';
 				} else {
 					$id = $this->CreateSqlField($fieldName,$pkVal);
-					$ret .= '<a title="Delete File" href="javascript:uf(\''.$id.'\', \'\')" class="uf icon-document-delete"></a>';
+					$ret .= '<a title="Delete File" href="#" name="'.$id.'" class="uf icon-document-delete"></a>';
 					$link = uBlob::GetLink(get_class($this),$fieldName,$pkVal,$row[$fieldName.'_filename']);
 					$ret .= '<a title="View File" target="_blank" href="'.$link.'" class="icon-document-view"></a>';
 					$ret .= '<a title="Download File" href="'.$link.'?attach=attachment" class="icon-document-download"></a>';
