@@ -470,9 +470,9 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 }
 uEvents::AddCallback('TableCreated','uCMS_Edit::DefaultPages','tabledef_CMS');
 utopia::AddTemplateParser('content',array(utopia::GetInstance('uCMS_Edit'),'getEditor'),'.*');
-uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'));
+uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'),null,-9999);
 
-uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'));
+uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'),null,9999);
 class uCMS_View extends uSingleDataModule {
 	public function GetOptions() { return ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
