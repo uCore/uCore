@@ -212,13 +212,12 @@ class uResetPassword extends uDataModule {
 	}
 
 	public function RunModule() {
-		$noticeBox = '<div style="color:#b20000;background-color:#eee8e5; border:1px solid #b20000; padding:10px;"><span style="font-weight:bold;font-size:1.25em;">! Important Message</span><br>';
 		$email = array_key_exists('e',$_REQUEST) ? $_REQUEST['e'] : '';
 		$notice = '';
 
 		$rec = $this->LookupRecord(array('username'=>$email));
+		if (!empty($email) && !$rec) uNotices::AddNotice('No account was found with this email address. Please try again.',NOTICE_TYPE_ERROR);
 		if (empty($email) || !$rec) {
-			if (!$rec && !empty($email)) echo $noticeBox.'No account was found with this email address. Please try again.</div>';
 			echo '<h1>Reset Password</h1>';
 			echo '<form id="reset-password-form" action="'.$this->GetURL(array()).'" method="post">';
 			echo '<p>What is your email address?</p>';
@@ -240,7 +239,7 @@ class uResetPassword extends uDataModule {
 		}
 		if (array_key_exists('__newpass_c',$_POST)) {
 			if ($_POST['__newpass'] !== $_POST['__newpass_c']) {
-				$notice = $noticeBox.'Password confirmation did not match, please try again.</div>';
+				uNotices::AddNotice('Password confirmation did not match, please try again.',NOTICE_TYPE_ERROR);
 			} else {
 				$this->UpdateFields(array('email_confirm_code'=>'','password'=>$_POST['__newpass']),$rec['user_id']);
 				echo '<p>You have successfully reset your password.</p>';
@@ -248,7 +247,6 @@ class uResetPassword extends uDataModule {
 			}
 		}
 
-		echo $notice;
 		if (empty($rec['password'])) $action = 'Activate Account';
 		else $action = 'Reset Password';
 		echo '<h1>'.$action.'</h1>';
