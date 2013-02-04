@@ -67,6 +67,9 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->CreateTable('users');
 		$this->CreateTable('roles','tabledef_UserRoles','users',array('role'=>'role_id'));
 		
+		$fld =& $this->AddField('gravatar','username','users',''); $fld['size'] = 24;
+		$this->AddPreProcessCallback('gravatar',array('uGravatar','GetImageField'));
+		
 		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('role','name','roles','Role',itCOMBO);
 		$this->AddField('last_login','last_login','users','Last Login');
