@@ -64,7 +64,7 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_ADD; }
 	public function SetupParents() {
-		$this->AddParent('uUsersList','user_id','*');
+		$this->AddParent('uUsersList',array('user_id'=>'_user_pk'),'*');
 	}
 	public function RunModule() {
 		$this->ShowData();
