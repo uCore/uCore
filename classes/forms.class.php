@@ -2496,7 +2496,10 @@ abstract class uDataModule extends uBasicModule {
 					$preModPk = $pkVal;
 					$pkVal = $row[$this->GetPrimaryKeyField($fieldAlias)];
 					if ($pkVal === NULL) { // initialise a row if needed
-						$tableObj->UpdateField($toField,$oldPkVal,$pkVal);
+						if ($toField == $fieldAlias)
+							$tableObj->UpdateField($toField,$newValue,$pkVal);
+						else
+							$tableObj->UpdateField($toField,$oldPkVal,$pkVal);
 					}
 					break; // if linkFrom is the primary key of our main table then we don't update the parent table.
 				}
