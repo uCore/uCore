@@ -97,6 +97,10 @@
 				} else {
 					$(event.data.container).html('Must install Plupload.');
 				}
+				if ($(event.data.container).is(':visible')) {
+					$('html').scrollTop($(event.data.container).offset().top);
+					$('body').scrollTop($(event.data.container).offset().top);
+				}
 			}
 			function NewFolder() {
 				var path = prompt('Enter Folder Name:');
