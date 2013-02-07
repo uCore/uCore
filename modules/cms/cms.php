@@ -664,14 +664,21 @@ class uCMS_View extends uSingleDataModule {
 		// nothing is required here as the content is output by 'assertContent'
 	}
 	
+	private static $parentsCache = array();
 	public function GetCmsParents($cms_id,$includeSelf=true) {
+		if (!self::$parentsCache) {
+			$ds = $this->GetDataset();
+			while (($row = $ds->fetch())) {
+				self::$parentsCache[$row['cms_id']] = $row['parent'];
+			}
+		}
+		
 		$parents = array();
-		$rec = $this->LookupRecord($cms_id);
 		if ($includeSelf) $parents[] = $cms_id;
-		while ($rec['parent']) {
-			$parents[] = $rec['parent'];
-			$rec = $this->LookupRecord($rec['parent']);
-			if (!$rec) break;
+		while ($cms_id && isset(self::$parentsCache[$cms_id]) && self::$parentsCache[$cms_id]) {
+			$parents[] = self::$parentsCache[$cms_id];
+			$cms_id = self::$parentsCache[$cms_id];
+
 		}
 		$parents = array_reverse($parents);
 		return $parents;
