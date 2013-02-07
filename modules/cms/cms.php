@@ -595,9 +595,7 @@ class uCMS_View extends uSingleDataModule {
 	}
 	function InitSitemap() {
 		$ds = $this->GetDataset(NULL,true);
-		$rows = $ds->ds()->fetchAll();
-
-		foreach ($rows as $row) {
+		while (($row = $ds->fetch())) {
 			// is published
 			if ($row['content_time'] == '0000-00-00 00:00:00' && !$row['is_published']) continue;
 			if (!$row['is_published']) continue;
