@@ -195,7 +195,7 @@ class uDataset {
 	public function GetPage($page, $items_per_page=10) {
 		$limit = '';
 		if ($items_per_page > 0) {
-			if ($page > $this->CountPages($items_per_page)) $page = 0;
+			if ($page >= $this->CountPages($items_per_page)) $page = 0;
 			$start = $items_per_page * $page;
 			return $this->GetOffset($start,$items_per_page);
 		}
