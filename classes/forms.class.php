@@ -1939,7 +1939,9 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($matches[1] as $match) {
 				if (!isset($this->fields[$match])) continue;
 				$replace = null;
-				if ($this->fields[$match]['foreign'] || (isset($this->fields[$match]['vtable']) && is_subclass_of($this->fields[$match]['vtable']['tModule'],'iLinkTable'))) {
+				if ($this->fields[$match]['foreign']) {
+					$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['vtable']['pk'].'`';
+				} else if (isset($this->fields[$match]['vtable']) && is_subclass_of($this->fields[$match]['vtable']['tModule'],'iLinkTable')) {
 					$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
 				} else {
 					$replace = $this->GetFieldLookupString($match);//'`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
