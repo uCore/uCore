@@ -54,7 +54,7 @@ class module_TinyMCE extends uBasicModule {
 
 			$richOpts = array();
 			$richOpts['plugins'] = "paste,inlinepopups,spellchecker,save";
-			$richOpts['theme_advanced_buttons1'] = "bold,italic,underline,strikethrough,|,numlist,bullist,|,spellchecker";
+			$richOpts['theme_advanced_buttons1'] = "formatselect,bold,italic,underline,strikethrough,|,numlist,bullist,|,removeformat,spellchecker";
 			$richOpts['theme_advanced_buttons2'] = "";
 			$richOpts['theme_advanced_buttons3'] = "";
 			$richOpts['theme_advanced_buttons4'] = "";
