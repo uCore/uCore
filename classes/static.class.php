@@ -309,7 +309,7 @@ class utopia {
 					if (isset($attributes['styles'])) $at['styles'] = $attributes['styles'];
 					$at = BuildAttrString($at);
 		
-					if (is_array($possibleValues) && !preg_match('/^usql\-/',$fieldName)) {
+					if (!preg_match('/^usql\-/',$fieldName)) {
 						$attributes['name'] = $attributes['name'].'[]';
 						$attr = BuildAttrString($attributes);
 					}
