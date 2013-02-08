@@ -3262,9 +3262,11 @@ abstract class uSingleDataModule extends uDataModule {
 		$row = null;
 		$num_rows = 0;
 		if (!isset($_GET['_n_'.$this->GetModuleId()])) {
+			$this->GetLimit($limit,$page);
 			$dataset = $this->GetDataset();
 			$num_rows = $dataset->CountRecords();
-			$row = $dataset->GetFirst();
+			$rows = $dataset->GetPage($page,$limit);
+			$row = reset($rows);
 		}
 
 		$pagination = '';
