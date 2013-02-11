@@ -41,7 +41,7 @@ function moveMceToolbars(event,ed) {
 		
 		var styles = { 'background':'none',margin:0,padding:0,display:'block','float':'none', width:'auto',
 			'-moz-transform':'none', '-webkit-transform':'none', '-o-transform':'none', '-ms-transform':'none', 'transform':'none',
-			'min-width':0
+			'min-width':0, 'position':'relative'
 		};
 		body.css(styles);
 		html.css(styles);
