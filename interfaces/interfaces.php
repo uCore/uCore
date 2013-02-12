@@ -1,6 +1,7 @@
 <?php
 interface iUtopiaModule {}
-interface iAdminModule {}
+interface iRestrictedAccess {}
+interface iAdminModule extends iRestrictedAccess {}
 
 interface iWidget {
         // for adding custom fields etc

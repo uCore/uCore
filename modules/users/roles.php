@@ -66,7 +66,7 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		$modules = utopia::GetModules();
 		foreach ($modules as $k => $v) {
 			$o =& utopia::GetInstance($k);
-			if (!($o instanceof iAdminModule)) unset($modules[$k]);
+			if (!($o instanceof iRestrictedAccess)) unset($modules[$k]);
 			else $modules[$k] = $o->GetTitle();
 		}
 		self::$modules = $modules;
@@ -104,8 +104,8 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		// custom permission
 		if (isset(self::$customRoles[$parent]) && is_callable(self::$customRoles[$parent])) return call_user_func_array(self::$customRoles[$parent],array($parent));
 
-		// only valid for custom and admin modules
-		if (!($object instanceof iAdminModule)) return true;
+		// only valid for iRestrictedAccess modules
+		if (!($object instanceof iRestrictedAccess)) return true;
 		
 		self::InitModules();
 		
