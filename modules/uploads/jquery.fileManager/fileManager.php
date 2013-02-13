@@ -172,8 +172,9 @@ class jqFileManager {
 
 		// Clean the fileName for security reasons
 		$fileName = preg_replace('/[^\w\._]+/', '', $fileName);
-		if (is_dir($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+		if (is_dir($targetDir . DIRECTORY_SEPARATOR . $fileName) || !$fileName) {
 			echo '{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}';
+			return;
 		}
 
 		// Create target dir
@@ -195,6 +196,7 @@ class jqFileManager {
 			closedir($dir);
 		} else {
 			echo '{"jsonrpc" : "2.0", "error" : {"code": 100, "message": "Failed to open temp directory."}, "id" : "id"}';
+			return;
 		}
 
 		$contentType = '';
