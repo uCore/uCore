@@ -103,11 +103,8 @@ FIN
 		// has been renamed.. fix in CMS
 		$from = jqFileManager::GetRelativePath($from);
 		$to = jqFileManager::GetRelativePath($to);
-//		$rows = cubeDB::lookupSimple(cubeCMS::GetTable(),'*','content LIKE \'%'.cubeDB::escape($from).'%\'');
-//		foreach ($rows as $row) {
-//			$newVal = str_replace($from,$to,$row['content']);
-//			cubeDB::updateRecord(cubeCMS::GetTable(),array('content'=>$newVal),array(cubeCMS::GetPrimaryKey()=>$row[cubeCMS::GetPrimaryKey()]));
-//		}
+		// find cms pages
+		// replace "$from" with "$to"
 	}
 	static function Init() {
 		uJavascript::IncludeText(<<<FIN
@@ -127,4 +124,26 @@ FIN
 	function GetAjaxUploadPath() {
 		return $this->GetURL(array('__ajax'=>'fileManagerAjax','upload'=>1));
 	}
+	static function ProcessDomDocument($event,$obj,$templateDoc) {
+		/* IMAGES */
+		$images = $templateDoc->getElementsByTagName('img');
+		foreach ($images as $img) {
+			$src = $img->getAttribute('src');
+			if (!preg_match('/^'.preg_quote(PATH_REL_ROOT,'/').'uploads\//',$src)) continue;
+			parse_str(parse_url($src,PHP_URL_QUERY),$qs);
+		
+			if (isset($qs['w']) !== false) continue;
+			if (isset($qs['h']) !== false) continue;
+			
+			if ($img->hasAttribute('width')) $qs['w'] = $img->getAttribute('width');
+			if ($img->hasAttribute('height')) $qs['h'] = $img->getAttribute('height');
+			
+			$qs = http_build_query($qs);
+			if (strpos('?',$src) !== false) $src .= '&'.$qs;
+			else $src .= '?'.$qs;
+			$img->setAttribute('src',$src);
+		}
+	}
 }
+
+uEvents::AddCallback('ProcessDomDocument','uUploads::ProcessDomDocument','',99999999);
