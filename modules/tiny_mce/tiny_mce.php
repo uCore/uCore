@@ -20,7 +20,7 @@ class module_TinyMCE extends uBasicModule {
 			self::$hasDrawnJS = true;
 		//	$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/lib/plugins/spellchecker/rpc.php';
 			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/lib/plugins/preview/preview.php';
-			list($fileManagerPath) = uUploads::Init();
+			list($fileManagerPath,$uploadPath) = uUploads::Init();
 			$relUploads = utopia::GetRelativePath(PATH_UPLOADS);
 
 			$options = array();
@@ -72,7 +72,7 @@ class module_TinyMCE extends uBasicModule {
 			$includeOpts = '';
 			if (class_exists('uPlupload')) {
 				$jsOptionVar = 'uCorePluploadOptions';
-				uPlupload::Init($jsOptionVar,$fileManagerPath);
+				uPlupload::Init($jsOptionVar,$uploadPath);
 				$includeOpts = ','.$jsOptionVar;
 			}
 
