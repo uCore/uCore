@@ -49,8 +49,8 @@ class jqFileManager {
 	static function GetRelativePath($path) {
 		$docroot = self::$docroot ? self::$docroot : $_SERVER['DOCUMENT_ROOT'];
 		$path = realpath($path);
-		$path = str_replace($docroot,self::$relroot,$path);
 		$path = str_replace(DIRECTORY_SEPARATOR,'/',$path);
+		$path = preg_replace('/^'.preg_quote($docroot,'/').'/',self::$relroot,$path);
 		return $path;
 	}
 	static function GetPathFolder() {

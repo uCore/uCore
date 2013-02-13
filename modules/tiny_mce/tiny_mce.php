@@ -20,7 +20,7 @@ class module_TinyMCE extends uBasicModule {
 			self::$hasDrawnJS = true;
 		//	$scUrl = utopia::GetRelativePath(dirname(__FILE__)).'/lib/plugins/spellchecker/rpc.php';
 			$previewUrl = utopia::GetRelativePath(dirname(__FILE__)).'/lib/plugins/preview/preview.php';
-			list($fileManagerPath) = fileManager::Init();
+			list($fileManagerPath) = uUploads::Init();
 			$relUploads = utopia::GetRelativePath(PATH_UPLOADS);
 
 			$options = array();
@@ -92,7 +92,8 @@ class module_TinyMCE extends uBasicModule {
 		if (type == 'image')
 			fltr = '.jpeg|.jpg|.png|.gif|.tif|.tiff';
 
-		mb.fileManager({ajaxPath:'$fileManagerPath',upload:true,get:{filter:fltr},mceInfo:{field_name:field_name,win:win,type:type},events:{click:doClick}}$includeOpts);
+		mb.fileManager({ajaxPath:'$fileManagerPath',upload:true,get:{filter:fltr},mceInfo:{field_name:field_name,win:win,type:type}}$includeOpts)
+			.on('click','.fmFile',doClick);
 		mb.dialog({modal:false,width:'60%',height:500});
 	}
 	function doClick(event) {
@@ -100,7 +101,8 @@ class module_TinyMCE extends uBasicModule {
 		if (item.type != 0) return;
 
 		var mceInfo = item.target.data('options').mceInfo;
-		var absPath = 'http://' + window.location.hostname + item.fullPath;
+		var absPath = PATH_REL_ROOT.replace(/\/$/,'') + item.fullPath;
+		absPath = absPath.replace(/uUploads\//,'uploads/');
 
 		mceInfo.win.document.getElementById(mceInfo.field_name).value = absPath;
 

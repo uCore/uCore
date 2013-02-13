@@ -26,6 +26,7 @@
 		fixedPath		: false,
 		
 		baseClass		: 'fmBase',
+		fileClass		: 'fmFile',
 		folderClass		: 'fmFolder',
 		trashClass		: 'fmTrash',
 		loadingClass		: 'fmLoading',
@@ -163,6 +164,8 @@
 				icon.addClass(mbOptions.folderClass);
 			else if (item.type == ICONTYPE_TRASH)
 				icon.addClass(mbOptions.trashClass);
+			else
+				icon.addClass(mbOptions.fileClass);
 			
 			// set draggables
 			if (!mbOptions.readonly) {
@@ -178,12 +181,6 @@
 				icon.append('<img style="width:100%;height:100%" src="'+iconPath+'">');
 			}
 			
-			// events
-			if (mbOptions.events) {
-				$.each(mbOptions.events,function (index,value) {
-					icon.bind(index, value);
-				});
-			}
 			icon.data('result',target.data('result'));
 			
 			target.append(icon);
