@@ -2958,7 +2958,7 @@ abstract class uListDataModule extends uDataModule {
 		$metadataTitle = ' {tabTitle:\''.$tabTitle.'\', tabPosition:\''.$this->GetSortOrder().'\'}';
 		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
-		if (!$this->isAjax) echo '<form action="" onsubmit="this.action = window.location" method="post"><input type="hidden" name="__ajax" value="updateField">';
+		if (!$this->isAjax) echo '<form class="uf" action="" onsubmit="this.action = window.location" method="post"><input type="hidden" name="__ajax" value="updateField">';
 		echo "<table class=\"".get_class($this)." layoutListSection datalist\">";
 
 		/*		echo "<colgroup>";
@@ -3310,7 +3310,7 @@ abstract class uSingleDataModule extends uDataModule {
 			$SN = ucwords($sectionName);
 
 			$out = '';
-			if (!$this->isAjax) $out .= '<form action="" onsubmit="this.action = window.location" method="post">';
+			if (!$this->isAjax) $out .= '<form class="uf" action="" onsubmit="this.action = window.location" method="post">';
 			$out .= "<table class=\"layoutDetailSection\">";
 
 			$fields = $this->GetFields(true,$sectionID);
