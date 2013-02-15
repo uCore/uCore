@@ -81,6 +81,7 @@ class module_TinyMCE extends uBasicModule {
 		$(document).trigger('tinyMceSetup',ed);
 	}
 	function onSave(ed) {
+		if (!$(ed.getElement()).hasClass('uf')) return;
 		uf(ed.getElement(),ed.getContent(),ed.getContainer());
 	}
 	$(document).on('submit','form',function(){tinyMCE.triggerSave(true,true)});
