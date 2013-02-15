@@ -132,7 +132,7 @@ class utopia {
 				$class = array('module_name'=>$class);
 				$class['module_id'] = $id;
 				$class['types'] = array_merge($parents,$interfaces);
-				$class['uuid'] = $class['module_name'];
+				$class['uuid'] = null;
 
 				if ($ref->isSubclassOf('uBasicModule')) {
 					$obj =& utopia::GetInstance($class['module_name']);
@@ -203,7 +203,7 @@ class utopia {
 		// rewritten url?   /u/MOD/
 		$u = self::GetRewriteURL();
 		if (!isset(self::$cmCache[$u])) foreach (self::GetModules() as $m) {
-			if (preg_match('/^'.preg_quote($m['uuid'].'/','/').'/i',$u.'/')) {
+			if ($m['uuid'] && preg_match('/^'.preg_quote($m['uuid'].'/','/').'/i',$u.'/')) {
 				self::$cmCache[$u] = $m['module_name'];
 				return $m['module_name'];
 			}
