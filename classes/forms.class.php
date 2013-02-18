@@ -2677,7 +2677,8 @@ abstract class uDataModule extends uBasicModule {
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
 		$value = '';
-		if (isset($row[$fieldName])) $value = $row[$fieldName];
+		if (isset($this->fields[$fieldName]['vtable']['parent'])) $value = $row[$this->GetPrimaryKeyField($fieldName)];
+		elseif (isset($row[$fieldName])) $value = $row[$fieldName];
 		if ($value === '' && isset($this->fields[$fieldName]) && preg_match('/^\'(.+?)\'/', $this->fields[$fieldName]['field'],$match)) $value = $match[1];
 		$value = $this->PreProcess($fieldName,$value,$row);
 		
