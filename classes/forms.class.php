@@ -1268,13 +1268,7 @@ abstract class uDataModule extends uBasicModule {
 			return call_user_func_array($this->fields[$alias]['values'],array($this,$alias,$pkVal));
 		}
 
-		if (isset($this->fields[$alias]['values_cache'])) return $this->fields[$alias]['values_cache'];
-		
-		return $this->SetValuesCache($alias,$this->FindValues($alias,isset($this->fields[$alias]['values'])?$this->fields[$alias]['values']:NULL));
-	}
-
-	public function SetValuesCache($alias,$vals) {
-		return $this->fields[$alias]['values_cache'] = $vals;
+		return $this->FindValues($alias,isset($this->fields[$alias]['values'])?$this->fields[$alias]['values']:NULL);
 	}
 
 	public function FindValues($aliasName,$values,$stringify = FALSE) {

@@ -84,8 +84,6 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		}
 		self::$modules[$id] = $id;
 		
-		$o->SetValuesCache('allow',self::$modules);
-		
 		if (!isset(self::$linked[$id])) self::$linked[$id] = array();
 		self::$linked[$id] = array_merge(self::$linked[$id],$modules);
 	}
