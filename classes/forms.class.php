@@ -1290,11 +1290,7 @@ abstract class uDataModule extends uBasicModule {
 				}
 			}
 		} elseif (($values===true || is_string($values)) && isset($this->fields[$aliasName]['vtable'])) {
-			$tbl = $this->fields[$aliasName]['vtable'];
-			$obj =& utopia::GetInstance($tbl['tModule']);
-			$pk = $obj->GetPrimaryKey();
-			$table = $tbl['table'];
-			$arr = GetPossibleValues($table,$pk,$this->fields[$aliasName]['field'],$values);
+			$arr = $this->GetPossibleValues($aliasName,$values);
 			if ($this->fields[$aliasName]['tablename'] === $this->sqlTableSetup['alias'] && $arr) 
 				$arr = array_combine(array_values($arr),array_values($arr));
 		}
@@ -1303,6 +1299,22 @@ abstract class uDataModule extends uBasicModule {
 			$arr = array_combine(array_values($arr),array_values($arr));
 		}
 		return $arr;
+	}
+	public function GetPossibleValues($alias,$where='') {
+		$tbl = $this->fields[$alias]['vtable'];
+		$field = $this->fields[$alias]['field'];
+		$obj =& utopia::GetInstance($tbl['tModule']);
+		$pkName = $obj->GetPrimaryKey();
+		$table = $tbl['table'];
+		
+		if (!empty($where)) $where = " WHERE $where";
+		$fns = CreateConcatString($field,$table);
+		$lRes = database::query("SELECT {$fns} as d, {$pkName} as v FROM {$table}{$where} ORDER BY {$fns}");
+		$lv = array();
+		while (($row = $lRes->fetch())) {
+			$lv[$row['v']] = $row['d'];
+		}
+		return $lv;
 	}
 
 	public function SetFieldOptions($alias,$newoptions) {
