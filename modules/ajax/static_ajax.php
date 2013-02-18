@@ -19,6 +19,22 @@ class internalmodule_StaticAjax extends uBasicModule {
 		utopia::RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
 		utopia::RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
 	}
+	static function InterpretSqlString($sqlString, &$module, &$field, &$pkVal) {
+		$matches = null;
+		if (!preg_match('/([^:]+):([^\(]+)(\(.*\))?/',$sqlString,$matches)) return false;
+		
+		$module = $matches[1];
+		$field = $matches[2];
+
+		if (!isset($matches[3]) || $matches[3] === '')
+			$pkVal = $pkVal;
+		elseif ($matches[3] == '()') {
+			$pkVal = '';
+		} else
+			$pkVal = substr($matches[3],1,-1);
+
+		return true;
+	}
 
 	public function RunModule() { }
 
@@ -164,7 +180,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 					$enc_name = $match[1];
 					$string = cbase64_decode($enc_name);
 
-					InterpretSqlString($string, $module, $field, $pkVal);
+					self::InterpretSqlString($string, $module, $field, $pkVal);
 					$obj =& utopia::GetInstance($module);
 					$obj->ProcessUpdates($enc_name,$field,$fileInfo,$pkVal,true);
 				}
@@ -177,7 +193,7 @@ class internalmodule_StaticAjax extends uBasicModule {
 				$enc_name = $match[1];
 				$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
 				
-				InterpretSqlString($string, $module, $field, $pkVal);
+				self::InterpretSqlString($string, $module, $field, $pkVal);
 				$obj =& utopia::GetInstance($module);
 				$obj->ProcessUpdates($enc_name,$field,$value,$pkVal);
 			}
