@@ -988,7 +988,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		return '_'.$this->sqlTableSetup['alias'].'_pk';
 	}
-	public function GetPrimaryKeyTable($fieldAlias=NULL) {
+	public function GetPrimaryKey($fieldAlias=NULL) {
 		if (!is_null($fieldAlias)) {
 			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
 			return $setup['pk'];
@@ -998,13 +998,6 @@ abstract class uDataModule extends uBasicModule {
 			$this->pk = $obj->GetPrimaryKey();
 		}
 		return $this->pk;
-	}
-	public function GetPrimaryKey() {
-		$pkT = $this->GetPrimaryKeyTable();
-		foreach ($this->fields as $fieldAlias=>$info) {
-			if ($info['field'] == $pkT && $this->FindFilter($fieldAlias)) return $fieldAlias;
-		}
-		return $this->GetPrimaryKeyTable();
 	}
 
 	public function GetPrimaryTable($fieldAlias=NULL) {
@@ -1043,7 +1036,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($this->UNION_MODULE !== TRUE) return;
 		$this->AddField('__module__',"'".get_class($this)."'",'');
 		$tbl = is_array($this->sqlTableSetup) ? $this->sqlTableSetup['alias'] : '';
-		$this->AddField('__module_pk__',$this->GetPrimaryKeyTable(),$tbl);
+		$this->AddField('__module_pk__',$this->GetPrimaryKey(),$tbl);
 	}
 
 	// this value will be used on new records or field updates
@@ -1062,7 +1055,6 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	protected function RefreshDefaultValue($pkVal, $fieldName,$onlyIfNull) {
-		AjaxEcho("// RefreshDefaultValue($fieldName,$onlyIfNull)\n");
 		$row = $this->LookupRecord($pkVal);
 		if ($row == NULL) return;
 		if ($onlyIfNull && !empty($row[$fieldName])) return;
@@ -1085,11 +1077,7 @@ abstract class uDataModule extends uBasicModule {
 		if (!empty($dl)) {
 			// find the value of valField
 			$row = $this->GetCurrentRecord();
-			$lookupVal = $this->GetRealValue($dl['valField'],$row[$this->GetPrimaryKey()]);
-			$obj =& utopia::GetInstance($dl['module']);
-			$value = $obj->GetRealValue($dl['getField'],$lookupVal);
-
-			return $value; //  process so only to return a string.... TO DO
+			return $row[$dl['getField']];
 		}
 
 		// is filter set?
@@ -1119,49 +1107,6 @@ abstract class uDataModule extends uBasicModule {
 			if ($filterData['ct'] != ctEQ) continue;
 			return $filterData['value'];
 			}*/
-	}
-
-	public function GetRootField($alias) {
-		$fieldData = $this->fields[$alias];
-		if (!array_key_exists('vtable',$fieldData) || !array_key_exists('joins',$fieldData['vtable'])) return $fieldData['field'];
-
-		$vtable = $fieldData['vtable'];
-		foreach ($vtable['joins'] as $fromField => $toField) {
-			$obj =& utopia::GetInstance($vtable['tModule']);
-			if ($toField == $obj->GetPrimaryKey()) return $fromField;
-		}
-	}
-
-	//	private $rvCache = array();
-	public function GetRealValue($alias,$pkVal, $useCache=true) {
-		//echo "GetRealValue($alias,$pkVal)<br/>";
-		//return "$alias:$pkVal";
-		$this->_SetupFields();
-
-		$field = $this->GetRootField($alias);
-		if ($field == $this->fields[$alias]['field']) {
-			//return "$alias";
-			//$rec = $this->GetCurrentRecord();
-			$rec = $this->LookupRecord($pkVal);
-			return $rec;
-			//return "grv $alias:$pkVal<br/>";
-			//if ($rec[$this->GetPrimaryKey()] == $pkVal)
-			return $rec[$alias];
-		}
-
-
-		//print_r($this->fields[$alias]);
-		$table = $this->sqlTableSetup['table'];
-		$pk = $this->sqlTableSetup['pk'];
-
-		//$field = $this->fields[$alias]['field'];
-		//$table = $this->fields[$alias]['vtable']['table'];
-		//$pk = $this->fields[$alias]['vtable']['pk'];
-
-		//		if (!$useCache || (!array_key_exists($table,$this->rvCache) || !array_key_exists($pkVal,$this->rvCache[$table]))) {
-		$stm = database::query("SELECT $field FROM $table WHERE $pk = ?",array($pkVal));
-		$row = $stm->fetch();
-		return $row[$field];
 	}
 
 	public function GetLookupValue($alias,$pkValue) {
@@ -1219,7 +1164,7 @@ abstract class uDataModule extends uBasicModule {
 			}
 			$this->sqlTableSetup = $newTable;
 
-			$this->AddField($this->GetPrimaryKeyTable(),$this->GetPrimaryKeyTable(),$alias);
+			$this->AddField($this->GetPrimaryKey(),$this->GetPrimaryKey(),$alias);
 			$this->AddField('_module',"'".get_class($this)."'",$alias);
 			return;
 		} else {
@@ -1254,7 +1199,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		if (is_subclass_of($tableModule,'iLinkTable') && !preg_match('/_ufullconcat$/',$alias)) {
 			$this->CreateTable($alias.'_ufullconcat', $tableModule, $parent, $joins, $joinType);
-			$this->AddGrouping($this->GetPrimaryKeyTable());
+			$this->AddGrouping($this->GetPrimaryKey());
 		}
 	}
 
@@ -2198,7 +2143,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function GetRowWhere($pkValue = NULL) {
-		if (!empty($pkValue)) return '`'.$this->GetPrimaryKeyTable()."` = '".$pkValue."'";
+		if (!empty($pkValue)) return '`'.$this->GetPrimaryKey()."` = '".$pkValue."'";
 		return '';
 	}
 	
@@ -2382,24 +2327,15 @@ abstract class uDataModule extends uBasicModule {
 			else
 				$this->UpdateField($fieldAlias,$value,$pkVal);
 		}
-	
-		// reset all fields.
-		if ($opk !== $pkVal) $this->ResetField($fieldAlias,$opk);
-		$this->ResetField($fieldAlias,$pkVal);
-		foreach ($this->fields as $alias => $field) {
-			if (!isset($field['preprocess']) && (isset($this->fields[$fieldAlias]) && $field['field'] !== $this->fields[$fieldAlias]['field'])) continue;
-			$this->ResetField($alias,$pkVal);
-		}
 	}
 
 	public function DeleteRecord($pkVal) {
-		AjaxEcho('//'.get_class($this)."@DeleteRecord($pkVal)");
 		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
 		
 		if (uEvents::TriggerEvent('BeforeDeleteRecord',$this,array($pkVal)) === FALSE) return FALSE;
 		
 		$table = TABLE_PREFIX.$this->GetTabledef();
-		database::query("DELETE FROM $table WHERE `{$this->GetPrimaryKeyTable()}` = ?",array($pkVal));
+		database::query("DELETE FROM $table WHERE `{$this->GetPrimaryKey()}` = ?",array($pkVal));
 		
 		uEvents::TriggerEvent('AfterDeleteRecord',$this,array($pkVal));
 		
@@ -2410,7 +2346,7 @@ abstract class uDataModule extends uBasicModule {
 		//$allowedTypes = $this->GetFieldProperty($fieldAlias, 'allowed');
 		if (uEvents::TriggerEvent('BeforeUploadFile',$this,array($fieldAlias,$fileInfo,&$pkVal)) === FALSE) return FALSE;
 		
-		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); return; }
+		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); $this->ResetField($fieldAlias,$pkVal); return; }
 		$type = getSqlTypeFromFieldType($this->GetFieldType($fieldAlias));
 		if (strpos($type,'blob') === FALSE && strpos($type,'text') === FALSE) {
 			$targetFile = get_class($this).'/'.date('Y-m-d').'/'.$pkVal.'/'.time().'_'.$fileInfo['name'];
@@ -2446,7 +2382,6 @@ abstract class uDataModule extends uBasicModule {
 	// returns a string pointing to a new url, TRUE if the update succeeds, false if it fails, and null to refresh the page
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
-		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldAlias,,$pkVal)\n"));
 		if ($pkVal === NULL && !flag_is_set($this->GetOptions(),ALLOW_ADD)) { throw new Exception('Module does not allow adding records.'); }
 		if ($pkVal !== NULL && !flag_is_set($this->GetOptions(),ALLOW_EDIT)) { throw new Exception('Module does not allow editing records.'); }
 
@@ -2479,61 +2414,79 @@ abstract class uDataModule extends uBasicModule {
 		$field = $this->fields[$fieldAlias]['field'];
 		$table		= $tbl['tModule'];
 		$tablePk	= $tbl['pk'];
-		
-		$preModPk	= NULL;
-		if (array_key_exists('parent',$tbl)) {
-			foreach ($tbl['joins'] as $fromField=>$toField) {
-				if ($fromField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) { // if the table join is linked to the parents primary key, then update that record
-					$tableObj =& utopia::GetInstance($table);
-					// find target PK value
-					$row = $this->LookupRecord($pkVal);
-					
-					// is link table?
-					if ($tableObj instanceof iLinkTable) {
-						if (!is_array($newValue)) $newValue = array($newValue);
-						// do link table stuff
-						// delete all where tofield is oldpk
-						database::query('DELETE FROM `'.$tableObj->tablename.'` WHERE `'.$toField.'` = ?',array($oldPkVal));
-						foreach ($newValue as $v) {
-							$n = null;
-							$tableObj->UpdateField($toField,$oldPkVal,$n); //set left
-							$tableObj->UpdateField($field,$v,$n); //set right
-						}
-						return true;
-					}
-					$preModPk = $pkVal;
-					$pkVal = $row[$this->GetPrimaryKeyField($fieldAlias)];
-					if ($pkVal === NULL) { // initialise a row if needed
-						if ($toField == $fieldAlias)
-							$tableObj->UpdateField($toField,$newValue,$pkVal);
-						else
-							$tableObj->UpdateField($toField,$oldPkVal,$pkVal);
-					}
-					break; // if linkFrom is the primary key of our main table then we don't update the parent table.
-				}
-			}
-			foreach ($tbl['joins'] as $fromField=>$toField) {
-				if ($toField == $tablePk) {
-					$field = $fromField;
-					$tbl = $this->sqlTableSetupFlat[$tbl['parent']];
-					$table		= $tbl['tModule'];
-					$tablePk	= $tbl['pk'];
-					break;
-				}
-			}
-		}
-		
+
 		if ((preg_match('/{[^}]+}/',$field) > 0) || IsSelectStatement($field) || is_array($field)) {
 			$this->ResetField($fieldAlias,$pkVal);
 			return FALSE; // this field is a pragma, select statement or callback
 		}
 		
-
 		if (isset($this->fields[$fieldAlias]['ismetadata']) && $this->fields[$fieldAlias]['ismetadata']) {
 			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
 		}
-		
+
 		$fieldType = $this->GetFieldType($fieldAlias);
+
+		$preModPk	= NULL;
+		if ($table !== $this->GetTabledef()) {
+			if ($pkVal === NULL) { // current module PK if not row exists, create it
+				$this->UpdateField($this->GetPrimaryKey(),null,$pkVal);
+			}
+			$row = $this->LookupRecord($pkVal);
+			
+			$pkLinkTo = null; $pkLinkFrom = null;
+			$pkValTo = null; $pkValFrom = null;
+			foreach ($tbl['joins'] as $fromField=>$toField) {
+				if ($toField == $this->sqlTableSetupFlat[$tbl['parent']]['pk']) {
+					$pkLinkFrom = $fromField; $pkLinkTo = $toField;
+					// from (parent) pk / to (child) pk
+					foreach ($this->fields as $_f => $_finfo) {
+						if ($_finfo['tablename'] == $this->sqlTableSetupFlat[$tbl['parent']]['alias'] && $_finfo['field'] == $fromField)
+							$pkValFrom = $row[$_f];
+						elseif ($_finfo['tablename'] == $this->sqlTableSetupFlat[$tbl['alias']]['alias'] && $_finfo['field'] == $toField)
+							$pkValTo = $row[$_f];
+					}
+				}
+			}
+			
+			$tableObj =& utopia::GetInstance($table);
+			if ($pkValTo === NULL && $pkValFrom) {
+				$tableObj->UpdateField($pkLinkTo,$pkValFrom);
+				$row = $this->LookupRecord($pkVal);
+			}
+			
+			$tableObj =& utopia::GetInstance($table);
+			if ($tableObj instanceof iLinkTable) {
+				if (!is_array($newValue)) $newValue = array($newValue);
+				// do link table stuff
+				// delete all where tofield is oldpk
+				database::query('DELETE FROM `'.$tableObj->tablename.'` WHERE `'.$pkLinkTo.'` = ?',array($pkVal));
+				foreach ($newValue as $v) {
+					$n = null;
+					$tableObj->UpdateField($pkLinkTo,$pkVal,$n,$fieldType); //set left
+					$tableObj->UpdateField($field,$v,$n,$fieldType); //set right
+				}
+				return true;
+			}
+			
+			// pk of table
+			$preModPk = $pkVal;
+			$pkVal = $row['_'.$tableAlias.'_pk'];
+			if ($pkVal === NULL) {
+				// linked target does not exist, create it
+				if ($pkLinkTo == $field) {
+					$tableObj->UpdateField($pkLinkTo,$newValue,$pkVal,$fieldType);
+				} else {
+					$tableObj->UpdateField($field,$newValue,$pkVal,$fieldType);
+				}
+				
+				foreach ($this->fields as $_f => $_finfo) { // set pkLinkFrom to newly created record in linked table
+					if (isset($_finfo['vtable']) && $_finfo['vtable']['tModule'] == $this->GetTabledef() && $_finfo['field'] == $pkLinkFrom) {
+						$this->UpdateField($_f,$pkVal,$preModPk);
+						break;
+					}
+				}
+			}
+		}
 
 		// lets update the field
 		$tableObj =& utopia::GetInstance($table);
@@ -2816,16 +2769,7 @@ abstract class uDataModule extends uBasicModule {
 				$correspondingKey = $ourKeys[$uFieldCount];
 				$value = $row[$correspondingKey];
 			} else {
-				//$value = $row[$linkInfo['fromField']]; // use actual value, getting the real value on every field causes a lot of lookups, the requested field must be the field that stores the actual value
-				/* */
-				$tableModule = $this->fields[$linkInfo['fromField']]['vtable']['tModule'];
-				if ($this->GetRootField($linkInfo['fromField']) == $this->fields[$linkInfo['fromField']]['field']) {
-					//if ($tableModule == $this->GetTabledef()) {
-					$value = $row[$linkInfo['fromField']];
-				} else {
-					$value = $this->GetRealValue($linkInfo['fromField'],$row[$this->GetPrimaryKey()]);
-				} /* */
-				//ErrorLog(print_r($linkInfo,true));
+				$value = $row[$linkInfo['fromField']]; // use actual value, getting the real value on every field causes a lot of lookups, the requested field must be the field that stores the actual value
 			}
 			//echo $value."<br/>";
 			if ($value !== NULL)
@@ -2845,17 +2789,28 @@ abstract class uDataModule extends uBasicModule {
 	public function ResetField($fieldAlias,$pkVal = NULL) {
 		if (!$this->FieldExists($fieldAlias)) return;
 		if (uEvents::TriggerEvent('BeforeResetField',$this,$fieldAlias) === FALSE) return FALSE;
-		//AjaxEcho("//".get_class($this)."@ResetField($fieldAlias~$pkVal)\n");
 		// reset the field.
-
+		
 		$enc_name = $this->GetEncodedFieldName($fieldAlias,$pkVal);
 		$newRec = is_null($pkVal) ? NULL : $this->LookupRecord($pkVal,true);
 		
 		$data = $this->GetCellData($fieldAlias,$newRec,$this->GetTargetURL($fieldAlias,$newRec));
-		
 		utopia::AjaxUpdateElement($enc_name,$data);
-		//$ov = base64_encode($data);
-		//AjaxEcho("$('div#$enc_name').html(Base64.decode('$ov'));\n");
+		
+		// if this field is the PK of a linked table also update all fields associated with that table
+		$info = $this->fields[$fieldAlias];
+		$tbl = array();
+		foreach ($this->sqlTableSetupFlat as $t) {
+			if (isset($t['joins'])) foreach ($t['joins'] as $from => $to) {
+				if ($from == $info['field'] || $to == $info['field']) $tbl[] = $t['alias'];
+			}
+		}
+		foreach ($this->fields as $alias => $info) {
+			if (array_search($info['tablename'],$tbl) === false) continue;
+			$enc_name = $this->GetEncodedFieldName($alias,$pkVal);
+			$data = $this->GetCellData($alias,$newRec,$this->GetTargetURL($alias,$newRec));
+			utopia::AjaxUpdateElement($enc_name,$data);
+		}
 	}
 }
 

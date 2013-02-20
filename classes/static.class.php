@@ -371,7 +371,7 @@ class utopia {
 					$valOutput = $key !== $val ? " value=\"$key\"" : '';
 					$out .= "<option$valOutput$selected>$val</option>";
 				}
-				if (!$defaultExists && ($defaultValue != '')) {
+				if (!$defaultExists && ($defaultValue)) {
 					$out .= "<optgroup label=\"No longer available\"><option selected=\"selected\">$defaultValue</option></optgroup>";
 				}
 				$out .= "</select>";

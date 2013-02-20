@@ -29,10 +29,6 @@ class UserProfileDetail extends uSingleDataModule {
 	public function SetupParents() { }
 	public function RunModule() {
 		if (!($l = uUserLogin::IsLoggedIn())) return;
-		$rec = $this->LookupRecord(array('user_id'=>$l),true);
-		if (!$rec) {
-			$this->UpdateField('user_id',$l);
-		}
 		$this->ShowData();
 	}
 	public function SetupFields() {
@@ -41,10 +37,11 @@ class UserProfileDetail extends uSingleDataModule {
 		$this->NewSection('My Profile');
 		$this->AddSpacer('<b style="font-size:1.2em">Personal Details</b>');
 		
-		$this->AddField('user_id','user_id','detail');
 		$l = uUserLogin::IsLoggedIn();
 		$this->AddFilter('user_id',ctEQ,itNONE,$l);
-		$this->SetDefaultValue('user_id',$l);
+		
+		$this->AddField('user_id_detail','user_id','detail');
+		$this->SetDefaultValue('user_id_detail',$l);
 		
 		$this->AddField('first_name','first_name','detail','First Name',itTEXT);
 		$this->AddField('last_name','last_name','detail','Last Name',itTEXT);
@@ -64,7 +61,7 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_ADD; }
 	public function SetupParents() {
-		$this->AddParent('uUsersList',array('user_id'=>'_user_pk'),'*');
+		$this->AddParent('uUsersList','user_id','*');
 	}
 	public function RunModule() {
 		$this->ShowData();
@@ -81,7 +78,7 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 		$this->AddSpacer();
 		$this->AddSpacer('<b style="font-size:1.2em">Personal Details</b>');
 		
-		$this->AddField('user_id','user_id','detail');
+		$this->AddField('user_id_detail','user_id','detail');
 		
 		$this->AddField('first_name','first_name','detail','First Name',itTEXT);
 		$this->AddField('last_name','last_name','detail','Last Name',itTEXT);

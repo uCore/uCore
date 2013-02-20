@@ -486,7 +486,7 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 		
 		database::query($query,$args);
-		if ($fieldName == $this->GetPrimaryKey()) {
+		if ($fieldName == $this->GetPrimaryKey() && $newValue !== NULL) {
 			// this allows us to get the real evaluated value of the new primary key
 			$stm = database::query('SELECT ? AS new_pk',array($newValue));
 			$row = $stm->fetch();

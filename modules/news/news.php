@@ -69,7 +69,7 @@ class module_NewsAdminDetail extends uSingleDataModule implements iAdminModule {
 		$this->CreateTable('author','tabledef_Users','news',array('author'=>'user_id'));
 
 		$this->AddField('time','time','news','Post Date',itDATE);
-		$this->AddField('author','username','author','Author',itSUGGEST);
+		$this->AddField('author','author','news','Author',itSUGGEST,'SELECT user_id,username FROM '.TABLE_PREFIX.'tabledef_Users ORDER BY username');
 		$this->SetDefaultValue('author',uUserLogin::IsLoggedIn());
 
 		$this->AddField('heading','heading','news','Title',itTEXT);

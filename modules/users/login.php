@@ -178,12 +178,10 @@ class uResetPassword extends uDataModule {
 
 	public function SetupFields() {
 		$this->CreateTable('users');
-		$this->CreateTable('roles','tabledef_UserRoles','users',array('role'=>'role_id'));
 
 		$this->AddField('user_id','user_id','users');
 		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('password','password','users','Password',itPASSWORD);
-		$this->AddField('role','name','roles','Role',itCOMBO);
 		$this->AddField('email_confirm','email_confirm','users');
 		$this->AddField('email_confirm_code','email_confirm_code','users');
 	}
