@@ -515,6 +515,7 @@ class uCMS_View extends uSingleDataModule {
 		}
 		
 		$cms_id = $filters['cms_id'];
+		if ($this->IsHome($cms_id)) return PATH_REL_ROOT;
 		$qs = '';
 		if (is_array($filters)) {
 			if (array_key_exists('cms_id',$filters)) unset($filters['cms_id']);
@@ -522,6 +523,7 @@ class uCMS_View extends uSingleDataModule {
 			$qs = http_build_query($filters); if ($qs) $qs = "?$qs";
 		}
 		$path = $this->GetCmsParents($cms_id);
+		
 		return PATH_REL_ROOT.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
@@ -662,7 +664,9 @@ class uCMS_View extends uSingleDataModule {
 		if (!self::$parentsCache) {
 			$ds = $this->GetDataset();
 			while (($row = $ds->fetch())) {
-				self::$parentsCache[$row['cms_id']] = $row['parent'];
+				$parent = $row['parent'];
+				if ($row['is_home']) $parent = false;
+				self::$parentsCache[$row['cms_id']] = $parent;
 			}
 		}
 		
@@ -671,10 +675,20 @@ class uCMS_View extends uSingleDataModule {
 		while ($cms_id && isset(self::$parentsCache[$cms_id]) && self::$parentsCache[$cms_id]) {
 			$parents[] = self::$parentsCache[$cms_id];
 			$cms_id = self::$parentsCache[$cms_id];
-
 		}
 		$parents = array_reverse($parents);
 		return $parents;
+	}
+	public function IsHome($cms_id) {
+		if (!self::$parentsCache) {
+			$ds = $this->GetDataset();
+			while (($row = $ds->fetch())) {
+				$parent = $row['parent'];
+				if ($row['is_home']) $parent = false;
+				self::$parentsCache[$row['cms_id']] = $parent;
+			}
+		}
+		return self::$parentsCache[$cms_id] === false;
 	}
 
 	static function GetTemplate($id) {
