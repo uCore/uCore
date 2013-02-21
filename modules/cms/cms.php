@@ -510,25 +510,18 @@ class uCMS_View extends uSingleDataModule {
 		if (!is_array($filters) && is_string($filters)) $filters = array('cms_id'=>$filters);
 		$this->RewriteFilters($filters);
 
-		if (isset($filters['cms_id']))
-			$rec = $this->LookupRecord($filters['cms_id']);
-		else
-			$rec = self::findPage();
-
-		if (!$rec) return $_SERVER['REQUEST_URI'];
-
-		// build QS
+		if (!isset($filters['cms_id'])) {
+			return $_SERVER['REQUEST_URI'];
+		}
+		
+		$cms_id = $filters['cms_id'];
 		$qs = '';
 		if (is_array($filters)) {
 			if (array_key_exists('cms_id',$filters)) unset($filters['cms_id']);
 			if (array_key_exists('uuid',$filters)) unset($filters['uuid']);
 			$qs = http_build_query($filters); if ($qs) $qs = "?$qs";
 		}
-		$cms_id = $rec['cms_id'];
-		if ($rec['is_home']) return PATH_REL_ROOT.$qs;
-
 		$path = $this->GetCmsParents($cms_id);
-
 		return PATH_REL_ROOT.implode('/',$path).$qs;
 	}
 	public function GetTitle() {
