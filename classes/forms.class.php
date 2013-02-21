@@ -2327,6 +2327,11 @@ abstract class uDataModule extends uBasicModule {
 			else
 				$this->UpdateField($fieldAlias,$value,$pkVal);
 		}
+
+		foreach ($this->fields as $alias => $field) {
+			if (!isset($field['preprocess']) && (isset($this->fields[$fieldAlias]) && $field['field'] !== $this->fields[$fieldAlias]['field'])) continue;
+			$this->ResetField($alias,$pkVal);
+		}
 	}
 
 	public function DeleteRecord($pkVal) {
