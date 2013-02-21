@@ -1385,10 +1385,6 @@ abstract class uDataModule extends uBasicModule {
 		$this->fields[$name]['ismetadata'] = true;
 	}
 
-	public function AddForeignField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {
-		$this->AddField($aliasName,$fieldName,$tableAlias,$visiblename,$inputtype,$values);
-		$this->fields[$aliasName]['foreign'] = true;
-	}
 	public function &AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
@@ -1400,7 +1396,6 @@ abstract class uDataModule extends uBasicModule {
 			'inputtype'   => $inputtype,
 			'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
 			'field'       => $fieldName,
-			'foreign'     => false,
 		);
 		$this->fields[$aliasName]['order'] = count($this->fields);
 		
@@ -1888,9 +1883,7 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($matches[1] as $match) {
 				if (!isset($this->fields[$match])) continue;
 				$replace = null;
-				if ($this->fields[$match]['foreign']) {
-					$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['vtable']['pk'].'`';
-				} else if (isset($this->fields[$match]['vtable']) && is_subclass_of($this->fields[$match]['vtable']['tModule'],'iLinkTable')) {
+				if (isset($this->fields[$match]['vtable']) && is_subclass_of($this->fields[$match]['vtable']['tModule'],'iLinkTable')) {
 					$replace = '`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
 				} else {
 					$replace = $this->GetFieldLookupString($match);//'`'.$this->fields[$match]['vtable']['alias'].'`.`'.$this->fields[$match]['field'].'`';
