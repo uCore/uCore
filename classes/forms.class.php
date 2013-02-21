@@ -851,6 +851,9 @@ abstract class uDataModule extends uBasicModule {
 				foreach ($matches[1] as $match) {
 					if (isset($filters[$match])) continue;
 					if (array_key_exists($match,$rec)) $filters[$match] = $rec[$match];
+					$fltr = $this->FindFilter($match);
+					if (!$fltr) continue;
+					unset($filters['_f_'.$fltr['uid']]);
 				}
 			}
 		}
@@ -888,11 +891,6 @@ abstract class uDataModule extends uBasicModule {
 		if ($filters === FALSE) return parent::GetURL($filters);
 		if (!is_array($filters) && $filters !== NULL) $filters = array($this->GetPrimaryKey()=>$filters);
 
-		$filArr = array();
-		if (is_array($filters)) foreach ($filters as $fieldName => $val) {
-			$filArr[$fieldName] = $val;
-		}
-
 		foreach ($this->filters as $filterType) {
 			foreach ($filterType as $filterSet) {
 				foreach ($filterSet as $filter) {
@@ -909,17 +907,17 @@ abstract class uDataModule extends uBasicModule {
 					if (!$val) continue;
 					if ($this->HasRewrite($filter['fieldName'])) {
 						if (isset($filters[$filter['fieldName']])) continue;
-						$filArr[$filter['fieldName']] = $val;
-						unset($filArr['_f_'.$filter['uid']]);
+						$filters[$filter['fieldName']] = $val;
+						unset($filters['_f_'.$filter['uid']]);
 						continue;
 					}
-					$filArr['_f_'.$filter['uid']] = $val;
-					unset($filArr[$filter['fieldName']]);
+					$filters['_f_'.$filter['uid']] = $val;
+					unset($filters[$filter['fieldName']]);
 				}
 			}
 		}
-		$this->RewriteFilters($filArr);
-		return parent::GetURL($filArr);
+		$this->RewriteFilters($filters);
+		return parent::GetURL($filters);
 	}
 
 	public function Initialise() {
@@ -2270,6 +2268,7 @@ abstract class uDataModule extends uBasicModule {
 
 		$default = $this->GetFilterValue($filterInfo['uid']);
 
+		$vals = $filterInfo['values'];
 		$pre = '';
 		$emptyVal = '';
 		if (!empty($filterInfo['title'])) {
@@ -2288,9 +2287,12 @@ abstract class uDataModule extends uBasicModule {
 				default:
 					$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']); break;
 			}
+			if ($vals === true) {
+				$vals = $this->fields[$fieldName]['values'];
+			}
 		}
 
-		$vals = $this->FindValues($fieldName,$filterInfo['values']);
+		$vals = $this->FindValues($fieldName,$vals);
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA) {
 			if (isset($values[$default])) $default = $values[$default];
 			$vals = cbase64_encode(get_class($this).':'.$fieldName);
@@ -2635,8 +2637,7 @@ abstract class uDataModule extends uBasicModule {
 
 		//		echo "// start PP for $fieldName ".(is_array($row) && array_key_exists($fieldName,$row) ? $row[$fieldName] : '')."\n";
 		$value = '';
-		/*if (isset($this->fields[$fieldName]['vtable']['parent'])) $value = $row[$this->GetPrimaryKeyField($fieldName)];
-		else*/if (isset($row[$fieldName])) $value = $row[$fieldName];
+		if (isset($row[$fieldName])) $value = $row[$fieldName];
 		if ($value === '' && isset($this->fields[$fieldName]) && preg_match('/^\'(.+?)\'/', $this->fields[$fieldName]['field'],$match)) $value = $match[1];
 		$value = $this->PreProcess($fieldName,$value,$row);
 		
@@ -2665,7 +2666,7 @@ abstract class uDataModule extends uBasicModule {
 				$ret .= '<span title="Upload File" class="icon-document-upload">'.$this->DrawSqlInput($fieldName,$value,$pkVal,null,$inputType,$valuesOverride).'</span>';
 			} else {
 				$attr = array();
-				if ($pkVal === NULL) {
+				if ($pkVal === NULL) { // set a placeholder based on the default value for new records
 					$dv = $this->GetDefaultValue($fieldName);
 					$vals = $valuesOverride;
 					if (!$vals) $vals = $this->GetValues($fieldName,$pkVal);
