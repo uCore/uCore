@@ -2388,7 +2388,7 @@ abstract class uDataModule extends uBasicModule {
 
 		$fieldType = $this->GetFieldType($fieldAlias);
 		
-		if ($this->fields[$fieldAlias]['inputtype'] == 0 && $fieldType !== ftRAW) {
+		if ($this->fields[$fieldAlias]['inputtype'] == itPASSWORD && $fieldType !== ftRAW) {
 			if (empty($newValue)) return FALSE;
 			$newValue = uCrypt::Encrypt($newValue);
 		}
