@@ -2385,7 +2385,10 @@ abstract class uDataModule extends uBasicModule {
 			$srch = array_search($newValue, $valSearch);
 			if ($srch !== FALSE) $newValue = $srch;
 		}*/
-		if ($this->fields[$fieldAlias]['inputtype'] == itPASSWORD) {
+
+		$fieldType = $this->GetFieldType($fieldAlias);
+		
+		if ($this->fields[$fieldAlias]['inputtype'] == 0 && $fieldType !== ftRAW) {
 			if (empty($newValue)) return FALSE;
 			$newValue = uCrypt::Encrypt($newValue);
 		}
@@ -2403,8 +2406,6 @@ abstract class uDataModule extends uBasicModule {
 		if (isset($this->fields[$fieldAlias]['ismetadata']) && $this->fields[$fieldAlias]['ismetadata']) {
 			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
 		}
-
-		$fieldType = $this->GetFieldType($fieldAlias);
 
 		$preModPk	= NULL;
 		if ($table !== $this->GetTabledef()) {
