@@ -96,7 +96,7 @@ class uUsersList extends uListDataModule implements iAdminModule {
 	}
 	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
-		if ($fieldAlias == 'role' && $pkVal == $_SESSION['current_user']) {
+		if ($fieldAlias == 'role' && isset($_SESSION['current_user']) && $pkVal == $_SESSION['current_user']) {
 			uNotices::AddNotice('You cannot edit your own role',NOTICE_TYPE_ERROR);
 			return;
 		}
