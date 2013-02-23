@@ -43,8 +43,7 @@ class tabledef_Users extends uTableDef {
 		if ($fieldName == 'email_confirm_code' && $newValue === true) {
 			// get old username
 			$r = database::query('SELECT username, email_confirm FROM `'.$this->tablename.'` WHERE user_id = ?',array($pkVal));
-			if ($r) {
-				$row = $r->fetch();
+			if ($r && ($row = $r->fetch()) && $row['email_confirm']) {
 				$old = $row['username']; $new = $row['email_confirm'];
 				// set username to email_confirm
 				parent::UpdateField('username','email_confirm',$pkVal,ftRAW);
