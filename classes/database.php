@@ -29,9 +29,10 @@ class database {
 		else
 			$GLOBALS['sql_query_count']++;
 
-
-		$tID='QRY: '.$query.PHP_EOL.var_export($args,true);
-		timer_start($tID);
+		if (utopia::DebugMode()) {
+			$tID='QRY: '.$query.PHP_EOL.var_export($args,true);
+			timer_start($tID);
+		}
 		$GLOBALS['sql_queries'][$GLOBALS['sql_query_count']] = $query;
 	
 		$pdo = self::connect();
@@ -43,9 +44,9 @@ class database {
 			self::$queryCount++;
 			$stm = $pdo->call($query);
 			$stm->setFetchMode(PDO::FETCH_ASSOC);
-		} catch (Exception $e) { $timetaken = timer_end($tID); throw $e;}
+		} catch (Exception $e) { if (utopia::DebugMode()) $timetaken = timer_end($tID); throw $e;}
 
-		$timetaken = timer_end($tID);
+		if (utopia::DebugMode()) $timetaken = timer_end($tID);
 		return $stm;
 	}
 	static function getType($val) {
