@@ -286,7 +286,7 @@ function DONT_USE_uuid()
 }
 
 function timer_start($timerName,$info='') {
-	if (!utopia::DebugMode()) return;
+	if (!(isset($_SESSION['admin_debug_mode']) && $_SESSION['admin_debug_mode'])) return;
 	$timer = &$GLOBALS['timers'][$timerName];
 
 	if (!is_string($info)) $info = print_r($info,true);
@@ -299,7 +299,7 @@ function timer_start($timerName,$info='') {
 //	$GLOBALS['timer_parent'] = $timerName;
 }
 function timer_end($timerName) {
-	if (!utopia::DebugMode()) return;
+	if (!(isset($_SESSION['admin_debug_mode']) && $_SESSION['admin_debug_mode'])) return;
 	$timer = &$GLOBALS['timers'][$timerName];
 	if (!isset($timer['start_time'])) { /*echo "Timer ($timerName) not started.";*/ return; }
 
@@ -314,7 +314,7 @@ function timer_end($timerName) {
 	//	if (isset($timer['parent'])) $GLOBALS['timer_parent'] = $timer['parent'];
 }
 function timer_findtime($timerName,$end=FALSE) {
-	if (!utopia::DebugMode()) return;
+	if (!(isset($_SESSION['admin_debug_mode']) && $_SESSION['admin_debug_mode'])) return;
 	$timer = &$GLOBALS['timers'][$timerName];
 	if (isset($timer['time_taken']))
 		return $timer['time_taken'];
