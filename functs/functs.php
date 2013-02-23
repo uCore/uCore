@@ -298,14 +298,10 @@ function timer_start($timerName,$info='') {
 	if (!(isset($_SESSION['admin_debug_mode']) && $_SESSION['admin_debug_mode'])) return;
 	$timer = &$GLOBALS['timers'][$timerName];
 
-	if (!is_string($info)) $info = print_r($info,true);
+	if (!is_string($info)) $info = var_export($info,true);
 
 	$timer['info'] = $info;
-//	if (!empty($GLOBALS['timer_parent'])) $timer['parent'] = $GLOBALS['timer_parent'];
-//	else $timer['parent'] = '';
 	$timer['start_time'] = microtime(true)*1000;
-
-//	$GLOBALS['timer_parent'] = $timerName;
 }
 function timer_end($timerName) {
 	if (!(isset($_SESSION['admin_debug_mode']) && $_SESSION['admin_debug_mode'])) return;
@@ -314,13 +310,8 @@ function timer_end($timerName) {
 
 	$timer['end_time'] = microtime(true)*1000;
 	$timer['time_taken'] = round($timer['end_time'] - $timer['start_time'],3);
-//	if (array_key_exists('parent',$timer) && array_key_exists($timer['parent'],$GLOBALS['timers']) && array_key_exists('parent',$GLOBALS['timers'][$timer['parent']]))
-//		$GLOBALS['timer_parent'] = $GLOBALS['timers'][$timer['parent']]['parent'];
-//	else
-//		$GLOBALS['timer_parent'] = NULL;
 
 	return $timer['time_taken'];
-	//	if (isset($timer['parent'])) $GLOBALS['timer_parent'] = $timer['parent'];
 }
 function timer_findtime($timerName,$end=FALSE) {
 	if (!(isset($_SESSION['admin_debug_mode']) && $_SESSION['admin_debug_mode'])) return;
@@ -332,12 +323,6 @@ function timer_findtime($timerName,$end=FALSE) {
 	$tt = round($currentTime - $timer['start_time'],3);
 
 	return $tt;
-	//timer_end($timerName);
-
-	// still not set? must be a problem
-	if (!isset($timer['time_taken'])) return;
-
-	return $timer['time_taken'];
 }
 
 function flag_gen($set='global') {

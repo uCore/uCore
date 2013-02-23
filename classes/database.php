@@ -30,8 +30,8 @@ class database {
 			$GLOBALS['sql_query_count']++;
 
 		if (utopia::DebugMode()) {
-			$tID='QRY: '.$query.PHP_EOL.var_export($args,true);
-			timer_start($tID);
+			$tID='QRY'.$GLOBALS['sql_query_count'].': '.$query;
+			timer_start($tID,$args);
 		}
 	
 		$pdo = self::connect();
