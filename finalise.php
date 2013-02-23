@@ -2,7 +2,7 @@
 
 utopia::OutputTemplate();
 
-if (isset($GLOBALS['timers']) && isset($_SESSION['admin_showT']) && $_SESSION['admin_showT'] === true) {
+if (isset($GLOBALS['timers']) && utopia::DebugMode()) {
 	echo '<pre class="uDebug"><table>';
 	foreach ($GLOBALS['timers'] as $name => $info) {
 		if (!is_array($info)) continue;

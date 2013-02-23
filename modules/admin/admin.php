@@ -31,15 +31,12 @@ class uDashboard extends uBasicModule implements iAdminModule {
 			uAdminBar::AddItem('<a class="dashboard-link" href="'.PATH_REL_CORE.'">Dashboard</a>',FALSE,-100);
 
 		$this->AddParent('/');
-		utopia::RegisterAjax('toggleT',array($this,'toggleT'));
+		utopia::RegisterAjax('toggle_debug',array($this,'toggleDebug'));
 		$this->UpdateHtaccess();
 	}
 
-	public function toggleT() {
-		if (!array_key_exists('admin_showT',$_SESSION))
-			$_SESSION['admin_showT'] = true;
-		else
-			$_SESSION['admin_showT'] = !$_SESSION['admin_showT'];
+	public function toggleDebug() {
+		utopia::DebugMode(!utopia::DebugMode());
 		die('window.location.reload();');
 	}
 

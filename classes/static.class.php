@@ -1040,6 +1040,11 @@ class utopia {
 	}
 
 	/*  MISC  */
+	static function DebugMode($set = null) {
+		if ($set !== null) $_SESSION['admin_debug_mode'] = (bool)$set;
+		return (isset($_SESSION['admin_debug_mode']) && $_SESSION['admin_debug_mode']);
+	}
+	
 	static function EvalString($string) {
 		if (!$string) return $string;
 		
