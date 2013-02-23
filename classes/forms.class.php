@@ -2410,7 +2410,7 @@ abstract class uDataModule extends uBasicModule {
 			if ($pkVal === NULL) { // current module PK if not row exists, create it
 				$this->UpdateField($this->GetPrimaryKey(),null,$pkVal);
 			}
-			$row = $this->LookupRecord($pkVal);
+			$row = $this->LookupRecord($pkVal,true);
 			
 			$pkLinkTo = null; $pkLinkFrom = null;
 			$pkValTo = null; $pkValFrom = null;
@@ -2430,7 +2430,7 @@ abstract class uDataModule extends uBasicModule {
 			$tableObj =& utopia::GetInstance($table);
 			if ($pkValTo === NULL && $pkValFrom) {
 				$tableObj->UpdateField($pkLinkTo,$pkValFrom);
-				$row = $this->LookupRecord($pkVal);
+				$row = $this->LookupRecord($pkVal,true);
 			}
 			
 			$tableObj =& utopia::GetInstance($table);
