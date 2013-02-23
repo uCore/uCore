@@ -85,7 +85,7 @@ class uSearch extends uBasicModule {
 //			return call_user_func(self::$types[$adv]['callback'],$q,$scores);
 		}
 
-		array_sort_subkey($scores,0,'>');
+		array_sort_subkey($scores,0,false);
 		return $scores;
 	}
 

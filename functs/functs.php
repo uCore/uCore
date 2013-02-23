@@ -193,10 +193,19 @@ function get_include_contents($filename) {
     return false;
 }
 
-function array_sort_subkey(&$array,$key,$direction='<') {
-	$key = is_string($key) ? "'$key'" : $key;
-	$func = create_function('$a,$b','$c1 = $a['.$key.']; $c2 = $b['.$key.']; if ($c1 == $c2) return 0;  return $c1 '.$direction.' $c2 ? -1 : 1;');
-	uasort($array,$func);
+class SubkeySorter {
+	var $key;
+	function __construct($key) { $this->key = $key; }
+	function doSort($a,$b) {
+		$key = $this->key;
+		if ($a[$key] == $b[$key]) return 0;
+		return (($a[$key] > $b[$key]) ? 1 : -1);
+	}
+}
+
+function array_sort_subkey(&$array,$key,$ascending=true) {
+	uasort($array,array(new SubkeySorter($key),'doSort'));
+	if (!$ascending) $array = array_reverse($array,true);
 }
 
 // MODULE FUNCTIONS
