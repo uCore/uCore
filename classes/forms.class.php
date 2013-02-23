@@ -101,6 +101,7 @@ class uDataset {
 	public function __construct($module,$filter,$clearFilters) {
 		// initialise count
 		$this->module = $module;
+		$this->module->_SetupFields();
 		
 		if ($filter===NULL) $filter = array();
 		if (!is_array($filter)) $filter = array($this->module->GetPrimaryKey()=>$filter);
@@ -121,14 +122,11 @@ class uDataset {
 			}
 			$this->module->AddFilter($field,ctEQ,itNONE,$val);
 		}
-		
 		$this->BuildSqlQuery($this->args);
 		
 		$this->module->filters = $fltrs;
 	}
 	public function BuildSqlQuery(&$args) {
-		$this->module->_SetupFields();
-
 		// GET SELECT
 		$select = $this->module->GetSelectStatement();
 		// GET FROM
