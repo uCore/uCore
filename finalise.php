@@ -1,6 +1,8 @@
 <?php
 
+timer_start('Output Template');
 utopia::OutputTemplate();
+timer_end('Output Template');
 
 if (isset($GLOBALS['timers']) && utopia::DebugMode()) {
 	echo '<pre class="uDebug"><table>';

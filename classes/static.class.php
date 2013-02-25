@@ -236,8 +236,11 @@ class utopia {
 		utopia::SetVar('current_module',$module);
 		$obj =& utopia::GetInstance($module);
 		utopia::SetVar('title',$obj->GetTitle());
+
 		// run module
+		timer_start('Run Module');
 		$obj->_RunModule();
+		timer_end('Run Module');
 	}
 
 	static $instances = array();
