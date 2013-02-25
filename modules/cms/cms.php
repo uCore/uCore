@@ -515,13 +515,13 @@ class uCMS_View extends uSingleDataModule {
 		}
 		
 		$cms_id = $filters['cms_id'];
-		if ($this->IsHome($cms_id)) return PATH_REL_ROOT;
 		$qs = '';
 		if (is_array($filters)) {
 			if (array_key_exists('cms_id',$filters)) unset($filters['cms_id']);
 			if (array_key_exists('uuid',$filters)) unset($filters['uuid']);
 			$qs = http_build_query($filters); if ($qs) $qs = "?$qs";
 		}
+		if ($this->IsHome($cms_id)) return PATH_REL_ROOT.$qs;
 		$path = $this->GetCmsParents($cms_id);
 		
 		return PATH_REL_ROOT.implode('/',$path).$qs;
