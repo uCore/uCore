@@ -1322,6 +1322,9 @@ class utopia {
 		if ($value === NULL) $value = $originalValue;
 		return $value;
 	}
+	static function checksum($val) {
+		return md5(json_encode($val));
+	}
 	static function GetMimeType($path) {
 		$cType = NULL;
 		if (function_exists('finfo_open') && defined('FILEINFO_MIME_TYPE')) {
