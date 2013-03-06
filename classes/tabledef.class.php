@@ -101,7 +101,6 @@ abstract class uTableDef implements iUtopiaModule {
 		if (!is_array($name)) $name = array($name);
 		foreach ($name as $k=>$v) {
 			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
-			$this->fields[$v]['null'] = SQL_NOT_NULL;
 		}
 		$this->index[] = $name;
 	}
