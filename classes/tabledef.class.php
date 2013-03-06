@@ -470,7 +470,7 @@ abstract class uTableDef implements iUtopiaModule {
 			case ftNUMBER:		$newValue = ($newValue==='' ? '' : preg_replace('/[^0-9\.-]/','',$newValue)); break;
 		}
 
-		if ($newValue === '' || $newValue === NULL)
+		if (($newValue === '' || $newValue === NULL) && $this->GetFieldProperty($fieldName,'null') !== SQL_NOT_NULL)
 			$newValue = NULL;
 
 		$updateQry = array();
