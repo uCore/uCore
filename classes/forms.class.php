@@ -2344,7 +2344,7 @@ abstract class uDataModule extends uBasicModule {
 
 	public function UpdateFields($fieldsVals,&$pkVal=NULL) {
 		foreach ($fieldsVals as $field => $val) {
-			if ($this->UpdateField($field,$val,$pkVal) === FALSE) return FALSE;
+			$this->UpdateField($field,$val,$pkVal);
 		}
 	}
 	
