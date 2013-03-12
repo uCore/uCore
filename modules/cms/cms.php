@@ -688,6 +688,7 @@ class uCMS_View extends uSingleDataModule {
 				self::$parentsCache[$row['cms_id']] = $parent;
 			}
 		}
+		if (!isset(self::$parentsCache[$cms_id])) return false;
 		return self::$parentsCache[$cms_id] === false;
 	}
 
