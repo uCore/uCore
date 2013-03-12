@@ -1147,8 +1147,7 @@ abstract class uDataModule extends uBasicModule {
 		$newTable['pk']		= $tableObj->GetPrimaryKey();
 		$newTable['tModule']= $tableModule;
 		
-		if (!preg_match('/_ufullconcat$/',$alias)) // don't add pk field for 'ufull' concat fields
-			$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
+		$this->AddField('_'.$alias.'_pk',$newTable['pk'],$alias);
 		//$this->AddFilter('_'.$alias.'_pk',ctEQ,itNONE);
 		
 		if ($parent==NULL) {
@@ -1191,8 +1190,7 @@ abstract class uDataModule extends uBasicModule {
 			// not found.. throw error
 			ErrorLog("Cannot find $parent");
 		}
-		if (is_subclass_of($tableModule,'iLinkTable') && !preg_match('/_ufullconcat$/',$alias)) {
-			$this->CreateTable($alias.'_ufullconcat', $tableModule, $parent, $joins, $joinType);
+		if (is_subclass_of($tableModule,'iLinkTable')) {
 			$this->AddGrouping($this->GetPrimaryKey());
 		}
 	}
@@ -1681,7 +1679,7 @@ abstract class uDataModule extends uBasicModule {
 		 
 		$chr1 = substr($fieldName,0,1);
 		if (isset($fieldData['vtable']) && is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable') && $this->sqlTableSetup['alias'] !== $fieldData['tablename']) {
-			$toAdd = 'GROUP_CONCAT(DISTINCT `'.$fieldData['tablename'].'_ufullconcat`.`'.$fieldName.'` SEPARATOR 0x1F)';
+			$toAdd = 'GROUP_CONCAT(DISTINCT `'.$fieldData['tablename'].'`.`'.$fieldName.'` SEPARATOR 0x1F)';
 		} elseif (!preg_match('/{[^}]+}/',$fieldData['field'])) {
 			if ($chr1 == '(' || $chr1 == "'" || $chr1 == '"')
 				$toAdd = $fieldData['field'];
