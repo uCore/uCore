@@ -2560,6 +2560,8 @@ abstract class uDataModule extends uBasicModule {
 		if (!is_array($attr)) $attr = array();
 		if (!array_key_exists('alt',$attr)) $attr['alt'] = '';
 		if ($width) $attr['width'] = intval($width); if ($height) $attr['height'] = intval($height);
+		if (isset($attr['class'])) $attr['class'] .= ' field-'.$fieldAlias;
+		else $attr['class'] = 'field-'.$fieldAlias;
 		$attr = BuildAttrString($attr);
 		
 		$url = uBlob::GetLink(get_class($this),$fieldAlias,$pkVal);
@@ -2571,6 +2573,8 @@ abstract class uDataModule extends uBasicModule {
 		if ($link === TRUE) $linkUrl = $url.$linkQ;
 		else $linkUrl = $link;
 
+		if (isset($linkAttr['class'])) $linkAttr['class'] .= ' field-'.$fieldAlias;
+		else $linkAttr['class'] = 'field-'.$fieldAlias;
 		$linkAttr = BuildAttrString($linkAttr);
 		return "<a$linkAttr href=\"$linkUrl\" target=\"_blank\"><img$attr src=\"$url\"></a>";
 	}
