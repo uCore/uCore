@@ -207,20 +207,16 @@ class uRegisterUser extends uDataModule {
 	public static $uuid = 'register';
 	public function RegisterLink() {
 		if (!modOpts::GetOption('open_user_registration')) return;
-		echo '<div id="register-wrap">';
-		echo '<div class="tag">New User?</div>';
-		echo '<h2>Create an Account</h2>';
 		if ($usr = $this->RegisterForm()) {
 			uVerifyEmail::VerifyAccount($usr);
 			echo '<p>Thank you for creating an account.  We need to verify your email before you can continue.</p>';
 			echo '<p>Please check your inbox, and follow the instructions we have sent you.</p>';
 		}
-		echo '</div>';
 //		echo '<p>Don&apos;t have an account?  <a href="'.$this->GetURL().'">Register</a> now.</p>';
 	}
 	public function RunModule() {
-		echo '<h1>User Registration</h1>';
 		if (!modOpts::GetOption('open_user_registration')) {
+			echo '<h1>User Registration</h1>';
 			echo '<p>Sorry. User registrations have been disabled by the administrator.</p>';
 			return;
 		}
@@ -292,6 +288,9 @@ class uRegisterUser extends uDataModule {
 			} while (false);
 		}
 		?>
+		<div id="register-wrap">
+		<div class="tag">New User?</div>
+		<h2>Create an Account</h2>
 		<form class="register-user oh" action="" method="POST">
 			<div class="form-field"><label for="username">Email:</label>
 			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" /></div>
@@ -315,6 +314,7 @@ class uRegisterUser extends uDataModule {
 		$('#username').change(regValidate).change();
 		$('#username2').change(regValidate).change();
 		</script>
+		</div>
 		<?php
 	}
 }
