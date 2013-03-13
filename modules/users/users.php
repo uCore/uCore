@@ -219,8 +219,11 @@ class uRegisterUser extends uDataModule {
 		}
 		// already logged in?
 		if (uUserLogin::IsLoggedIn()) {
-			$o =& utopia::GetInstance('uUserProfile');
-			header('Location: '.$o->GetURL());
+			echo '<p>You are already logged in.</p>';
+			if (uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') === FALSE) {
+				$o =& utopia::GetInstance('uUserProfile');
+				header('Location: '.$o->GetURL());
+			}
 			return;
 		}
 		
