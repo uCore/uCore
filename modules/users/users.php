@@ -207,8 +207,15 @@ class uRegisterUser extends uDataModule {
 	public static $uuid = 'register';
 	public function RegisterLink() {
 		if (!modOpts::GetOption('open_user_registration')) return;
-		echo '<h2>New User?</h2>';
-		echo '<a class="btn register right" href="'.$this->GetURL().'">Register</a>';
+		echo '<div id="register-wrap">';
+		echo '<div class="tag">New User?</div>';
+		echo '<h2>Create an Account</h2>';
+		if ($usr = $this->RegisterForm()) {
+			uVerifyEmail::VerifyAccount($usr);
+			echo '<p>Thank you for creating an account.  We need to verify your email before you can continue.</p>';
+			echo '<p>Please check your inbox, and follow the instructions we have sent you.</p>';
+		}
+		echo '</div>';
 //		echo '<p>Don&apos;t have an account?  <a href="'.$this->GetURL().'">Register</a> now.</p>';
 	}
 	public function RunModule() {
@@ -285,20 +292,15 @@ class uRegisterUser extends uDataModule {
 			} while (false);
 		}
 		?>
-		<p>To create an account, please enter the following details.</p>
-		<p>You will be sent an email to confirm your details and activate your account.</p>
-		<style>
-			form.register-user label { float:left; clear:both; display:block; width:150px; }
-			form.register-user input { float:left; width:150px; box-sizing: border-box; }
-		</style>
-		<form class="register-user left oh" action="" method="POST">
-			<label for="username">Email:</label>
-			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" />
-			<label for="username2">Confirm Email:</label>
-			<input type="text" name="username2" id="username2" value="<?php echo isset($_POST['username2']) ? htmlentities(utf8_decode($_POST['username2'])):''; ?>" />
-			<label for="password">Password:</label>
-			<input type="password" name="password" id="password" />
-			<label>&nbsp;</label><input class="btn right" style="float:right;width:auto" type="submit" value="Register" />
+		<form class="register-user oh" action="" method="POST">
+			<div class="form-field"><label for="username">Email:</label>
+			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" /></div>
+			<div class="form-field"><label for="username2">Confirm Email:</label>
+			<input type="text" name="username2" id="username2" value="<?php echo isset($_POST['username2']) ? htmlentities(utf8_decode($_POST['username2'])):''; ?>" /></div>
+			<div class="form-field"><label for="password">Password:</label>
+			<input type="password" name="password" id="password" /></div>
+			<p>You will be sent an email to confirm your details and activate your account.</p>
+			<input class="btn right" type="submit" value="Register" />
 		</form>
 		<script>
 		function regValidate(){

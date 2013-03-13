@@ -128,10 +128,10 @@ class uUserLogin extends uDataModule {
 	}
 
 	public static function GetLoginUserBox() {
-		return utopia::DrawInput('__login_u',itTEXT,'',NULL,array('id'=>'lu'));
+		return utopia::DrawInput('__login_u',itTEXT,'',NULL,array('id'=>'__login_u'));
 	}
 	public static function GetLoginPassBox() {
-		return utopia::DrawInput('__login_p',itPASSWORD);
+		return utopia::DrawInput('__login_p',itPASSWORD,'',NULL,array('id'=>'__login_p'));
 	}
 
 	public function RunModule() {
@@ -143,17 +143,30 @@ class uUserLogin extends uDataModule {
 	}
 	public static function LoginForm() {
 		if (self::IsLoggedIn()) return;
-		echo '<div id="login-wrap">';
-		echo '<h1>Please log in</h1>';
-		echo '<form id="login-form" action="" method="POST"><table>';
-		echo '<tr><td align="right">Email:</td><td>{login_user}</td></tr>';
-		echo '<tr><td align="right">Password:</td><td>{login_pass}</td></tr>';
-		echo '<tr><td colspan="2" align="right"><input type="checkbox" value="1" name="remember_me" id="remember_me"/><label for="remember_me"> Remember Me</label> '.utopia::DrawInput('',itSUBMIT,'Log In').'</td></tr>';
-		echo '<tr><td colspan="2" align="right">';
+		?>
+		<div id="login-register-wrap">
+			<div id="login-wrap">
+			<div class="tag">{option.site_name}</div>
+			<form action="" method="POST">
+			<h2>Login</h2>
+			<div class="form-field">
+			<label for="__login_u">Email/Username</label>{login_user}
+			</div>
+			<div class="form-field">
+			<label for="__login_p">Password</label>{login_pass}
+			</div>
+			<label><input type="checkbox" value="1" name="remember_me" /> Remember Me</label>
+		<?php
+		$o =& utopia::GetInstance('uResetPassword');
+		echo utopia::DrawInput('',itSUBMIT,'Log In',null,array('class'=>'right'));
+		echo '<a href="'.$o->GetURL(null).'" class="forgotten-password">Forgotten Password?</a>';
+		echo '</form><script type="text/javascript">$(function (){$(\'#__login_u\').focus()})</script>';
 		uEvents::TriggerEvent('LoginButtons');
-		echo '</td></tr>';
-		echo '</table></form><script type="text/javascript">$(function (){$(\'#lu\').focus()})</script>';
+		echo '</div>';
+
+		// register
 		uEvents::TriggerEvent('AfterShowLogin');
+		
 		echo '</div>';
 	}
 }
@@ -170,10 +183,6 @@ class uResetPassword extends uDataModule {
 	public function SetupParents() {
 		$this->SetRewrite(array('{e}','{c}'));
 		uEmailer::InitialiseTemplate('account_resetpw','Reset your password','<p>You can reset your password by clicking the link below:</p><p><a href="{home_url_abs}/{activate_link}">{home_url_abs}/{activate_link}</a></p>',array('email','activate_link'));
-		uEvents::AddCallback('LoginButtons',array($this,'forgottenPasswordButton'));
-	}
-	public function forgottenPasswordButton() {
-		echo '<a href="'.$this->GetURL(array()).'" class="forgotten-password">Forgotten Password?</a>';
 	}
 
 	public function SetupFields() {
