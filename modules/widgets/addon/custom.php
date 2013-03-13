@@ -71,8 +71,7 @@ class uCustomWidget implements iWidget {
 		if (!$rec['module'] || !class_exists($rec['module'])) return $rec['no_rows'];
 
 		if (!($instance =& utopia::GetInstance($rec['module'],false))) {
-			echo 'Could not load Data Source';
-			return;
+			return 'Could not load Data Source';
 		}
 	
 		$instance->_SetupParents(); $instance->_SetupFields();
