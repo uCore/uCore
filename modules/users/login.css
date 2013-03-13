@@ -5,6 +5,7 @@
 
 #login-wrap, #register-wrap { width:300px; display:inline-block; vertical-align: top; padding:10px 25px }
 #login-register-wrap #register-wrap { border-left: 1px solid #ccc }
+.uRegisterUser #register-wrap .tag { display:none; }
 
 #login-wrap .forgotten-password { float:right; clear:both; margin-top:10px; }
 
