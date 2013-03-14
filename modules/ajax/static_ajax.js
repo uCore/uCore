@@ -489,10 +489,7 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('submit','form.uf',function(event) {
 		if ($(this).attr('target')) return;
 		if ($('[name^="usql-"]',this).length) {
-			var eleData = {'__ajax':'updateField'};
-			$(':input',this).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
-			var hourglass = makeHourglass(this);
-			_ufData(eleData,hourglass);
+			ufForm(this,this);
 			event.stopImmediatePropagation(); 
 			return false;
 		}
@@ -503,10 +500,7 @@ $(function() { // call on docready to allow cancelling events to bind first.
 		if (frm.attr('target')) return;
 		var n = $(this).attr('name');
 		if (n && n.match(/^usql\-/)) {
-			var eleData = {'__ajax':'updateField'};
-			$(':input',frm).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
-			var hourglass = makeHourglass(this);
-			return _ufData(eleData,hourglass);
+			return ufForm(frm,this);
 		}
 		if (frm.length) { // sitting within form, submit it
 			if (frm[0].onsubmit && frm[0].onsubmit() === false) return false;
@@ -607,7 +601,14 @@ function _uf(ele,hourglass) {
 	});
 }
 
-function _ufData(eleData,hourglass) {
+function ufForm(frm,hourglassEle) {
+	setTimeout(function(){_ufData(frm, hourglassEle);},200);
+}
+function _ufData(frm,hourglassEle) {
+	var eleData = {'__ajax':'updateField'};
+	$(':input',frm).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
+	var hourglass = makeHourglass(hourglassEle);
+	
 	targetPage = window.location.pathname+window.location.search;
 	$.ajax({
 		type: "POST",
