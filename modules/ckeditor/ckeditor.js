@@ -1,10 +1,14 @@
 CKEDITOR.disableAutoInline = true;
 CKEDITOR.config.toolbar_Basic = [
-	[ 'Format', 'Styles', 'Bold', 'Italic', 'Underline', 'Strikethrough', '-', 'NumberedList', 'BulletedList', '-', 'RemoveFormat' ]
+	[ 'Format', 'Styles', 'Bold', 'Italic', 'Underline', 'Strike', '-', 'NumberedList', 'BulletedList', '-', 'RemoveFormat' ]
 ];
 CKEDITOR.config.toolbar_Advanced = [
-	[ 'Format', 'Styles', 'Bold', 'Italic', 'Underline', 'Strikethrough', '-', 'NumberedList', 'BulletedList', '-', 'RemoveFormat' ],
-	[ 'Image', 'Flash', 'Table', 'Source' ]
+	[ 'Format', 'Styles', 'Bold', 'Italic', 'Underline', 'Strike', '-', 'NumberedList', 'BulletedList', '-', 'RemoveFormat' ],
+	{ name: 'colors', items : [ 'TextColor','BGColor' ] },
+	'/',
+	[ 'Link', 'Unlink', 'Anchor' ],
+	{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','SpecialChar' ] },
+	[ 'Maximize', 'ShowBlocks', 'Source' ]
 ];
 CKEDITOR.config.toolbar = 'Advanced';
 CKEDITOR.config.filebrowserBrowseUrl = FILE_BROWSE_URL;
