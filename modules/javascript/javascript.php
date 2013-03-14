@@ -138,8 +138,6 @@ class uJavascript extends uBasicModule {
 			$body .= file_get_contents($filename).";\n\n";
 		}
     
-		if ($minify) $body = JSMin::minify($body);
-
 		return $body;
 	}
 }
