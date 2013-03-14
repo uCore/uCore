@@ -1,0 +1,21 @@
+.switch {
+	display:inline-block; background-repeat:no-repeat; width:63px; height:18px;
+	transition:background-position 0.1s linear;
+	-moz-transition:background-position 0.1s linear;
+	-webkit-transition:background-position 0.1s linear;
+	-o-transition:background-position 0.1s linear;
+	-ms-transition:background-position 0.1s linear;
+}
+.switch.switch-true { background-position: left center; }
+.switch.switch-false { background-position: right center; }
+/*.switch.switch-true:hover { background-position: -5px center; }*/
+/*.switch.switch-false:hover { background-position: -32px center; }*/
+.switch.yesno {
+	background-image: url(images/switch-yes-no.png);
+}
+.switch.onoff {
+	background-image: url(images/switch-on-off.png);
+}
+.switch.disabled {
+	background-image: url(images/switch-disabled.png);
+}
