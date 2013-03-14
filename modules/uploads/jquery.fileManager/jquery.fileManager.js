@@ -72,7 +72,7 @@
 				$(data.files).each(function () {
 					DrawItem($sel,this);
 				});
-				$sel.append('<div style="clear:both"></div>');
+				$sel.append('<div class="separator"></div>');
 				if (!mbOptions.readonly)
 					$sel.append($('<div>New Folder</div>').button().bind('click',NewFolder));
 				if (mbOptions.upload) {
@@ -178,7 +178,7 @@
 			if (item.type == ICONTYPE_FILE && item.path.search(/.jpeg|.jpg|.png|.gif|.tif|.tiff/i) > -1) {
 				icon.css('background-image','none');
 				var iconPath = (item.icon) ? item.icon : item.fullPath;
-				icon.append('<img style="width:100%;height:100%" src="'+iconPath+'">');
+				icon.append('<img style="width:64px;height:64px" src="'+iconPath+'">');
 			}
 			
 			icon.data('result',target.data('result'));
@@ -193,7 +193,7 @@
 			else ext = '';
 			var basename = item.path.replace(ext,'');
 
-			var renamebox = $('<input style="position:absolute;left:-1em;bottom:-1px;right:-1em" type="text">')
+			var renamebox = $('<textarea></textarea>')
 				.bind('focus',function() { $(this).val(basename); })
 				.bind('blur',function() { $(this).hide(); if (item.path == $(this).val()+ext) return; Rename(item.target,item.path,$(this).val()+ext); })
 				.bind('keydown',function(event) { if (event.keyCode == '13' || event.keyCode == '27') $(this).blur(); })
