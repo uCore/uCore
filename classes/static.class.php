@@ -746,6 +746,7 @@ class utopia {
 		return $cssfiles;
 	}
 	private static $doneCSS = false;
+	public static $noSnip = false;
 	public static function OutputTemplate() {
 		uEvents::TriggerEvent('BeforeOutputTemplate');
 		if (!self::UsingTemplate()) {
@@ -886,7 +887,7 @@ class utopia {
 				$template = $doc->saveHTML();
 			}
 			$template = preg_replace('/<\?xml encoding="UTF-8"\??>\n?/i','',$template);
-			if ($isSnip) {
+			if ($isSnip && !self::$noSnip) {
 				$template = preg_replace('/.*<body[^>]*>\s*/ims', '',$template); // remove everything up to and including the body open tag
 				$template = preg_replace('/\s*<\/body>.*/ims', '',$template); // remove everything after and including the body close tag
 			}
