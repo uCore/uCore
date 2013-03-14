@@ -5,10 +5,15 @@ class fileManager extends uBasicModule implements iAdminModule {
 	function GetTitle() { return 'Media'; }
 	function SetupParents() {
 		$this->AddParent('/');
+		utopia::RegisterAjax('media',array($this,'RunPopup'));
+	}
+	function RunPopup() {
+		utopia::SetTitle('Browse Media');
+		uEvents::RemoveCallback('ProcessDomDocument','uAdminBar::ProcessDomDocument');
+		utopia::UseTemplate(TEMPLATE_BLANK); utopia::$noSnip = true;
+		$this->_RunModule();
 	}
 	function RunModule() {
-		$tabGroupName = utopia::Tab_InitGroup();
-		ob_start();
 		list($path,$pathUpload) = uUploads::Init();
 
 		echo '<div>Uploads <span id="mediaPath"></span></div><div id="fileMan"></div>';
@@ -23,14 +28,13 @@ class fileManager extends uBasicModule implements iAdminModule {
 		$('#fileMan')
 			.fileManager({ajaxPath:'$path',upload:true}$pluploadOpts)
 			.on('changed',function(event, data){ $('#mediaPath').text(data.path.replace(/\//g,' > ')); })
-			.on('dblclick','.fmFile',FileManagerItemClick);
+			.on('dblclick','.fmFile',function() {
+				var item = $(this).data('item');
+				if (item.type != 0) return;
+				window.open(item.fullPath);
+			});
 	});
 FIN
 );
-
-		$out = ob_get_contents();
-		ob_end_clean();
-		utopia::Tab_Add($this->GetTitle(),$out,$this->GetModuleId(),$tabGroupName,false,$this->GetSortOrder());
-		utopia::Tab_InitDraw($tabGroupName);
 	}
 }

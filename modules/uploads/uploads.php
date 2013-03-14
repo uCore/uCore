@@ -107,14 +107,6 @@ FIN
 		// replace "$from" with "$to"
 	}
 	static function Init() {
-		uJavascript::IncludeText(<<<FIN
-	function FileManagerItemClick(event) {
-		var item = $(this).data('item');
-		if (item.type != 0) return;
-		window.open(item.fullPath);
-	}
-FIN
-);
 		$obj =& utopia::GetInstance(__CLASS__);
 		return array($obj->GetAjaxPath(),$obj->GetAjaxUploadPath());
 	}
