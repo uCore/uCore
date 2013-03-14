@@ -245,16 +245,14 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		// preview, publish, revert (red)
 		$obj =& utopia::GetInstance('uCMS_View');
 		$preview = CreateNavButton('Preview',$obj->GetURL(array('cms_id'=>$pkVal,'preview'=>1)),array('target'=>'_blank','title'=>'Preview this page'));
-		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish'),itBUTTON);
 		$revert = $this->DrawSqlInput('revert','Revert',$pkVal,array('title'=>'Reset to published version','class'=>'page-revert'),itBUTTON);
+		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish greenbtn'),itBUTTON);
 
-		return $preview.$publish.$revert;
+		return $preview.$revert.$publish;
 	}
 	
 	public function processWidget($originalValue,$pkVal,$value,$rec,$fieldName) {
 			// replace pragma with uWidgetDiv
-//			$value = preg_replace('/\{widget\.(.+)\}/Ui','<div class="uWidgetPlaceholder mceNonEditable" title="$0"><h1>$1</h1> options here (including delete) <input type="button" onclick="window.top.location = \'$0\'" value="EDIT"></div>',$value);
-
 			if (preg_match_all('/\{widget.(.+)\}/Ui', $value, $matches, PREG_SET_ORDER)) {
 				foreach ($matches as $match) {
 					$value = str_replace($match[0],$this->getWidgetPlaceholder($match[1]),$value);
@@ -412,7 +410,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		if (!isset($_GET['edit'])) {
 			$obj =& utopia::GetInstance('uCMS_View');
 			$editURL = $obj->GetURL(array('cms_id'=>$rec['cms_id'],'edit'=>1));
-			uAdminBar::AddItem('<a href="'.$editURL.'">Edit Page</a>');
+			uAdminBar::AddItem('<a class="btn" href="'.$editURL.'">Edit Page</a>',FALSE,null,'edit-page-link');
 			return;
 		}
 		
@@ -440,14 +438,14 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->tabGroup = NULL;
 		$c = ob_get_contents();
 		ob_end_clean();
-		$pubCell = '<span class="left" style="padding-left:10px">'.$this->GetCell('publishing',$rec).'</span>';
+		$pubCell = '<span class="right publish-buttons" style="padding-left:10px">'.$this->GetCell('publishing',$rec).'</span>';
 
 		
 		$obj =& utopia::GetInstance('uCMS_View');
 		$url = $obj->GetURL(array('cms_id'=>$rec['cms_id']));
 
-		uAdminBar::AddItem('<span class="left">Edit Page Information</span>'.$pubCell,$c);
-		uAdminBar::AddItem('<a href="'.$url.'">Stop Editing</a>');
+		uAdminBar::AddItem('<span class="left">Page Information</span>'.$pubCell,$c);
+		uAdminBar::AddItem('<a class="btn" href="'.$url.'">Stop Editing</a>',FALSE,null,'edit-page-link');
 	}
 	public function RunModule() {
 		$this->ShowData();

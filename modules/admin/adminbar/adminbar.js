@@ -4,11 +4,12 @@ $(function () {
 		if (!$body) return;
 		$body.animate({height:'toggle',width:'toggle'});
 	});
+	$(document).on('click','.admin-bar .admin-toggle',function() { $('.admin-container').animate({width:'toggle'}); $(this).toggleClass('rotate'); });
 
-	setInterval(function() {
+	/*setInterval(function() {
 		var top = parseInt($('html').css('padding-top'));
 		if (!top) top = 0;
 		top += $('.admin-bar').outerHeight();
 		$('html').css('margin-top',top);
-	},5);
+	},5);*/
 });
