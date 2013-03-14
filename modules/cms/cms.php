@@ -210,13 +210,12 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID',itTEXT);
 		$this->AddField('parent','parent','cms');
-		$this->AddField('link',"'View Page'",'cms','');
 		$this->AddField('title','title','cms','Page Title',itTEXT);
 		$this->AddField('nav_text','nav_text','cms','Menu Title',itTEXT);
 		$templates = utopia::GetTemplates(true);
 		$this->AddField('template','template','cms','Template',itCOMBO,$templates);
 		$this->AddField('position','position','cms');
-		$this->AddField('hide','hide','cms','Hide from Menus',itCHECKBOX);
+		$this->AddField('hide','hide','cms','Hide from Menus',itYESNO);
 		$this->AddField('noindex','noindex','cms','noindex',itCHECKBOX);
 		$this->AddField('nofollow','nofollow','cms','nofollow',itCHECKBOX);
 		$this->FieldStyles_Set('title',array('width'=>'100%'));
@@ -366,7 +365,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	public function SetupParents() {
 		utopia::RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
 		$this->AddParent('uCMS_List','cms_id');
-		$this->AddChild('uCMS_View','cms_id','link');
 	}
 	public function getEditor($id = '') {
 		$canEdit = uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE;
