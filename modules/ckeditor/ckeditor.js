@@ -33,9 +33,7 @@ function initCKE() {
 		if (!$(ele).hasClass('ckEditReplace')) return false;
 		if ($(ele).data('toolbar')) config.toolbar = $(ele).data('toolbar');
 	}
-	try {
-		CKEDITOR.replaceAll(initEditor);
-		CKEDITOR.inlineAll();
-	} catch (e) {}
+	CKEDITOR.replaceAll(initEditor);
+	CKEDITOR.inlineAll();
 }
 utopia.Initialise.add(initCKE);
