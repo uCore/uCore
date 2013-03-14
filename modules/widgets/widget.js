@@ -1,18 +1,3 @@
-$(document).on('tinyMceSetup',initialiseMceWidgetButton);
-function initialiseMceWidgetButton(event,ed) {
-	if (ed.settings.theme_advanced_buttons4) ed.settings.theme_advanced_buttons4 += ',addWidgetButton';
-	else ed.settings.theme_advanced_buttons4 = 'addWidgetButton';
-	ed.addButton('addWidgetButton', {
-		title : 'Insert Widget',
-		image : PATH_REL_CORE+'images/ucore-icon.png',
-		onclick : function() {
-			// Add you own code to execute something on click
-			ed.focus();
-			ChooseWidget();
-		}
-	});
-};
-
 var chooseWidgetDialog = null;
 function ChooseWidget() {
 	if (!chooseWidgetDialog) {
@@ -59,10 +44,10 @@ function ChooseWidget() {
 
 function InsertWidget(id) {
 	$.get('?__ajax=getWidgetPlaceholder&id='+id,function (data) {
-		tinyMCE.execCommand('mceInsertContent',true,data);
+		CKEDITOR.currentInstance.insertText(data);
 	});
 }
 
 $(document).on('click','.widget-field',function () {
-	tinyMCE.execCommand('mceInsertContent',true,'{'+(this.dataset['fieldname'])+'}');
+	CKEDITOR.currentInstance.insertText('{'+($(this).data('fieldname'))+'}');
 });

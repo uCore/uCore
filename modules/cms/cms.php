@@ -226,6 +226,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
 
 		$this->AddField('content','content','cms','Page Content',itHTML);
+		$this->fields['content']['attr']['contenteditable'] = 'true';
 //		$this->AddPreProcessCallback('content',array($this,'processWidget'));
 		$this->FieldStyles_Set('content',array('width'=>'100%'));
 		$this->AddField('content_published','content_published','cms');
@@ -278,7 +279,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$addition = '<div class="uWidgetHeader">'.$delBtn.$editBtn.$id.'</div>';
 
 		$ele = $ele->root->children[0];
-		$ele->class .= ' uWidgetPlaceholder mceNonEditable';
+		$ele->class .= ' uWidgetPlaceholder';
 		$ele->title = $id;
 		$ele->innertext = $addition.$ele->innertext;
 
@@ -415,18 +416,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		}
 		
 		uJavascript::LinkFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.js'),9999);
-		uCSS::LinkFile(utopia::GetRelativePath(dirname(__FILE__).'/mce_style.css'),9999);
-
-		/* commented out in favour of javascript automatically pulling all stylesheets from current page
-		$cssfiles = array();
-		$cssfiles[] = PATH_ABS_CORE.'default.css';
-		$cssfiles[] = dirname(__FILE__).'/mce_style.css';
-		$cssfiles = array_map('utopia::GetRelativePath',$cssfiles);
-		$cssfiles = $cssfiles ? ','.json_encode(array('content_css'=>implode(',',$cssfiles))) : '';
-		*/
-		uJavascript::AddText('mceDefaultOptions = $.extend({},mceDefaultOptions,{theme_advanced_toolbar_location:"external",theme_advanced_resizing:false,theme_advanced_statusbar_location:"none"});');
-
-		uAdminBar::AddItem('',FALSE,10000,'defaultSkin mceToolbarContainer');
 
 		ob_start();
 		$this->ClearFilters();

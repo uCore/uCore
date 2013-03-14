@@ -72,7 +72,7 @@ class uEmailTemplateDetails extends uSingleDataModule implements iAdminModule {
 		if (!uEmailer::$init[$pk]['fields']) return 'None';
 		$ret = '';
 		foreach (uEmailer::$init[$pk]['fields'] as $field) {
-			$ret .= "<span onclick=\"tinyMCE.execCommand('mceInsertContent',false,'\{{$field}\}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn btn-mce-insert\">{$field}</span>";
+			$ret .= "<span onclick=\"CKEDITOR.currentInstance.insertText('{{$field}}');\" style=\"margin:0 5px;cursor:pointer\" class=\"btn btn-mce-insert\">{$field}</span>";
 		}
 		return $ret;
 	}
