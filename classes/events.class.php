@@ -6,26 +6,34 @@ class uEvents {
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
 		if (!isset(self::$callbacks[$eventName][$module])) self::$callbacks[$eventName][$module] = array();
-		if (self::CallbackExists($eventName, $callback, $module)) return;
+		if (self::CallbackExists($eventName, $callback, $module)) return false;
 		
 		if ($order === NULL) $order = count(self::$callbacks[$eventName][$module])+1;
 
 		self::$callbacks[$eventName][$module][] = array('callback'=>$callback,'order'=>$order);
+		return true;
 	}
 	public static function RemoveCallback($eventName, $callback, $module = '') {
-		$cb =& self::CallbackExists($eventName, $callback, $module);
-		if ($cb) unset($cb);
-	}
-	public static function &CallbackExists($eventName, $callback, $module = '') {
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
-		$false = FALSE;
 		
-		if (!isset(self::$callbacks[$eventName][$module])) return $false;
+		if (!isset(self::$callbacks[$eventName][$module])) return false;
 		foreach (self::$callbacks[$eventName][$module] as $k => $v) {
-			if ($v['callback'] === $callback) return self::$callbacks[$eventName][$module][$k];
+			if ($v['callback'] !== $callback) continue;
+			unset(self::$callbacks[$eventName][$module][$k]);
+			return true;
 		}
-		return $false;
+		return false;
+	}
+	public static function CallbackExists($eventName, $callback, $module = '') {
+		$module = strtolower($module);
+		$eventName = strtolower($eventName);
+
+		if (!isset(self::$callbacks[$eventName][$module])) return false;
+		foreach (self::$callbacks[$eventName][$module] as $k => $v) {
+			if ($v['callback'] === $callback) return $k;
+		}
+		return false;
 	}
 	public static function TriggerEvent($eventName,$object=null,$eventData=array()) {
 		$module = null;
