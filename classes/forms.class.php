@@ -938,9 +938,10 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function DrawSqlInput($field,$defaultValue='',$pkValue=NULL,$attributes=NULL,$inputTypeOverride=NULL,$valuesOverride=NULL) {
+		$of = $field;
+		if (strpos($field,':') !== FALSE) list($field) = explode(':',$field);
 		if ($attributes==NULL) $attributes = array();
-		if (isset($this->fields[$field]['attr']))
-			$attributes = array_merge($this->fields[$field]['attr'],$attributes);
+		if (isset($this->fields[$field]['attr'])) $attributes = array_merge($this->fields[$field]['attr'],$attributes);
 		$inputType = $inputTypeOverride ? $inputTypeOverride : $this->fields[$field]['inputtype'];
 		$length = $this->GetFieldProperty($field,'length') ? $this->GetFieldProperty($field,'length') : $this->GetTableProperty($field,'length');
 		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field,$pkValue);
@@ -971,7 +972,7 @@ abstract class uDataModule extends uBasicModule {
 		if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
 		if ($this->isAjax) $attributes['class'] .= ' uf';
 
-		$fieldName = $this->CreateSqlField($field,$pkValue);
+		$fieldName = $this->CreateSqlField($of,$pkValue);
 		if ($inputType == itFILE) $attributes['id'] = $fieldName;
 		return utopia::DrawInput($fieldName,$inputType,$defaultValue,$values,$attributes);
 	}
