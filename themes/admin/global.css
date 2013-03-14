@@ -1,3 +1,3 @@
 .admin-bar .dashboard-link {
-        padding-left:30px; background:url(images/ucore-icon.png) no-repeat center left;
+        padding-left:21px !important; background-image:url(images/bolt.png) !important; background-repeat:no-repeat !important; background-position: 7px center !important;
 }
