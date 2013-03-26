@@ -10,8 +10,8 @@ class module_CKEditor extends uBasicModule {
 		utopia::AddInputType(itRICHTEXT,array($this,'drti_func'));
 		utopia::AddInputType(itHTML,array($this,'drti_func'));
 		self::InitScript();
-		uJavascript::IncludeFile(dirname(__FILE__).'/lib/ckeditor.js');
-		uJavascript::IncludeFile(dirname(__FILE__).'/ckeditor.js');
+		uJavascript::IncludeFile(dirname(__FILE__).'/lib/ckeditor.js',1000);
+		uJavascript::IncludeFile(dirname(__FILE__).'/ckeditor.js',1005);
 		uEvents::AddCallback('AfterRunModule',array($this,'MediaScript'),'fileManager');
 	}
 	public function MediaScript() {
@@ -36,8 +36,8 @@ echo '<style>.ui-widget{font-size:0.8em}body{font-family:Arial}</style>';
 			list($fileManagerPath,$uploadPath) = uUploads::Init();
 			$basepath = utopia::GetRelativePath(dirname(__FILE__).'/lib/');
 			uJavascript::IncludeText(<<< FIN
-	var CKEDITOR_BASEPATH = '$basepath/';
-	var FILE_BROWSE_URL = PATH_REL_CORE+'index.php?__ajax=media';
+var CKEDITOR_BASEPATH = '$basepath/';
+var FILE_BROWSE_URL = PATH_REL_CORE+'index.php?__ajax=media';
 FIN
 );
 		}
@@ -71,13 +71,12 @@ FIN
 		$plugins = glob(dirname(__FILE__).'/plugins/*/plugin.js');
 		$p = array();
 		foreach ($plugins as $file) {
-			uJavascript::IncludeFile($file,9999);
 			preg_match('/\/([^\/]+)\/plugin\.js/i',$file,$match);
 			$match = $match[1];
-			uJavascript::IncludeText("$(function(){CKEDITOR.plugins.addExternal('$match','$ppath$match/', 'plugin.js');});");
+			uJavascript::IncludeText("CKEDITOR.plugins.addExternal('$match','$ppath$match/', 'plugin.js');",1003);
 			$p[] = $match;
 		}
-		uJavascript::IncludeText("$(function(){CKEDITOR.config.extraPlugins = '".implode(',',$p)."';});");
+		uJavascript::IncludeText("CKEDITOR.config.extraPlugins = '".implode(',',$p)."';",1004);
 	}
 }
 uEvents::AddCallback('BeforeResetField','module_CKEditor::CanResetField');
