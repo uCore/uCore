@@ -59,7 +59,7 @@
 }
 
 .admin-bar .layoutDetailSection { width:100% }
-.admin-bar .inputtype { padding:5px; width:100%; box-sizing:border-box; border: 1px solid #ABADB3; margin:3px 0; }
+.admin-bar .inputtype { padding:5px !important; height:auto; line-height:normal; width:100%; box-sizing:border-box; border: 1px solid #ABADB3; margin:3px 0; font-size: 12px; box-shadow: none; border-radius: 0; color:#333; }
 .admin-bar .inputtype.inputtype-combo.ui-combobox { width:100% !important; }
 
 .admin-bar .menu_0 {
