@@ -67,10 +67,17 @@ FIN
 	}
 	
 	public static function AddExternalPlugins() {
-		$plugins = glob(dirname(__FILE__).'/plugins/*.js');
+		$ppath = utopia::GetRelativePath(dirname(__FILE__)).'/plugins/';
+		$plugins = glob(dirname(__FILE__).'/plugins/*/plugin.js');
+		$p = array();
 		foreach ($plugins as $file) {
 			uJavascript::IncludeFile($file,9999);
+			preg_match('/\/([^\/]+)\/plugin\.js/i',$file,$match);
+			$match = $match[1];
+			uJavascript::IncludeText("$(function(){CKEDITOR.plugins.addExternal('$match','$ppath$match/', 'plugin.js');});");
+			$p[] = $match;
 		}
+		uJavascript::IncludeText("$(function(){CKEDITOR.config.extraPlugins = '".implode(',',$p)."';});");
 	}
 }
 uEvents::AddCallback('BeforeResetField','module_CKEditor::CanResetField');

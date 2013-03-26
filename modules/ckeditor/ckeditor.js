@@ -38,6 +38,6 @@ function initCKE() {
 		if ($(ele).data('toolbar')) config.toolbar = $(ele).data('toolbar');
 	}
 	CKEDITOR.replaceAll(initEditor);
-	CKEDITOR.inlineAll();
+	CKEDITOR.inlineAll(initEditor);
 }
 utopia.Initialise.add(initCKE);
