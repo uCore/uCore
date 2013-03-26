@@ -64,15 +64,17 @@ class uJavascript extends uBasicModule {
 		self::$linkFiles[] = array('path'=>$path,'order'=>$order,'attr'=>$attr);
 	}
 	private static $includeFiles = array();
-	public static function IncludeFile($path) {
+	public static function IncludeFile($path,$order=NULL) {
 		// if running ALERT: CANNOT BE CALLED AT RUN TIME
 		if (!file_exists($path)) $path = utopia::GetAbsolutePath($path);
 		if (!file_exists($path)) return;
-		self::$includeFiles[] = $path;
+		if ($order === null) $order = count(self::$includeFiles);
+		self::$includeFiles[] = array('path'=>$path,'order'=>$order);
 	}
-	private static $includeText = '';
-	public static function IncludeText($text) {
-		self::$includeText .= "\n$text";
+	private static $includeText = array();
+	public static function IncludeText($text,$order=NULL) {
+		if ($order === null) $order = count(self::$includeText);
+		self::$includeText[] = array('text'=>$text,'order'=>$order);
 	}
 	private static $script_include = '';
 	public static function AddText($text) {
@@ -91,14 +93,12 @@ class uJavascript extends uBasicModule {
 
 		clearstatcache();
 		$uStr = '';
-		self::$includeFiles = array_unique(self::$includeFiles);
-		foreach (self::$includeFiles as $filename) {
-			//does it exist?
-			if (!file_exists($filename)) continue;
-			$uStr .= $filename.filemtime($filename).'-'.filesize($filename);
+		foreach (self::$includeFiles as $info) {
+			if (!file_exists($info['path'])) continue;
+			$uStr .= $info['path'].filemtime($info['path']).'-'.filesize($info['path']);
 		}
 
-		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()).self::$includeText.'-'.PATH_REL_CORE);
+		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()).count(self::$includeText).'-'.PATH_REL_CORE);
 		utopia::Cache_Check($etag,'text/javascript',$this->GetUUID());
 
 		// minify caching
@@ -128,14 +128,17 @@ class uJavascript extends uBasicModule {
 		return $body;
 	}
 
-	static function BuildJavascript($minify=true) {
-		$body = self::GetJavascriptConstants();
+	static function BuildJavascript() {
+		$textarr = self::$includeText;
+		foreach (self::$includeFiles as $info) {
+			if (!file_exists($info['path'])) continue;
+			$textarr[] = array('text'=>file_get_contents($info['path']),'order'=>$info['order']);
+		}
+		array_sort_subkey($textarr,'order');
 
-		$body .= self::$includeText;
-		
-		foreach (self::$includeFiles as $filename) {
-			if (!file_exists($filename)) continue;
-			$body .= file_get_contents($filename).";\n\n";
+		$body = self::GetJavascriptConstants();
+		foreach ($textarr as $info) {
+			$body .= $info['text'].';'.PHP_EOL;
 		}
     
 		return $body;
