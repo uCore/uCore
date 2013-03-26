@@ -169,8 +169,6 @@ $(document).ready(function(){
 	}
 
 	$('img.calendar_trigger').bind('click', function (event) {event.stopPropagation(); return true;});
-
-	$("[name^=usql]").bind('keydown', function (event) {if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA'))) this.blur(); });
 });
 
 utopia.Initialise.add(RefreshTables);
