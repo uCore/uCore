@@ -53,6 +53,7 @@ FIN
 			if ($inputType == itRICHTEXT) $attributes['data-toolbar'] = 'Basic';
 		}
 		if (isset($attributes['contenteditable'])) {
+			$attributes['class'] = str_replace(array('inputtype-html','inputtype'),'',$attributes['class']);
 			$attr = BuildAttrString($attributes);
 			return '<div'.$attr.'>'.$defaultValue.'</div>';
 		}
