@@ -12,6 +12,7 @@ CKEDITOR.config.toolbar_Advanced = [
 	[ 'Sourcedialog' ]
 ];
 CKEDITOR.config.toolbar = 'Advanced';
+CKEDITOR.config.allowedContent = true;
 CKEDITOR.config.filebrowserBrowseUrl = FILE_BROWSE_URL;
 CKEDITOR.config.filebrowserWindowWidth = '800';
 CKEDITOR.config.filebrowserWindowHeight = '600';
