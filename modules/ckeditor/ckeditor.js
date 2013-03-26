@@ -8,7 +8,8 @@ CKEDITOR.config.toolbar_Advanced = [
 	'/',
 	[ 'Link', 'Unlink', 'Anchor' ],
 	{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','SpecialChar' ] },
-	[ 'Maximize', 'ShowBlocks', 'Source' ]
+	[ 'Maximize', 'ShowBlocks' ],
+	[ 'Sourcedialog' ]
 ];
 CKEDITOR.config.toolbar = 'Advanced';
 CKEDITOR.config.filebrowserBrowseUrl = FILE_BROWSE_URL;
