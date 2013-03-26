@@ -12,6 +12,7 @@ class module_CKEditor extends uBasicModule {
 		self::InitScript();
 		uJavascript::IncludeFile(dirname(__FILE__).'/lib/ckeditor.js',1000);
 		uJavascript::IncludeFile(dirname(__FILE__).'/ckeditor.js',1005);
+		uCSS::IncludeFile(dirname(__FILE__).'/ckeditor.css');
 		uEvents::AddCallback('AfterRunModule',array($this,'MediaScript'),'fileManager');
 	}
 	public function MediaScript() {
