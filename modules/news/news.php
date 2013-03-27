@@ -254,6 +254,7 @@ class module_NewsDisplay extends uDataModule {
 			$rec = $this->LookupRecord($_GET['news_id']);
 			$img = 'http://'.utopia::GetDomainName().uBlob::GetLink(get_class($this),'image',$rec['news_id']);
 			$meta = $doc->createElement('meta'); $meta->setAttribute('property','og:title'); $meta->setAttribute('content',$rec['heading']); $head->appendChild($meta);
+			$meta = $doc->createElement('meta'); $meta->setAttribute('property','og:type'); $meta->setAttribute('content','article'); $head->appendChild($meta);
 			$meta = $doc->createElement('meta'); $meta->setAttribute('property','og:url'); $meta->setAttribute('content','http://'.utopia::GetDomainName().$_SERVER['REQUEST_URI']); $head->appendChild($meta);
 			if ($rec['image']) { // image exists?
 				$meta = $doc->createElement('meta'); $meta->setAttribute('property','og:image'); $meta->setAttribute('content',$img); $head->appendChild($meta);
