@@ -194,9 +194,9 @@ class module_NewsDisplay extends uDataModule {
 	public function GetTitle() { return 'Latest News'; }
 	public function SetupParents() {
 		$this->SetRewrite('{heading}-{news_id}',true);
-		modOpts::AddOption('news_per_page','News Articles Per Page','News',2);
-		modOpts::AddOption('news_widget_archive','News Archive Widget','News','news-archive');
-		modOpts::AddOption('news_widget_article','News Article Widget','News','news-article');
+		modOpts::AddOption('news_per_page','Articles Per Page','Articles',2);
+		modOpts::AddOption('news_widget_archive','Archive Widget','Articles','article-archive');
+		modOpts::AddOption('news_widget_article','Article Widget','Articles','article');
 		
 		uSearch::AddSearchRecipient(__CLASS__,array('heading','text'),'heading','text');
 	}
