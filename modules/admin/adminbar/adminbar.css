@@ -5,7 +5,7 @@
 	z-index:99999;
 	background-color:#333;
 }
-.admin-bar .admin-container { display:none; border-right: 1px solid #aaa; }
+.admin-bar .admin-container { display:none; border-right: 1px solid #aaa; border-bottom: 1px solid #aaa; }
 .admin-bar .admin-menu {
 	min-width:400px;
 	line-height:25px;
@@ -30,7 +30,7 @@
 	height: 30px;
 	white-space:nowrap;
 }
-.admin-bar .admin-menu li.first-item { border-left:0;}
+.admin-bar .admin-menu li.first-child { margin-bottom:-1px; }
 .admin-bar .admin-menu li.toggle {
 	cursor: pointer;
 	background-image: url(images/dropdown.png);
