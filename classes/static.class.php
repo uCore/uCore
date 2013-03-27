@@ -19,6 +19,7 @@ utopia::AddTemplateParser('inline','inline=0','');
 utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 
 utopia::AddTemplateParser('setrequest','utopia::setRequest');
+utopia::AddTemplateParser('setget','utopia::setGet');
 
 class utopia {
 	private static $children = array();
@@ -1021,6 +1022,10 @@ class utopia {
 
 	static function SetRequest($query) {
 		foreach ($query as $k=>$v) $_REQUEST[$k] = $v;
+		return '';
+	}
+	static function SetGet($query) {
+		foreach ($query as $k=>$v) $_GET[$k] = $v;
 		return '';
 	}
 	
