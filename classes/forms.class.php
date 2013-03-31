@@ -890,15 +890,18 @@ abstract class uDataModule extends uBasicModule {
 		foreach ($this->filters as $filterType) {
 			foreach ($filterType as $filterSet) {
 				foreach ($filterSet as $filter) {
+					// is the current filter referenced in $filters? if not, continue;
+					if (!isset($filters[$filter['fieldName']]) && !isset($filters['_f_'.$filter['uid']])) continue;
+					
 					$val = $this->GetFilterValue($filter['uid']);
 					if (isset($filters[$filter['fieldName']])) $val = $filters[$filter['fieldName']];
 					if (isset($filters['_f_'.$filter['uid']])) $val = $filters['_f_'.$filter['uid']];
 					
-					if (!empty($filter['default']) && $val == $filter['default']) {
+					/*if (!empty($filter['default']) && $val == $filter['default']) {
 						unset($filters[$filter['fieldName']]);
 						unset($filters['_f_'.$filter['uid']]);
 						continue;
-					}
+					}*/
 
 					if (!$val) continue;
 					if ($this->HasRewrite($filter['fieldName'])) {
@@ -907,6 +910,7 @@ abstract class uDataModule extends uBasicModule {
 						unset($filters['_f_'.$filter['uid']]);
 						continue;
 					}
+					continue; // skip below
 					$filters['_f_'.$filter['uid']] = $val;
 					unset($filters[$filter['fieldName']]);
 				}
