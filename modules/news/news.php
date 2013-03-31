@@ -215,15 +215,11 @@ class module_NewsDisplay extends uDataModule {
 		$this->AddField('tags','tag','tags','tags',itTEXT);
 		$this->AddPreProcessCallback('tags',array($this,'ppTag'));
 		
-		$this->AddFilter('news_id',ctEQ,itNONE);
-		if (isset($_GET['news_id'])) {
-			$this->AddFilter('news_id',ctEQ,itNONE,$_GET['news_id']);
-		}
+		$this->AddFilter('news_id',ctEQ,itNONE,isset($_GET['news_id'])?$_GET['news_id']:null);
 		
 		$this->AddFilter('{time} <= NOW()',ctCUSTOM);
 		
-		if (isset($_GET['tags']))
-			$this->AddFilter('tags',ctEQ,itNONE,$_GET['tags']);
+		$this->AddFilter('tags',ctEQ,itNONE,isset($_GET['tags'])?$_GET['tags']:null);
 		$this->AddOrderBy('time','desc');
 	}
 	public static $uuid = 'news';
@@ -242,8 +238,11 @@ class module_NewsDisplay extends uDataModule {
 		echo '{widget.'.modOpts::GetOption('news_widget_archive').'}';
 	}
 	public function ppTag($v) {
-		if (!is_array($v)) return $v;
+		if (!is_array($v)) $v = array($v);
 		sort($v);
+		foreach($v as $k=>$tag) {
+			$v[$k] = '<a href="'.$this->GetURL(array('tags'=>$tag)).'">'.$tag.'</a>';
+		}
 		return implode(', ',$v);
 	}
 	public function ProcessDomDocument($o,$e,$doc) {
