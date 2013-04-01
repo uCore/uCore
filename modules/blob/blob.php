@@ -23,7 +23,7 @@ class uBlob extends uBasicModule {
 
 		if ($isImg && ($width || $height)) $filetype = 'image/png';
 		
-		$etag = utopia::checksum(array($data,$width,$height,$isImg));
+		$etag = utopia::checksum(array(base64_encode($data),$width,$height,$isImg));		
 		
 		$attach = 'inline';
 		if (isset($_REQUEST['attach'])) {
