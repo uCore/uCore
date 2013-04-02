@@ -118,6 +118,7 @@ class uCustomWidget implements iWidget {
 
 		// get rows
 		$rows = $dataset->GetOffset($offset,$limit);
+		if (!$rows) return $rec['no_rows'];
 		
 		// get content
 		$content = $append = $prepend = '';
