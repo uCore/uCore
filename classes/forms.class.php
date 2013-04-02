@@ -201,8 +201,9 @@ class uDataset {
 	}
 	
 	public function GetOffset($offset,$count) {
-		$limit = ' LIMIT '.$offset.','.$count;
-		return $this->CreateRecords(database::query($this->query.$limit,$this->args)->fetchAll());
+		$ql = $this->query.' LIMIT ?,?';
+		$qa = $this->args; $qa[] = intval($offset); $qa[] = intval($count);
+		return $this->CreateRecords(database::query($ql,$qa)->fetchAll());
 	}
 	
 	private $ds = null;
