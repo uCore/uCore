@@ -126,6 +126,10 @@ class module_NewsRSS extends uDataModule {
 		$this->AddField('image','image','news','Image',itFILE);
 		$this->AddField('archive','archive','news','Archive',itCHECKBOX);
 		$this->AddField('featured','featured','news','Featured');
+		
+		$this->AddFilter('news_id',ctEQ,itNONE,isset($_GET['news_id'])?$_GET['news_id']:null);
+		$this->AddFilter('{time} <= NOW()',ctCUSTOM);
+		$this->AddFilter('tags',ctEQ,itNONE,isset($_GET['tags'])?$_GET['tags']:null);
 		$this->AddOrderBy('time','desc');
 	}
 	public function ppTag($v) {
@@ -225,9 +229,7 @@ class module_NewsDisplay extends uDataModule {
 		$this->AddPreProcessCallback('tags',array($this,'ppTag'));
 		
 		$this->AddFilter('news_id',ctEQ,itNONE,isset($_GET['news_id'])?$_GET['news_id']:null);
-		
 		$this->AddFilter('{time} <= NOW()',ctCUSTOM);
-		
 		$this->AddFilter('tags',ctEQ,itNONE,isset($_GET['tags'])?$_GET['tags']:null);
 		$this->AddOrderBy('time','desc');
 	}
