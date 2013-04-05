@@ -158,7 +158,7 @@ class module_NewsRSS extends uDataModule {
   <title>{$row['heading']}</title>
   <description>{$row['description']}</description>
   <link>{$link}</link>
-  <guid isPermaLink="false">{$link}</guid>
+  <guid>{$link}</guid>
   <pubDate>{$updated}</pubDate>{$img}
  </item>
 FIN;
