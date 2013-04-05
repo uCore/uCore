@@ -887,8 +887,9 @@ abstract class uDataModule extends uBasicModule {
 		$this->_SetupFields();
 		if ($filters === FALSE) return parent::GetURL($filters);
 		if (!is_array($filters) && $filters !== NULL) {
-			$f = $this->FindFilter($this->GetPrimaryKey(),ctEQ);
-			$filters = array('_f_'.$f['uid']=>$filters);
+			$f = $this->FindFilter($this->GetPrimaryKey());
+			if ($f) $filters = array('_f_'.$f['uid']=>$filters);
+			else $filters = array($this->GetPrimaryKey()=>$filters);
 		}
 
 		foreach ($this->filters as $filterType) {
