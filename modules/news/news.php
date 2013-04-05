@@ -204,8 +204,17 @@ class module_NewsDisplay extends uDataModule {
 	public function SetupFields() {
 		$this->CreateTable('news');
 		$this->CreateTable('tags','tabledef_NewsTags','news','news_id');
+		
+		$this->CreateTable('user','tabledef_Users','news',array('author'=>'user_id'));
+		$this->CreateTable('author','tabledef_UserProfile','news',array('author'=>'user_id'));
+		$this->AddField('author_name','(IF(TRIM(CONCAT(COALESCE({first_name},\'\'),\' \',COALESCE({last_name},\'\'))) != \'\',TRIM(CONCAT(COALESCE({first_name},\'\'),\' \',COALESCE({last_name},\'\'))),`user`.`username`))','author','Author Name');
+		$this->AddField('gplus_url','gplus_url','author','Google+ URL');
+		$this->AddPreProcessCallback('gplus_url',array($this,'gplusurl'));
+		
 		$this->AddField('time','time','news','time');
+		$this->AddPreProcessCallback('time',array($this,'timeformat'));
 		$this->SetFieldType('time',ftDATE);
+		
 		$this->AddField('heading','heading','news','heading');
 		$this->AddField('text','text','news','text');
 		$this->AddField('description','description','news','description');
@@ -223,6 +232,26 @@ class module_NewsDisplay extends uDataModule {
 		$this->AddOrderBy('time','desc');
 	}
 	public static $uuid = 'news';
+	public function timeformat($originalValue,$pkVal,$processedVal) {
+		return '<abbr class="published" title="'.$originalValue.'">'.utopia::convDateTime($originalValue,$pkVal,$processedVal).'</abbr>';
+	}
+	public function gplusurl($v) {
+		if (!$v) return $v;
+		$u = parse_url($v);
+		$q = array();
+		if (isset($u['query'])) $q = parse_str($u['query']);
+		$q['rel'] = 'author';
+		$u['query'] = http_build_query($q);
+		return unparse_url($u);
+	}
+	public function ppTag($v) {
+		if (!is_array($v)) $v = array($v);
+		sort($v);
+		foreach($v as $k=>$tag) {
+			$v[$k] = '<a rel="category tag" title="View all posts in '.ucwords($tag).'" href="'.$this->GetURL(array('tags'=>$tag)).'">'.$tag.'</a>';
+		}
+		return implode(', ',$v);
+	}
 	public function RunModule() {
 		uEvents::AddCallback('ProcessDomDocument',array($this,'ProcessDomDocument'));
 		if (isset($_GET['news_id'])) {
@@ -236,14 +265,6 @@ class module_NewsDisplay extends uDataModule {
 		}
 		if (isset($_GET['tags'])) utopia::SetTitle('Latest '.ucwords($_GET['tags']).' News');
 		echo '{widget.'.modOpts::GetOption('news_widget_archive').'}';
-	}
-	public function ppTag($v) {
-		if (!is_array($v)) $v = array($v);
-		sort($v);
-		foreach($v as $k=>$tag) {
-			$v[$k] = '<a href="'.$this->GetURL(array('tags'=>$tag)).'">'.$tag.'</a>';
-		}
-		return implode(', ',$v);
 	}
 	public function ProcessDomDocument($o,$e,$doc) {
 		$head = $doc->getElementsByTagName('head')->item(0);
@@ -271,4 +292,16 @@ class module_NewsDisplay extends uDataModule {
 		$link->setAttribute('href',$rssobj->GetURL());
 		$head->appendChild($link);
 	}
+	
+	public static function AddUserFields($o,$e) {
+		$o->AddField('gplus_url',ftVARCHAR,255);
+	}
+	public static function AddUserFieldsDetail($o,$e) {
+		$o->AddSpacer();
+		$o->AddField('gplus_url','gplus_url','detail','Google+ URL',itTEXT);
+	}
 }
+
+uEvents::AddCallback('AfterSetupFields','module_NewsDisplay::AddUserFields','tabledef_UserProfile');
+uEvents::AddCallback('AfterSetupFields','module_NewsDisplay::AddUserFieldsDetail','UserProfileDetail');
+uEvents::AddCallback('AfterSetupFields','module_NewsDisplay::AddUserFieldsDetail','UserDetailAdmin');
