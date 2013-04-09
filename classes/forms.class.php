@@ -2300,6 +2300,7 @@ abstract class uDataModule extends uBasicModule {
 
 		foreach ($this->fields as $alias => $field) {
 			if ($alias == $fieldAlias) continue;
+			if (!isset($field['preprocess']) && !$field['values']) continue;
 			$this->ResetField($alias,$pkVal);
 		}
 	}
