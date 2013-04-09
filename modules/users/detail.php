@@ -43,6 +43,8 @@ class UserProfileDetail extends uSingleDataModule {
 		$this->AddField('user_id_detail','user_id','detail');
 		$this->SetDefaultValue('user_id_detail',$l);
 		
+		$this->AddField('visible_name','(IF(TRIM(CONCAT(COALESCE({first_name},\'\'),\' \',COALESCE({last_name},\'\'))) != \'\',TRIM(CONCAT(COALESCE({first_name},\'\'),\' \',COALESCE({last_name},\'\'))),`user`.`username`))','detail');
+		
 		$this->AddField('first_name','first_name','detail','First Name',itTEXT);
 		$this->AddField('last_name','last_name','detail','Last Name',itTEXT);
 		$this->AddField('phone','phone','detail','Home Phone',itTEXT);
