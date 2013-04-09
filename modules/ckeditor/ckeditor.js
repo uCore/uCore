@@ -37,6 +37,7 @@ CKEDITOR.on('instanceReady',function(info) {
 function initCKE() {
 	function initEditor(ele,config) {
 		if (!$(ele).hasClass('ckEditReplace')) return false;
+		if ($(ele).attr('name') && CKEDITOR.instances[$(ele).attr('name')]) return false;
 		if ($(ele).data('toolbar')) config.toolbar = $(ele).data('toolbar');
 	}
 	CKEDITOR.replaceAll(initEditor);
