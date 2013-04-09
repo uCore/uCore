@@ -48,6 +48,18 @@ class database {
 		if (utopia::DebugMode()) $timetaken = timer_end($tID);
 		return $stm;
 	}
+	static function getKeyValuePairs($query,$args=null) {
+		$result = self::query($query,$args);
+		$arr = array();
+		while ($result !== false && (($row = $result->fetch(PDO::FETCH_NUM)) !== FALSE)) {
+			if (isset($row[1])) {
+				$arr[$row[0]] = $row[1];
+			} else {
+				$arr[$row[0]] = $row[0];
+			}
+		}
+		return $arr;
+	}
 	static function getType($val) {
 		if ($val === NULL) return PDO::PARAM_NULL;
 		if (is_bool($val)) return PDO::PARAM_BOOL;

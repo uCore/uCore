@@ -1226,16 +1226,7 @@ abstract class uDataModule extends uBasicModule {
 		if (is_array($values)) {
 			$arr = $values;
 		} elseif (IsSelectStatement($values)) {
-			$arr = array();
-			$result = database::query($values);
-			while ($result != false && (($row = $result->fetch(PDO::FETCH_NUM)) !== FALSE)) {
-				if (isset($row[1])) {
-					// key value pair
-					$arr[$row[0]] = $row[1];
-				} else {
-					$arr[$row[0]] = $row[0];
-				}
-			}
+			$arr = database::getKeyValuePairs($values);
 		}
 		
 		if ($stringify && is_array($arr) && $arr) {
