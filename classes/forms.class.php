@@ -2433,14 +2433,16 @@ abstract class uDataModule extends uBasicModule {
 			
 			$tableObj =& utopia::GetInstance($table);
 			if ($tableObj instanceof iLinkTable) {
-				if (!is_array($newValue)) $newValue = array($newValue);
-				// do link table stuff
 				// delete all where tofield is oldpk
 				database::query('DELETE FROM `'.$tableObj->tablename.'` WHERE `'.$pkLinkTo.'` = ?',array($pkVal));
-				foreach ($newValue as $v) {
-					$n = null;
-					$tableObj->UpdateField($pkLinkTo,$pkVal,$n,$fieldType); //set left
-					$tableObj->UpdateField($field,$v,$n,$fieldType); //set right
+				// loop through new values (unless empty) and add them to the link table
+				if ($newValue !== NULL && $newValue !== '') {
+					if (!is_array($newValue)) $newValue = array($newValue);
+					foreach ($newValue as $v) {
+						$n = null;
+						$tableObj->UpdateField($pkLinkTo,$pkVal,$n,$fieldType); //set left
+						$tableObj->UpdateField($field,$v,$n,$fieldType); //set right
+					}
 				}
 				return true;
 			}
