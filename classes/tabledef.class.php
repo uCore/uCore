@@ -81,7 +81,7 @@ abstract class uTableDef implements iUtopiaModule {
 				$this->fields[$name]['default'] = NULL;
 				$this->auto_increment = $name;
 			}
-			$name = array($name);
+			$name = (array)$name;
 		}
 		foreach ($name as $k=>$v) {
 			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
@@ -90,7 +90,7 @@ abstract class uTableDef implements iUtopiaModule {
 		$this->primary = $name;
 	}
 	public function SetUniqueField($name) {
-		if (!is_array($name)) $name = array($name);
+		$name = (array)$name;
 		foreach ($name as $k=>$v) {
 			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
 			$this->fields[$v]['null'] = SQL_NOT_NULL;
@@ -98,7 +98,7 @@ abstract class uTableDef implements iUtopiaModule {
 		$this->unique[] = $name;
 	}
 	public function SetIndexField($name) {
-		if (!is_array($name)) $name = array($name);
+		$name = (array)$name;
 		foreach ($name as $k=>$v) {
 			if (!isset($this->fields[$v])) { unset($name[$k]); continue; }
 		}
@@ -110,10 +110,16 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 	
 	public function IsIndex($field) {
-		$field = (array)$field;
 		if ($this->primary == $field) return true;
-		foreach ($this->index as $f) if ($f == $field) return true;
-		foreach ($this->unique as $f) if ($f == $field) return true;
+		if (is_array($this->primary) && array_search($field,$this->primary) !== FALSE) return true;
+		foreach ($this->index as $f) {
+			if ($f == $field) return true;
+			if (is_array($f) && array_search($field,$f) !== FALSE) return true;
+		}
+		foreach ($this->unique as $f) {
+			if ($f == $field) return true;
+			if (is_array($f) && array_search($field,$f) !== FALSE) return true;
+		}
 		return false;
 	}
 
