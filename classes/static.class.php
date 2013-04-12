@@ -860,16 +860,6 @@ class utopia {
 				uEvents::TriggerEvent('ProcessDomDocument',null,array(&$doc));
 			} catch (Exception $e) { uErrorHandler::EchoException($e); }
 			
-			// move all LINK end of HEAD
-			$links = $head->getElementsByTagName('link');
-			for ($i = 0; $i < $links->length; $i++) { $head->appendChild($links->item(0)); }
-			// move all SCRIPT end of HEAD (after LINK)
-			$scripts = $head->getElementsByTagName('script');
-			for ($i = 0; $i < $scripts->length; $i++) { $head->appendChild($scripts->item(0)); }
-			// move all STYLE end of HEAD
-			$styles = $doc->getElementsByTagName('style');
-			for ($i = 0; $i < $styles->length; $i++) { $head->appendChild($styles->item(0)); }
-			
 			$ctNode = null;
 			foreach ($head->getElementsByTagName('meta') as $meta) {
 				if ($meta->hasAttribute('http-equiv') && strtolower($meta->getAttribute('http-equiv')) == 'content-type') { $ctNode = $meta; break; }
