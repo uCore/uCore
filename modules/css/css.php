@@ -52,6 +52,8 @@ class uCSS extends uBasicModule {
 			if ($v === NULL) $v = $style->childNodes->item(0)->nodeValue;
 			$style->removeChild($style->childNodes->item(0));
 			$style->appendChild($doc->createTextNode("/*"));
+			$v = preg_replace('/^\s*\*\/\s*/','',$v);
+			$v = preg_replace('/\s*\/\*\s*$/','',$v);
 			$style->appendChild($doc->createCDATASection("*/\n" . trim($v) . "\n/*"));
 			$style->appendChild($doc->createTextNode("*/"));
 		}
