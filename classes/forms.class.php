@@ -157,14 +157,14 @@ class uDataset {
 				//				if (!empty($having2)) $having2 = $having.' AND ('.$having2.')';
 				//				else $having2 = $having;
 				$order2 = $obj->GetOrderBy(); $order2 = $order2 ? "\n ORDER BY $order2" : '';
-				$union .= "\nUNION\n($select2$from2$where2$group2$having2$order2)";
+				$union .= "\nUNION\n(SELECT $select2$from2$where2$group2$having2$order2)";
 			}
 			$union .= " $order";
 		}
 		
-		$this->query = "($select$from$where$group$having1$order1)$union";
-		if ($having) $this->countQuery = '(SELECT COUNT(*) FROM ('.$this->query.') as `__`)';
-		else $this->countQuery = "(SELECT COUNT(*) FROM (SELECT 1$from$where$group ORDER BY NULL) as `__`)";
+		$this->query = "(SELECT $select$from$where$group$having1$order1)$union";
+		if ($having) $this->countQuery = "(SELECT SQL_CALC_FOUND_ROWS $select$from$where$group$having1$order1)$union LIMIT 0";
+		else $this->countQuery = "(SELECT SQL_CALC_FOUND_ROWS NULL$from$where$group ORDER BY NULL LIMIT 0)";
 	}
 	
 	
@@ -178,7 +178,8 @@ class uDataset {
 	public function CountRecords() {
 		if ($this->recordCount === NULL) {
 			try {
-				$this->recordCount = database::query($this->countQuery,$this->args)->fetchColumn();
+				database::query($this->countQuery,$this->args);
+				$this->recordCount = database::query('SELECT FOUND_ROWS()')->fetchColumn();
 			} catch (Exception $e) { return 0; }
 		}
 		return $this->recordCount;
@@ -1730,8 +1731,8 @@ abstract class uDataModule extends uBasicModule {
 
 		// now create function to turn the sqlTableSetup into a FROM clause
 
-		$distinct = flag_is_set($this->GetOptions(),DISTINCT_ROWS) ? ' DISTINCT' : '';
-		$qry = "SELECT$distinct ".join(",\n",$flds);
+		$distinct = flag_is_set($this->GetOptions(),DISTINCT_ROWS) ? 'DISTINCT ' : '';
+		$qry = "$distinct".join(",\n",$flds);
 		return $qry;
 	}
 
@@ -2101,7 +2102,6 @@ abstract class uDataModule extends uBasicModule {
 	public function LookupRecord($filter=NULL,$clearFilters=false) {
 		if ($filter===NULL && $clearFilters===false && isset($_GET['_n_'.$this->GetModuleId()])) return NULL;
 		$ds = $this->GetDataset($filter,$clearFilters);
-		if (!$ds->CountRecords()) return NULL;
 		$row = $ds->GetFirst();
 		if (!$row) return NULL;
 		if ($filter===NULL && $clearFilters === FALSE) $this->currentRecord = $row;
