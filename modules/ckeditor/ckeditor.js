@@ -35,12 +35,14 @@ CKEDITOR.on('instanceReady',function(info) {
 
 	
 function initCKE() {
-	function initEditor(ele,config) {
-		if (!$(ele).hasClass('ckEditReplace')) return false;
-		if ($(ele).attr('name') && CKEDITOR.instances[$(ele).attr('name')]) return false;
-		if ($(ele).data('toolbar')) config.toolbar = $(ele).data('toolbar');
-	}
-	CKEDITOR.replaceAll(initEditor);
-	CKEDITOR.inlineAll(initEditor);
+	$('.ckEditReplace').each(function() {
+		if ($(this).attr('name') && CKEDITOR.instances[$(this).attr('name')]) return false;
+		var config = {};
+		if ($(this).data('toolbar')) config.toolbar = $(this).data('toolbar');
+		if ($(this).is('[contenteditable]'))
+			CKEDITOR.inline(this,config);
+		else
+			CKEDITOR.replace(this,config);
+	});
 }
 utopia.Initialise.add(initCKE);
