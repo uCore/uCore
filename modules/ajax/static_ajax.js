@@ -483,7 +483,6 @@ $(function() { // call on docready to allow cancelling events to bind first.
 	$(document).on('change',':input.uf',_fieldChange);
 	$(document).on('click','a.uf',function(){ uf(this,''); return false; });
 	$(document).on('click','input[type=button].uf, .btn.uf',_fieldChange);
-	$(document).on('click','.btn',function(event) {event.stopPropagation();});
 	$(document).on('submit','form.uf',function(event) {
 		if ($(this).attr('target')) return;
 		if ($('[name^="usql-"]',this).length) {
