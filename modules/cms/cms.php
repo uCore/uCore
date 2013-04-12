@@ -315,15 +315,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 			}
 		}
 		if (substr($fieldAlias,0,8) == 'content:') {
-			// replace uWidgetDiv with pragma
-			$html = str_get_html($newValue);
-			if ($html) {
-				foreach ($html->find('.uWidgetPlaceholder') as $ele) {
-					if ($ele->plaintext == '') $ele->class = null;
-					else $ele->outertext = '{widget.'.$ele->title.'}';
-				}
-				$newValue = $html;
-			}
 			$rec = $this->LookupRecord($pkVal);
 			$contentarr = utopia::jsonTryDecode($rec['content']);
 			if (!is_array($contentarr)) $contentarr = array(''=>$contentarr);
