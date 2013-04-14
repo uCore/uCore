@@ -7,7 +7,7 @@ CKEDITOR.config.toolbar_Advanced = [
 	{ name: 'colors', items : [ 'TextColor','BGColor' ] },
 	'/',
 	[ 'Link', 'Unlink', 'Anchor' ],
-	{ name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','SpecialChar' ] },
+	{ name: 'insert', items : [ 'Image','Flash','Iframe','Table','HorizontalRule','SpecialChar' ] },
 	[ 'Maximize', 'ShowBlocks' ],
 	[ 'Sourcedialog' ]
 ];
