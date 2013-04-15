@@ -3,7 +3,7 @@ CKEDITOR.config.toolbar_Basic = [
 	[ 'Format', 'Styles', 'Bold', 'Italic', 'Underline', 'Strike', '-', 'NumberedList', 'BulletedList', '-', 'RemoveFormat' ]
 ];
 CKEDITOR.config.toolbar_Advanced = [
-	[ 'Format', 'Styles', 'Bold', 'Italic', 'Underline', 'Strike', '-', 'NumberedList', 'BulletedList', '-', 'RemoveFormat' ],
+	[ 'Format', 'Styles', 'Bold', 'Italic', 'Underline', 'Strike', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'RemoveFormat' ],
 	{ name: 'colors', items : [ 'TextColor','BGColor' ] },
 	'/',
 	[ 'Link', 'Unlink', 'Anchor' ],
