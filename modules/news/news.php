@@ -50,6 +50,8 @@ class module_NewsAdmin extends uListDataModule implements iAdminModule {
 		
 		$this->AddFilter('time',ctGTEQ,itDATE);
 		$this->AddFilter('time',ctLTEQ,itDATE);
+
+		$this->AddOrderBy('time','DESC');
 	}
 	public function RunModule() {
 		$this->ShowData();
