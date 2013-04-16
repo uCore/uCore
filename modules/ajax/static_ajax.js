@@ -230,11 +230,6 @@ function UpdateSelectedLinks() {
 	});
 }
 
-utopia.Initialise.add(UIButtons);
-function UIButtons() {
-	$('.btn').not('.ui-button').button();
-}
-
 utopia.Initialise.add(InitDatePickers);
 function InitDatePickers() {
 	$('.dPicker').each(function () {

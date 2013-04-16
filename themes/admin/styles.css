@@ -5,7 +5,7 @@
 body { text-align:left !important; text-align:center; margin:0; font-family: Arial; font-size:12px; }
 #wrap { width:100%; margin:0 auto; text-align:left; background:white; }
 
-a, a:link, a:visited { color: #333; text-decoration:none }
+a { color: #333; text-decoration:none }
 a:hover { color: #8CC63F }
 a.ui-state-hover:hover { color: #333; }
 
@@ -64,7 +64,6 @@ input, select, textarea { margin:2px; }
 .layoutDetailSection .inputtype { width:300px; }
 .layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; }
 
-.inputtype-button, .inputtype-reset, .inputtype-submit, .btn { padding:0; }
 .inputtype-file, .inputtype-combo { padding:0; height:24px; }
 
 .inputtype.inputtype-combo.ui-combobox {

@@ -2884,7 +2884,7 @@ abstract class uListDataModule extends uDataModule {
 						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
 						&& ($link['parentField'] === NULL || $link['parentField'] === '*')) {
 					$url = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>'1'));
-					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New '.$obj->itemName,$url,array('class'=>'btn-new')),1);
+					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New '.$obj->itemName,$url,array('class'=>'btn-green')),1);
 				}
 			}
 		}
