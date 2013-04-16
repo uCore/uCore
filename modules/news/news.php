@@ -149,7 +149,6 @@ class module_NewsRSS extends uDataModule {
 		$pubDate = null;
 		$dataset = $this->GetDataset();
 		while (($row = $dataset->fetch())) {
-			$crop = (strlen($row['text']) > 100) ? substr($row['text'],0,100).'...' : '';
 			$link = htmlentities('http://'.$dom.$obj->GetURL(array('news_id'=>$row['news_id'])));
 			$img = '';
 			if ($row['image']) $img = "\n".'  <media:thumbnail width="150" height="150" url="'.htmlentities('http://'.$dom.uBlob::GetLink(get_class($this),'image',$row['news_id']).'?w=150&h=150').'"/>';
@@ -158,7 +157,7 @@ class module_NewsRSS extends uDataModule {
 			$items .= <<<FIN
  <item>
   <title>{$row['heading']}</title>
-  <description>{$row['description']}</description>
+  <description><![CDATA[{$row['text']}]]></description>
   <link>{$link}</link>
   <guid>{$link}</guid>
   <pubDate>{$updated}</pubDate>{$img}
