@@ -3163,21 +3163,6 @@ abstract class uListDataModule extends uDataModule {
  */
 abstract class uSingleDataModule extends uDataModule {
 	public $itemName = 'Item';
-	/*
-	 public function CreateParentNavButtons() {
-		foreach ($this->parents as $parentName => $linkArray){
-		if ($parentName !== utopia::GetCurrentModule()) continue;
-		foreach ($linkArray as $linkInfo) {
-		if ($linkInfo['parentField'] !== NULL) continue; // is linked to fields in the list, skip it
-		if (flag_is_set($this->GetOptions(),ALLOW_ADD)) { // create an addition button  --  && utopia::GetCurrentModule() == get_class($this)
-		$filters = array('newrec'=>1); // set this filter so that the primary key is negative, this will force no policy to be found, and show a new form
-		utopia::AppendVar('footer_left',CreateNavButton('New Record',$this->GetURL($filters),NULL,array('class'=>'btn btn-new')));
-		}
-		}
-		}
-
-		//		parent::CreateParentNavButtons();
-		}*/
 	public function DeleteRecord($pkVal) {
 		parent::DeleteRecord($pkVal);
 		AjaxEcho('history.go(-1);');

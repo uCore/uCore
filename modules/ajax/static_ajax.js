@@ -101,7 +101,6 @@ utopia.Initialise.add(function() { // auto append submit buttons
 });
 
 $(document).ready(function(){
-	//$('.btn').button();
 	// preload hourglass image
 	$("<img>").attr("src", PATH_REL_CORE+'images/hourglass.png');
 	//$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
