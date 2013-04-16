@@ -223,7 +223,9 @@ class module_NewsDisplay extends uDataModule {
 		
 		$this->AddField('heading','heading','news','heading');
 		$this->AddField('text','text','news','text');
-		$this->AddField('description','description','news','description');
+		$this->AddField('description','description','news','Excerpt');
+		$this->AddPreProcessCallback('description',array($this,'makeExcerpt'));
+		
 		$this->AddField('image','image','news','image');
 		$this->AddField('featured','featured','news','Featured');
 		
@@ -234,6 +236,13 @@ class module_NewsDisplay extends uDataModule {
 		$this->AddFilter('{time} <= NOW()',ctCUSTOM);
 		$this->AddFilter('tags',ctEQ,itNONE,isset($_GET['tags'])?$_GET['tags']:null);
 		$this->AddOrderBy('time','desc');
+	}
+	public function makeExcerpt($v,$pk,$processed,$row) {
+		if ($processed) return $processed;
+		$text = strip_tags($row['text']);
+		if (!(preg_match_all('/^(.*?\.)/',$text,$matches))) return '';
+		if (isset($matches[0][0])) return $matches[0][0];
+		return '';
 	}
 	public static $uuid = 'news';
 	public function timeformat($originalValue,$pkVal,$processedVal) {
