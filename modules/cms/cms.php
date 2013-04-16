@@ -246,7 +246,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$obj =& utopia::GetInstance('uCMS_View');
 		$preview = CreateNavButton('Preview',$obj->GetURL(array('cms_id'=>$pkVal,'preview'=>1)),array('target'=>'_blank','title'=>'Preview this page'));
 		$revert = $this->DrawSqlInput('revert','Revert',$pkVal,array('title'=>'Reset to published version','class'=>'page-revert'),itBUTTON);
-		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish greenbtn'),itBUTTON);
+		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish btn-green'),itBUTTON);
 
 		return $preview.$revert.$publish;
 	}

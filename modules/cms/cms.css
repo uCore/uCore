@@ -15,54 +15,5 @@
 .cmsItem .cmsItem { padding-top:1px; min-height:18px; }
 .cmsItem .cmsParentToggle { margin-left:-16px }
 
-.publish-buttons .btn { margin: 0 5px; }
+.publish-buttons .btn { margin: 0 0 0 5px; }
 .admin-bar .edit-page-link { position:absolute; top:0; right:0; }
-
-
-
-.admin-bar .greenbtn span { padding:0; }
-.admin-bar .greenbtn {
-	-moz-box-shadow:inset 0px 1px 0px 0px #b2e6aa;
-	-webkit-box-shadow:inset 0px 1px 0px 0px #b2e6aa;
-	box-shadow:inset 0px 1px 0px 0px #b2e6aa;
-	
-	color: #fff;
-	text-shadow: 0 -1px 0 #55830c;
-	border-color: #62a60a #62a60a #4d9200;
-	background: #69b10b;
-	background-image: -webkit-gradient(linear,0 0,0 100%,from(#9ad717),to(#69b10b));
-	background-image: -webkit-linear-gradient(top,#9ad717,#69b10b);
-	background-image: -o-linear-gradient(top,#9ad717,#69b10b);
-	background-image: linear-gradient(to bottom,#9ad717,#69b10b);
-	background-image: -moz-linear-gradient(top,#9ad717,#69b10b);
-	filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='#ff9ad717',endColorstr='#ff69b10b');
-
-	
-	-moz-border-radius:6px;
-	-webkit-border-radius:6px;
-	border-radius:6px;
-	
-	border:1px solid #62a658;
-	
-	display:inline-block;
-	font-family:arial;
-	font-size:15px;
-	font-weight:bold;
-	padding:7px 7px;
-	text-decoration:none;
-	
-    text-shadow:0px 1px 0px #3e8a33;
-	
-}
-.admin-bar .greenbtn:hover {
-	color: #fff;
-	text-shadow: 0 -1px 0 #55830c;
-	border-color: #62a60a #62a60a #4d9200;
-	background: #69b10b;
-	background-image: -webkit-gradient(linear,0 0,0 100%,from(#69b10b),to(#9ad717));
-	background-image: -webkit-linear-gradient(top,#69b10b,#9ad717);
-	background-image: -o-linear-gradient(top,#69b10b,#9ad717);
-	background-image: linear-gradient(to bottom,#69b10b,#9ad717);
-	background-image: -moz-linear-gradient(top,#69b10b,#9ad717);
-	filter: progid:DXImageTransform.Microsoft.gradient(gradientType=0,startColorstr='#ff69b10b',endColorstr='#ff9ad717');
-}
