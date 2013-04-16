@@ -117,7 +117,7 @@ class uJavascript extends uBasicModule {
 
 	static function GetJavascriptConstants() {
 		$body = '';
-		array_push($GLOBALS['jsDefine'],'FORMAT_DATETIME','FORMAT_DATE','FORMAT_TIME','USE_TABS','PATH_REL_ROOT','PATH_REL_CORE');
+		array_push($GLOBALS['jsDefine'],'FORMAT_DATETIME','FORMAT_DATE','FORMAT_TIME','USE_TABS','PATH_REL_ROOT','PATH_REL_CORE','PATH_FULL_ROOT','PATH_FULL_CORE');
 		$GLOBALS['jsDefine'] = array_unique($GLOBALS['jsDefine']);
 		if (array_key_exists('jsDefine',$GLOBALS))
 		foreach ($GLOBALS['jsDefine'] as $var) {

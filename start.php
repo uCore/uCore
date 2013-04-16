@@ -58,6 +58,9 @@ define('PATH_ABS_MODULES',fix_path(PATH_ABS_ROOT.'uModules').'/');
 define('PATH_ABS_TEMPLATES',fix_path(PATH_ABS_ROOT.'uTemplates').'/');
 define('PATH_ABS_THEMES',fix_path(PATH_ABS_ROOT.'uThemes').'/');
 
+define('PATH_FULL_ROOT',((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')?'https':'http').'://'.$_SERVER['HTTP_HOST'].PATH_REL_ROOT);
+define('PATH_FULL_CORE',((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')?'https':'http').'://'.$_SERVER['HTTP_HOST'].PATH_REL_CORE);
+
 ini_set('session.cookie_path',PATH_REL_ROOT);
 session_cache_limiter(false);
 session_name('ucore');
