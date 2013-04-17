@@ -6,7 +6,7 @@ class uAdminBar {
 	static $items = array();
 	public static function AddItem($menu=FALSE,$body=FALSE,$order=null,$class='') {
 		if ($order === null) $order = count(self::$items);
-		uCSS::LinkFile(dirname(__FILE__).'/adminbar.css',-50);
+		uCSS::LinkFile(dirname(__FILE__).'/adminbar.css',999);
 		uJavascript::LinkFile(dirname(__FILE__).'/adminbar.js');
 		self::$items[] = array('menu'=>$menu,'body'=>$body,'order'=>$order,'class'=>$class);
 	}
