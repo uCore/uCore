@@ -28,7 +28,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	}
 	public function SetupParents() {
 		if (uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE)
-			uAdminBar::AddItem('<a class="btn dashboard-link" href="'.PATH_REL_CORE.'">Dashboard</a>',FALSE,-100);
+			uAdminBar::AddItem('<a class="btn dashboard-link" href="'.PATH_REL_CORE.'"><span/>Dashboard</a>',FALSE,-100);
 
 		$this->AddParent('/');
 		utopia::RegisterAjax('toggle_debug',array($this,'toggleDebug'));

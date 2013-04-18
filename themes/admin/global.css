@@ -1,3 +1,7 @@
 .admin-bar .dashboard-link {
-        padding-left:21px !important; background-image:url(images/bolt.png) !important; background-repeat:no-repeat !important; background-position: 7px center !important;
+	padding-left: 21px !important; position:relative;
+}
+.admin-bar .dashboard-link span {
+	background-image:url(images/bolt.png); background-repeat:no-repeat; background-position: 7px center;
+	position:absolute; top:0; left:0px; bottom:0; width:21px;
 }
