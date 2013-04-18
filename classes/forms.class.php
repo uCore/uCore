@@ -2649,7 +2649,6 @@ abstract class uDataModule extends uBasicModule {
 					if ($vals && isset($vals[$dv])) $dv = $vals[$dv];
 					$attr['placeholder'] = $dv;
 				}
-				if (!empty($url)) $attr['ondblclick'] = "javascript:nav('$url')";
 				$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 			}
 		} else {
