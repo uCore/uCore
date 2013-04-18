@@ -174,3 +174,30 @@
      -moz-box-shadow: none;
           box-shadow: none;
 }
+
+
+.admin-bar .btn.btn-green {
+	color: #FFFFFF;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	background-color: #63991C;
+	*background-color: #63991C;
+	background-image: -moz-linear-gradient(top, #8CC63F, #63991C);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#8CC63F), to(#63991C));
+	background-image: -webkit-linear-gradient(top, #8CC63F, #63991C);
+	background-image: -o-linear-gradient(top, #8CC63F, #63991C);
+	background-image: linear-gradient(to bottom, #8CC63F, #63991C);
+	background-repeat: repeat-x;
+	border-color: #63991C;
+	border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#8CC63F', endColorstr='#63991C', GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+}
+.admin-bar .btn.btn-green:hover,
+.admin-bar .btn.btn-green:active,
+.admin-bar .btn.btn-green.active,
+.admin-bar .btn.btn-green.disabled,
+.admin-bar .btn.btn-green[disabled] {
+	color: #FFFFFF;
+	background-color: #63991C;
+	*background-color: #003bb3;
+}
