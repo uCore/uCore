@@ -222,7 +222,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('description','description','cms','Meta Description',itTEXT);
 		$this->FieldStyles_Set('description',array('width'=>'100%'));
 
-		$this->AddField('publishing',array($this,'publishLinks'),'cms','Publish');
+		$this->AddField('publishing',array($this,'publishLinks'),'cms');
 
 		$this->AddField('content','content','cms','Page Content',itHTML);
 		$this->fields['content']['attr']['contenteditable'] = 'true';
