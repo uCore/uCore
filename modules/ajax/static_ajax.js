@@ -108,7 +108,6 @@ $(document).ready(function(){
 	$('li:first-child').addClass('first-child');
 	$('li:last-child').addClass('last-child');
 
-	$(".tabGroup").tabs();
 	$(document).on('tabsactivate', function(event, ui) { // bind after creation to stop immediate redirection to first hash
 		var hash = ui.newTab.attr('aria-controls');
 		var nodes = $('#'+hash);
@@ -175,6 +174,11 @@ function RefreshTables() {
 	$('.layoutListSection TBODY TR').removeClass('odd even');
 	$('.layoutListSection TBODY TR:odd').addClass('odd');
 	$('.layoutListSection TBODY TR:even').addClass('even');
+}
+
+utopia.Initialise.add(InitTabs);
+function InitTabs() {
+	$(".tabGroup").tabs();
 }
 
 utopia.Initialise.add(UpdateSelectedLinks);
