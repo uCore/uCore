@@ -3265,7 +3265,9 @@ abstract class uSingleDataModule extends uDataModule {
 			utopia::Tab_Add($SN,$out,$this->GetModuleId(),$tabGroupName,false,$order);
 		}
 
-		if ($num_rows > 1) echo '<div class="oh"><b>'.$records.'</b>'.$pager.'</div>';
+		if ($num_rows > 1) echo '<div class="oh">{list.'.get_class($this).'}<b>'.$records.'</b>'.$pager.'</div>';
+		else echo '<div class="oh">{list.'.get_class($this).'}</div>';
+
 		utopia::Tab_InitDraw($tabGroupName);
 	}
 }
