@@ -26,7 +26,7 @@ class tabledef_CMS extends uTableDef {
 		$this->SetFieldProperty('updated','default','current_timestamp');
 
 		$this->SetPrimaryKey('cms_id');
-		$this->SetIndexField('position');
+		$this->SetIndexField(array('parent','position'));
 	}
 	public $auto_increment = 'position';
 	
