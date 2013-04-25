@@ -510,7 +510,7 @@ function StoppedUpdating(ele) {
 		if (isUpdating[e].element == ele) delete isUpdating[e];
 	}
 }
-function _fieldChange(event) { uf(this); event.stopImmediatePropagation(); return true; }
+function _fieldChange(event) { if ($(this).closest('form').length) return true; uf(this); event.stopImmediatePropagation(); return true; }
 function uf(ele, forcedValue, hourglassEle) {
 	for (e in isUpdating) {
 		if (isUpdating[e].element == ele) return;
