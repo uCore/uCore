@@ -1289,6 +1289,10 @@ class utopia {
 		return $value;
 	}
 
+	static function stringify($array) {
+		return array_combine($array,$array);
+	}
+	
 	static function stripslashes_deep($value) {
 		$value = is_array($value) ?
 			array_map('utopia::stripslashes_deep', $value) :
