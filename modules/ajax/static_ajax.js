@@ -747,15 +747,10 @@ function makeHourglass(hourglassEle) {
 				.attr( "tabIndex", -1 )
 				.attr( "title", "Show All Items" )
 				.appendTo( wrapper )
-				.button({
-					icons: {
-						primary: this.options.icon
-					},
-					text: false
-				})
 				.removeClass( "ui-corner-all" )
-				.addClass( "ui-combobox-toggle" )
-				.click(toggleDropdown);
+				.addClass( "btn ui-combobox-toggle" )
+				.click(toggleDropdown)
+				.append($('<span/>').addClass('ui-icon').addClass(this.options.icon));
 				
 			function toggleDropdown() {
 				// close if already visible
