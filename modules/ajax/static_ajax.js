@@ -670,7 +670,7 @@ function makeHourglass(hourglassEle) {
 				self = this,
 				select = this.element.hide(),
 				selected = select.children( ":selected" ),
-				placeholder = $('option:first-child',select).text(), // placeholder is the first item
+				placeholder = $(select).attr('placeholder')?$(select).attr('placeholder'):$('option:first-child',select).text(), // placeholder is placeholder or first item
 				value = selected.text(), // value is defaulted to current selected item
 				value = (value === placeholder) ? '' : value, // if value is the placeholder, set it to empty.
 				wrapper = this.wrapper = $( "<span>" )
