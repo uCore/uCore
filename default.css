@@ -34,7 +34,6 @@ th.sortable { cursor:pointer; }
   color: #333333;
   text-align: center;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
-  vertical-align: middle;
   cursor: pointer;
   background-color: #f5f5f5;
   *background-color: #e6e6e6;
@@ -219,6 +218,7 @@ ul.pagination li { list-style:none; float:left; margin:0 2px; }
 
 .layoutDetailSection td.fld { width:8em; padding-right:10px; font-weight:normal; text-align:right; vertical-align:middle }
 
+.inputtype { margin:0 }
 .inputtype.inputtype-checkboxlist { height:6em; overflow:auto; display:inline-block; resize:both; }
 .inputtype.inputtype-checkboxlist label { display:block; margin-right: 20px; white-space: nowrap; }
 .inputtype.inputtype-checkboxlist .inputtype.inputtype-checkbox { float:none; padding:0; margin-right:5px; height:auto; line-height:normal; }
@@ -262,12 +262,19 @@ input.inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; backg
 	padding: 0;
 	width: auto;
 	height: auto;
+	overflow:hidden;
 }
-.ui-combobox .ui-button.ui-combobox-toggle {
+.ui-combobox a.ui-combobox-toggle {
 	position: absolute;
 	top: 0; bottom: 0; right:0; height:auto; width:31px;
 	padding: 0;	margin:0;
 	border-top: 0; border-right: 0; border-bottom: 0;
+	border-radius:0;
+}
+.ui-combobox a.ui-combobox-toggle span.ui-icon {
+	position: absolute;
+	top: 50%; margin-top: -8px; 
+	left: 50%; margin-left: -8px;
 }
 .ui-combobox .ui-combobox-input.ui-autocomplete-input {
 	display:block;
