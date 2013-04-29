@@ -272,9 +272,8 @@ abstract class uBasicModule implements iUtopiaModule {
 		$instance =& utopia::GetInstance(get_class($this));
 		return call_user_func_array(array($instance,$name),$arguments);
 	}*/
-	public function flag_is_set($flag,$field=null) {
+	public function flag_is_set($flag) {
 		$options = $this->GetOptions();
-		if ($field && $this->fields[$field]['options']) $options = $this->fields[$field]['options'];
 		return flag_is_set($options,$flag);
 	}
 
@@ -783,6 +782,10 @@ abstract class uDataModule extends uBasicModule {
 
 	public $hasEditableFilters = FALSE;
 
+	public function flag_is_set($flag,$field=null) {
+		if ($field && isset($this->fields[$field]['options'])) return flag_is_set($this->fields[$field]['options'],$flag);
+		return parent::flag_is_set($flag);
+	}
 	public abstract function GetTabledef();
 
 	public abstract function SetupFields();
