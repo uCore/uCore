@@ -272,6 +272,11 @@ abstract class uBasicModule implements iUtopiaModule {
 		$instance =& utopia::GetInstance(get_class($this));
 		return call_user_func_array(array($instance,$name),$arguments);
 	}*/
+	public function flag_is_set($flag,$field=null) {
+		$options = $this->GetOptions();
+		if ($field && $this->fields[$field]['options']) $options = $this->fields[$field]['options'];
+		return flag_is_set($options,$flag);
+	}
 
 	public function GetOptions() { return DEFAULT_OPTIONS; }
 
