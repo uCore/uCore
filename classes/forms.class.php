@@ -3092,14 +3092,14 @@ abstract class uListDataModule extends uDataModule {
 		$body .= "</tbody>";
 		timer_end('display rows');
 		$foot = '';
-		$editablefields = false;
+		$canadd = false;
 		foreach ($this->fields as $fieldName => $fieldData) {
-			if ($fieldData['inputtype'] !== itNONE) {
-				$editablefields = true;
+			if ($this->flag_is_set(ALLOW_ADD,$fieldName)) {
+				$canadd = true;
 				break;
 			}
 		}
-		if ($this->flag_is_set(ALLOW_ADD) && $editablefields) {
+		if ($canadd) {
 			$hideNew = ($this->GetMaxRows() && $num_rows >= $this->GetMaxRows()) ? ' style="display:none"' : '';
 			$foot .= '<tr class="newRow"'.$hideNew.'>';
 			if ($this->flag_is_set(ALLOW_DELETE)) $foot .= "<td class=\"new-ident\"></td>";
