@@ -1949,7 +1949,8 @@ abstract class uDataModule extends uBasicModule {
 				$val = $value; break;
 			case $compareType == ctIN:
 				if (IsSelectStatement($fieldName)) return trim("$val $compareType $fieldName");
-				$vals = explode(',',$value);
+				$vals = $value;
+				if (!is_array($vals)) $vals = explode(',',$vals);
 				$args = array_merge($args,$vals);
 				foreach ($vals as $k=>$v) $vals[$k] = '?';
 				$val = '('.join(',',$vals).')';
