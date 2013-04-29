@@ -358,15 +358,14 @@ class utopia {
 				break;
 			case itCOMBO:
 				if (empty($possibleValues)) $possibleValues = array();
+				$out .= "<select $attr>"; 
 				$defaultExists = false;
-				$blankVal = isset($possibleValues['']) ? $possibleValues[''] : FALSE;
-				if ($blankVal === FALSE) {
-					if (isset($attributes['placeholder']) && $attributes['placeholder']) $blankVal = $attributes['placeholder'];
+				if (!isset($possibleValues[''])) {
+					if (isset($attributes['placeholder']) && $attributes['placeholder'] && !isset($possibleValues[$attributes['placeholder']])) $blankVal = $attributes['placeholder'];
 					else $blankVal = '&nbsp;';
+					$possibleValues = array(''=>$blankVal) + $possibleValues;
 				}
-				$out .= "<select $attr><option value=\"\">$blankVal</option>";
 				if (is_array($possibleValues)) foreach ($possibleValues as $key => $val) {
-					if ((string)$key === '') continue;
 					$selected = '';
 					if ($defaultValue !== '' && ((is_array($defaultValue) && in_array($key,$defaultValue)) || ((string)$key === (string)$defaultValue))) {
 						$defaultExists = true;
