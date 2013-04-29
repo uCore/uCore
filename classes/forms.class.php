@@ -1375,7 +1375,7 @@ abstract class uDataModule extends uBasicModule {
 			'tablename'   => $tableAlias,
 			'visiblename' => $visiblename,
 			'inputtype'   => $inputtype,
-			'options'     => ALLOW_ADD | ALLOW_EDIT, // this can be re-set using $this->SetFieldOptions
+			'options'     => NULL, // this can be re-set using $this->SetFieldOptions
 			'field'       => $fieldName,
 		);
 		$this->fields[$aliasName]['order'] = count($this->fields);
