@@ -679,12 +679,12 @@ abstract class uBasicModule implements iUtopiaModule {
 				//echo "not installed:".get_class($this);
 				//if (($row = $this->IsInstalled()) == FALSE) {
 				//DebugMail('not installed',get_class($this));
-				$active = flag_is_set($this->GetOptions(),INSTALL_INACTIVE) ? '0' : '1';
+				$active = $this->flag_is_set(INSTALL_INACTIVE) ? '0' : '1';
 				database::query('INSERT INTO internal_modules (`uuid`,`module_name`,`module_active`) VALUES (?,?,?)',array($uuid,get_class($this),$active));
 			} else {
 				$qry = 'UPDATE internal_modules SET `uuid` = ?, `module_name` = ?, `sort_order` = ?';
 				$args = array($uuid,get_class($this),$this->GetSortOrder);
-				if (flag_is_set($this->GetOptions(),ALWAYS_ACTIVE))
+				if ($this->flag_is_set(ALWAYS_ACTIVE))
 					$qry .= ', `module_active` = 1';
 
 				$qry .= ' WHERE `uuid = ?';
@@ -728,7 +728,7 @@ abstract class uBasicModule implements iUtopiaModule {
 	//	$lm = utopia::GetVar('loadedModules',array());
 	//	foreach ($this->parents as $parentName => $linkArray) {
 //			$parentName = $linkArray['moduleName'];
-			if (flag_is_set($this->GetOptions(),NO_NAV)) return;
+			if ($this->flag_is_set(NO_NAV)) return;
 	//		if (array_search($this,$lm,true) === FALSE) continue;
 
 			$cModuleObj =& utopia::GetInstance(utopia::GetCurrentModule());
@@ -1736,7 +1736,7 @@ abstract class uDataModule extends uBasicModule {
 
 		// now create function to turn the sqlTableSetup into a FROM clause
 
-		$distinct = flag_is_set($this->GetOptions(),DISTINCT_ROWS) ? 'DISTINCT ' : '';
+		$distinct = $this->flag_is_set(DISTINCT_ROWS) ? 'DISTINCT ' : '';
 		$qry = "$distinct".join(",\n",$flds);
 		return $qry;
 	}
@@ -2312,7 +2312,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function DeleteRecord($pkVal) {
-		if (!flag_is_set($this->GetOptions(),ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
+		if (!$this->flag_is_set(ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
 		
 		if (uEvents::TriggerEvent('BeforeDeleteRecord',$this,array($pkVal)) === FALSE) return FALSE;
 		
@@ -2360,12 +2360,12 @@ abstract class uDataModule extends uBasicModule {
 		$this->SetFieldType($fieldAlias,$fieldType);
 		return $ret;
 	}
-	
+		
 	// returns a string pointing to a new url, TRUE if the update succeeds, false if it fails, and null to refresh the page
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
-		if ($pkVal === NULL && !flag_is_set($this->GetOptions(),ALLOW_ADD)) { throw new Exception('Module does not allow adding records.'); }
-		if ($pkVal !== NULL && !flag_is_set($this->GetOptions(),ALLOW_EDIT)) { throw new Exception('Module does not allow editing records.'); }
+		if ($pkVal === NULL && !$this->flag_is_set(ALLOW_ADD,$fieldAlias)) { throw new Exception('Module does not allow adding records.'); }
+		if ($pkVal !== NULL && !$this->flag_is_set(ALLOW_EDIT,$fieldAlias)) { throw new Exception('Module does not allow editing records.'); }
 
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
@@ -2631,7 +2631,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
-		if ($inputType !== itNONE && (($row !== NULL && flag_is_set($this->GetOptions(),ALLOW_EDIT)) || ($row === NULL  && flag_is_set($this->GetOptions(),ALLOW_ADD)))) {
+		if ($inputType !== itNONE && ($inputTypeOverride || ($row !== NULL && $this->flag_is_set(ALLOW_EDIT)) || ($row === NULL  && $this->flag_is_set(ALLOW_ADD)))) {
 			if ($inputType === itFILE) {
 				$ret = '';
 				if (!$value) {
@@ -2888,8 +2888,8 @@ abstract class uListDataModule extends uDataModule {
 		foreach ($children as $childModule => $links) {
 			foreach ($links as $link) {
 				$obj =& utopia::GetInstance($link['moduleName']);
-				if (!flag_is_set($this->GetOptions(),ALLOW_ADD)
-						&& flag_is_set($obj->GetOptions(),ALLOW_ADD)
+				if (!$this->flag_is_set(ALLOW_ADD)
+						&& $obj->flag_is_set(ALLOW_ADD)
 						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
 						&& ($link['parentField'] === NULL || $link['parentField'] === '*')) {
 					$url = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>'1'));
@@ -2925,7 +2925,7 @@ abstract class uListDataModule extends uDataModule {
 			echo "</colgroup>\n";   */
 		$sectionFieldTitles = array();
 		// TODO: pagination for list record display
-		if (!flag_is_set($this->GetOptions(),LIST_HIDE_HEADER)) {
+		if (!$this->flag_is_set(LIST_HIDE_HEADER)) {
 			echo '<thead>';
 
 			ob_start();
@@ -2933,7 +2933,7 @@ abstract class uListDataModule extends uDataModule {
 			if (count($this->layoutSections) > 1) {
 				echo '<tr>';
 				// need first 'empty' column for buttons?
-				if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo "<td>&nbsp;</td>"; }
+				if ($this->flag_is_set(ALLOW_DELETE)) { echo "<td>&nbsp;</td>"; }
 				$sectionCount = 0;
 				$sectionID = NULL;
 				$keys = array_keys($this->fields);
@@ -2963,7 +2963,7 @@ abstract class uListDataModule extends uDataModule {
 			// start of FIELD headers
 			$colcount = 0;
 			echo '<tr class="ui-tabs-nav ui-helper-reset ui-widget-header ui-corner-all">';
-			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo '<th class="ui-corner-top"></th>'; $colcount++; }
+			if ($this->flag_is_set(ALLOW_DELETE)) { echo '<th class="ui-corner-top"></th>'; $colcount++; }
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$colcount++;
@@ -3001,11 +3001,11 @@ abstract class uListDataModule extends uDataModule {
 			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
 			$pager = '<div class="pagination right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itCOMBO,$limit,array(25=>'25 per page',50=>'50 per page',150=>'150 per page',0=>'Show All'),array('class'=>'uFilter uLimit')).'</div>';
-			if (!flag_is_set($this->GetOptions(),LIST_HIDE_STATUS)) {
+			if (!$this->flag_is_set(LIST_HIDE_STATUS)) {
 				echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
 			}
 			
-			if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
+			if ($this->flag_is_set(ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
 				echo '<tr><td class="uFilters" colspan="'.$colcount.'">';
 			//	$v = isset($_GET['_g_'.$this->GetModuleId()]) ? $_GET['_g_'.$this->GetModuleId()] : '';
 			//	echo utopia::DrawInput('_g_'.$this->GetModuleId(),itTEXT,$v,null,array('class'=>'uFilter'));
@@ -3023,7 +3023,7 @@ abstract class uListDataModule extends uDataModule {
 				echo '</td></tr>';
 			}
 
-			if ($num_rows > 0 || flag_is_set($this->GetOptions(),ALLOW_ADD) || $this->hasEditableFilters === true) echo $c;
+			if ($num_rows > 0 || $this->flag_is_set(ALLOW_ADD) || $this->hasEditableFilters === true) echo $c;
 
 			echo "</thead>\n";
 		}
@@ -3102,7 +3102,7 @@ abstract class uListDataModule extends uDataModule {
 		if ($this->flag_is_set(ALLOW_ADD) && $editablefields) {
 			$hideNew = ($this->GetMaxRows() && $num_rows >= $this->GetMaxRows()) ? ' style="display:none"' : '';
 			$foot .= '<tr class="newRow"'.$hideNew.'>';
-			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) $foot .= "<td class=\"new-ident\"></td>";
+			if ($this->flag_is_set(ALLOW_DELETE)) $foot .= "<td class=\"new-ident\"></td>";
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$classes=array();
@@ -3110,7 +3110,7 @@ abstract class uListDataModule extends uDataModule {
 				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
 				//$this->PreProcess($fieldName,'');
 				//$enc_name = $this->GetEncodedFieldName($fieldName);
-				if (flag_is_set($fieldData['options'],ALLOW_ADD))
+				if ($this->flag_is_set(ALLOW_ADD,$fieldName))
 					$foot .= "<td$class>".$this->GetCell($fieldName, NULL).'</td>';
 				//if (array_key_exists('inputtype',$fieldData) && $fieldData['inputtype'] !== itNONE && flag_is_set($fieldData['options'],ALLOW_ADD)) {
 				//	$foot .= "<td$class>".$this->GetCell($fieldName, NULL).'</td>';
@@ -3124,13 +3124,13 @@ abstract class uListDataModule extends uDataModule {
 
 		if (!empty($total)) {
 			$foot .= '<tr>';
-			if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) $foot .= "<td class=\"totals-ident\"></td>";
+			if ($this->flag_is_set(ALLOW_DELETE)) $foot .= "<td class=\"totals-ident\"></td>";
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$classes=array();
 				//if (array_key_exists($fieldName,$this->firsts)) $classes[] = 'sectionFirst';
 				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
-				if (flag_is_set($this->GetOptions(),SHOW_TOTALS) && array_key_exists($fieldName,$total)) {
+				if ($this->flag_is_set(SHOW_TOTALS) && array_key_exists($fieldName,$total)) {
 					$foot .= "<td$class><b>";
 					if ($totalShown[$fieldName] != $total[$fieldName])
 					$foot .= htmlentities($this->PreProcess($fieldName,$totalShown[$fieldName])).'(shown)<br/>';
@@ -3159,7 +3159,7 @@ abstract class uListDataModule extends uDataModule {
 	function DrawRow($row) {
 		$pk = $row[$this->GetPrimaryKey()];
 		$body = '<tr class="'.cbase64_encode(get_class($this).':'.$pk).'">';
-		if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) {
+		if ($this->flag_is_set(ALLOW_DELETE)) {
 			$delbtn = $this->GetDeleteButton($row[$this->GetPrimaryKey()]);
 			$body .= '<td style="width:1px">'.$delbtn.'</td>';
 		}
@@ -3228,7 +3228,7 @@ abstract class uSingleDataModule extends uDataModule {
 			
 		uEvents::TriggerEvent('OnShowDataDetail',$this);
 
-		if (flag_is_set($this->GetOptions(),ALLOW_DELETE) && $row) {
+		if ($this->flag_is_set(ALLOW_DELETE) && $row) {
 			$fltr =& $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
 			$delbtn = $this->GetDeleteButton($this->GetFilterValue($fltr['uid']),'Delete Record');
 			utopia::AppendVar('footer_left',$delbtn);
