@@ -2652,8 +2652,9 @@ abstract class uDataModule extends uBasicModule {
 					$dv = $this->GetDefaultValue($fieldName);
 					$vals = $valuesOverride;
 					if (!$vals) $vals = $this->GetValues($fieldName,$pkVal);
-					if ($vals && isset($vals[$dv])) $dv = $vals[$dv];
-					$attr['placeholder'] = $dv;
+					if ($dv && $vals && isset($vals[$dv])) $dv = $vals[$dv];
+					if (!$value) $value = $dv;
+					$attr['placeholder'] = $value;
 				}
 				$ret = $this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride);
 			}
