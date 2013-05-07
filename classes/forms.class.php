@@ -2367,16 +2367,17 @@ abstract class uDataModule extends uBasicModule {
 	// returns a string pointing to a new url, TRUE if the update succeeds, false if it fails, and null to refresh the page
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		$this->_SetupFields();
+		if (!array_key_exists($fieldAlias,$this->fields)) { throw new Exception('Cannot update a field that does not exist.'); }
+		
 		if ($pkVal === NULL && !$this->flag_is_set(ALLOW_ADD,$fieldAlias)) { throw new Exception('Module does not allow adding records.'); }
 		if ($pkVal !== NULL && !$this->flag_is_set(ALLOW_EDIT,$fieldAlias)) { throw new Exception('Module does not allow editing records.'); }
+		if (!$this->flag_is_set(PERSISTENT,$fieldAlias) && uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) { throw new Exception('Access Denied when attempting to update field.'); }
 
-		$this->_SetupFields();
-		if (!array_key_exists($fieldAlias,$this->fields)) return FALSE;
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
 
 		if (!$tableAlias) return FALSE; // cannot update a field that has no table
 
-		if (($this->fields[$fieldAlias]['options'] & PERSISTENT != PERSISTENT) && uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return FALSE;
 		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,&$pkVal)) === FALSE) return FALSE;
 		
 		$oldPkVal = $pkVal;
