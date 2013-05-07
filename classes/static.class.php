@@ -360,10 +360,14 @@ class utopia {
 				if (empty($possibleValues)) $possibleValues = array();
 				$out .= "<select $attr>"; 
 				$defaultExists = false;
-				if (!isset($possibleValues[''])) {
+				if (!isset($possibleValues[''])) { // blank value does not exist.
 					if (isset($attributes['placeholder']) && $attributes['placeholder'] && !isset($possibleValues[$attributes['placeholder']])) $blankVal = $attributes['placeholder'];
 					else $blankVal = '&nbsp;';
 					$possibleValues = array(''=>$blankVal) + $possibleValues;
+				} else { // blank value exists, ensure it is at the top.
+					$v = $possibleValues[''];
+					unset($possibleValues['']);
+					$possibleValues = array(''=>$v) + $possibleValues;
 				}
 				if (is_array($possibleValues)) foreach ($possibleValues as $key => $val) {
 					$selected = '';
