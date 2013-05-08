@@ -90,12 +90,9 @@ $(document).on('click','.btn-del',function(event) {
 });
 
 
-utopia.Initialise.add(PaginationHash);
-function PaginationHash() {
-	$('.uPaginationLink').each(function(){
-		$(this).attr('href',$(this).attr('href').replace(/#.+$/,'')+window.location.hash);
-	});
-};
+$(document).on('click','a.uPaginationLink',function(){
+	$(this).attr('href',$(this).attr('href').replace(/#.+$/,'')+window.location.hash);
+});
 
 utopia.Initialise.add(AppendSubmit);
 function AppendSubmit() { // auto append submit buttons
