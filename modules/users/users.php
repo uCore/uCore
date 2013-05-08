@@ -127,7 +127,7 @@ class uAssertAdminUser extends uBasicModule {
 	public function AssertAdminUser() {
 		// admin user exists?
 		$obj =& utopia::GetInstance('uUsersList');
-		$rec = $obj->LookupRecord(array('_roles_pk'=>-1,'validated'=>1),true);
+		$rec = $obj->LookupRecord(array('role'=>-1,'validated'=>1),true);
 		if ($rec) return;
 
 		// module is persist?
@@ -139,7 +139,7 @@ class uAssertAdminUser extends uBasicModule {
 	}
 	public function RunModule() {
 		$obj =& utopia::GetInstance('uUsersList');
-		$rec = $obj->LookupRecord(array('_roles_pk'=>-1,'validated'=>1),true);
+		$rec = $obj->LookupRecord(array('role'=>-1,'validated'=>1),true);
 		if ($rec) {
 			header('Location: '.PATH_REL_CORE); die();
 		}
@@ -192,6 +192,7 @@ class uRegisterUser extends uDataModule {
 		
 		$this->AddField('username','username','users','Username',itTEXT);
 		$this->AddField('password','password','users','Password',itPASSWORD);
+		$this->AddField('role','role','users');
 
 		$this->AddField('email_confirm_code','email_confirm_code','users');
 
