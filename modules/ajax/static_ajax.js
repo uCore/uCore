@@ -158,8 +158,6 @@ $(document).ready(function(){
 		ReloadWithItems(order);
 	});
 
-	$(window).bind("beforeunload", function(){ uf=null; });
-
 	window.onscroll = function() {
 		// Thanks to Johan SundstrÃ¶m (http://ecmanaut.blogspot.com/) and David Lantner (http://lantner.net/david)
 		// for their help getting Safari working as documented at http://www.derekallard.com/blog/post/conditionally-sticky-sidebar
