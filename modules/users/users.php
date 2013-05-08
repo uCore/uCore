@@ -229,8 +229,9 @@ class uRegisterUser extends uDataModule {
 		}
 		
 		if ($usr = $this->RegisterForm()) {
-			echo '<p>Your account has now been created.</p>';
 			uVerifyEmail::VerifyAccount($usr);
+			echo '<p>Thank you for creating an account.  We need to verify your email before you can continue.</p>';
+			echo '<p>Please check your inbox, and follow the instructions we have sent you.</p>';
 		}
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
