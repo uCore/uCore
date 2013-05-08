@@ -50,6 +50,8 @@ class uUserLogin extends uDataModule {
 		$this->CreateTable('users');
 		$this->AddField('username','username','users');
 		$this->AddField('password','password','users');
+		$this->AddField('last_login','last_login','users');
+		$this->SetFieldOptions('last_login',ALLOW_EDIT);
 		$this->AddField('can_login','(!({email_confirm} <=> {username}))','users');
 		$this->AddFilter('can_login',ctEQ,itNONE,1);
 	}
@@ -87,7 +89,7 @@ class uUserLogin extends uDataModule {
 
 		if (($userID = uUsersList::TestCredentials($un,$pw)) !== false) {
 			self::SetLogin($userID);
-			$obj =& utopia::GetInstance('uUsersList');
+			$obj =& utopia::GetInstance(__CLASS__);
 			$obj->UpdateFieldRaw('last_login','NOW()',$userID);
 			if (isset($_REQUEST['remember_me'])) {
 				session_set_cookie_params(604800,PATH_REL_ROOT);
