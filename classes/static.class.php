@@ -359,7 +359,6 @@ class utopia {
 			case itCOMBO:
 				if (empty($possibleValues)) $possibleValues = array();
 				$out .= "<select $attr>"; 
-				$defaultExists = false;
 				if (!isset($possibleValues[''])) { // blank value does not exist.
 					if (isset($attributes['placeholder']) && $attributes['placeholder'] && !isset($possibleValues[$attributes['placeholder']])) $blankVal = $attributes['placeholder'];
 					else $blankVal = '&nbsp;';
@@ -369,7 +368,9 @@ class utopia {
 					unset($possibleValues['']);
 					$possibleValues = array(''=>$v) + $possibleValues;
 				}
+				$defaultExists = false;
 				if (is_array($possibleValues)) foreach ($possibleValues as $key => $val) {
+					if ($val === false) continue;
 					$selected = '';
 					if ($defaultValue !== '' && ((is_array($defaultValue) && in_array($key,$defaultValue)) || ((string)$key === (string)$defaultValue))) {
 						$defaultExists = true;
