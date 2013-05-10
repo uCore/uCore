@@ -138,7 +138,9 @@ class uUserLogin extends uDataModule {
 
 	public function RunModule() {
 		if (self::IsLoggedIn()) {
-			echo '<p>You are already logged in.</p>';
+			// redirect to user profile
+			$o =& utopia::GetInstance('uUserProfile');
+			$o->AssertURL(307,false);
 			return;
 		}
 		self::LoginForm();
