@@ -2,12 +2,12 @@
 
 class adminLogout extends uBasicModule implements iAdminModule {
 	public function GetOptions() { return PERSISTENT; }
-	public function GetTitle() { return 'Logout'; }
+	public function GetTitle() { return 'Log Out'; }
 	public function GetSortOrder() { return -9900; }
 	public static $uuid = 'logout';
 	public function SetupParents() {
 		$this->SetRewrite(true);
-		utopia::AddTemplateParser('logout','<a href="'.$this->GetURL().'">Logout</a>','');
+		utopia::AddTemplateParser('logout','<a href="'.$this->GetURL().'">Log Out</a>','');
 		
 		if (!uUserLogin::IsLoggedIn()) return;
 		$this->AddParent('/');
@@ -42,7 +42,7 @@ utopia::AddTemplateParser('login','uUserLogin::LoginForm','',true);
 uEvents::AddCallback('BeforeRunModule','uUserLogin::checkLogin');
 class uUserLogin extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'User Login'; }
+	public function GetTitle() { return 'User Log In'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT | NO_NAV; }
 	public static $uuid = 'login';
 	public function GetTabledef() { return 'tabledef_Users'; }
