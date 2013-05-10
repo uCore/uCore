@@ -143,8 +143,8 @@ th.sortable { cursor:pointer; }
 }
 
 
-.btn-edit { margin:0;width:16px;height:16px;padding:2px;background-image:url(images/edit.png);background-repeat:no-repeat;background-position:center !important; }
-.btn-del  { margin:0;width:16px;height:16px;padding:2px;background-image:url(images/delete.png);background-repeat:no-repeat;background-position:center !important; }
+.btn.btn-edit { margin:0;width:16px;height:16px;padding:2px;background-color:white;background-image:url(images/edit.png);background-repeat:no-repeat;background-position:center !important; }
+.btn.btn-del  { margin:0;width:16px;height:16px;padding:2px;background-color:white;background-image:url(images/delete.png);background-repeat:no-repeat;background-position:center !important; }
 
 
 
