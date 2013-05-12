@@ -91,7 +91,7 @@ class uUserLogin extends uDataModule {
 			self::SetLogin($userID);
 			
 			$obj =& utopia::GetInstance('uUsersList');
-			$rec =& $obj->LookupRecord($userID);
+			$rec = $obj->LookupRecord($userID);
 			// check if password is the most secure we can have.
 			if (!uCrypt::IsStrongest($pw,$rec['password'])) {
 				$pk = $rec['user_id'];
