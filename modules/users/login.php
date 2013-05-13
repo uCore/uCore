@@ -50,6 +50,7 @@ class uUserLogin extends uDataModule {
 		$this->CreateTable('users');
 		$this->AddField('username','username','users');
 		$this->AddField('password','password','users');
+		$this->SetFieldOptions('password',ALLOW_EDIT);
 		$this->AddField('last_login','last_login','users');
 		$this->SetFieldOptions('last_login',ALLOW_EDIT);
 		$this->AddField('can_login','(!({email_confirm} <=> {username}))','users');
@@ -90,15 +91,14 @@ class uUserLogin extends uDataModule {
 		if (($userID = uUsersList::TestCredentials($un,$pw)) !== false) {
 			self::SetLogin($userID);
 			
-			$obj =& utopia::GetInstance('uUsersList');
+			$obj =& utopia::GetInstance(__CLASS__);
 			$rec = $obj->LookupRecord($userID);
 			// check if password is the most secure we can have.
 			if (!uCrypt::IsStrongest($pw,$rec['password'])) {
 				$pk = $rec['user_id'];
-				$obj->UpdateField('password',$pw,$pk);
+				$obj->UpdateField('password',uCrypt::Encrypt($pw),$pk);
 			}
 			
-			$obj =& utopia::GetInstance(__CLASS__);
 			$obj->UpdateFieldRaw('last_login','NOW()',$userID);
 			if (isset($_REQUEST['remember_me'])) {
 				session_set_cookie_params(604800,PATH_REL_ROOT);
