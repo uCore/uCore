@@ -13,6 +13,7 @@ CKEDITOR.config.toolbar_Advanced = [
 ];
 CKEDITOR.config.toolbar = 'Advanced';
 CKEDITOR.config.allowedContent = true;
+CKEDITOR.config.autoParagraph = false;
 CKEDITOR.config.filebrowserBrowseUrl = FILE_BROWSE_URL;
 CKEDITOR.config.filebrowserWindowWidth = '800';
 CKEDITOR.config.filebrowserWindowHeight = '600';
