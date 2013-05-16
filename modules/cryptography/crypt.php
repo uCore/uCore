@@ -19,7 +19,7 @@ class uCryptBlowfish implements iCrypt {
 		return crypt($string,$salt);
 	}
 	public static function Test($string,$digest) {
-		return (crypt($string, $digest) == $digest);
+		return (crypt($string, $digest) === $digest);
 	}
 }
 uCrypt::RegisterClass('uCryptBlowfish');
@@ -35,7 +35,7 @@ class uCryptSHA512 implements iCrypt {
 		return crypt($string,$salt);
 	}
 	public static function Test($string,$digest) {
-		return (crypt($string, $digest) == $digest);
+		return (crypt($string, $digest) === $digest);
 	}
 }
 uCrypt::RegisterClass('uCryptSHA512');
@@ -52,7 +52,7 @@ class uCryptSHA256 implements iCrypt {
 		return crypt($string,$salt);
 	}
 	public static function Test($string,$digest) {
-		return (crypt($string, $digest) == $digest);
+		return (crypt($string, $digest) === $digest);
 	}
 }
 uCrypt::RegisterClass('uCryptSHA256');
