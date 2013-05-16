@@ -2,7 +2,6 @@
 
 interface iCrypt {
 	public static function CanUse();
-	public static function CreateSalt();
 	public static function Encrypt($string,$salt = null);
 	public static function Test($string,$digest);
 }
@@ -70,11 +69,22 @@ class uCryptMD5 implements iCrypt {
 	}
 	public static function Test($string,$digest) {
 		if (substr($digest,0,3) !== '$1$') return (md5($string) === $digest);
-		return (crypt($string, $digest) == $digest);
+		return (crypt($string, $digest) === $digest);
 	}
 }
 uCrypt::RegisterClass('uCryptMD5',99999);
 
+
+class uCryptPlain implements iCrypt {
+	public static function CanUse() { return true; }
+	public static function Encrypt($string,$salt = null) {
+		return $string;
+	}
+	public static function Test($string,$digest) {
+		return $string === $digest;
+	}
+}
+uCrypt::RegisterClass('uCryptPlain',999999);
 
 
 class uCrypt {
