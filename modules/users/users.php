@@ -322,6 +322,11 @@ class uVerifyEmail extends uDataModule {
 
 	public function SetupParents() {
 		$this->SetRewrite(array('{c}'));
+		uEvents::AddCallback('AfterUpdateField',array($this,'UpdatedEmail'),'uUserProfile');
+	}
+	public function UpdatedEmail($o,$e,$f,$v,$pk) {
+		if ($f !== 'username') return;
+		uVerifyEmail::VerifyAccount($pk);
 	}
 
 	public function SetupFields() {
