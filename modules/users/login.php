@@ -92,9 +92,9 @@ class uUserLogin extends uDataModule {
 			self::SetLogin($userID);
 			
 			$obj =& utopia::GetInstance(__CLASS__);
-			$rec = $obj->LookupRecord($userID);
+			$rec = $obj->LookupRecord($userID,true);
 			// check if password is the most secure we can have.
-			if (!uCrypt::IsStrongest($pw,$rec['password'])) {
+			if ($rec && !uCrypt::IsStrongest($pw,$rec['password'])) {
 				$pk = $rec['user_id'];
 				$obj->UpdateField('password',uCrypt::Encrypt($pw),$pk);
 			}
