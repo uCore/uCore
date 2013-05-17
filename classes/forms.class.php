@@ -2298,14 +2298,14 @@ abstract class uDataModule extends uBasicModule {
 		$opk = NULL;
 		
 		// can we access this field?
-		if ($pkVal === NULL || $this->LookupRecord($pkVal)) {
-			if ($fieldAlias === '__u_delete_record__')
-				$this->DeleteRecord($pkVal);
-			elseif ($isFile)
-				$this->UploadFile($fieldAlias,$value,$pkVal);
-			else
-				$this->UpdateField($fieldAlias,$value,$pkVal);
-		}
+		if ($pkVal !== NULL && !$this->LookupRecord($pkVal)) throw new Exception('Unable update a field that you cannot read.');
+		
+		if ($fieldAlias === '__u_delete_record__')
+			$this->DeleteRecord($pkVal);
+		elseif ($isFile)
+			$this->UploadFile($fieldAlias,$value,$pkVal);
+		else
+			$this->UpdateField($fieldAlias,$value,$pkVal);
 
 		foreach ($this->fields as $alias => $field) {
 			if ($alias == $fieldAlias) continue;
