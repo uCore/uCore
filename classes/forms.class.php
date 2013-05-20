@@ -186,25 +186,30 @@ class uDataset {
 	}
 	
 	public function GetFirst() {
-		$rows = $this->GetOffset(0,1);
-		return reset($rows);
+		return $this->GetOffset(0,1)->fetch();
 	}
 	
 	/* page is zero indexed */
-	public function GetPage($page, $items_per_page=10) {
+	public function &GetPage($page, $items_per_page=10) {
 		$limit = '';
 		if ($items_per_page > 0) {
 			if ($page >= $this->CountPages($items_per_page)) $page = 0;
 			$start = $items_per_page * $page;
 			return $this->GetOffset($start,$items_per_page);
 		}
-		return $this->fetchAll();
+		return $this;
 	}
 	
-	public function GetOffset($offset,$count) {
+	public function &GetOffset($offset,$count) {
 		$ql = $this->query.' LIMIT ?,?';
 		$qa = $this->args; $qa[] = intval($offset); $qa[] = intval($count);
-		return $this->CreateRecords(database::query($ql,$qa)->fetchAll());
+		$this->ds =& database::query($ql,$qa);
+		return $this;
+	}
+	
+	public function &GetAll() {
+		$this->ds = null;
+		return $this;
 	}
 	
 	private $ds = null;
@@ -2872,19 +2877,14 @@ abstract class uListDataModule extends uDataModule {
 	
 	public $limit = 50;
 	
-	public function ShowData($rows = null, $tabTitle = null,$tabOrder = null) {
+	public function ShowData($dataset = null, $tabTitle = null,$tabOrder = null) {
 		//	echo "showdata ".get_class($this)."\n";
 		array_sort_subkey($this->fields,'order');
 
-		
 		$this->GetLimit($limit,$page);
-		if (!$rows) {
-			$dataset = $this->GetDataset();
-			$num_rows = $dataset->CountRecords();
-			$rows = $dataset->GetPage($page,$limit);
-		} else {
-			$num_rows = count($rows);
-		}
+		if (!$dataset) $dataset = $this->GetDataset();
+		$dataset->GetPage($page,$limit);
+		$num_rows = $dataset->CountRecords();
 		if (!$tabTitle) $tabTitle = $this->GetTitle();
 		if (!$tabOrder) $tabOrder = $this->GetSortOrder();
 		
@@ -3071,7 +3071,9 @@ abstract class uListDataModule extends uDataModule {
 			//			if ($result != FALSE && mysql_num_rows($result) > 200)
 			//				echo "<tr><td colspan=\"$colcount\">There are more than 200 rows. Please use the filters to narrow your results.</td></tr>";
 			$i = 0;
-			foreach ($rows as $row) {
+			//$rows = $dataset->GetPage($page,$limit);
+			//foreach ($rows as $row) {
+			while (($row = $dataset->fetch())) {
 				$i++;
 				// move totals here
 				$fields = $this->GetFields();
@@ -3214,8 +3216,7 @@ abstract class uSingleDataModule extends uDataModule {
 			$this->GetLimit($limit,$page);
 			$dataset = $this->GetDataset();
 			$num_rows = $dataset->CountRecords();
-			$rows = $dataset->GetPage($page,$limit);
-			$row = reset($rows);
+			$row = $dataset->GetPage($page,$limit)->fetch();
 		}
 
 		$pagination = '';

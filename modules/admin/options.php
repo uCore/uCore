@@ -8,7 +8,9 @@ class tabledef_ModOpts extends uTableDef {
 		// AddField($name, $type, $length, $collation='', $attributes='', $null='not null', $default='', $extra='', $comments='')
 		// SetPrimaryKey($name);
 
-		$this->AddField('ident','varchar',100);
+		$this->AddField('ident',ftVARCHAR,100);
+		$this->AddField('group',ftVARCHAR,100);
+		$this->AddField('name',ftVARCHAR,100);
 		$this->AddField('value',ftLONGTEXT);
 		$this->SetPrimaryKey('ident');
 	}
@@ -22,8 +24,8 @@ class modOpts extends uDataModule {
 	public function SetupFields() {
 		$this->CreateTable('opts');
 		$this->AddField('ident','ident','opts');
-		$this->AddField('group','','');
-		$this->AddField('name','','','Name');
+		$this->AddField('group','group','opts');
+		$this->AddField('name','name','opts','Name');
 		$this->AddField('value','value','opts','Value',itTEXT);
 	}
 	public function SetupParents() {
@@ -40,10 +42,17 @@ class modOpts extends uDataModule {
 	public static function GetOption($ident) {
 		$obj =& utopia::GetInstance(__CLASS__);
 		$rec = $obj->LookupRecord($ident);
-		if ($rec) return $rec['value'];
-		$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
-		if (isset(self::$types[$ident])) return self::$types[$ident][4];
-		return FALSE;
+		if (!$rec) {
+			$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
+			return self::$types[$ident][4];
+		}
+		
+		// check group and name
+		if ($rec['name'] !== self::$types[$ident][2] || $rec['group'] !== self::$types[$ident][3]) {
+			$obj->UpdateFields(array('name'=>self::$types[$ident][2],'group'=>self::$types[$ident][3]),$ident);
+		}
+		
+		return $rec['value'];
 	}
 	public static function SetOption($ident,$value) {
 		$obj =& utopia::GetInstance(__CLASS__);
@@ -59,38 +68,24 @@ class modOptsList extends uListDataModule implements iAdminModule {
 	public function SetupFields() {
 		$this->CreateTable('opts');
 		$this->AddField('ident','ident','opts');
-		$this->AddField('group','','');
-		$this->AddField('name','','','Name');
+		$this->AddField('group','group','opts');
+		$this->AddField('name','name','opts','Name');
 		$this->AddField('value','value','opts','Value',itTEXT);
+		$this->AddFilter('name',ctISNOT,itNONE,'NULL');
+		$this->AddFilter('group',ctISNOT,itNONE,'NULL');
+		$this->AddOrderBy('name');
 	}
 	public function SetupParents() {
 		$this->AddParent('/');
 	}
 	public function RunModule() {
-		$dataset = $this->GetDataset();
-		$rows = $dataset->fetchAll();
-		
-		foreach ($rows as $k=>$row) {
-			foreach (modOpts::$types as $id=>$t) {
-				if ($id == $row['ident']) {
-					$rows[$k]['name'] = $t[2];
-					$rows[$k]['group'] = $t[3];
-				}
-			}
-		}
-		
-		array_sort_subkey($rows,'group');
-		$grouped = array();
-		
-		foreach ($rows as $r) {
-			if (!isset(modOpts::$types[$r['ident']])) continue;
-			if (!$r['name']) continue;
-			$grouped[modOpts::$types[$r['ident']][3]][] = $r;
-		}
-		
-		foreach ($grouped as $group=>$g) {
+		$groups = database::query('SELECT DISTINCT `group` FROM tabledef_ModOpts WHERE `group` IS NOT NULL ORDER BY (`group` = ?), `group` ASC',array('Site Options'))->fetchAll();
+
+		foreach ($groups as $group) {
+			$group = $group['group'];
 			$order = $group == 'Site Options' ? -10000 : null;
-			$this->ShowData($g,$group,$order);
+			$ds = $this->GetDataset(array('group'=>$group));
+			$this->ShowData($ds,$group,$order);
 		}
 	}
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {

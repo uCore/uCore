@@ -117,8 +117,7 @@ class uCustomWidget implements iWidget {
 		if (!($total = $dataset->CountRecords())) return $rec['no_rows'];
 
 		// get rows
-		$rows = $dataset->GetOffset($offset,$limit);
-		if (!$rows) return $rec['no_rows'];
+		if ($offset > $total) return $rec['no_rows'];
 		
 		// get content
 		$content = $append = $prepend = '';
@@ -143,7 +142,8 @@ class uCustomWidget implements iWidget {
 			$repeatable = $ele;
 		}
 		
-		foreach ($rows as $row) {
+		$dataset->GetOffset($offset,$limit);
+		while (($row = $dataset->fetch())) {
 			$c = $repeatable;
 			$instance->MergeFields($c,$row);
 			$content .= $c;
