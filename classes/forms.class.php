@@ -2554,9 +2554,9 @@ abstract class uDataModule extends uBasicModule {
 					$this->FieldStyles_Add($field,$qs);
 				}
 				switch ($typeArr[$k]) {
-					case 'u':
+					case 'urlencode':
 						$replace = $this->PreProcess($field,$row[$field],$row);
-						$replace = UrlReadable($replace);
+						$replace = urlencode($replace);
 						$string = str_replace($search,$replace,$string);
 						break;
 					case 'd':
