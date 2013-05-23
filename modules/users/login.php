@@ -75,7 +75,7 @@ class uUserLogin extends uDataModule {
 	}
 	public static function GetLoginStatus() {
 		$u = self::IsLoggedIn();
-		if (!$u) return 'Login';
+		if (!$u) return 'Log In';
 		$o =& utopia::GetInstance(__CLASS__);
 		$rec = $o->LookupRecord($u);
 		return $rec['username'];
@@ -160,7 +160,7 @@ class uUserLogin extends uDataModule {
 		<div id="login-register-wrap">
 			<div id="login-wrap">
 			<div class="tag">{option.site_name}</div>
-			<h2>Login</h2>
+			<h2>Log In</h2>
 			<form action="" method="POST">
 			<div class="form-field">
 			<label for="__login_u">Email/Username</label>{login_user}
