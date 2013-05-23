@@ -1269,7 +1269,7 @@ class utopia {
 			}
 		}
 		if (!$c) return $originalValue;
-		$dp = $originalValue - floor($originalValue) > 0 ? 2 : 0;
+		$dp = $originalValue - floor($originalValue) > 0 || $originalValue < 100 ? 2 : 0;
 		$value = number_format($originalValue,$dp,$c['mon_decimal_point'],$c['mon_thousands_sep']);
 		
 		if ($originalValue >= 0) {
