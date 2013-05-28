@@ -812,9 +812,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		uEvents::TriggerEvent('AfterSetupFields',$this);
 		
-		$fields = $this->GetStringFields();
-		$this->AddField('__global__','(CAST(CONCAT_WS(\' \','.$fields.') AS CHAR))','');
-		$fltr =& $this->AddFilter('utopia::GetGlobalSearch',ctCUSTOM,itTEXT,null,null,'Global Search');
+		$fltr =& $this->AddFilter(array($this,'GetGlobalSearch'),ctCUSTOM,itTEXT,null,null,'Global Search');
 		$fltr['attributes']['class'] = 'uGlobalSearch';
 	}
 	public function GetStringFields() {	
@@ -827,7 +825,36 @@ abstract class uDataModule extends uBasicModule {
 				$fields[] = "`{$t['alias']}`.`{$f}`";
 			}
 		}
-		return implode(', ',$fields);
+		return $fields;
+	}
+	public function GetGlobalSearch($val,&$args) {
+		$all = array(array());
+		$cAll = count($all);
+
+		$fields = $this->GetStringFields();
+		
+		// match phrases
+		preg_match_all('/(".+")|([\w\+\']+)/',$val,$matches);
+		foreach ($matches[0] as $v) {
+			$v = trim($v,'"');
+			switch (strtolower($v)) {
+				case 'or':	$all[] = array(); $cAll = count($all);
+				case 'and':	continue 2;
+			}
+			$allflds = array();
+			foreach ($fields as $f) {
+				$args[] = '%'.$v.'%';
+				$allflds[] = $f.' LIKE ?';
+			}
+			$all[$cAll-1][] = '('.implode(' OR ',$allflds).')'.PHP_EOL;
+		}
+		
+		$a = array();
+		foreach ($all as $or) {
+			$a[] = implode(' AND ',$or);
+		}
+		
+		return implode(' OR ',$a);
 	}
 
 	public function ParseRewrite($caseSensative = false) {
@@ -910,10 +937,10 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($filterType as $filterSet) {
 				foreach ($filterSet as $filter) {
 					// is the current filter referenced in $filters? if not, continue;
-					if (!isset($filters[$filter['fieldName']]) && !isset($filters['_f_'.$filter['uid']])) continue;
+					if (!is_callable($filter['fieldName']) && !isset($filters[$filter['fieldName']]) && !isset($filters['_f_'.$filter['uid']])) continue;
 					
 					$val = $this->GetFilterValue($filter['uid']);
-					if (isset($filters[$filter['fieldName']])) $val = $filters[$filter['fieldName']];
+					if (!is_callable($filter['fieldName']) && isset($filters[$filter['fieldName']])) $val = $filters[$filter['fieldName']];
 					if (isset($filters['_f_'.$filter['uid']])) $val = $filters['_f_'.$filter['uid']];
 					
 					/*if (!empty($filter['default']) && $val == $filter['default']) {
@@ -1557,6 +1584,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function &AddFilter($fieldName,$compareType,$inputType=itNONE,$value=NULL,$values=NULL,$title=NULL) {
+		if (is_callable($fieldName)) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 		if (isset($this->fields[$fieldName])) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 		
 		if (preg_match_all('/{([^}]+)}/',$fieldName,$matches)) {
@@ -1564,8 +1592,6 @@ abstract class uDataModule extends uBasicModule {
 				if (isset($this->fields[$match])) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 			}
 		}
-		
-		if (is_callable($fieldName)) return $this->AddFilterWhere($fieldName,$compareType,$inputType,$value,$values,$title);
 
 		if (array_key_exists($fieldName,$this->fields) && stripos($this->fields[$fieldName]['field'],' ') === FALSE && !$this->UNION_MODULE && isset($this->fields[$fieldName]['vtable'])) {
 			return $this->AddFilterWhere($this->GetFieldLookupString($fieldName),$compareType,$inputType,$value,$values,$title);

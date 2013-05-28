@@ -1404,28 +1404,4 @@ class utopia {
 
 		return false;
 	}
-
-	static function GetGlobalSearch($val,&$args) {
-		$all = array(array());
-		$cAll = count($all);
-
-		// match phrases
-		preg_match_all('/(".+")|([\w\+\']+)/',$val,$matches);
-		foreach ($matches[0] as $v) {
-			$v = trim($v,'"');
-			switch (strtolower($v)) {
-				case 'or':	$all[] = array(); $cAll = count($all);
-				case 'and':	continue 2;
-			}
-			$args[] = $v;
-			$all[$cAll-1][] = '{__global__} LIKE CONCAT(\'%\',?,\'%\')';
-		}
-		
-		$a = array();
-		foreach ($all as $or) {
-			$a[] = implode(' AND ',$or);
-		}
-		
-		return implode(' OR ',$a);
-	}
 }
