@@ -528,7 +528,10 @@ abstract class uBasicModule implements iUtopiaModule {
 	}
 	final public function GetUUID() {
 		$class = get_class($this);
-		if (isset($class::$uuid) && $class::$uuid) return $class::$uuid;
+		try {
+			$x = new ReflectionClass($class);
+			if ($x->getStaticPropertyValue('uuid')) return $x->getStaticPropertyValue('uuid');
+		} catch(Exception $e) {}
 		$uuid = preg_replace('((.{8})(.{4})(.{4})(.{4})(.+))','$1-$2-$3-$4-$5',md5($class));
 		return $uuid;
 	}
