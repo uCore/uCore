@@ -3039,7 +3039,7 @@ abstract class uListDataModule extends uDataModule {
 			}
 			
 			if ($this->flag_is_set(ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
-				echo '<tr><td class="uFilters" colspan="'.$colcount.'">';
+				echo '<tr class="noprint"><td class="uFilters" colspan="'.$colcount.'">';
 			//	$v = isset($_GET['_g_'.$this->GetModuleId()]) ? $_GET['_g_'.$this->GetModuleId()] : '';
 			//	echo utopia::DrawInput('_g_'.$this->GetModuleId(),itTEXT,$v,null,array('class'=>'uFilter'));
 				

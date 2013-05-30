@@ -1,3 +1,7 @@
+@media print {
+        .admin-bar { display:none; }
+}
+
 .admin-bar, .admin-bar * { font-family: Arial; font-size:12px; }
 .admin-bar { position:fixed;top:0;left:0; z-index:99999; }
 .admin-bar .admin-menu {
