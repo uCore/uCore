@@ -3035,7 +3035,7 @@ abstract class uListDataModule extends uDataModule {
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
 			$pager = '<div class="pagination right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itCOMBO,$limit,array(25=>'25 per page',50=>'50 per page',150=>'150 per page',0=>'Show All'),array('class'=>'uFilter uLimit')).'</div>';
 			if (!$this->flag_is_set(LIST_HIDE_STATUS)) {
-				echo '<tr><td colspan="'.$colcount.'">{list.'.get_class($this).'}<span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
+				echo '<tr class="noprint"><td colspan="'.$colcount.'">{list.'.get_class($this).'}<span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
 			}
 			
 			if ($this->flag_is_set(ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {

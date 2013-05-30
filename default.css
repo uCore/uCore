@@ -22,6 +22,9 @@ th.sortable { cursor:pointer; }
 	zoom: 1; /* required for ie hasLayout */
 }
 
+@media print {
+	.noprint { display:none; }
+}
 
 .btn {
   display: inline-block;
