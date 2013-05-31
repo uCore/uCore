@@ -154,7 +154,9 @@ class uCMS_List extends uDataModule implements iAdminModule {
 	}
 
 	public function GetNestedArray($parent='') {
+		$this->BypassSecurity(true);
 		$dataset = $this->GetDataset();
+		$this->BypassSecurity(false);
 
 		$relational = array();
 		while ($row = $dataset->fetch()) {
