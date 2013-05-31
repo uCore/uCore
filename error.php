@@ -1,7 +1,7 @@
 <?php
 ini_set('html_errors','Off');
 set_error_handler('uErrorHandler::ThrowException');
-set_exception_handler('uErrorHandler::exception_handler');
+set_exception_handler('uErrorHandler::EchoException');
 
 class uErrorHandler {
 	static function ThrowException($code, $message, $file=null, $line=null, $errcontext=null) {
@@ -9,15 +9,13 @@ class uErrorHandler {
 		// Convert Errors to Exceptions
 		throw new ErrorException($message, $code, 0, $file, $line);
 	}
-	static function exception_handler($e) {
-		self::EchoException($e);
-	}
 	static function EchoException($e) {
 		$fullError = sprintf("<b>ERROR</b> [%s] %s<br />\n  Error on line %s in file %s<br />\n%s",$e->getCode(),$e->getMessage(),$e->getLine(),$e->getFile(),nl2br(htmlentities($e->getTraceAsString())));
 		DebugMail('Server Error: '.$e->getCode(),$fullError);
 		error_log($fullError);
 
-		if (ini_get('display_errors') != 'on') $fullError = 'An error has occurred.  The system administrator has been notified.';
+		$display = ini_get('display_errors');
+		if ($display == 'off' || !$display) $fullError = 'An error has occurred.  The system administrator has been notified.';
 		
 		echo $fullError;
 		return $fullError;
