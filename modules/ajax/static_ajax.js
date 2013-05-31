@@ -499,7 +499,6 @@ $(function() { // call on docready to allow cancelling events to bind first.
 			return frm[0].submit();
 		}
 	});
-	$(document).on('click','.btn-reset',function(event) {var frm = $(this).closest('form'); if (frm.length) return frm[0].reset();});
 });
 var isUpdating = [];
 function StoppedUpdating(ele) {
