@@ -296,16 +296,28 @@ class utopia {
 		switch ($inputType) {
 			case itNONE: $out .= $defaultValue; break;
 			case itBUTTON:
-			case itSUBMIT:
-			case itRESET:
-				if (isset($attributes['class']))
-					$attributes['class'] .= ' btn';
-				else
-					$attributes['class'] = 'btn';
+				if (isset($attributes['class'])) $attributes['class'] .= ' btn';
+				else $attributes['class'] = 'btn';
 				$attributes['class'] .= ' btn-'.$inputType;
 				$attributes['class'] = str_replace('inputtype ','',$attributes['class']);
 				$attr = BuildAttrString($attributes);
-				$out .= '<a '.$attr.' href="javascript:void(0)">'.$defaultValue.'</a>';
+				$out .= '<button'.$attr.'>'.$defaultValue.'</button>';
+				break;
+			case itSUBMIT:
+				if (isset($attributes['class'])) $attributes['class'] .= ' btn';
+				else $attributes['class'] = 'btn';
+				$attributes['class'] .= ' btn-'.$inputType;
+				$attributes['class'] = str_replace('inputtype ','',$attributes['class']);
+				$attr = BuildAttrString($attributes);
+				$out .= '<input'.$attr.' type="submit" value="'.$defaultValue.'"/>';
+				break;
+			case itRESET:
+				if (isset($attributes['class'])) $attributes['class'] .= ' btn';
+				else $attributes['class'] = 'btn';
+				$attributes['class'] .= ' btn-'.$inputType;
+				$attributes['class'] = str_replace('inputtype ','',$attributes['class']);
+				$attr = BuildAttrString($attributes);
+				$out .= '<input'.$attr.' type="reset" value="'.$defaultValue.'"/>';
 				break;
 			case itCHECKBOX:
 				if (is_array($possibleValues)) {
