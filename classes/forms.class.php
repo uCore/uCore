@@ -1190,7 +1190,7 @@ abstract class uDataModule extends uBasicModule {
 		//		$fromField = strtolower($fromField);
 		//		$toField = strtolower($toField);
 		if (!$this->sqlTableSetupFlat) $this->sqlTableSetupFlat = array();
-		if ($this->TableExists($alias)) { throw new Exception("Table with alias '$alias' already exists."); return; }
+		if ($this->TableExists($alias)) { throw new Exception("Table with alias '$alias' already exists"); return; }
 
 		$tableObj =& utopia::GetInstance($tableModule);
 
@@ -2332,7 +2332,7 @@ abstract class uDataModule extends uBasicModule {
 		$opk = NULL;
 		
 		// can we access this field?
-		if ($pkVal !== NULL && !$this->LookupRecord($pkVal)) throw new Exception('Unable update a field that you cannot read.');
+		if ($pkVal !== NULL && !$this->LookupRecord($pkVal)) throw new Exception('Unable update a field that you cannot read');
 		
 		if ($fieldAlias === '__u_delete_record__')
 			$this->DeleteRecord($pkVal);
@@ -2349,7 +2349,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 
 	public function DeleteRecord($pkVal) {
-		if (!$this->flag_is_set(ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion.'); }
+		if (!$this->flag_is_set(ALLOW_DELETE)) { throw new Exception('Module does not allow record deletion'); }
 		
 		if (uEvents::TriggerEvent('BeforeDeleteRecord',$this,array($pkVal)) === FALSE) return FALSE;
 		
@@ -2402,11 +2402,11 @@ abstract class uDataModule extends uBasicModule {
 	private $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		$this->_SetupFields();
-		if (!array_key_exists($fieldAlias,$this->fields)) { throw new Exception('Cannot update a field that does not exist.'); }
+		if (!array_key_exists($fieldAlias,$this->fields)) { throw new Exception('Cannot update a field that does not exist'); }
 		
-		if ($pkVal === NULL && !$this->flag_is_set(ALLOW_ADD,$fieldAlias)) { throw new Exception('Module does not allow adding records.'); }
-		if ($pkVal !== NULL && !$this->flag_is_set(ALLOW_EDIT,$fieldAlias)) { throw new Exception('Module does not allow editing records.'); }
-		if (!$this->flag_is_set(PERSISTENT,$fieldAlias) && uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) { throw new Exception('Access Denied when attempting to update field.'); }
+		if ($pkVal === NULL && !$this->flag_is_set(ALLOW_ADD,$fieldAlias)) { throw new Exception('Module does not allow adding records'); }
+		if ($pkVal !== NULL && !$this->flag_is_set(ALLOW_EDIT,$fieldAlias)) { throw new Exception('Module does not allow editing records'); }
+		if (!$this->bypassSecurity && !$this->flag_is_set(PERSISTENT,$fieldAlias) && uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) { throw new Exception('Access Denied when attempting to update field'); }
 
 		$tableAlias	= $this->fields[$fieldAlias]['tablename'];
 
