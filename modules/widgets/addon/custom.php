@@ -41,7 +41,10 @@ class uCustomWidget implements iWidget {
 		foreach ($f as $t) {
 			foreach ($t as $fs) {
 				foreach ($fs as $filter) {
-					$arr[$filter['uid']] = $filter['fieldName'];
+					$text = $filter['fieldName'];
+					if (is_array($text)) $text = (is_string($text[0])?$text[0]:get_class($text[0])).'->'.$text[1];
+					if (is_callable($filter['fieldName'])) $text = 'Function: '.$text;
+					$arr[$filter['uid']] = $text;
 				}
 			}
 		}
