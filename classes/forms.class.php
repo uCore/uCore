@@ -283,6 +283,11 @@ abstract class uBasicModule implements iUtopiaModule {
 	}
 
 	public function GetOptions() { return DEFAULT_OPTIONS; }
+	
+	protected $bypassSecurity = false;
+	public function BypassSecurity($flag) {
+		$this->bypassSecurity = $flag;
+	}
 
 	public function GetTitle() { return get_class($this); }
 	public function GetDescription() {}
@@ -2109,6 +2114,7 @@ abstract class uDataModule extends uBasicModule {
 	public function &GetDataset($filter=null,$clearFilters=false) {
 		$this->_SetupParents();
 		$this->_SetupFields();
+		if (!$this->bypassSecurity && !$this->flag_is_set(PERSISTENT) && uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) { throw new Exception('Access denied to module '.get_class($this)); }
 		
 		$this->dataset = new uDataset($this,$filter,$clearFilters);
 

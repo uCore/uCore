@@ -104,7 +104,9 @@ class uUsersList extends uListDataModule implements iAdminModule {
 	
 	public static function TestCredentials($username,$password) {
 		$obj =& utopia::GetInstance(__CLASS__);
+		$obj->BypassSecurity(true);
 		$rec = $obj->LookupRecord(array('username'=>$username));
+		$obj->BypassSecurity(false);
 		if (!$rec) return false;
 		if (!uCrypt::Test($password,$rec['password'])) return false;
 		
@@ -121,7 +123,9 @@ class uAssertAdminUser extends uBasicModule {
 	public function AssertAdminUser() {
 		// admin user exists?
 		$obj =& utopia::GetInstance('uUsersList');
+		$obj->BypassSecurity(true);
 		$rec = $obj->LookupRecord(array('role'=>-1,'validated'=>1),true);
+		$obj->BypassSecurity(false);
 		if ($rec) return;
 
 		// module is persist?

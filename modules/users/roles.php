@@ -32,7 +32,9 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		uEvents::AddCallback('AfterInit',array($this,'AssertAdminRole'));
 	}
 	public function AssertAdminRole() {
+		$this->BypassSecurity(true);
 		$rec = $this->LookupRecord(-1,true);
+		$this->BypassSecurity(false);
 		if (!$rec) { // insert directly to table to avoid checking permissions
 			$o =& utopia::GetInstance('tabledef_UserRoles');
 			$pk = null;
@@ -46,11 +48,15 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		if (!isset($_SESSION['current_user'])) return FALSE;
 		if (!self::$roleCache) {
 			$obj =& utopia::GetInstance('uUsersList');
+			$obj->BypassSecurity(true);
 			$user = $obj->LookupRecord(array('user_id'=>$_SESSION['current_user']),true);
+			$obj->BypassSecurity(false);
 			if ($user['_roles_pk'] === NULL) return FALSE;
 
 			$obj =& utopia::GetInstance('uUserRoles');
+			$obj->BypassSecurity(true);
 			$role = $obj->LookupRecord($user['_roles_pk'],true); // clear fixed filters
+			$obj->BypassSecurity(false);
 			self::$roleCache = array($role['role_id'],utopia::jsonTryDecode($role['allow']));
 		}
 		return self::$roleCache;
