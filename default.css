@@ -1,6 +1,7 @@
 body { position: relative; }
 body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
+html.wait * { cursor:wait !important; }
 
 .uDebug { white-space:pre-wrap; background:white; color:black; text-align:left; clear:both; }
 

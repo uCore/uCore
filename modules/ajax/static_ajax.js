@@ -100,10 +100,6 @@ function AppendSubmit() { // auto append submit buttons
 };
 
 $(document).ready(function(){
-	// preload hourglass image
-	$("<img>").attr("src", PATH_REL_CORE+'images/hourglass.png');
-	//$("<img>").attr("src", PATH_REL_CORE+'images/utopia-systems-hover.png');
-
 	$('li:first-child').addClass('first-child');
 	$('li:last-child').addClass('last-child');
 
@@ -482,22 +478,10 @@ $(function() { // call on docready to allow cancelling events to bind first.
 		if ($(this).attr('target')) return;
 		if ($('[name^="usql-"]',this).length) {
 			ufForm(this,this);
-			event.stopImmediatePropagation(); 
+			event.stopImmediatePropagation();
 			return false;
 		}
 		return true;
-	});
-	$(document).on('click','.btn-submit',function(event) {
-		var frm = $(this).closest('form');
-		if (frm.attr('target')) return;
-		var n = $(this).attr('name');
-		if (n && n.match(/^usql\-/)) {
-			return ufForm(frm,this);
-		}
-		if (frm.length) { // sitting within form, submit it
-			if (frm[0].onsubmit && frm[0].onsubmit() === false) return false;
-			return frm[0].submit();
-		}
 	});
 });
 var isUpdating = [];
@@ -507,22 +491,18 @@ function StoppedUpdating(ele) {
 	}
 }
 function _fieldChange(event) { if ($(this).closest('form').length) return true; uf(this); event.stopImmediatePropagation(); return true; }
-function uf(ele, forcedValue, hourglassEle) {
+function uf(ele, forcedValue) {
 	for (e in isUpdating) {
 		if (isUpdating[e].element == ele) return;
 	}
 	isUpdating.push({element:ele,val:forcedValue});
 
-	if (!hourglassEle) hourglassEle = ele;
-	if (typeof(hourglassEle) == 'string') hourglassEle = document.getElementById(hourglassEle);
-	if (hourglassEle) {
-		var hourglass = makeHourglass(hourglassEle);
-	}
+	$('html').addClass('wait');
 
 	// timeout for autocomplete
-	setTimeout(function(){_uf(ele, hourglass);},200);
+	setTimeout(function(){_uf(ele);},200);
 }
-function _uf(ele,hourglass) {
+function _uf(ele) {
 	var forcedValue = '';
 	for (e in isUpdating) {
 		if (isUpdating[e].element == ele) {
@@ -558,7 +538,7 @@ function _uf(ele,hourglass) {
 			dataType: "script",
 			success: function (msg) {
 				eval(msg);
-				$(hourglass).remove();
+				$('html').removeClass('wait');
 				StoppedUpdating(ele);
 				$('.auto-complete-list').hide();
 				utopia.Initialise.run();
@@ -577,28 +557,25 @@ function _uf(ele,hourglass) {
 		url: targetPage,
 		data: eleData,
 		dataType: "script"
-	}).done(function(msg){
-		$(hourglass).remove();
 	}).fail(function(obj,type,e){
-		$(hourglass).remove();
 		if (empty(e)) return;
 		$(ele).css('background','red');
 		ErrorLog(type+': '+e.message);
 	}).always(function(){
-		$(hourglass).remove();
+		$('html').removeClass('wait');
 		StoppedUpdating(ele);
 		$('.auto-complete-list').hide();
 		ReFocus();
 	});
 }
 
-function ufForm(frm,hourglassEle) {
-	setTimeout(function(){_ufData(frm, hourglassEle);},200);
+function ufForm(frm) {
+	setTimeout(function(){_ufData(frm);},200);
 }
-function _ufData(frm,hourglassEle) {
+function _ufData(frm) {
 	var eleData = {'__ajax':'updateField'};
 	$(':input',frm).each(function(){ if ($(this).attr('name')) eleData[$(this).attr('name')]=getEleVal(this)});
-	var hourglass = makeHourglass(hourglassEle);
+	$('html').addClass('wait');
 	
 	targetPage = window.location.pathname+window.location.search;
 	$.ajax({
@@ -608,12 +585,8 @@ function _ufData(frm,hourglassEle) {
 		url: targetPage,
 		data: eleData,
 		dataType: "script"
-	}).done(function(msg){
-		$(hourglass).remove();
-	}).fail(function(obj,type,e){
-		$(hourglass).remove();
 	}).always(function(){
-		$(hourglass).remove();
+		$('html').removeClass('wait');
 		$('.auto-complete-list').hide();
 		ReFocus();
 	});
@@ -639,21 +612,6 @@ function getEleVal(ele) {
 		case 1: eleVal = eleVal[0]; break;
 	}
 	return eleVal;
-}
-
-function makeHourglass(hourglassEle) {
-	var hourglass = $('<img align="texttop" src="'+PATH_REL_CORE+'images/hourglass.png"/>');
-	var offset = $(hourglassEle).offset();
-	hourglass.css({
-		position:'absolute',
-		'z-index':5000,
-		top: offset.top,
-		left: offset.left + hourglassEle.offsetWidth
-	});
-	$('body').append(hourglass);
-	$('body').addClass('progressCursor');
-	//if (!$(hourglassEle).is(':file')) $(hourglassEle).attr('color','disabled');
-	return hourglass;
 }
 
 
