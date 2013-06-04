@@ -138,4 +138,4 @@ FIN
 	}
 }
 
-uEvents::AddCallback('ProcessDomDocument','uUploads::ProcessDomDocument','',99999999);
+uEvents::AddCallback('ProcessDomDocument','uUploads::ProcessDomDocument','',MAX_ORDER);

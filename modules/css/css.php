@@ -5,7 +5,7 @@ uCSS::IncludeFile(PATH_REL_CORE.'default.css');
 uCSS::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
 
 uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
-uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument','',99999);
+uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument',null,MAX_ORDER);
 class uCSS extends uBasicModule {
 	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);

@@ -1,7 +1,7 @@
 <?php
 
 uEvents::AddCallback('ProcessDomDocument','uJavascript::LinkToDocument');
-uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument','',99999);
+uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument',null,MAX_ORDER);
 class uJavascript extends uBasicModule {
 	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);

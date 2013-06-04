@@ -13,7 +13,7 @@ class uEvents {
 		self::$callbacks[$eventName][$module][] = array('callback'=>$callback,'order'=>$order);
 		return true;
 	}
-	public static function RemoveCallback($eventName, $callback, $module = '') {
+	public static function RemoveCallback($eventName, $callback, $module = null) {
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);
 		
