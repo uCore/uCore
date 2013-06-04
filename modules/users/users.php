@@ -137,7 +137,9 @@ class uAssertAdminUser extends uBasicModule {
 	}
 	public function RunModule() {
 		$obj =& utopia::GetInstance('uUsersList');
+		$obj->BypassSecurity(true);
 		$rec = $obj->LookupRecord(array('role'=>-1,'validated'=>1),true);
+		$obj->BypassSecurity(false);
 		if ($rec) {
 			header('Location: '.PATH_REL_CORE); die();
 		}
