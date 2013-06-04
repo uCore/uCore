@@ -1806,11 +1806,11 @@ abstract class uDataModule extends uBasicModule {
 
 	public function &GetFilterInfo($uid) {
 		//		echo get_class($this).".GetFilterInfo($uid)<br/>";
-		foreach ($this->filters as &$filterTypeArray) {
-			foreach ($filterTypeArray as &$filterset) {
+		foreach ($this->filters as $ftKey => $filterTypeArray) {
+			foreach ($filterTypeArray as $fsKey => $filterset) {
 				if (!is_array($filterset)) continue;
-				foreach ($filterset as &$filterInfo) {
-					if ($filterInfo['uid'] == $uid)	return $filterInfo;
+				foreach ($filterset as $fk => $filterInfo) {
+					if ($filterInfo['uid'] == $uid)	return $this->filters[$ftKey][$fsKey][$fk];
 				}
 			}
 		}
