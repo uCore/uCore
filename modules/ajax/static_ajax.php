@@ -3,21 +3,27 @@
 // dependancies
 // check dependancies exist - Move to install?
 
-class internalmodule_StaticAjax extends uBasicModule {
-	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return ''; }
-	public function GetOptions() { return ALWAYS_ACTIVE | PERSISTENT_PARENT; }
+// register ajax
+utopia::RegisterAjax('updateField','internalmodule_StaticAjax::UpdateField');
+utopia::RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
+utopia::RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
+utopia::RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
+utopia::RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
+utopia::RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
 
-	public function SetupParents() {
+uEvents::AddCallback('AfterInit','internalmodule_StaticAjax::RunAjax',null,MAX_ORDER+MAX_ORDER);
+
+class internalmodule_StaticAjax {
+	static function RunAjax() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
-		// register ajax
-		utopia::RegisterAjax('updateField','internalmodule_StaticAjax::UpdateField');
-		utopia::RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
-		utopia::RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
-		utopia::RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
-		utopia::RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
-		utopia::RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
+		
+		// process ajax function
+		if (array_key_exists('__ajax',$_REQUEST)) {
+			$ajaxIdent	= $_REQUEST['__ajax'];
+			utopia::RunAjax($ajaxIdent);
+		}
 	}
+
 	static function InterpretSqlString($sqlString, &$module, &$field, &$pkVal) {
 		$matches = null;
 		if (!preg_match('/([^:]+):([^\(]+)(\(.*\))?/',$sqlString,$matches)) return false;
@@ -34,8 +40,6 @@ class internalmodule_StaticAjax extends uBasicModule {
 
 		return true;
 	}
-
-	public function RunModule() { }
 
 	public static function getParserContent() {
 		$ident = isset($_GET['ident']) ? $_GET['ident'] : null;

@@ -51,10 +51,4 @@ header('Access-Control-Allow-Origin: '.modOpts::GetOption('site_url'));
 uEvents::TriggerEvent('AfterInit');
 uEvents::TriggerEvent('InitComplete');
 
-// process ajax function
-if (array_key_exists('__ajax',$_REQUEST)) {
-	$ajaxIdent	= $_REQUEST['__ajax'];
-	utopia::RunAjax($ajaxIdent);
-}
-
 utopia::UseTemplate(TEMPLATE_DEFAULT);

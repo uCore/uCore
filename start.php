@@ -61,6 +61,8 @@ define('PATH_ABS_THEMES',fix_path(PATH_ABS_ROOT.'uThemes').'/');
 define('PATH_FULL_ROOT',((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')?'https':'http').'://'.$_SERVER['HTTP_HOST'].PATH_REL_ROOT);
 define('PATH_FULL_CORE',((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')?'https':'http').'://'.$_SERVER['HTTP_HOST'].PATH_REL_CORE);
 
+define('MAX_ORDER',99999999);
+
 ini_set('session.cookie_path',PATH_REL_ROOT);
 session_cache_limiter(false);
 session_name('ucore');
