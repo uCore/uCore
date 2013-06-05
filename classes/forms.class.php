@@ -541,12 +541,8 @@ abstract class uBasicModule implements iUtopiaModule {
 		return $uuid;
 	}
 	
-	private $mID = NULL;
 	public function GetModuleId() {
-		if ($this->mID !== NULL) return $this->mID;
-		$m = utopia::ModuleExists(get_class($this));
-		$this->mID = $m['module_id'];
-		return $this->mID;
+		return utopia::GetModuleId($this);
 	}
   
 	public $rewriteMapping=NULL;
@@ -821,6 +817,7 @@ abstract class uDataModule extends uBasicModule {
 		uEvents::TriggerEvent('AfterSetupFields',$this);
 		
 		$fltr =& $this->AddFilter(array($this,'GetGlobalSearch'),ctCUSTOM,itTEXT,null,null,'Global Search');
+		$fltr['uid'] = $this->GetModuleId().'_global_search_';
 		$fltr['attributes']['class'] = 'uGlobalSearch';
 	}
 	public function GetStringFields() {	
@@ -836,6 +833,7 @@ abstract class uDataModule extends uBasicModule {
 		return $fields;
 	}
 	public function GetGlobalSearch($val,&$args) {
+		if (!$val) return '';
 		$all = array(array());
 		$cAll = count($all);
 

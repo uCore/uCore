@@ -148,9 +148,17 @@ class utopia {
 		return self::$allmodules;
 	}
 
+	static function GetModuleId($module) {
+		if (!is_string($module)) $module = get_class($module);
+		$m = utopia::ModuleExists($module);
+		if ($m) return $m['module_id'];
+		return false;
+	}
+	
 	static function ModuleExists($module) {
 		$modules = self::GetModules();
 		if (isset($modules[$module])) return $modules[$module];
+		return false;
 	}
 	static function UUIDExists($uuid) {
 		$modules = self::GetModules();
