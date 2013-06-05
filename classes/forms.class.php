@@ -91,6 +91,19 @@ define('DEFAULT_OPTIONS',ALLOW_FILTER);
 
 // START CLASSES
 
+class uFilter {
+	public $filter;
+	public $compareType;
+	public $inputType;
+	public $value;
+	public function __construct($filter,$compareType,$inputType,$value) {
+		$this->filter = $filter;
+		$this->compareType = $compareType;
+		$this->inputType = $inputType;
+		$this->value = $value;
+	}
+}
+
 class uDataset {
 	private $module = null;
 	private $query = null;
@@ -108,16 +121,20 @@ class uDataset {
 		$fltrs = $this->module->filters;
 		if ($clearFilters) $this->module->ClearFilters();
 		foreach ($filter as $field => $val) {
+			if ($val instanceof uFilter) {
+				if (($fltr =& $this->module->GetFilterInfo($val->filter))) {
+					$fltr['value'] = $val->value;
+				} else {
+					$this->module->AddFilter($val->filter,$val->compareType,$val->inputType,$val->value);
+				}
+				continue;
+			}
 			if (is_numeric($field)) { // numeric key is custom filter
 				$this->module->AddFilter($val,ctCUSTOM);
 				continue;
 			}
 			if (($fltr =& $this->module->GetFilterInfo($field))) { // filter uid exists
 				$fltr['value'] = $val;
-				continue;
-			}
-			if (is_array($val)) {
-				$fltr = $this->module->AddFilter($field,$val['ct'],itNONE,$val['val']);
 				continue;
 			}
 			$this->module->AddFilter($field,ctEQ,itNONE,$val);
