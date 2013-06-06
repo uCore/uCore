@@ -1,7 +1,6 @@
 <?php
 
 uEvents::AddCallback('ProcessDomDocument','uAdminBar::ProcessDomDocument');
-//utopia::AddTemplateParser('admin_bar','uAdminBar::DrawAdminBar','');
 class uAdminBar {
 	static $items = array();
 	public static function AddItem($menu=FALSE,$body=FALSE,$order=null,$class='') {
@@ -37,6 +36,7 @@ class uAdminBar {
 		return '<div class="u-admin admin-bar"><div class="admin-toggle"><span/></div><div class="admin-container"><ul class="admin-menu">'.implode('',$arr).'</ul><div class="admin-body">'.implode('',$body).'</div></div></div>';
 	}
 	static function ProcessDomDocument($obj,$event,$templateDoc) {
+		if (!(utopia::GetCurrentModule() instanceof iAdminModule)) return;
 		$html = self::DrawAdminBar();
 		if (!$html) return;
 		$body = $templateDoc->getElementsByTagName('body')->item(0);
