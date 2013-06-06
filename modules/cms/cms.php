@@ -443,6 +443,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$pk = NULL;
 		$o->UpdateField('cms_id','index',$pk);
 		$o->UpdateField('title','Welcome Willkommen Bienvenue Bienvenido 歡迎光臨 ようこそ',$pk);
+		$o->UpdateField('nav_text','Home',$pk);
 		$o->UpdateField('content','<h1>Welcome Willkommen Bienvenue Bienvenido 歡迎光臨 ようこそ</h1><p>Hello and welcome to your new website.</p><p>We have marked your template as offline for now.  Once you have finished editing your pages you can turn it on in the <a href="'.PATH_REL_CORE.'">uCore Dashboard</a>.</p>',$pk);
 		$o->UpdateField('position',0,$pk);
 		$o->UpdateField('publish',true,$pk);
