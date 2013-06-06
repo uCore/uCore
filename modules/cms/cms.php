@@ -26,6 +26,7 @@ class tabledef_CMS extends uTableDef {
 		$this->SetFieldProperty('updated','default','current_timestamp');
 
 		$this->SetPrimaryKey('cms_id');
+		$this->SetIndexField('position');
 		$this->SetIndexField(array('parent','position'));
 	}
 	public $auto_increment = 'position';
@@ -438,12 +439,14 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 	}
 	public static function DefaultPages() {
 		$o = utopia::GetInstance(__CLASS__);
+		$o->BypassSecurity(true);
 		$pk = NULL;
 		$o->UpdateField('cms_id','index',$pk);
 		$o->UpdateField('title','Welcome Willkommen Bienvenue Bienvenido 歡迎光臨 ようこそ',$pk);
 		$o->UpdateField('content','<h1>Welcome Willkommen Bienvenue Bienvenido 歡迎光臨 ようこそ</h1><p>Hello and welcome to your new website.</p><p>We have marked your template as offline for now.  Once you have finished editing your pages you can turn it on in the <a href="'.PATH_REL_CORE.'">uCore Dashboard</a>.</p>',$pk);
 		$o->UpdateField('position',0,$pk);
 		$o->UpdateField('publish',true,$pk);
+		$o->BypassSecurity(false);
 	}
 }
 uEvents::AddCallback('TableCreated','uCMS_Edit::DefaultPages','tabledef_CMS');
