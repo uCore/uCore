@@ -1,6 +1,6 @@
 <?php
 
-utopia::AddTemplateParser('breadcrumb','uBreadcrumb::GetTrail','');
+utopia::AddTemplateParser('breadcrumb','uBreadcrumb::GetTrail','.*');
 class uBreadcrumb {
 	private static $extras = array();
 	static function AddCrumb($name,$url) {
@@ -33,8 +33,8 @@ class uBreadcrumb {
 		}
 		$build = array_unique($build);
 		if ($start) $build[] = $start;
-		if (count($build) <= 1) return '';
+		if (count($build) < 1) return '';
 
-		return '<div class="breadcrumb">'.implode(' &gt; ',array_reverse($build)).'</div>';
+		return implode(' &gt; ',array_reverse($build));
 	}
 }
