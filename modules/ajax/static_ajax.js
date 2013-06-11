@@ -600,7 +600,7 @@ function getEleVal(ele) {
 	if (eleName == undefined) return;
 	var eleVal = [];
 	var n = eleName.replace('usql-','');
-	$(ele).closest('span.'+n).find('[name="'+eleName+'"]').each(function () {
+	$(ele).closest('span.'+n).find('[name="'+eleName+'"]').add(ele).each(function () {
 		if (this.tagName == 'INPUT' && $(this).is(':checkbox')) {
 			if ($(this).is(':checked')) eleVal.push($(this).val());
 		} else {
