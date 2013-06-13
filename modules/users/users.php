@@ -289,7 +289,6 @@ class uRegisterUser extends uDataModule {
 		}
 		?>
 		<div id="register-wrap">
-		<div class="tag">New User?</div>
 		<h1>Create an Account</h1>
 		<form class="register-user oh" action="{home_url}register" method="POST">
 			<div class="form-field"><label for="username">Email:</label>

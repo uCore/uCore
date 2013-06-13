@@ -159,8 +159,7 @@ class uUserLogin extends uDataModule {
 		?>
 		<div id="login-register-wrap">
 			<div id="login-wrap">
-			<div class="tag">{option.site_name}</div>
-			<h2>Log In</h2>
+			<h1>Log In</h1>
 			<form action="" method="POST">
 			<div class="form-field">
 			<label for="__login_u">Email/Username</label>{login_user}
