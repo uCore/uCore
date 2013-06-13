@@ -1,5 +1,5 @@
 .switch {
-	display:inline-block; background-repeat:no-repeat; width:63px; height:18px;
+	display:inline-block; background-repeat:no-repeat; width:63px; height:18px; cursor:pointer;
 	transition:background-position 0.1s linear;
 	-moz-transition:background-position 0.1s linear;
 	-webkit-transition:background-position 0.1s linear;
