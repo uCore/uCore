@@ -2722,10 +2722,10 @@ abstract class uDataModule extends uBasicModule {
 			if (!$vals) $vals = $this->GetValues($fieldName);
 			if (isset($vals[$value])) $value = $vals[$value];
 			$ret = '';
-			$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
-			if ($url) {
+			if ($url && !$this->GetFieldProperty($fieldName,'nolink')) {
+				$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
 				$ret = "<a$class href=\"$url\">$value</a>";
-			} elseif (!$class) {
+			} else {
 				$ret = $value;
 			}
 		}
