@@ -2,7 +2,8 @@
 
 class uTwitterWidget implements iWidget {
 	static function Initialise($sender) {
-		$sender->AddMetaField('twitter_id','Twitter ID',itTEXT);
+		$sender->AddMetaField('twitter_id','Twitter Username',itTEXT);
+		$sender->AddMetaField('twitter_widget_id','Twitter Widget ID',itTEXT);
 		$sender->AddMetaField('width','Width',itTEXT);
 		$sender->AddMetaField('height','Height',itTEXT);
 		
@@ -11,44 +12,13 @@ class uTwitterWidget implements iWidget {
 	}
 	static function DrawData($data) {
 		$blockId = $data['block_id'];
-		$id = $data['twitter_id'];
-		$width = $data['width'] ? $data['width'] : 250;
-		$height = $data['height'] ? $data['height'] : 350;
+		$user = $data['twitter_id'];
+		$id = $data['twitter_widget_id'];
+		$width = $data['width'] ? $data['width'] : 250; $width = ' width="'.$width.'"';
+		$height = $data['height'] ? $data['height'] : 350; $height = ' height="'.$height.'"';
 		return <<<FIN
-<div id="twitter_$blockId"></div>
-<script type="text/javascript">
-$.getScript('http://widgets.twimg.com/j/2/widget.js',function () {
-new TWTR.Widget({
-  id: 'twitter_$blockId',
-  version: 2,
-  type: 'profile',
-  rpp: 4,
-  interval: 6000,
-  width: $width,
-  height: $height,
-  theme: {
-    shell: {
-      background: '#333333',
-      color: '#ffffff'
-    },
-    tweets: {
-      background: '#000000',
-      color: '#ffffff',
-      links: '#4aed05'
-    }
-  },
-  features: {
-    scrollbar: false,
-    loop: false,
-    live: false,
-    hashtags: true,
-    timestamp: true,
-    avatars: false,
-    behavior: 'all'
-  }
-}).render().setUser('$id').start();
-});
-</script>
+<a class="twitter-timeline"$width$height href="https://twitter.com/$user" data-widget-id="$id">Tweets by @$user</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 FIN;
 	}
 }
