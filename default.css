@@ -246,7 +246,7 @@ input.inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; backg
 .uSearch .searchResult a { padding-bottom: 5px; font-size:1.1em }
 .uSearch .searchResult { margin-bottom: 30px; }
 
-.utopia-placeholder { color: #999 !important; }
+.utopia-placeholder { color: #999; }
 ::-webkit-input-placeholder {
     color:    #999;
 }
