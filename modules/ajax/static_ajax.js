@@ -9,7 +9,7 @@ jQuery.support.placeholder = (function(){
 // Placeholders
 $(function () {
 	// edit all input titles to placeholders
-	$(':input[title]').each(function(){
+	$(':input[title]:not(:button)').each(function(){
 		$(this).attr('placeholder',$(this).attr('title'));
 	});
 });
@@ -32,14 +32,14 @@ function PlaceholderLeave(sender) {
 	}
 }
 $(function () {
-	$(".uFilter, :input[placeholder]").each(function() {
+	$(".uFilter, :input[placeholder]:not(:button)").each(function() {
 		PlaceholderLeave(this);
 	});
 });
-$(document).on('focus',':input[placeholder]',function (event) {PlaceholderEnter(this);});
-$(document).on('blur',':input[placeholder]',function (event) {var sender = this; setTimeout(function(){PlaceholderLeave(sender);},50);});
+$(document).on('focus',':input[placeholder]:not(:button)',function (event) {PlaceholderEnter(this);});
+$(document).on('blur',':input[placeholder]:not(:button)',function (event) {var sender = this; setTimeout(function(){PlaceholderLeave(sender);},50);});
 
-$(document).on('submit','form',function (event) { $(".uFilter, :input[placeholder]").each(function() { PlaceholderEnter(this); }); });
+$(document).on('submit','form',function (event) { $(".uFilter, :input[placeholder]:not(:button)").each(function() { PlaceholderEnter(this); }); });
 
 // Filters
 utopia.Initialise.add(function(){ $('.uFilter').each(function(){ if ($(this).data('ov')) return; $(this).data('ov',$(this).val()); }) });
