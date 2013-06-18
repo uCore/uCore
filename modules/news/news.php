@@ -25,6 +25,9 @@ class tabledef_NewsTable extends uTableDef {
 		$this->AddField('author',ftNUMBER);
 		
 		$this->AddField('featured',ftBOOL);
+		
+		$this->AddField('noindex',ftBOOL);
+		$this->AddField('nofollow',ftBOOL);
 
 		$this->SetPrimaryKey('news_id');
 		$this->SetIndexField('author');
@@ -82,6 +85,9 @@ class module_NewsAdminDetail extends uSingleDataModule implements iAdminModule {
 		$this->FieldStyles_Set('tags',array('width'=>'60%'));
 		
 		$this->AddField('featured','featured','news','Featured',itCHECKBOX);
+		
+		$this->AddField('noindex','noindex','news','noindex',itCHECKBOX);
+		$this->AddField('nofollow','nofollow','news','nofollow',itCHECKBOX);
 		
 		$this->AddField('text','text','news','Content',itHTML);
 		$this->FieldStyles_Set('text',array('width'=>'100%','height'=>'10em'));
@@ -227,6 +233,8 @@ class module_NewsDisplay extends uDataModule {
 		
 		$this->AddField('image','image','news','image');
 		$this->AddField('featured','featured','news','Featured');
+		$this->AddField('noindex','noindex','news','noindex');
+		$this->AddField('nofollow','nofollow','news','nofollow');
 		
 		$this->AddField('tags','tag','tags','tags',itTEXT);
 		$this->AddPreProcessCallback('tags',array($this,'ppTag'));
@@ -271,6 +279,11 @@ class module_NewsDisplay extends uDataModule {
 			if (!$rec) utopia::PageNotFound();
 			utopia::SetTitle($rec['heading']);
 			utopia::SetDescription($rec['description']);
+			
+			$n = array();
+			if ($rec['noindex']) $n[] = 'noindex';
+			if ($rec['nofollow']) $n[] = 'nofollow';
+			if ($n) utopia::AddMetaTag('robots',implode(',',$n));
 
 			echo '{widget.'.modOpts::GetOption('news_widget_article').'}';
 			return;
