@@ -156,7 +156,7 @@ class module_NewsRSS extends uDataModule {
 			if (!$pubDate || (strtotime($row['time']) > $pubDate)) $pubDate = strtotime($row['time']);
 			$items .= <<<FIN
  <item>
-  <title>{$row['heading']}</title>
+  <title><![CDATA[{$row['heading']}]]</title>
   <description><![CDATA[{$row['text']}]]></description>
   <link>{$link}</link>
   <guid>{$link}</guid>
