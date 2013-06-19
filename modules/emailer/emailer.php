@@ -242,10 +242,11 @@ class uEmailer extends uDataModule {
 			$xpath = new DOMXPath($doc);
 			$entries = $xpath->query('//*[@href]', $doc->documentElement);
 			if ($entries) {
+				$siteurl = modOpts::GetOption('site_url');
 				foreach ($entries as $entry) {
 					$v = $entry->getAttribute('href');
 					if (preg_match('/^\//',$v)) {
-						$v = rtrim(modOpts::GetOption('site_url'),'/').$v;
+						$v = rtrim($siteurl,'/').$v;
 						$entry->setAttribute('href',$v);
 					}
 				}
