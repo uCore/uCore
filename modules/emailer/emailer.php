@@ -232,8 +232,27 @@ class uEmailer extends uDataModule {
 
 		while (utopia::MergeVars($subject));
 		$message->setSubject($subject);
+		
 		while (utopia::MergeVars($content));
-		$message->setBody($content, ($content == strip_tags($content)) ? 'text/plain' : 'text/html');
+		$ishtml = ($content !== strip_tags($content));
+		if ($ishtml) {
+			// process content, make all relative links absolute
+			libxml_use_internal_errors(true);
+			$doc = new DOMDocument; $doc->loadHTML($content);
+			$xpath = new DOMXPath($doc);
+			$entries = $xpath->query('//*[@href]', $doc->documentElement);
+			if ($entries) {
+				foreach ($entries as $entry) {
+					$v = $entry->getAttribute('href');
+					if (preg_match('/^\//',$v)) {
+						$v = rtrim(modOpts::GetOption('site_url'),'/').$v;
+						$entry->setAttribute('href',$v);
+					}
+				}
+				$content = $doc->saveHTML();
+			}
+		}
+		$message->setBody($content, ($ishtml) ? 'text/html' : 'text/plain');
 
 		$message->setTo($to);
 		$failures = array();
