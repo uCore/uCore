@@ -639,6 +639,7 @@ function getEleVal(ele) {
 				.addClass( "inputtype-text" )
 				.attr('readonly','readonly')
 				.attr('placeholder',placeholder)
+				.attr('disabled',this.element.attr('disabled'))
 				.click(toggleDropdown)
 				.val(value)
 				.autocomplete({
@@ -707,6 +708,8 @@ function getEleVal(ele) {
 				.append($('<span/>').addClass('ui-icon').addClass(this.options.icon));
 				
 			function toggleDropdown() {
+				if (input.attr('disabled')) return;
+				
 				// close if already visible
 				if ( input.autocomplete( "widget" ).is( ":visible" ) ) {
 					input.autocomplete( "close" );
