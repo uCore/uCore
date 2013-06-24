@@ -1372,6 +1372,7 @@ class utopia {
 		$parsed = parse_url($_SERVER['REQUEST_URI']);
 		$args = isset($parsed['query']) ? $parsed['query'] : '';
 		if (is_string($args)) parse_str($args,$args);
+		if (get_magic_quotes_gpc()) $args = utopia::stripslashes_deep($args);
 
 		$page = isset($args[$pageKey]) ? $args[$pageKey] : 0;
 		echo '<ul class="pagination">';
