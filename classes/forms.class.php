@@ -2433,7 +2433,10 @@ abstract class uDataModule extends uBasicModule {
 
 		if (!$tableAlias) return FALSE; // cannot update a field that has no table
 
-		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,&$pkVal)) === FALSE) return FALSE;
+		if (uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldAlias,$newValue,&$pkVal)) === FALSE) {
+			$this->ResetField($fieldAlias,$pkVal);
+			return FALSE;
+		}
 		
 		$oldPkVal = $pkVal;
 		$fieldPK = $this->GetPrimaryKey($fieldAlias);
