@@ -2319,17 +2319,23 @@ abstract class uDataModule extends uBasicModule {
 				default:
 					$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']); break;
 			}
-			if ($vals === true) {
-				$vals = $this->fields[$fieldName]['values'];
-			}
 		}
-
+		if ($vals === true && isset($this->fields[$fieldName])) {
+			$vals = $this->fields[$fieldName]['values'];
+		}
+		
 		$vals = $this->FindValues($fieldName,$vals);
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA) {
 			if (isset($values[$default])) $default = $values[$default];
 			$vals = cbase64_encode(get_class($this).':'.$fieldName);
 		}
-
+		
+		if (isset($vals['']) && $vals[''] === FALSE && isset($vals[$filterInfo['default']])) {
+			$vals[''] = $vals[$filterInfo['default']];
+			if ($default == $filterInfo['default']) $default = '';
+			unset($vals[$filterInfo['default']]);
+		}
+		
 		if (!$attributes) $attributes = array();
 		if (isset($filterInfo['attributes'])) $attributes = array_merge((array)$filterInfo['attributes'],$attributes);
 		$attributes['placeholder'] = trim(strip_tags($emptyVal));
