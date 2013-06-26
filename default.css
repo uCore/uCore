@@ -280,6 +280,11 @@ input.inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; backg
 	top: 50%; margin-top: -8px; 
 	left: 50%; margin-left: -8px;
 }
+.ui-combobox .ui-combobox-toggle:before {
+	content: "\25be"; font-size: 1.9em; font-family: Arial; font-style: normal; font-weight: normal;
+	speak: none; display: inline-block; text-decoration: inherit; width: 1em; margin-right: .2em; text-align: center; font-variant: normal; text-transform: none; line-height: 1em; margin-left: .2em;
+	position: absolute; top: 50%; margin-top: -0.5em; left: 50%; margin-left: -0.5em;
+}
 .ui-combobox .ui-combobox-input.ui-autocomplete-input {
 	display:block;
 	margin:0; border:0;

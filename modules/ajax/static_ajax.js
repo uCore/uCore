@@ -617,8 +617,6 @@ function getEleVal(ele) {
 
 (function( $ ) {
 	$.widget( "ui.combobox", {
-		options: {icon:'ui-icon-triangle-1-s'},
-		
 		_create: function() {
 			var input,
 				self = this,
@@ -704,8 +702,7 @@ function getEleVal(ele) {
 				.appendTo( wrapper )
 				.removeClass( "ui-corner-all" )
 				.addClass( "btn ui-combobox-toggle" )
-				.click(toggleDropdown)
-				.append($('<span/>').addClass('ui-icon').addClass(this.options.icon));
+				.click(toggleDropdown);
 				
 			function toggleDropdown() {
 				if (input.attr('disabled')) return;
@@ -737,6 +734,6 @@ function getEleVal(ele) {
 	});
 })( jQuery );
 
-utopia.CustomCombo = function(opt) {
-	utopia.Initialise.add(function(){$('select').combobox(opt);});
+utopia.CustomCombo = function() {
+	utopia.Initialise.add(function(){$('select').combobox();});
 }
