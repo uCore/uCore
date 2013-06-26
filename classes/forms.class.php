@@ -2854,7 +2854,7 @@ abstract class uDataModule extends uBasicModule {
 		$newRec = is_null($pkVal) ? NULL : $this->LookupRecord($pkVal,true);
 		
 		$data = $this->GetCellData($fieldAlias,$newRec,$this->GetTargetURL($fieldAlias,$newRec));
-		utopia::AjaxUpdateElement($enc_name,$data);
+		utopia::AjaxUpdateElement('.'.$enc_name,$data);
 		
 		// if this field is the PK of a linked table also update all fields associated with that table
 		$info = $this->fields[$fieldAlias];
@@ -2868,7 +2868,7 @@ abstract class uDataModule extends uBasicModule {
 			if (array_search($info['tablename'],$tbl) === false) continue;
 			$enc_name = $this->GetEncodedFieldName($alias,$pkVal);
 			$data = $this->GetCellData($alias,$newRec,$this->GetTargetURL($alias,$newRec));
-			utopia::AjaxUpdateElement($enc_name,$data);
+			utopia::AjaxUpdateElement('.'.$enc_name,$data);
 		}
 	}
 }

@@ -11,5 +11,14 @@ utopia.Initialise = {
 		}
 	}
 }
+
+utopia.RedrawField = function(selector,encVal) {
+	$sel = $(selector);
+	var curval = $sel.html(),
+		newval = Base64.decode(encVal);
+	if (curval == newval) return;
+	$sel.html(newval);
+}
+
 $(function(){utopia.Initialise.run();});
 $(document).ajaxComplete(function() {utopia.Initialise.run();});

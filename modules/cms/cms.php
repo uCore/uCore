@@ -116,7 +116,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$r = $obj->GetChildren($relational);
 		// javascript: find open folders (visible ui-treesort-folder with visible ul)
 		AjaxEcho('var openfolders = $(\'.ui-treesort-folder:has(ul:visible)\');');
-		utopia::AjaxUpdateElement('uCMS_List',$r);
+		utopia::AjaxUpdateElement('.uCMS_List',$r);
 		AjaxEcho('InitialiseTree();');
 		AjaxEcho('$(openfolders).each(function() {$(\'#\'+$(this).attr(\'id\')).children(\'ul\').show();});');
 		AjaxEcho('RefreshIcons();');
