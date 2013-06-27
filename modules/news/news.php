@@ -125,9 +125,11 @@ class module_NewsRSS extends uDataModule {
 	public function SetupFields() {
 		$this->CreateTable('news');
 		$this->CreateTable('tags','tabledef_NewsTags','news','news_id');
+		
 		$this->AddField('time','time','news','Date',itDATE);
 		$this->AddField('heading','heading','news','Heading',itTEXT);
 		$this->AddField('description','description','news','Description',itTEXT);
+		$this->AddPreProcessCallback('description',array($this,'makeExcerpt'));
 		$this->AddField('tags','tag','tags','tags',itTEXT);
 		$this->AddPreProcessCallback('tags',array($this,'ppTag'));
 		$this->AddField('text','text','news','Content',itHTML);
@@ -145,6 +147,13 @@ class module_NewsRSS extends uDataModule {
 		sort($v);
 		return implode(',',$v);
 	}
+	public function makeExcerpt($v,$pk,$processed,$row) {
+		if ($processed) return $processed;
+		$text = strip_tags($row['text']);
+		if (!(preg_match_all('/^(.*?\.)/',$text,$matches))) return '';
+		if (isset($matches[0][0])) return $matches[0][0];
+		return '';
+	}
 	public function RunModule() {
 		utopia::CancelTemplate();
 		$dom = utopia::GetDomainName();
@@ -153,39 +162,67 @@ class module_NewsRSS extends uDataModule {
 		$items = '';
 		$obj = utopia::GetInstance('module_NewsDisplay');
 		$pubDate = null;
-		$dataset = $this->GetDataset();
+		$dataset = $obj->GetDataset();
 		while (($row = $dataset->fetch())) {
 			$link = htmlentities('http://'.$dom.$obj->GetURL(array('news_id'=>$row['news_id'])));
 			$img = '';
 			if ($row['image']) $img = "\n".'  <media:thumbnail width="150" height="150" url="'.htmlentities('http://'.$dom.uBlob::GetLink(get_class($this),'image',$row['news_id']).'?w=150&h=150').'"/>';
-			$updated = date('r',strtotime($row['time']));
+			$updated = date(DATE_ATOM,strtotime($row['time']));
 			if (!$pubDate || (strtotime($row['time']) > $pubDate)) $pubDate = strtotime($row['time']);
+			
+			$content = $row['text'];
+			while (utopia::MergeVars($content));
+			$content = html_entity_decode(strip_tags($content),ENT_COMPAT,'UTF-8');
+			$ishtml = ($content !== strip_tags($content));
+			if ($ishtml) {
+				// process content, make all relative links absolute
+				libxml_use_internal_errors(true);
+				$doc = new DOMDocument; $doc->loadHTML($content);
+				$xpath = new DOMXPath($doc);
+				$entries = $xpath->query('//*[@href]', $doc->documentElement);
+				if ($entries) {
+					$siteurl = modOpts::GetOption('site_url');
+					foreach ($entries as $entry) {
+						$v = $entry->getAttribute('href');
+						if (preg_match('/^\//',$v)) {
+							$v = rtrim($siteurl,'/').$v;
+							$entry->setAttribute('href',$v);
+						}
+					}
+					$content = $doc->saveXML();
+					$content = preg_replace('/.*<body[^>]*>\s*/ims', '',$content); // remove everything up to and including the body open tag
+					$content = preg_replace('/\s*<\/body>.*/ims', '',$content); // remove everything after and including the body close tag
+				}
+			}
+			
+			$summ = html_entity_decode(strip_tags($obj->PreProcess('description',$row['description'],$row)),ENT_COMPAT,'UTF-8');
+			
 			$items .= <<<FIN
- <item>
-  <title><![CDATA[{$row['heading']}]]></title>
-  <description><![CDATA[{$row['text']}]]></description>
-  <link>{$link}</link>
-  <guid>{$link}</guid>
-  <pubDate>{$updated}</pubDate>{$img}
- </item>
+ <entry>
+  <author><name>{$row['author_name']}</name></author>
+  <title>{$row['heading']}</title>
+  <summary>{$summ}</summary>
+  <content>{$content}</content>
+  <link href="{$link}"/>
+  <id>{$link}</id>
+  <updated>{$updated}</updated>{$img}
+ </entry>
 FIN;
 		}
-		$pubDate = date('r',$pubDate);
+		$pubDate = date(DATE_ATOM,$pubDate);
 
-		header('Content-Type: application/rss+xml',true);
+		header('Content-Type: application/atom+xml',true);
 		header('Access-Control-Allow-Origin: *');
 		$self = htmlentities('http://'.$dom.$_SERVER['REQUEST_URI']);
 		echo <<<FIN
-<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"><channel>
- <atom:link href="{$self}" rel="self" type="application/rss+xml" />
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
+ <link href="{$self}" rel="self" type="application/atom+xml" />
+ <link href="http://{$dom}" />
  <title>{$siteName} News Feed</title>
- <description>Latest news from {$siteName}</description>
- <link>http://{$dom}</link>
- <lastBuildDate>{$pubDate}</lastBuildDate>
- <language>en-gb</language>
- <ttl>15</ttl>
+ <id>{$self}</id>
+ <updated>{$pubDate}</updated>
 {$items}
-</channel></rss>
+</feed>
 FIN;
 	}
 }
