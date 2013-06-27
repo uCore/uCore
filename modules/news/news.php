@@ -173,6 +173,7 @@ FIN;
 		$pubDate = date('r',$pubDate);
 
 		header('Content-Type: application/rss+xml',true);
+		header('Access-Control-Allow-Origin: *');
 		$self = htmlentities('http://'.$dom.$_SERVER['REQUEST_URI']);
 		echo <<<FIN
 <rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom"><channel>
