@@ -17,8 +17,6 @@ if (PHP_SAPI == "cli") {
 	parse_str($q,$_GET);
 }
 
-$_SERVER['REQUEST_URI'] = urldecode($_SERVER['REQUEST_URI']);
-
 //--  Charset
 define('CHARSET_ENCODING'        , 'utf-8');
 define('SQL_CHARSET_ENCODING'    , 'utf8');
