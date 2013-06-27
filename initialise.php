@@ -46,8 +46,6 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 }
 timer_end('Module Initialise');
 
-header('Access-Control-Allow-Origin: '.modOpts::GetOption('site_url'));
-
 uEvents::TriggerEvent('AfterInit');
 uEvents::TriggerEvent('InitComplete');
 
