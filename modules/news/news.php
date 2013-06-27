@@ -173,33 +173,11 @@ class module_NewsRSS extends uDataModule {
 			$content = $row['text'];
 			while (utopia::MergeVars($content));
 			$content = html_entity_decode(strip_tags($content),ENT_COMPAT,'UTF-8');
-			$ishtml = ($content !== strip_tags($content));
-			if ($ishtml) {
-				// process content, make all relative links absolute
-				libxml_use_internal_errors(true);
-				$doc = new DOMDocument; $doc->loadHTML($content);
-				$xpath = new DOMXPath($doc);
-				$entries = $xpath->query('//*[@href]', $doc->documentElement);
-				if ($entries) {
-					$siteurl = modOpts::GetOption('site_url');
-					foreach ($entries as $entry) {
-						$v = $entry->getAttribute('href');
-						if (preg_match('/^\//',$v)) {
-							$v = rtrim($siteurl,'/').$v;
-							$entry->setAttribute('href',$v);
-						}
-					}
-					$content = $doc->saveXML();
-					$content = preg_replace('/.*<body[^>]*>\s*/ims', '',$content); // remove everything up to and including the body open tag
-					$content = preg_replace('/\s*<\/body>.*/ims', '',$content); // remove everything after and including the body close tag
-				}
-			}
-			
 			$summ = html_entity_decode(strip_tags($obj->PreProcess('description',$row['description'],$row)),ENT_COMPAT,'UTF-8');
 			
 			$items .= <<<FIN
  <entry>
-  <author><name>{$row['author_name']}</name></author>
+  <author><name>{$row['author_name']}</name><email>{$row['author_email']}</email></author>
   <title>{$row['heading']}</title>
   <summary>{$summ}</summary>
   <content>{$content}</content>
@@ -256,6 +234,7 @@ class module_NewsDisplay extends uDataModule {
 		
 		$this->CreateTable('user','tabledef_Users','news',array('author'=>'user_id'));
 		$this->CreateTable('author','tabledef_UserProfile','news',array('author'=>'user_id'));
+		$this->AddField('author_email','username','user','Author Email');
 		$this->AddField('author_name','(IF(TRIM(CONCAT(COALESCE({first_name},\'\'),\' \',COALESCE({last_name},\'\'))) != \'\',TRIM(CONCAT(COALESCE({first_name},\'\'),\' \',COALESCE({last_name},\'\'))),`user`.`username`))','author','Author Name');
 		$this->AddField('gplus_url','gplus_url','author','Google+ URL');
 		$this->AddPreProcessCallback('gplus_url',array($this,'gplusurl'));
