@@ -9,7 +9,9 @@ class mainSchema extends sqlSchema {
 class database {
 	private static $conn = null;
 	static function connect() {
-		if (self::$conn) return self::$conn;
+		try {
+			if (self::$conn && self::$conn->query('select 1;')) return self::$conn;
+		} catch (Exception $e) {}
 
 		self::$conn = new mainSchema(array(PDO::ATTR_PERSISTENT => true, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', PDO::MYSQL_ATTR_FOUND_ROWS => true));
 	
