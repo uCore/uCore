@@ -1272,7 +1272,7 @@ class utopia {
 	}
 	static function convCurrency($originalValue,$pkVal,$processedVal,$rec,$fieldName) {
 		$locale = DEFAULT_LOCALE;
-		if ($rec && $rec[$fieldName.'_locale']) $locale=$rec[$fieldName.'_locale'];
+		if ($rec && isset($rec[$fieldName.'_locale']) && $rec[$fieldName.'_locale']) $locale=$rec[$fieldName.'_locale'];
 		return self::money_format($originalValue,$locale);
 	}
 	static function money_format($originalValue,$locale=DEFAULT_LOCALE) {
