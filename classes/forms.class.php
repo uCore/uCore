@@ -2563,6 +2563,7 @@ abstract class uDataModule extends uBasicModule {
 				$this->noDefaults = true;
 				foreach ($this->fields as $dalias => $fieldData) {
 					if ($fieldAlias == $dalias) continue; // dont update the default for the field which is being set.
+					if ($dalias == $this->GetPrimaryKey()) continue;
 					$default = $this->GetDefaultValue($dalias);
 					if (!empty($default)) {
 						//echo "//setting default for $dalias to $default PK $pkVal\n";
