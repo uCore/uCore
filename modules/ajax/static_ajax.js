@@ -666,6 +666,7 @@ function getEleVal(ele) {
 							item: ui.item.option
 						});
 						select.change();
+						input.blur();
 					},
 					change: function( event, ui ) {
 						if ( !ui.item ) {
