@@ -196,7 +196,8 @@ class uCMS_List extends uDataModule implements iAdminModule {
 	public function reorderCMS() {
 		utopia::cancelTemplate();
 		if (!$_POST['data']) return;
-		foreach ($_POST['data'] as $cms_id => $val) {
+		$data = json_decode($_POST['data'],true);
+		foreach ($data as $cms_id => $val) {
 			list($newParent,$pos) = explode(':',$val);
 			$obj =& utopia::GetInstance('uCMS_View');
 			$oldURL = $obj->GetURL($cms_id);

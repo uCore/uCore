@@ -13,7 +13,7 @@ function RefreshIcons() {
 function dropped() {
 	RefreshIcons();
 	data = serialiseTree();
-	$.post('?__ajax=reorderCMS',{data:data});
+	$.post('?__ajax=reorderCMS',{data:JSON.stringify(data)});
 }
 function serialiseTree() {
 	var data = {};
