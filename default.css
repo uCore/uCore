@@ -267,6 +267,7 @@ input.inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; backg
 	width: auto;
 	height: auto;
 	overflow:hidden;
+	vertical-align:bottom;
 }
 .ui-combobox a.ui-combobox-toggle {
 	position: absolute;
