@@ -86,6 +86,8 @@
 
 
 .admin-bar .btn {
+  text-transform: none;
+  font-weight: normal;
   display: inline-block;
   *display: inline;
   padding: 4px 12px;
@@ -124,7 +126,7 @@
 
 .admin-bar .btn:hover,
 .admin-bar .btn:focus,
-.admin-bar .admin-bar .btn:active,
+.admin-bar .btn:active,
 .admin-bar .btn.active,
 .admin-bar .btn.disabled,
 .admin-bar .btn[disabled] {
