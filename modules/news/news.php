@@ -17,8 +17,8 @@ class tabledef_NewsTable extends uTableDef {
 		$this->AddField('news_id',ftNUMBER);
 		$this->AddField('time',ftDATE);
 		$this->AddField('heading',ftVARCHAR,150);
-		$this->AddField('description',ftTEXT);
-		$this->AddField('text',ftLONGTEXT);
+		$this->AddField('description',ftVARCHAR,255);
+		$this->AddField('text',ftMEDIUMTEXT);
 		$this->AddField('image',ftIMAGE);
 		$this->AddField('archive',ftBOOL);
 

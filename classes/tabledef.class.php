@@ -4,6 +4,7 @@
 define('ftNONE'				,'');
 define('ftVARCHAR'			,'varchar');
 define('ftTEXT'				,'text');
+define('ftMEDIUMTEXT'			,'mediumtext');
 define('ftLONGTEXT'			,'longtext');
 // time
 define('ftDATE'				,'date');
@@ -265,7 +266,7 @@ abstract class uTableDef implements iUtopiaModule {
 		if (empty($this->fields)) return;
 		if (!$this->engine) $this->engine = MYSQL_ENGINE;
 
-		$this->AddField('__metadata',ftLONGTEXT);
+		$this->AddField('__metadata',ftMEDIUMTEXT);
 
 		$oldTable = isset($this->tablename) ? $this->tablename : NULL;
 		$this->tablename = TABLE_PREFIX.get_class($this);
