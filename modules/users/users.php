@@ -220,15 +220,6 @@ class uRegisterUser extends uDataModule {
 			echo '<p>Sorry. User registrations have been disabled by the administrator.</p>';
 			return;
 		}
-		// already logged in?
-		if (uUserLogin::IsLoggedIn()) {
-			echo '<p>You are already logged in.</p>';
-			if (uEvents::TriggerEvent('CanAccessModule','uCMS_Edit') === FALSE) {
-				$o =& utopia::GetInstance('uUserProfile');
-				header('Location: '.$o->GetURL());
-			}
-			return;
-		}
 		
 		if ($usr = $this->RegisterForm()) {
 			uVerifyEmail::VerifyAccount($usr);
