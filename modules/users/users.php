@@ -17,6 +17,7 @@ class tabledef_Users extends uTableDef {
 		// 
 
 		$this->SetPrimaryKey('user_id');
+		$this->SetUniqueField('username');
 		$this->SetIndexField(array('username','email_confirm_code','role'));
 	}
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
