@@ -113,7 +113,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		if (!is_array($rec)) {
 			if (self::StaticWidgetExists($rec)) return call_user_func(self::$staticWidgets[$rec]);
 			$obj->BypassSecurity(true);
-			$rec = $obj->LookupRecord($rec,true);
+			$rec = $obj->LookupRecord(array('block_id'=>$rec),true);
 			$obj->BypassSecurity(false);
 		}
 		if (!$rec || !isset($rec['block_type']) || !$rec['block_type'] || !class_exists($rec['block_type'])) return '';
