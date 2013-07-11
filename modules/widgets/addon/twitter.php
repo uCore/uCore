@@ -11,27 +11,7 @@ class tabledef_TwitterWidget extends uTableDef {
 		
 		$this->SetPrimaryKey('widget_id');
 	}
-
-	static function pull_from_meta() {
-		try {
-			$obj =& utopia::GetInstance('uWidgets',false);
-			$obj->BypassSecurity(true);
-
-			$ds = database::query('SELECT * FROM tabledef_Widgets WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTwitterWidget'));
-			while (($row = $ds->fetch())) {
-				$pk = $row['widget_id'];
-				$meta = utopia::jsonTryDecode($row['__metadata']);
-				foreach ($meta as $field => $val) {
-					$obj->UpdateField($field,$val,$pk);
-				}
-			}
-			$obj->BypassSecurity(false);
-			
-			$ds = database::query('UPDATE tabledef_Widgets SET `__metadata` = NULL WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTwitterWidget'));
-		} catch (Exception $e) {}
-	}
 }
-uEvents::AddCallback('AfterInit','tabledef_TwitterWidget::pull_from_meta');
 
 class uTwitterWidget implements iWidget {
 	static function Initialise($sender) {
