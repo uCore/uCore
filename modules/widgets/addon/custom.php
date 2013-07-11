@@ -1,5 +1,39 @@
 <?php
 
+class tabledef_CustomWidget extends uTableDef {
+	public function SetupFields() {
+		$this->AddField('widget_id',ftNUMBER);
+		$this->AddField('module',ftVARCHAR,255);
+		$this->AddField('content',ftTEXT);
+		$this->AddField('no_rows',ftTEXT);
+		$this->AddField('clear_filter',ftVARCHAR,255);
+		$this->AddField('filter',ftVARCHAR,255);
+		$this->AddField('order',ftVARCHAR,255);
+		$this->AddField('limit',ftVARCHAR,50);
+		
+		$this->SetPrimaryKey('widget_id');
+	}
+
+	static function pull_from_meta() {
+		$obj =& utopia::GetInstance('uWidgets',false);
+		$obj->BypassSecurity(true);
+
+		$ds = database::query('SELECT * FROM tabledef_Widgets WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uCustomWidget'));
+		while (($row = $ds->fetch())) {
+			$pk = $row['widget_id'];
+			$meta = utopia::jsonTryDecode($row['__metadata']);
+			foreach ($meta as $field => $val) {
+				$obj->UpdateField($field,$val,$pk);
+			}
+		}
+		$obj->BypassSecurity(false);
+		
+		$ds = database::query('UPDATE tabledef_Widgets SET `__metadata` = NULL WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uCustomWidget'));
+	}
+}
+uEvents::AddCallback('AfterInit','tabledef_CustomWidget::pull_from_meta');
+
+
 class uCustomWidget implements iWidget {
 	static function Initialise($sender) {
 		$installed = array();
@@ -10,24 +44,27 @@ class uCustomWidget implements iWidget {
 			if (!$o->HasRewrite()) continue;
 			$installed[$classname] = $classname;
 		}
-		$sender->AddMetaField('module','Data Source',itCOMBO,$installed);
+		
+		$sender->CreateTable('custom','tabledef_CustomWidget','blocks','widget_id');
+
+		$sender->AddField('module','module','custom','Data Source',itCOMBO,$installed);
 		
 		$sender->AddSpacer();
 		$sender->AddField('content_info',"'The content you enter below will be repeated for each row in the result.<br>If you want to repeat only a part of the content, give the element a class of _r (class=\"_r\"), or _ri to repeat contained elements only (innerHTML).'",'','');
 		$sender->AddField('fields',array(__CLASS__,'getPossibleFields'),'blocks','Possible Fields');
-		$sender->AddMetaField('content','Content',itHTML);
+		$sender->AddField('content','content','custom','Content',itHTML);
 		$sender->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
 		
 		$sender->AddSpacer();
 		$sender->AddField('nr_info',"'The content below will be shown if no rows exist.'",'','');
-		$sender->AddMetaField('no_rows','Default',itHTML);
-		$sender->FieldStyles_Set('content',array('width'=>'100%','height'=>'20em'));
+		$sender->AddField('no_rows','no_rows','custom','No Rows Found',itHTML);
+		$sender->FieldStyles_Set('content',array('height'=>'20em'));
 
 		$sender->NewSection('Filters');
-		$sender->AddMetaField('clear_filter','Remove Filters',itCHECKBOX,'uCustomWidget::ListFilters');
-		$sender->AddMetaField('filter','Add Filter',itTEXT);
-		$sender->AddMetaField('order','Order',itTEXT);
-		$sender->AddMetaField('limit','Limit',itTEXT);
+		$sender->AddField('clear_filter','clear_filter','custom','Remove Filters',itCHECKBOX,'uCustomWidget::ListFilters');
+		$sender->AddField('filter','filter','custom','Add Filter',itTEXT);
+		$sender->AddField('order','order','custom','Order',itTEXT);
+		$sender->AddField('limit','limit','custom','Limit',itTEXT);
 	}
 	public static function ListFilters($obj,$field,$pkVal) {
 		$rec = $obj->LookupRecord($pkVal);

@@ -266,8 +266,6 @@ abstract class uTableDef implements iUtopiaModule {
 		if (empty($this->fields)) return;
 		if (!$this->engine) $this->engine = MYSQL_ENGINE;
 
-		$this->AddField('__metadata',ftMEDIUMTEXT);
-
 		$oldTable = isset($this->tablename) ? $this->tablename : NULL;
 		$this->tablename = TABLE_PREFIX.get_class($this);
 

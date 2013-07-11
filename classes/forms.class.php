@@ -247,10 +247,6 @@ class uDataset {
 	}
 	public function CreateRecord($row) {
 		if (!is_array($row)) return $row;
-		if (isset($row['__metadata']) && $row['__metadata']) {
-			$meta = utopia::jsonTryDecode($row['__metadata']);
-			if ($meta) $row = array_merge($row,$meta);
-		}
 		
 		// make link tables into array
 		foreach ($row as $field=>$val) {
@@ -1402,28 +1398,6 @@ abstract class uDataModule extends uBasicModule {
 		unset($this->fields[$field]['style_fn']);
 	}
 
-	public function SetMetaValue($fieldAlias,$newValue,&$pkVal=NULL) {
-		if ($pkVal == NULL) {
-			$newValue = json_encode(array($fieldAlias=>$newValue));
-		} else {
-			$rec = $this->LookupRecord($pkVal);
-			$metadata = json_decode($rec['__metadata'],true);
-			$metadata[$fieldAlias] = $newValue;
-			$newValue = json_encode($metadata);
-		}
-		return $this->UpdateField('__metadata',$newValue,$pkVal);
-	}
-
-	private $includeMeta = false;
-	public function AddMetaField($name,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {
-		if (!$this->includeMeta) {
-			$this->includeMeta = true;
-			$this->AddField('__metadata','__metadata');
-		}
-		$this->AddField($name,"''",NULL,$visiblename,$inputtype,$values);
-		$this->fields[$name]['ismetadata'] = true;
-	}
-
 	public function &AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
@@ -2207,9 +2181,6 @@ abstract class uDataModule extends uBasicModule {
 		$pkVal = !is_null($rec) ? $rec[$this->GetPrimaryKey()] : NULL;
 		if (is_string($value) && $realType !== ftFILE) $value = mb_convert_encoding($value, 'HTML-ENTITIES', CHARSET_ENCODING);
 		$originalValue = $value;
-		if (isset($this->fields[$fieldName]['ismetadata'])) {
-			$value = utopia::jsonTryDecode($value);
-		}
 		$suf = ''; $pre = ''; $isNumeric=true;
 		if ($forceType === NULL) $forceType = $realType;
 		switch ($forceType) {
@@ -2473,10 +2444,6 @@ abstract class uDataModule extends uBasicModule {
 			return FALSE; // this field is a pragma, select statement or callback
 		}
 		
-		if (isset($this->fields[$fieldAlias]['ismetadata']) && $this->fields[$fieldAlias]['ismetadata']) {
-			return $this->SetMetaValue($fieldAlias,$newValue,$pkVal);
-		}
-
 		$preModPk	= NULL;
 		if ($table !== $this->GetTabledef()) {
 			if ($pkVal === NULL) { // current module PK if not row exists, create it

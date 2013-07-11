@@ -3,12 +3,14 @@
 class tabledef_Widgets extends uTableDef {
 	public $tablename = 'tabledef_DataBlocks';
 	public function SetupFields() {
+		$this->AddField('widget_id',ftNUMBER);
 		$this->AddField('block_id',ftVARCHAR,150);
 		$this->AddField('block_type',ftVARCHAR,150);
 
 		$this->AddField('display',ftTEXT);
 
-		$this->SetPrimaryKey('block_id');
+		$this->SetPrimaryKey('widget_id');
+		$this->SetUniqueField('block_id');
 	}
 }
 
@@ -19,6 +21,7 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 	public function GetTabledef() { return 'tabledef_Widgets'; }
 	public function SetupFields() {
 		$this->CreateTable('blocks');
+		$this->AddField('widget_id','widget_id','blocks');
 		$this->AddField('block_id','block_id','blocks','ID');
 		$this->AddField('block_type','block_type','blocks','Type');
 	}
@@ -62,6 +65,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 	public function GetTabledef() { return 'tabledef_Widgets'; }
 	public function SetupFields() {
 		$this->CreateTable('blocks');
+		$this->AddField('widget_id','widget_id','blocks');
 		$this->AddField('block_id','block_id','blocks','Widget ID',itTEXT);
 
 		$installed = array();
@@ -74,10 +78,13 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 	}
 	public function SetupParents() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/widget.js');
-		$this->AddParent('uWidgets_List','block_id','*');
+		$this->AddParent('uWidgets_List','widget_id','*');
 	}
 
+	private $initialisedType = false;
 	public function InitInstance($type) {
+		if ($this->initialisedType) return;
+		$this->initialisedType = true;
 		if (class_exists($type)) call_user_func(array($type,'Initialise'),$this);
 		$this->NewSection('Preview');
 		$this->AddField('preview',array($this,'getPreview'),'blocks','');
@@ -113,7 +120,7 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		
 		$obj->InitInstance($rec['block_type']); // init and re-request
 		$obj->BypassSecurity(true);
-		$rec = $obj->LookupRecord($rec['block_id'],true);
+		$rec = $obj->LookupRecord($rec['widget_id'],true);
 		$obj->BypassSecurity(false);
 		$content = call_user_func(array($rec['block_type'],'DrawData'),$rec);
 
