@@ -9,20 +9,22 @@ class tabledef_TextWidget extends uTableDef {
 	}
 
 	static function pull_from_meta() {
-		$obj =& utopia::GetInstance('uWidgets',false);
-		$obj->BypassSecurity(true);
+		try {
+			$obj =& utopia::GetInstance('uWidgets',false);
+			$obj->BypassSecurity(true);
 
-		$ds = database::query('SELECT * FROM tabledef_Widgets WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTextWidget'));
-		while (($row = $ds->fetch())) {
-			$pk = $row['widget_id'];
-			$meta = utopia::jsonTryDecode($row['__metadata']);
-			foreach ($meta as $field => $val) {
-				$obj->UpdateField($field,$val,$pk);
+			$ds = database::query('SELECT * FROM tabledef_Widgets WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTextWidget'));
+			while (($row = $ds->fetch())) {
+				$pk = $row['widget_id'];
+				$meta = utopia::jsonTryDecode($row['__metadata']);
+				foreach ($meta as $field => $val) {
+					$obj->UpdateField($field,$val,$pk);
+				}
 			}
-		}
-		$obj->BypassSecurity(false);
-		
-		$ds = database::query('UPDATE tabledef_Widgets SET `__metadata` = NULL WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTextWidget'));
+			$obj->BypassSecurity(false);
+			
+			$ds = database::query('UPDATE tabledef_Widgets SET `__metadata` = NULL WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTextWidget'));
+		} catch (Exception $e) {}
 	}
 }
 uEvents::AddCallback('AfterInit','tabledef_TextWidget::pull_from_meta');
