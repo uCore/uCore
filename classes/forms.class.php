@@ -1377,7 +1377,6 @@ abstract class uDataModule extends uBasicModule {
 		if (!$conditionalStyles) $conditionalStyles = array();
 
 		$styles = array_merge($defaultStyles,$specificStyles,$conditionalStyles);
-		if ($inputType == itDATE && !array_key_exists('width',$styles)) $styles['width'] = '8.5em';
 		
 		// if width/height has no delimiter, append 'px'
 		if (isset($styles['width']) && is_numeric($styles['width'])) $styles['width'] = $styles['width'].'px';
