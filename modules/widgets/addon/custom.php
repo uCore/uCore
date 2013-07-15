@@ -75,16 +75,16 @@ class uCustomWidget implements iWidget {
 		if (!$obj) return '';
 		$fields = $obj->fields;
 		$ret = '';
-		$ret .= '<span data-fieldname="total" class="btn widget-field">Total Records</span>';
+		$ret .= '<span data-fieldname="total" class="btn widget-field">Total Records</span> ';
 		if (isset($rec['limit']) && strpos($rec['limit'],',')===FALSE && isset($rec['content']) && stripos($rec['content'],'{pagination}') !== FALSE) {
-			$ret .= '<span data-fieldname="pages" class="btn widget-field">Total Pages</span>';
-			$ret .= '<span data-fieldname="current_page" class="btn widget-field">Current Page</span>';
-			$ret .= '<span data-fieldname="pagination" class="btn widget-field">Pagination</span>';
+			$ret .= '<span data-fieldname="pages" class="btn widget-field">Total Pages</span> ';
+			$ret .= '<span data-fieldname="current_page" class="btn widget-field">Current Page</span> ';
+			$ret .= '<span data-fieldname="pagination" class="btn widget-field">Pagination</span> ';
 		}
-		$ret .= '<span data-fieldname="field._module_url" class="btn widget-field">Module URL</span>';
+		$ret .= '<span data-fieldname="field._module_url" class="btn widget-field">Module URL</span> ';
 		foreach ($fields as $field) {
 			$visname = $field['visiblename'] ? $field['visiblename'] : $field['alias'];
-			$ret .= '<span data-fieldname="field.'.$field['alias'].'" class="btn widget-field">'.$visname.'</span>';
+			$ret .= '<span data-fieldname="field.'.$field['alias'].'" class="btn widget-field">'.$visname.'</span> ';
 		}
 		return trim($ret);
 	}
