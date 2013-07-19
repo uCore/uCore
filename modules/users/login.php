@@ -84,9 +84,10 @@ class uUserLogin extends uDataModule {
 		if (isset($_SESSION['current_user'])) return;
 		// login not attempted.
 		if (!array_key_exists('__login_u',$_POST)) return;
+		if (!array_key_exists('__login_p',$_POST)) return;
 
 		$un = $_POST['__login_u']; $pw = $_POST['__login_p'];
-		unset($_POST['__login_u']); unset($_POST['__login_p']);
+		unset($_POST['__login_p']);
 
 		if (($userID = uUsersList::TestCredentials($un,$pw)) !== false) {
 			self::SetLogin($userID);
@@ -139,7 +140,8 @@ class uUserLogin extends uDataModule {
 	}
 
 	public static function GetLoginUserBox() {
-		return utopia::DrawInput('__login_u',itTEXT,'',NULL,array('id'=>'__login_u'));
+		$val = isset($_POST['__login_u']) ? $_POST['__login_u'] : '';
+		return utopia::DrawInput('__login_u',itTEXT,$val,NULL,array('id'=>'__login_u'));
 	}
 	public static function GetLoginPassBox() {
 		return utopia::DrawInput('__login_p',itPASSWORD,'',NULL,array('id'=>'__login_p'));
