@@ -145,7 +145,7 @@ class uJavascript extends uBasicModule {
 	}
 }
 
-uJavascript::LinkFile(dirname(__FILE__).'/jQuery/jquery-1.9.0.min.js',-100);
+uJavascript::LinkFile(dirname(__FILE__).'/jQuery/jquery-1.10.2.min.js',-100);
 uJavascript::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui-1.10.0.min.js',-99);
 uJavascript::IncludeFile(dirname(__FILE__).'/javascript.js',-999);
 uJavascript::IncludeFile(dirname(__FILE__).'/js/min/jquery.metadata.min.js');
