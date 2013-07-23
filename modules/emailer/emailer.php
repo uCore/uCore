@@ -118,6 +118,7 @@ class uEmailer extends uDataModule {
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
 		modOpts::AddOption('emailer_from','Mailer From','Emails',ADMIN_EMAIL);
+		modOpts::AddOption('return_path','Return Path','Emails');
 		uEvents::AddCallback('AfterInit',array($this,'InitialiseTemplates'));
 	}
 
@@ -217,6 +218,9 @@ class uEmailer extends uDataModule {
 		
 		$sender = self::ConvertEmails(modOpts::GetOption('emailer_from'));
 		$message->setSender($sender);
+		
+		$return = modOpts::GetOption('return_path');
+		if ($return) $message->setReturnPath($return);
 
 		$from = $from ? self::ConvertEmails($from) : $sender;
 		if ($from) $message->setFrom($from);
