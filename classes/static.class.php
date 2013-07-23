@@ -935,15 +935,15 @@ class utopia {
 		$pr = rtrim(PATH_REL_ROOT,'/');
 		$string = preg_replace('/'.preg_quote($pr.$pr,'/').'/',$pr,$string);
 		
-		if (preg_match_all('/(%7B|{)(.+)(}|%7D)/Ui',$string,$matches,PREG_PATTERN_ORDER)) { // loop through all parser tags {.+}
+		if (preg_match_all('/{(.+)}/Ui',$string,$matches,PREG_PATTERN_ORDER)) { // loop through all parser tags {.+}
 			$searchArr = $matches[0];
 			foreach ($searchArr as $search) {
 				// if contains another pragma then skip it, pick up post-merged on next pass.
-				while (preg_match('/(%7B|{)(.+)(}|%7D)/Ui',$search,$res,0,1)) $search = $res[0];
+				while (preg_match('/{(.+)}/Ui',$search,$res,0,1)) $search = $res[0];
 
 				foreach (self::$templateParsers as $ident => $arr) {
-					if (!preg_match('/(%7B|{)'.$ident.'(}|%7D)/Ui',$search,$match)) continue; // doesnt match this templateparser
-					$data = isset($match[2]) ? $match[2] : false;
+					if (!preg_match('/{'.$ident.'}/Ui',$search,$match)) continue; // doesnt match this templateparser
+					$data = isset($match[1]) ? $match[1] : false;
 					$searchLen = strlen($search);
 					$offset = 0;
 					while (($pos = strpos($string, $search, $offset)) !== FALSE) {
@@ -973,7 +973,6 @@ class utopia {
 						// $test either (doesnt contain a noprocess) OR (also contains the end tag)
 						$string = substr_replace($string, $replace, $pos, $searchLen); // str_replace($search,$replace,$contents);
 						$offset = $pos + $replaceLen;
-						return ($string !== $start);
 					}
 				}
 			}
