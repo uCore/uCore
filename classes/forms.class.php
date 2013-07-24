@@ -853,7 +853,7 @@ abstract class uDataModule extends uBasicModule {
 		$fields = $this->GetStringFields();
 		
 		// match phrases
-		preg_match_all('/(".+")|([\w\+\']+)/',$val,$matches);
+		preg_match_all('/(".+?")|([\w\+\']+)/',$val,$matches);
 		foreach ($matches[0] as $v) {
 			$v = trim($v,'"');
 			switch (strtolower($v)) {
