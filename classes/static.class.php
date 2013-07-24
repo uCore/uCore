@@ -985,9 +985,14 @@ class utopia {
 		if (is_string($function) && strpos($function,'::') !== FALSE) {
 			$function = explode('::',$function);
 		}
+		if ($match === '.*') {
+			self::AddTemplateParser($ident,$function,'.+',$catchOutput);
+			self::AddTemplateParser($ident,$function,'',$catchOutput);
+			return;
+		}
 		$ident = preg_quote($ident);
-		if ($match === '.*') $ident .= '(?:\.('.$match.'))?';
-		elseif ($match) $ident .= '\.('.$match.')';
+		
+		if ($match) $ident .= '\.('.$match.')';
 		else $ident .= '()';
 		if (isset(self::$templateParsers[$ident])) { throw new Exception("$ident is already defined as a template parser."); }
 		self::$templateParsers[$ident] = array($function,$catchOutput);
