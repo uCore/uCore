@@ -264,7 +264,7 @@ class module_NewsDisplay extends uDataModule {
 	public function makeExcerpt($v,$pk,$processed,$row) {
 		if ($processed) return $processed;
 		$text = strip_tags($row['text']);
-		if (!(preg_match_all('/^(.*?\.)/',$text,$matches))) return '';
+		if (!(preg_match_all('/^([^\.]*\.?)/',$text,$matches))) return '';
 		if (isset($matches[0][0])) return $matches[0][0];
 		return '';
 	}
