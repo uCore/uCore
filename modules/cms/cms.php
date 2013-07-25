@@ -49,7 +49,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 	public function GetTitle() { return 'Pages'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
-	public function GetSortOrder() { return -8900; }
+	public function GetSortOrder() { return -9900; }
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID');
@@ -83,34 +83,25 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		AjaxEcho('window.location.reload();');
 	}
 	public function RunModule() {
-		$tabGroupName = utopia::Tab_InitGroup();
-		ob_start();
-
-		$obj =& utopia::GetInstance('uCMS_Edit');
-		$newUrl = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>1));
+		echo '<h1>'.$this->GetTitle().'</h1>';
+		echo '{list.'.get_class($this).'}';
+		
 		$relational = $this->GetNestedArray();
-		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
-		echo '<div style="white-space:nowrap"><a class="btn" href="'.$newUrl.'">New Page</a>';
+		echo '<div id="tree" class="module-content">';
 
 		$modOptsObj =& utopia::GetInstance('modOpts');
 		$row = $modOptsObj->LookupRecord('default_template');
-		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row);
+		echo 'Default Template: '.$modOptsObj->GetCell('value',$row);
 
 		echo '<hr>';
 		echo '<div id="uCMS_List">'.self::GetChildren($relational).'</div>';
-		echo '</div></td>';
-		echo '<td style="width:100%;vertical-align:top; border-left:1px solid #333"><div style="width:100%" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
+		echo '</div>';
 
 		$editObj =& utopia::GetInstance('uCMS_Edit');
 		$editLink = $editObj->GetURL();
 		$fid = $editObj->FindFilter('cms_id');
 
 		uJavascript::LinkFile(dirname(__FILE__).'/page_list.js');
-		
-		$c = ob_get_contents();
-		ob_end_clean();
-		utopia::Tab_Add('Page Editor',$c,$this->GetModuleId(),$tabGroupName,false);
-		utopia::Tab_InitDraw($tabGroupName);
 	}
 	public static function RefreshList() {
 		if (utopia::GetCurrentModule() !== __CLASS__) return;
