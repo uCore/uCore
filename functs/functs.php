@@ -119,11 +119,11 @@ function ReplacePragma($string,$tbl='') {
 
 function CreateConcatString($string,$tbl='') {
 	$tbl = ($tbl) ? "`$tbl`." : '';
-  $retF = "$tbl`$string`";
-	if (preg_match_all('/{[^}]+}/',$string,$matches) > 0 && !empty($tbl)) {
+	$retF = "$tbl`$string`";
+	if (preg_match_all('/{([^}]+)}/',$string,$matches) > 0 && !empty($tbl)) {
 		$retF = "CONCAT('$string')";
-		foreach ($matches[0] as $match) {
-			$retF = str_replace($match,"',$tbl".trim($match,'{}').",'",$retF);
+		foreach ($matches[0] as $k => $match) {
+			$retF = str_replace($match,"',IFNULL($tbl`".$matches[1][$k]."`,''),'",$retF);
 		}
 	}
 
