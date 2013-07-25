@@ -1035,9 +1035,6 @@ abstract class uDataModule extends uBasicModule {
 		//		else // dont want to set onchange for suggestions
 		//if (!array_key_exists('onchange',$attributes)) $attributes['onchange']='uf(this);';
 
-		// styles
-		$attributes['style'] = $this->FieldStyles_Get($field,$defaultValue);
-
 		if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
 		if ($this->isAjax) $attributes['class'] .= ' uf';
 
@@ -1361,18 +1358,19 @@ abstract class uDataModule extends uBasicModule {
 		unset($this->fields[$field]['style'][$key]);
 	}
 
-	public function FieldStyles_Get($field,$value=NULL) {
+	public function FieldStyles_Get($field,$rec=NULL) {
 		if (strpos($field,':') !== FALSE) list($field) = explode(':',$field);
 		if (!isset($this->fields[$field])) return null;
 		$inputType = $this->fields[$field]['inputtype'];
 		$defaultStyles = array_key_exists($inputType,$this->defaultStyles) ? $this->defaultStyles[$inputType] : array();
 		$specificStyles = $this->GetFieldProperty($field,'style'); if (!$specificStyles) $specificStyles = array();
 		$conditionalStyles = array();
-
-		if (array_key_exists('style_fn',$this->fields[$field]) && is_callable($this->fields[$field]['style_fn'][0])) {
-			$arr = $this->fields[$field]['style_fn'][1];
-			if (is_array($arr)) array_unshift($arr,$value); else $arr = array($value);
-			$conditionalStyles = call_user_func_array($this->fields[$field]['style_fn'][0],$arr);
+		
+		if (isset($this->fields[$field]['style_fn']) && is_callable($this->fields[$field]['style_fn'][0])) {
+			$args = $this->fields[$field]['style_fn'][1];
+			if (is_array($args)) array_unshift($args,$rec); else $args = array($rec);
+			array_unshift($args,$field);
+			$conditionalStyles = call_user_func_array($this->fields[$field]['style_fn'][0],$args);
 		}
 		if (!$conditionalStyles) $conditionalStyles = array();
 
@@ -1381,16 +1379,12 @@ abstract class uDataModule extends uBasicModule {
 		// if width/height has no delimiter, append 'px'
 		if (isset($styles['width']) && is_numeric($styles['width'])) $styles['width'] = $styles['width'].'px';
 		if (isset($styles['height']) && is_numeric($styles['height'])) $styles['height'] = $styles['height'].'px';
-		
+
 		return $styles;
 	}
 
-	public function ConditionalStyle_Set($field,$callback) {
-		$numargs = func_num_args();
-		$arr = array();
-		for ($i = 2; $i < $numargs; $i++)
-		$arr[] = func_get_arg($i);
-		$this->fields[$field]['style_fn'] = array($callback,$arr);
+	public function ConditionalStyle_Set($field,$callback,$args=null) {
+		$this->fields[$field]['style_fn'] = array($callback,$args);
 	}
 
 	public function ConditionalStyle_Unset($field) {
@@ -2192,7 +2186,7 @@ abstract class uDataModule extends uBasicModule {
 				break;
 			case ftIMAGE:
 				if (!$value) break;
-				$style = $this->FieldStyles_Get($fieldName);
+				$style = $this->FieldStyles_Get($fieldName,$rec);
 				$w = isset($style['width']) ? intval($style['width']) : null;
 				$h = isset($style['height']) ? intval($style['height']) : null;
 				$value = $this->DrawSqlImage($fieldName,$pkVal,$w,$h,array('style'=>$style));
@@ -2665,6 +2659,10 @@ abstract class uDataModule extends uBasicModule {
 			if (isset($this->fields[$vname])) $fieldData = $this->fields[$vname];
 		}
 		
+		$attr = array();
+		$styles = $this->FieldStyles_Get($fieldName,$row);
+		if ($styles) $attr['style'] = $styles;
+		
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
 		if ($inputType !== itNONE && ($inputTypeOverride || ($row !== NULL && $this->flag_is_set(ALLOW_EDIT)) || ($row === NULL  && $this->flag_is_set(ALLOW_ADD)))) {
 			if ($inputType === itFILE) {
@@ -2680,9 +2678,8 @@ abstract class uDataModule extends uBasicModule {
 					$ret .= '<a title="View File" target="_blank" href="'.$link.'" class="icon-document-view"></a>';
 					$ret .= '<a title="Download File" href="'.$link.'?attach=attachment" class="icon-document-download"></a>';
 				}
-				$ret .= '<span title="Upload File" class="icon-document-upload">'.$this->DrawSqlInput($fieldName,$value,$pkVal,null,$inputType,$valuesOverride).'</span>';
+				$ret .= '<span title="Upload File" class="icon-document-upload">'.$this->DrawSqlInput($fieldName,$value,$pkVal,$attr,$inputType,$valuesOverride).'</span>';
 			} else {
-				$attr = array();
 				if ($pkVal === NULL) { // set a placeholder based on the default value for new records
 					$dv = $this->GetDefaultValue($fieldName);
 					$vals = $valuesOverride;
@@ -2699,10 +2696,13 @@ abstract class uDataModule extends uBasicModule {
 			if (isset($vals[$value])) $value = $vals[$value];
 			$ret = '';
 			if ($url && !$this->GetFieldProperty($fieldName,'nolink')) {
-				$class = $this->GetFieldProperty($fieldName,'button') ? ' class="btn"' : '';
-				$ret = "<a$class href=\"$url\">$value</a>";
+				if ($this->GetFieldProperty($fieldName,'button')) $attr['class'] = isset($attr['class'])? $attr['class'].' btn' : 'btn';
+				$attrStr = BuildAttrString($attr);
+				$ret = "<a$attrStr href=\"$url\">$value</a>";
 			} else {
+				$attrStr = BuildAttrString($attr);
 				$ret = $value;
+				if ($attrStr) $ret = "<span$attrStr>$value</span>";
 			}
 		}
 		return $ret;
