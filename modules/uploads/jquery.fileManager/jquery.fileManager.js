@@ -75,10 +75,10 @@
 				});
 				$sel.append('<div class="separator"></div>');
 				if (!mbOptions.readonly)
-					$sel.append($('<div class="btn">New Folder</div>').bind('click',NewFolder));
+					$sel.append($('<button>New Folder</button>').bind('click',NewFolder));
 				if (mbOptions.upload) {
 					var ul = $('<div></div>').hide();
-					$sel.append($('<div class="btn">Upload Files</div>').bind('click',{container:ul},UploadFiles));
+					$sel.append($('<button>Upload Files</button>').bind('click',{container:ul},UploadFiles));
 					$sel.append(ul);
 				}
 				

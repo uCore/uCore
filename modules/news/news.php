@@ -35,7 +35,7 @@ class tabledef_NewsTable extends uTableDef {
 }
 
 class module_NewsAdmin extends uListDataModule implements iAdminModule {
-	public function GetSortOrder() { return -8800; }
+	public function GetSortOrder() { return -9800; }
 	public function SetupParents() {
 		$this->AddParent('/');
 	}

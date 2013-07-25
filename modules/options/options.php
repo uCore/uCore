@@ -19,7 +19,7 @@ class tabledef_ModOpts extends uTableDef {
 utopia::AddTemplateParser('option','modOpts::GetOption','.+');
 class modOpts extends uDataModule {
 	public function GetTitle() { return 'Options'; }
-	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE; }
+	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_ModOpts'; }
 	public function SetupFields() {
 		$this->CreateTable('opts');
@@ -61,9 +61,13 @@ class modOpts extends uDataModule {
 }
 
 class modOptsList extends uListDataModule implements iAdminModule {
-	public function GetTitle() { return 'Options'; }
-	public function GetSortOrder() { return -9999.5; }
-	public function GetOptions() { return ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE; }
+	public function GetTitle() { 
+		$f =& $this->FindFilter('group');
+		if ($f['value']) return $f['value'];
+		return 'Options';
+	}
+	public function GetSortOrder() { return 10000-2; }
+	public function GetOptions() { return ALLOW_EDIT | LIST_HIDE_HEADER; }
 	public function GetTabledef() { return 'tabledef_ModOpts'; }
 	public function SetupFields() {
 		$this->CreateTable('opts');
@@ -72,20 +76,20 @@ class modOptsList extends uListDataModule implements iAdminModule {
 		$this->AddField('name','name','opts','Name');
 		$this->AddField('value','value','opts','Value',itTEXT);
 		$this->AddFilter('name',ctISNOT,itNONE,'NULL');
-		$this->AddFilter('group',ctISNOT,itNONE,'NULL');
+		$this->AddFilter('group',ctEQ,itNONE);
 		$this->AddOrderBy('name');
 	}
 	public function SetupParents() {
 		$this->AddParent('/');
 	}
 	public function RunModule() {
-		$groups = database::query('SELECT DISTINCT `group` FROM tabledef_ModOpts WHERE `group` IS NOT NULL ORDER BY (`group` = ?), `group` ASC',array('Site Options'))->fetchAll();
+		$groups = database::query('SELECT DISTINCT `group` FROM tabledef_ModOpts WHERE `group` IS NOT NULL ORDER BY (`group` = ?) DESC, `group` ASC',array('Site Options'))->fetchAll();
 
+		$f =& $this->FindFilter('group');
 		foreach ($groups as $group) {
 			$group = $group['group'];
-			$order = $group == 'Site Options' ? -10000 : null;
-			$ds = $this->GetDataset(array('group'=>$group));
-			$this->ShowData($ds,$group,$order);
+			$f['value'] = $group;
+			$this->ShowData();
 		}
 	}
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {

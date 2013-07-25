@@ -58,25 +58,25 @@ class tabledef_Users extends uTableDef {
 
 class uUsersList extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Users'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT | ALLOW_FILTER; }
-
+	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_DELETE | ALLOW_EDIT | ALLOW_FILTER; }
+	public function GetSortOrder() { return 10000-3; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function SetupFields() {
 		$this->CreateTable('users');
 		$this->CreateTable('roles','tabledef_UserRoles','users',array('role'=>'role_id'));
 		
-		$fld =& $this->AddField('gravatar','username','users',''); $fld['size'] = 24;
-		$this->AddPreProcessCallback('gravatar',array('uGravatar','GetImageField'));
-		
-		$this->AddField('username','username','users','Username',itTEXT);
+		$this->AddField('username','username','users','Username');
+		$this->ConditionalStyle_Set('username',array($this,'isvalidated'));
 		$this->AddField('role','role','users','Role',itCOMBO,'SELECT role_id,name FROM '.TABLE_PREFIX.'tabledef_UserRoles ORDER BY role_id');
 		$this->AddField('last_login','last_login','users','Last Login');
 		$this->AddField('password','password','users','Change Password',itPASSWORD);
 		$this->AddField('email_confirm','email_confirm','users');
 		$this->AddField('email_confirm_code','email_confirm_code','users');
-		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users','Validate');
-		$this->AddPreProcessCallback('validated',array($this,'ValidateButtons'));
-		$this->SetFieldProperty('validated','nolink',true);
+		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users');
+	}
+	public function isvalidated($field,$record) {
+		if ($record['validated']) return;
+		return array('color'=>'#999');
 	}
 
 	public function SetupParents() {
@@ -87,20 +87,11 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->ShowData();
 	}
 	
-	public function ValidateButtons($originalValue,$pkVal,$value,$rec,$fieldName) {
-		if ($originalValue == 1 || $pkVal === NULL) {
-			return '';
-		}
-		return $this->DrawSqlInput('_validate_user','Force Validate',$pkVal,NULL,itBUTTON).$this->DrawSqlInput('_validate_send','Send Validation',$pkVal,NULL,itBUTTON);
-	}
-	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		if ($fieldAlias == 'role' && isset($_SESSION['current_user']) && $pkVal == $_SESSION['current_user']) {
 			uNotices::AddNotice('You cannot edit your own role',NOTICE_TYPE_ERROR);
 			return;
 		}
-		if ($fieldAlias == '_validate_user') return $this->UpdateField('email_confirm_code',true,$pkVal);
-		if ($fieldAlias == '_validate_send') { uVerifyEmail::VerifyAccount($pkVal); return; }
 		parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
 	
@@ -283,7 +274,7 @@ class uRegisterUser extends uDataModule {
 		?>
 		<div id="register-wrap">
 		<h1>Create an Account</h1>
-		<form class="register-user oh" action="{home_url}register" method="POST">
+		<form class="register-user oh" action="<?php echo $this->GetURL(); ?>" method="POST">
 			<div class="form-field"><label for="username">Email:</label>
 			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" /></div>
 			<div class="form-field"><label for="username2">Confirm Email:</label>
@@ -360,7 +351,7 @@ class uVerifyEmail extends uDataModule {
 		$randKey = uCrypt::GetRandom(20);
 		$o->UpdateField('email_confirm_code',$randKey,$user_id);
 		$url = $o->GetURL(array('c'=>$randKey));
-		$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
+		//$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
 		uNotices::AddNotice('Please check '.$rec['email_confirm'].' for a validation link.');
 		uEmailer::SendEmailTemplate('account_activate',array('email'=>$rec['email_confirm'],'activate_link'=>$url),'email');
 		return false;
@@ -368,7 +359,7 @@ class uVerifyEmail extends uDataModule {
 }
 
 class uUserProfile extends uSingleDataModule {
-	public function GetTitle() { return 'User Profile'; }
+	public function GetTitle() { return 'Account Details'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetSortOrder() { return 10000000; }
@@ -376,7 +367,6 @@ class uUserProfile extends uSingleDataModule {
 	public function SetupFields() {
 		$this->CreateTable('users');
 		
-		$this->NewSection('Account Details');
 		$this->AddField('user_id','user_id','users');
 		$this->AddSpacer('<b style="font-size:1.1em">Change Email</b>');
 		$this->AddSpacer('We will send a message to your new email address.  You must click the verification link to complete this process.');
@@ -404,7 +394,6 @@ class uUserProfile extends uSingleDataModule {
 			$obj->_RunModule();
 			return;
 		}
-		echo '<h1>User Profile</h1>';
 		$this->ShowData();
 	}
 	public static function GetCurrentUser() {

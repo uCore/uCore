@@ -17,7 +17,7 @@ class tabledef_Widgets extends uTableDef {
 class uWidgets_List extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Widgets'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER; }
-	public function GetSortOrder() { return -8800; }
+	public function GetSortOrder() { return -9700; }
 	public function GetTabledef() { return 'tabledef_Widgets'; }
 	public function SetupFields() {
 		$this->CreateTable('blocks');
