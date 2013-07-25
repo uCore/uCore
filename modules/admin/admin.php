@@ -2,17 +2,20 @@
 
 class internalmodule_Reconfigure extends uBasicModule implements iAdminModule {
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'Reconfigure'; }
+	public function GetTitle() { return 'Configuration'; }
 	public function GetOptions() { return ALWAYS_ACTIVE; }
 
 	public function SetupParents() {
 		$this->AddParent('/');
 	}
 
-	public function GetSortOrder() { return -9998; }
+	public function GetSortOrder() { return 10000-1; }
 
 	public function RunModule() {
+		echo '<h1>'.$this->GetTitle().'</h1>';
+		echo '<div class="layoutListSection module-content">';
 		uConfig::ShowConfig();
+		echo '</div>';
 	}
 }
 
