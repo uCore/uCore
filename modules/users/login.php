@@ -1,16 +1,11 @@
 <?php
 
-class adminLogout extends uBasicModule implements iAdminModule {
-	public function GetOptions() { return PERSISTENT; }
+class adminLogout extends uBasicModule {
 	public function GetTitle() { return 'Log Out'; }
-	public function GetSortOrder() { return -9900; }
 	public static $uuid = 'logout';
 	public function SetupParents() {
 		$this->SetRewrite(true);
 		utopia::AddTemplateParser('logout','<a href="'.$this->GetURL().'">Log Out</a>','');
-		
-		if (!uUserLogin::IsLoggedIn()) return;
-		$this->AddParent('/');
 	}
 	public function RunModule() {
 		$_SESSION = array();
@@ -28,11 +23,7 @@ class adminLogout extends uBasicModule implements iAdminModule {
 		header('Location: '.$ref);
 		die();
 	}
-	public static function NoRole() {
-		uUserRoles::NoRole('adminLogout');
-	}
 }
-uEvents::AddCallback('AfterInit','adminLogout::NoRole');
 
 
 utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');

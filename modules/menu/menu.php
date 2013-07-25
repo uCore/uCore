@@ -34,7 +34,10 @@ class uMenu {
 		$items = array();
 		foreach (self::$items[$group] as $item) {
 			if (empty($item['url']) && $lastWasBlank) continue;
-			$attrs = BuildAttrString($item['attr']);
+			$attrs = $item['attr'];
+			if (isset($attrs['class'])) $attrs['class'] .= ' '.strtolower($item['id']);
+			else $attrs['class'] = strtolower($item['id']);
+			$attrs = BuildAttrString($attrs);
 
 			$ret = '<li '.$attrs.'>';
 			if (!empty($item['url']))
