@@ -384,11 +384,10 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($lc !== TRUE && $lc !== NULL) return $lc;
 
 		ob_start();
-		if ($this instanceof iAdminModule) echo '<h1>'.$this->GetTitle().'</h1>';
 		$result = $this->RunModule();
 		$c = ob_get_contents();
 		ob_end_clean();
-		if (utopia::UsingTemplate() && $c) $c = '<div class="'.get_class($this).'">'.$c.'</div>';
+		if (utopia::UsingTemplate() && $c) $c = '<div class="module-container '.get_class($this).'">'.$c.'</div>';
 		echo $c;
 		if ($result === FALSE) return false;
 		$this->hasRun = true;
@@ -519,6 +518,19 @@ abstract class uBasicModule implements iUtopiaModule {
 		$this->parents[$parentModule][] = $info;
 		utopia::AddChild($parentModule, get_class($this), $info);
 
+		// build linklist
+		$pm = $parentModule;
+		if ($pm == '/') $pm = utopia::GetCurrentModule();
+		if ($pm == '') $pm = 'uDashboard';
+		$obj =& utopia::GetInstance($pm);
+		if ($this->flag_is_set(ALLOW_ADD)
+				&& !$obj->flag_is_set(ALLOW_ADD)
+				&& is_subclass_of(get_class($this),'uSingleDataModule')
+				&& ($info['parentField'] === NULL || $info['parentField'] === '*')) {
+			$url = $this->GetURL(array('_n_'.$this->GetModuleId()=>'1'));
+			utopia::LinkList_Add('list_functions:'.($pm),null,CreateNavButton('New '.$this->itemName,$url,array('class'=>'new-item')),1);
+		}
+		
 		return $fieldLinks;
 	}
 
@@ -811,7 +823,6 @@ abstract class uDataModule extends uBasicModule {
 	public abstract function GetTabledef();
 
 	public abstract function SetupFields();
-	//public abstract function ShowData();//$customFilter = NULL);
 
 	public $isAjax = true;
 	
@@ -2904,7 +2915,10 @@ abstract class uListDataModule extends uDataModule {
 	
 	public $limit = 50;
 	
-	public function ShowData($dataset = null, $tabTitle = null,$tabOrder = null) {
+	public function ShowData($dataset = null) {
+		echo '<h1>'.$this->GetTitle().'</h1>';
+		echo '{list.'.get_class($this).'}';
+		
 		//	echo "showdata ".get_class($this)."\n";
 		array_sort_subkey($this->fields,'order');
 
@@ -2912,22 +2926,8 @@ abstract class uListDataModule extends uDataModule {
 		if (!$dataset) $dataset = $this->GetDataset();
 		$dataset->GetPage($page,$limit);
 		$num_rows = $dataset->CountRecords();
-		if (!$tabTitle) $tabTitle = $this->GetTitle();
-		if (!$tabOrder) $tabOrder = $this->GetSortOrder();
-		
-		$children = utopia::GetChildren(get_class($this));
-		foreach ($children as $childModule => $links) {
-			foreach ($links as $link) {
-				$obj =& utopia::GetInstance($link['moduleName']);
-				if (!$this->flag_is_set(ALLOW_ADD)
-						&& $obj->flag_is_set(ALLOW_ADD)
-						&& is_subclass_of($link['moduleName'],'uSingleDataModule')
-						&& ($link['parentField'] === NULL || $link['parentField'] === '*')) {
-					$url = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>'1'));
-					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New '.$obj->itemName,$url,array('class'=>'btn-green')),1);
-				}
-			}
-		}
+		//if (!$tabTitle) $tabTitle = $this->GetTitle();
+		//if (!$tabOrder) $tabOrder = $this->GetSortOrder();
 
 		uEvents::TriggerEvent('OnShowDataList',$this);
 		//		LoadChildren(get_class($this));
@@ -2936,14 +2936,14 @@ abstract class uListDataModule extends uDataModule {
 		if (!isset($GLOBALS['inlineListCount'])) $GLOBALS['inlineListCount'] = 0;
 		else $GLOBALS['inlineListCount']++;
 
-		$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
+		//$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
 
 		//$layoutID = utopia::tab_ //$tabGroupName.'-'.get_class($this)."_list_".$GLOBALS['inlineListCount'];
-		$metadataTitle = ' {tabTitle:\''.$tabTitle.'\', tabPosition:\''.$this->GetSortOrder().'\'}';
+		//$metadataTitle = ' {tabTitle:\''.$tabTitle.'\', tabPosition:\''.$this->GetSortOrder().'\'}';
 		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
 		if (!$this->isAjax) echo '<form class="uf" action="" onsubmit="this.action = window.location" method="post"><input type="hidden" name="__ajax" value="updateField">';
-		echo "<table class=\"".get_class($this)." layoutListSection datalist\">";
+		echo "<table class=\"".get_class($this)." layoutListSection module-content\">";
 
 		/*		echo "<colgroup>";
 		 // need first 'empty' column for buttons?
@@ -2977,7 +2977,7 @@ abstract class uListDataModule extends uDataModule {
 						// write the section, and reset the count
 						$sectionName = $this->layoutSections[$sectionID]['title'];
 						$secClass = empty($sectionName) ? '' : ' sectionHeader';
-						echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
+						echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br($sectionName)."</td>";
 						$sectionCount = 0;
 						$sectionID = $fieldData['layoutsection'];
 					}
@@ -2987,32 +2987,32 @@ abstract class uListDataModule extends uDataModule {
 				}
 				$sectionName = $this->layoutSections[$sectionID]['title'];
 				$secClass = empty($sectionName) ? '' : ' sectionHeader';
-				echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br(htmlentities_skip($sectionName,'<>"'))."</td>";
+				echo "<td colspan=\"$sectionCount\" class=\"$secClass\">".nl2br($sectionName)."</td>";
 				echo "</tr>";
 			}
 
 			// start of FIELD headers
 			$colcount = 0;
-			echo '<tr class="ui-tabs-nav ui-helper-reset ui-widget-header ui-corner-all">';
-			if ($this->flag_is_set(ALLOW_DELETE)) { echo '<th class="ui-corner-top"></th>'; $colcount++; }
+			echo '<tr>';
+			if ($this->flag_is_set(ALLOW_DELETE)) { echo '<th"></th>'; $colcount++; }
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$colcount++;
-				echo '<th class="ui-state-default ui-corner-top sortable" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
 
 				// sort?
+				$icon = '';
 				$o = $this->GetOrderBy(true);
 				if (is_array($o)) foreach ($o as $order) {
 					if (strpos($order,'`'.$fieldName.'`') !== FALSE) {
-						$icon = 'ui-icon-triangle-1-s';
-						if (stripos($order,'desc') !== FALSE) $icon = 'ui-icon-triangle-1-n';
-						echo '<span class="ui-icon '.$icon.' left"></span>';
+						$icon = ' sort-down';
+						if (stripos($order,'desc') !== FALSE) $icon = ' sort-up';
 						break;
 					}
 				}
+				echo '<th class="sortable'.$icon.'" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
 
 				// title
-				echo nl2br(htmlentities_skip($fieldData['visiblename'],'<>"'));
+				echo nl2br($fieldData['visiblename']);
 				echo "</th>";
 			}
 			echo '</tr>'; // close column headers
@@ -3033,7 +3033,7 @@ abstract class uListDataModule extends uDataModule {
 			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
 			$pager = '<div class="pagination right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itCOMBO,$limit,array(25=>'25 per page',50=>'50 per page',150=>'150 per page',0=>'Show All'),array('class'=>'uFilter uLimit')).'</div>';
 			if (!$this->flag_is_set(LIST_HIDE_STATUS)) {
-				echo '<tr class="noprint"><td colspan="'.$colcount.'">{list.'.get_class($this).'}<span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
+				echo '<tr class="noprint"><td colspan="'.$colcount.'"><span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
 			}
 			
 			if ($this->flag_is_set(ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
@@ -3185,8 +3185,9 @@ abstract class uListDataModule extends uDataModule {
 		$cont = ob_get_contents();
 		ob_end_clean();
 
-		utopia::Tab_Add($tabTitle,$cont,$this->GetModuleId(),$tabGroupName,false,$tabOrder);
-		utopia::Tab_InitDraw($tabGroupName);
+		echo $cont;
+	//	utopia::Tab_Add($tabTitle,$cont,$this->GetModuleId(),$tabGroupName,false,$tabOrder);
+	//	utopia::Tab_InitDraw($tabGroupName);
 	}
 
 	function DrawRow($row) {
@@ -3232,10 +3233,12 @@ abstract class uSingleDataModule extends uDataModule {
 	
 	public $limit = 1;
 
-	public function ShowData(){//$customFilter=NULL) {//,$sortColumn=NULL) {
-		//	echo "showdata ".get_class($this)."\n";
+	public function ShowData(){
 		//check pk and ptable are set up
 		if (is_empty($this->GetTabledef())) { ErrorLog('Primary table not set up for '.get_class($this)); return; }
+		
+		echo '<h1>'.$this->GetTitle().'</h1>';
+		echo '{list.'.get_class($this).'}';
 
 		$row = null;
 		$num_rows = 0;
@@ -3277,18 +3280,22 @@ abstract class uSingleDataModule extends uDataModule {
 		
 		$extraCount = 1;
 //		if (!flag_is_set($this->GetOptions(), NO_TABS))
-		$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
+		//$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
+		$secCount = count($this->layoutSections);
 		foreach ($this->layoutSections as $sectionID => $sectionInfo) {
-			$sectionName = $sectionInfo['title'];
-			if ($sectionName === '') {
-				if ($sectionID === 0) $SN = 'General';
-				else { $SN = "Extra ($extraCount)"; $extraCount++; }
-			} else
-			$SN = ucwords($sectionName);
-
 			$out = '';
+			if ($secCount > 1) {
+				$sectionName = $sectionInfo['title'];
+				if ($sectionName === '') {
+					if ($sectionID === 0) $SN = 'General';
+					else { $SN = "Extra ($extraCount)"; $extraCount++; }
+				} else
+				$SN = ucwords($sectionName);
+				$out .= '<h2>'.$SN.'</h2>';
+			}
+			
 			if (!$this->isAjax) $out .= '<form class="uf" action="" onsubmit="this.action = window.location" method="post">';
-			$out .= "<table class=\"layoutDetailSection\">";
+			$out .= "<table class=\"module-content layoutDetailSection\">";
 
 			$fields = $this->GetFields(true,$sectionID);
 			$hasFieldHeaders = false;
@@ -3308,12 +3315,12 @@ abstract class uSingleDataModule extends uDataModule {
 			}
 			$out .= "</table>";
 			if (!$this->isAjax) $out .= '</form>';
-			utopia::Tab_Add($SN,$out,$this->GetModuleId(),$tabGroupName,false,$order);
+			//utopia::Tab_Add($SN,$out,$this->GetModuleId(),$tabGroupName,false,$order);
+			echo $out;
 		}
 
-		if ($num_rows > 1) echo '<div class="oh">{list.'.get_class($this).'}<b>'.$records.'</b>'.$pager.'</div>';
-		else echo '<div class="oh">{list.'.get_class($this).'}</div>';
+		if ($num_rows > 1) echo '<div class="oh"><b>'.$records.'</b>'.$pager.'</div>';
 
-		utopia::Tab_InitDraw($tabGroupName);
+		//utopia::Tab_InitDraw($tabGroupName);
 	}
 }

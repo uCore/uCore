@@ -169,11 +169,6 @@ function RefreshTables() {
 	$('.layoutListSection TBODY TR:even').addClass('even');
 }
 
-utopia.Initialise.add(InitTabs);
-function InitTabs() {
-	$(".tabGroup").tabs();
-}
-
 utopia.Initialise.add(UpdateSelectedLinks);
 function UpdateSelectedLinks() {
 	$('.active-link').removeClass('active-link');

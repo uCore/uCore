@@ -32,6 +32,7 @@ class uEmailTemplateList extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Email Templates'; }
 	public function GetOptions() { return ALLOW_FILTER | ALLOW_DELETE; }
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
+	public function GetSortOrder() { return -8800; }
 
 	public function SetupParents() {
 		$this->AddParent('');

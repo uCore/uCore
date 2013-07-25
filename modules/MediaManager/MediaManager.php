@@ -1,7 +1,7 @@
 <?php
 define('itFILEMANAGER' ,'fileman');
 class fileManager extends uBasicModule implements iAdminModule {
-	public function GetSortOrder() { return -8700; }
+	public function GetSortOrder() { return -8900; }
 	function GetTitle() { return 'Media'; }
 	function SetupParents() {
 		$this->AddParent('/');
@@ -14,9 +14,11 @@ class fileManager extends uBasicModule implements iAdminModule {
 		$this->_RunModule();
 	}
 	function RunModule() {
+		echo '<h1>'.$this->GetTitle().'</h1>';
+		echo '{list.'.get_class($this).'}';
 		list($path,$pathUpload) = uUploads::Init();
 
-		echo '<div>Uploads <span id="mediaPath"></span></div><div id="fileMan"></div>';
+		echo '<div class="module-content">You are here: Uploads <span id="mediaPath"></span><div id="fileMan"></div></div>';
 		$pluploadOpts = '';
 		if (class_exists('uPlupload')) {
 			$jsOptionVar = 'filemanagerOptions';
