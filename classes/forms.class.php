@@ -1016,9 +1016,10 @@ abstract class uDataModule extends uBasicModule {
 		$values = $valuesOverride ? $valuesOverride : $this->GetValues($field,$pkValue);
 
 		if (isset($this->fields[$field]['vtable']['parent']) && !is_subclass_of($this->fields[$field]['vtable']['tModule'],'iLinkTable') && $pkValue !== NULL) {
+			$rec = null;
 			foreach ($this->fields[$field]['vtable']['joins'] as $from=>$to) {
 				if ($from == $field) {
-					$rec = $this->LookupRecord($pkValue);
+					if (!$rec) $rec = $this->LookupRecord($pkValue);
 					$defaultValue = $rec[$this->GetPrimaryKeyField($field)];
 					break;
 				}
