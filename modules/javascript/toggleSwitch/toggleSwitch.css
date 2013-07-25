@@ -8,8 +8,8 @@
 }
 .switch.switch-true { background-position: left center; }
 .switch.switch-false { background-position: right center; }
-/*.switch.switch-true:hover { background-position: -5px center; }*/
-/*.switch.switch-false:hover { background-position: -32px center; }*/
+.switch.switch-true.peek { background-position: -5px center; }
+.switch.switch-false.peek { background-position: -32px center; }
 .switch.yesno {
 	background-image: url(images/switch-yes-no.png);
 }

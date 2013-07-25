@@ -29,9 +29,19 @@
 				
 				if($(this).attr('disabled')) sw.addClass('disabled');
 
-				sw.on('click',function(){
-					$(this).data('obj').trigger('click');
-				});
+				if ('ontouchstart' in document.documentElement) {
+					sw.on('touchstart',function(){
+						$(this).addClass('peek');
+					})
+					.on('touchend',function(){
+						$(this).removeClass('peek');
+						$(this).data('obj').trigger('click');
+					});
+				} else {
+					sw.on('click',function(){
+						$(this).data('obj').trigger('click');
+					});
+				}
 				obj.on('change',function(){
 					UpdateStatus(this);
 				});
