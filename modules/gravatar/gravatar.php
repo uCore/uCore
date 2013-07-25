@@ -1,5 +1,6 @@
 <?php
 
+utopia::AddTemplateParser('gravatar','uGravatar::GetImage');
 class uGravatar {
 	public static function GetImageField($originalValue,$pkVal,$value,$rec,$fieldName) {
 		if (!$originalValue) return '';
