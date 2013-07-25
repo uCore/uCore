@@ -28,7 +28,7 @@ class modLinks {
 				$position = $obj->GetSortOrder();
 				if (isset($child['fieldLinks']) && $mid === $cm) $position = 0;
 				if ($position > $highestpos) $highestpos = $position;
-				uMenu::AddItem('_modlinks_'.$mid,$obj->GetTitle(),$obj->GetURL(),$parent,null,$position);
+				uMenu::AddItem($parent.$mid,$obj->GetTitle(),$obj->GetURL(),$parent,null,$position);
 
 			}
 			self::CreateLinkMenu($mid);

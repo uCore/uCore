@@ -27,7 +27,7 @@ class uDataOnly {
 		}
 		if (!is_subclass_of($parent,'uDataModule')) return;
 		$url = $obj->GetURL(array_merge($_GET,array('__ajax'=>'dataonly','dataonly-type'=>'csv')));
-		utopia::LinkList_Add('list_functions:'.$parent,'Export to CSV',$url,10,NULL,array('class'=>'btn btn-csv'));
+		utopia::LinkList_Add('list_functions:'.$parent,'Export to CSV',$url,10,NULL,array('class'=>'export export-csv'));
 		self::$allowed[] = $parent;
 	}
 	private static $allowed = array();

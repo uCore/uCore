@@ -3,11 +3,11 @@ function RefreshIcons() {
 	$('.ui-treesort-item:not(.ui-treesort-folder) > .cmsParentToggle').remove();
 	$('.ui-treesort-folder').each(function () {
 		var icon = $('.cmsParentToggle',this);
-		if (!icon.length) icon = $('<span class="cmsParentToggle ui-widget ui-icon" style="width:16px; float:left"/>').prependTo(this);
+		if (!icon.length) icon = $('<span class="cmsParentToggle"/>').prependTo(this);
 		if ($('ul:visible',this).length)
-			icon.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+			icon.addClass('open');
 		else
-			icon.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+			icon.removeClass('open');
 	});
 }
 function dropped() {
