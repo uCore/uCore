@@ -652,7 +652,7 @@ abstract class uBasicModule implements iUtopiaModule {
 
 		foreach ($mapped as $key => $val) {
 			$URLreadable = is_array($this->rewriteURLReadable) ? $this->rewriteURLReadable[$key] : $this->rewriteURLReadable;
-			$mapped[$key] = ($URLreadable) ? urlencode(UrlReadable($val)) : urlencode($val);
+			$mapped[$key] = ($URLreadable) ? rawurlencode(UrlReadable($val)) : rawurlencode($val);
 		}
 
 		if (isset($filters['uuid'])) unset($filters['uuid']);
@@ -2577,7 +2577,7 @@ abstract class uDataModule extends uBasicModule {
 				switch ($typeArr[$k]) {
 					case 'urlencode':
 						$replace = $this->PreProcess($field,$row[$field],$row);
-						$replace = urlencode($replace);
+						$replace = rawurlencode($replace);
 						$string = str_replace($search,$replace,$string);
 						break;
 					case 'd':
