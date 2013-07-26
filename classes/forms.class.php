@@ -637,6 +637,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$mapped = $this->rewriteMapping;
 		foreach ($mapped as $key => $val) {
 			if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$val,$matches)) {
+				$URLreadable = is_array($this->rewriteURLReadable) ? $this->rewriteURLReadable[$key] : $this->rewriteURLReadable;
 				foreach ($matches[1] as $fieldName) {
 					$newVal = '';
 					if (array_key_exists($fieldName,$filters)) $newVal = $filters[$fieldName];
@@ -644,18 +645,14 @@ abstract class uBasicModule implements iUtopiaModule {
 
 					unset($filters[$fieldName]);
 					unset($filters['_f_'.$fieldName]);
+					
+					if ($URLreadable) $newVal = trim(UrlReadable($newVal),'-');
 
 					$mapped[$key] = str_replace('{'.$fieldName.'}',$newVal,$mapped[$key]);
 				}
 			}
-			if ($mapped[$key] === preg_replace('/{([a-zA-Z0-9_]+)}/','',$val)) {
-				$mapped[$key] = '';
-			}
-		}
-
-		foreach ($mapped as $key => $val) {
-			$URLreadable = is_array($this->rewriteURLReadable) ? $this->rewriteURLReadable[$key] : $this->rewriteURLReadable;
-			$mapped[$key] = ($URLreadable) ? rawurlencode(UrlReadable($val)) : rawurlencode($val);
+			if ($mapped[$key] === preg_replace('/{([a-zA-Z0-9_]+)}/','',$val)) $mapped[$key] = '';
+			$mapped[$key] = rawurlencode($mapped[$key]);
 		}
 
 		if (isset($filters['uuid'])) unset($filters['uuid']);
