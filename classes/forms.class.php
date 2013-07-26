@@ -613,7 +613,7 @@ abstract class uBasicModule implements iUtopiaModule {
 			// generate preg for section
 			if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$map,$matches)) {
 				foreach ($matches[1] as $match) {
-					$map = str_replace('{'.$match.'}','(.+)',$map);
+					$map = str_replace('{'.$match.'}','(.*)',$map);
 					$replace[] = $match;
 				}
 			}
@@ -636,7 +636,7 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function RewriteURL(&$filters) {
 		$mapped = $this->rewriteMapping;
 		foreach ($mapped as $key => $val) {
-			if (preg_match_all('/{([a-zA-Z_]+)}/',$val,$matches)) {
+			if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$val,$matches)) {
 				foreach ($matches[1] as $fieldName) {
 					$newVal = '';
 					if (array_key_exists($fieldName,$filters)) $newVal = $filters[$fieldName];
@@ -647,6 +647,9 @@ abstract class uBasicModule implements iUtopiaModule {
 
 					$mapped[$key] = str_replace('{'.$fieldName.'}',$newVal,$mapped[$key]);
 				}
+			}
+			if ($mapped[$key] === preg_replace('/{([a-zA-Z0-9_]+)}/','',$val)) {
+				$mapped[$key] = '';
 			}
 		}
 
