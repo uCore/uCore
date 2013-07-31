@@ -1420,6 +1420,7 @@ abstract class uDataModule extends uBasicModule {
 		switch ($this->GetFieldType($aliasName)) {
 			case ftFILE:
 			case ftIMAGE:
+			case ftUPLOAD:
 				$this->AddField($aliasName.'_filename', $fieldName.'_filename', $tableAlias);
 				$this->AddField($aliasName.'_filetype', $fieldName.'_filetype', $tableAlias);
 				break;
@@ -2358,17 +2359,20 @@ abstract class uDataModule extends uBasicModule {
 		if (uEvents::TriggerEvent('BeforeUploadFile',$this,array($fieldAlias,$fileInfo,&$pkVal)) === FALSE) return FALSE;
 		
 		if (!file_exists($fileInfo['tmp_name'])) { AjaxEcho('alert("File too large. Maximum File Size: '.utopia::ReadableBytes(utopia::GetMaxUpload()).'");'); $this->ResetField($fieldAlias,$pkVal); return; }
-		$type = getSqlTypeFromFieldType($this->GetFieldType($fieldAlias));
-		if (strpos($type,'blob') === FALSE && strpos($type,'text') === FALSE) {
-			$targetFile = get_class($this).'/'.date('Y-m-d').'/'.$pkVal.'/'.time().'_'.$fileInfo['name'];
-			$filename = uUploads::UploadFile($fileInfo,$targetFile);
-			if (!$filename) return;
-			$this->UpdateField($fieldAlias,$filename,$pkVal);
-		} else {
+		
+		$this->UpdateField($fieldAlias.'_filename',$fileInfo['name'],$pkVal);
+		$this->UpdateField($fieldAlias.'_filetype',$fileInfo['type'],$pkVal);
+		
+		$type = $this->GetFieldType($fieldAlias);
+		if ($type === ftFILE || $type === ftIMAGE) {
 			$value = file_get_contents($fileInfo['tmp_name']);
-			$this->UpdateField($fieldAlias.'_filename',$fileInfo['name'],$pkVal);
-			$this->UpdateField($fieldAlias.'_filetype',$fileInfo['type'],$pkVal);
 			$this->UpdateField($fieldAlias,$value,$pkVal);
+		} else {
+			$targetFile = utopia::checksum(array(time(),get_class($this),$pkVal,$fileInfo['name']));
+			$targetPath = 'uFiles/'.date('Y-m-d').'/';
+			if (!file_exists(PATH_ABS_ROOT.$targetPath)) mkdir(PATH_ABS_ROOT.$targetPath,0755,true);
+			copy($fileInfo['tmp_name'],PATH_ABS_ROOT.$targetPath.$targetFile);
+			$this->UpdateField($fieldAlias,$targetPath.$targetFile,$pkVal);
 		}
 		
 		if (uEvents::TriggerEvent('AfterUploadFile',$this,array($fieldAlias,$fileInfo,&$pkVal)) === FALSE) return FALSE;

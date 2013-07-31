@@ -78,6 +78,9 @@ FileETag MTime Size
 	RewriteRule ^(.*/)?(\.svn)|(\.git) - [F,L]
 	ErrorDocument 403 "Access Forbidden"
 	
+	RewriteRule ^uFiles - [F,L]
+	ErrorDocument 403 "Access Forbidden"
+	
 	# Skip if file exists
 	RewriteCond %{REQUEST_FILENAME} -f
 	RewriteRule .* - [L]

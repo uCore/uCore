@@ -39,11 +39,10 @@ function getSqlTypeFromFieldType($fieldType) {
 		case ftPERCENT:
 			return 'decimal';
 		case ftIMAGE:
-			return 'longblob';
 		case ftFILE:
 			return 'longblob';
 		case ftUPLOAD:
-			return 'varchar(500)';
+			return 'varchar(255)';
 		case ftBOOL:
 			return 'tinyint';
 		default:
@@ -164,7 +163,7 @@ abstract class uTableDef implements iUtopiaModule {
 		$field['collation'] = (!stristr($sqltype, 'binary') && !stristr($sqltype, 'blob')) ? $collation : NULL;
 		$field['comments'] = $comments;
 
-		if ($type == ftFILE || $type == ftIMAGE) {
+		if ($type == ftFILE || $type == ftIMAGE || $type == ftUPLOAD) {
 			$this->AddField($name.'_filename', ftVARCHAR, 255);
 			$this->AddField($name.'_filetype', ftVARCHAR, 255);
 		}
