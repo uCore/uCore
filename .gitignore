@@ -1,5 +1,1 @@
-.config.php
-.javascript.js
-.uploads
-*.cache
-*.cache.sha1
+.cache

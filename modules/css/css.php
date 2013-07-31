@@ -96,18 +96,16 @@ class uCSS extends uBasicModule {
 			$uStr .= $filename.filemtime($filename).'-'.filesize($filename);
 		}
 
-		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.PATH_REL_CORE);
+		$identifiers = array($_SERVER['REQUEST_URI'],$uStr,count(self::$includeFiles),PATH_REL_CORE);
+		$etag = utopia::checksum($identifiers);
 		utopia::Cache_Check($etag,'text/css',$this->GetUUID());
 
-		// minify caching
-		$minifyCache = '';
-		if (file_exists(__FILE__.'.cache') && file_exists(__FILE__.'.cache.sha1')) $minifyCache = file_get_contents(__FILE__.'.cache.sha1');
-		if ($etag !== $minifyCache) {
-			$out = self::BuildCSS(true);
-			file_put_contents(__FILE__.'.cache',$out); chmod(__FILE__.'.cache', 0664);
-			file_put_contents(__FILE__.'.cache.sha1',$etag); chmod(__FILE__.'.cache.sha1', 0664);
+		$out = uCache::retrieve($identifiers);
+		if ($out) {
+			$out = file_get_contents($out);
 		} else {
-			$out = file_get_contents(__FILE__.'.cache');
+			$out = self::BuildCSS(true);
+			uCache::store($identifiers,$out);
 		}
 
 		utopia::Cache_Output($out,$etag,'text/css',$this->GetUUID());

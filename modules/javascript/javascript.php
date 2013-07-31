@@ -98,18 +98,16 @@ class uJavascript extends uBasicModule {
 			$uStr .= $info['path'].filemtime($info['path']).'-'.filesize($info['path']);
 		}
 
-		$etag = sha1($uStr.'-'.count(self::$includeFiles).'-'.sha1(self::GetJavascriptConstants()).count(self::$includeText).'-'.PATH_REL_CORE);
+		$identifiers = array($_SERVER['REQUEST_URI'],$uStr,self::$includeFiles,self::GetJavascriptConstants(),self::$includeText,PATH_REL_CORE);
+		$etag = utopia::checksum($identifiers);
 		utopia::Cache_Check($etag,'text/javascript',$this->GetUUID());
 
-		// minify caching
-		$minifyCache = '';
-		if (file_exists(__FILE__.'.cache') && file_exists(__FILE__.'.cache.sha1')) $minifyCache = file_get_contents(__FILE__.'.cache.sha1');
-		if ($etag !== $minifyCache) {
-			$out = self::BuildJavascript(true);
-			file_put_contents(__FILE__.'.cache',$out); chmod(__FILE__.'.cache', 0664);
-			file_put_contents(__FILE__.'.cache.sha1',$etag); chmod(__FILE__.'.cache.sha1', 0664);
+		$out = uCache::retrieve($identifiers);
+		if ($out) {
+			$out = file_get_contents($out);
 		} else {
-			$out = file_get_contents(__FILE__.'.cache');
+			$out = self::BuildJavascript(true);
+			uCache::store($identifiers,$out);
 		}
 
 		utopia::Cache_Output($out,$etag,'text/javascript',$this->GetUUID());
