@@ -144,6 +144,7 @@ FIN
 			if ($img->hasAttribute('height')) $qs['h'] = $img->getAttribute('height');
 			
 			$qs = http_build_query($qs);
+			if (!$qs) continue;
 			if (strpos('?',$src) !== false) $src .= '&'.$qs;
 			else $src .= '?'.$qs;
 			$img->setAttribute('src',$src);
