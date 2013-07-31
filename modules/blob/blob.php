@@ -8,9 +8,9 @@ class uBlob extends uBasicModule {
 		if (!isset($_REQUEST['module']) || !class_exists($_REQUEST['module']) || !isset($_REQUEST['pk']) || !isset($_REQUEST['field'])) utopia::PageNotFound();
 
 		$obj =& utopia::GetInstance($_REQUEST['module']);
-		if (uEvents::TriggerEvent('CanAccessModule',$obj) === FALSE) return FALSE;
-		
-		$rec = $obj->LookupRecord($_REQUEST['pk'],true);
+		try {
+			$rec = $obj->LookupRecord($_REQUEST['pk'],true);
+		} catch (Exception $e) { utopia::PageNotFound(); }
 		if (!$rec || !isset($rec[$_REQUEST['field']])) utopia::PageNotFound();
 		utopia::CancelTemplate();
 		$data = $rec[$_REQUEST['field']];
