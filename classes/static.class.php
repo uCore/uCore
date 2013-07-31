@@ -1229,8 +1229,8 @@ class utopia {
 		$srcW = imagesx($src);
 		$srcH = imagesy($src);
 
-                $width	= $maxW && ($enlarge || $maxW <= $srcW) ? $maxW : $srcW;
-                $height	= $maxH && ($enlarge || $maxH <= $srcW) ? $maxH : $srcH;
+		$width	= $maxW && ($enlarge || $maxW <= $srcW) ? $maxW : $srcW;
+		$height	= $maxH && ($enlarge || $maxH <= $srcW) ? $maxH : $srcH;
 
 		$ratio_orig = $srcW/$srcH;
 		if ($width/$height > $ratio_orig) {
@@ -1248,7 +1248,6 @@ class utopia {
 		$offsetX = ($maxW - $width) /2;
 		$offsetY = ($maxH - $height) /2;
 
-		//fastimagecopyresampled($img,$src,$offsetX,$offsetY,0,0,$width,$height,$srcW,$srcH,1);
 		imagecopyresampled($img,$src,$offsetX,$offsetY,0,0,$width,$height,$srcW,$srcH);
 		imagealphablending($img, true);
 		imagesavealpha($img, true);
