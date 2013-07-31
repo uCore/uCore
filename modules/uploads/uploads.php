@@ -29,15 +29,20 @@ class uUploads extends uBasicModule {
 
 		$fileName = pathinfo($path,PATHINFO_BASENAME);
 		$fileMod = filemtime($path);
-		$etag = sha1($fileMod.'-'.$_SERVER['REQUEST_URI']);
+		$fileSize = filesize($path);
+		$w = isset($_GET['w']) ? $_GET['w'] : NULL;
+		$h = isset($_GET['h']) ? $_GET['h'] : NULL;
+		
+		$idents = array($_SERVER['REQUEST_URI'],$fileMod,$fileSize,$w,$h);
+		$etag = utopia::checksum($idents);
 		utopia::Cache_Check($etag,$cType,$fileName);
 
-		$output = file_get_contents($path);
+		$cacheFile = uCache::retrieve($idents);
+		if ($cacheFile) $output = file_get_contents($cacheFile);
+		else $output = file_get_contents($path);
 
-		if (stripos($cType,'image/') !== FALSE && (isset($_GET['w']) || isset($_GET['h']))) {
+		if (stripos($cType,'image/') !== FALSE && ($w || $h) && $cacheFile === FALSE) {
 			// check w and h
-			$w = isset($_GET['w']) ? $_GET['w'] : NULL;
-			$h = isset($_GET['h']) ? $_GET['h'] : NULL;
 			$img = imagecreatefromstring($output);
 			$img = utopia::constrainImage($img,$w,$h);
 			$ext = pathinfo($path,PATHINFO_EXTENSION);
@@ -53,6 +58,9 @@ class uUploads extends uBasicModule {
 			$output = ob_get_contents();
 			ob_end_clean();
 			imagedestroy($img);
+			
+			// only need to cache the resized versions
+			uCache::store($idents,$output);
 		}
 
 		utopia::Cache_Output($output,$etag,$cType,$fileName);
