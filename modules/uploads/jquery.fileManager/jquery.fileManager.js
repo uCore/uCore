@@ -21,6 +21,7 @@
 ;(function($){
 	var optionDefaults = {
 		path			: '',
+		virtualRoot		: false,
 		upload			: false,
 		readonly		: false,
 		fixedPath		: false,
@@ -154,7 +155,8 @@
 			if (item.type == ICONTYPE_FOLDER && mbOptions.fixedPath) return;
 			
 			item.target = $(target);
-			item.fullPath = item.target.data('result').rootPath + item.target.data('result').path + '/' + item.path;
+			var rootPath = mbOptions.virtualRoot ? mbOptions.virtualRoot : item.target.data('result').rootPath;
+			item.fullPath = rootPath + item.target.data('result').path + '/' + item.path;
 			var icon = $('<div title="'+item.title+'"></div>');
 			icon.data('item',item);
 			icon.addClass(mbOptions.baseClass);

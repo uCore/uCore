@@ -15,6 +15,7 @@ class fileManager extends uBasicModule implements iAdminModule {
 	}
 	function RunModule() {
 		list($path,$pathUpload) = uUploads::Init();
+		$relRoot = PATH_REL_ROOT;
 
 		echo '<div>Uploads <span id="mediaPath"></span></div><div id="fileMan"></div>';
 		$pluploadOpts = '';
@@ -26,7 +27,7 @@ class fileManager extends uBasicModule implements iAdminModule {
 		uJavascript::AddText(<<<FIN
 	$(function(){
 		$('#fileMan')
-			.fileManager({ajaxPath:'$path',upload:true}$pluploadOpts)
+			.fileManager({ajaxPath:'$path',virtualRoot:'{$relRoot}uploads',upload:true}$pluploadOpts)
 			.on('changed',function(event, data){ $('#mediaPath').text(data.path.replace(/\//g,' > ')); })
 			.on('dblclick','.fmFile',function() {
 				var item = $(this).data('item');
