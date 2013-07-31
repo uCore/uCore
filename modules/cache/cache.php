@@ -41,6 +41,7 @@ class uCache {
 	 */
 	private static function getPath($identifiers) {
 		$cachePath = PATH_ABS_CORE.'.cache';
+		if (!file_exists($cachePath)) mkdir($cachePath);
 		$checksum = utopia::checksum($identifiers);
 		return $cachePath.'/'.$checksum.'.cache';
 	}
