@@ -143,6 +143,17 @@ FIN
 			if ($img->hasAttribute('width')) $qs['w'] = $img->getAttribute('width');
 			if ($img->hasAttribute('height')) $qs['h'] = $img->getAttribute('height');
 			
+			// inline styles second as they have priority over attributes
+			if ($img->hasAttribute('style')) {
+				$s = $img->getAttribute('style');
+				$s = explode(';',$s);
+				foreach ($s as $prop) {
+					if (preg_match('/\s*(width|height)\s*:\s*([0-9]+)px/',$prop,$matches)) {
+						$qs[$matches[1][0]] = intval($matches[2]);
+					}
+				}
+			}
+			
 			$qs = http_build_query($qs);
 			if (!$qs) continue;
 			if (strpos('?',$src) !== false) $src .= '&'.$qs;
