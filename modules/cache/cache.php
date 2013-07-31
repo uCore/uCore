@@ -2,9 +2,9 @@
 
 class uCache {
 	/**
-	 * Cached files are stale if older than one day by default
+	 * Cached files are stale if older than four weeks by default
 	 */
-	public static $staleTime = 86400;
+	public static $staleTime = 2419200;
 	
 	/**
 	 * Get path to cache file if file exists and is not stale
