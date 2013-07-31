@@ -130,6 +130,11 @@ FIN
 		foreach ($images as $img) {
 			$src = $img->getAttribute('src');
 			if (!preg_match('/^'.preg_quote(PATH_REL_ROOT,'/').'uploads\//',$src)) continue;
+			
+			$p = $img; $inEditable = false;
+			while (($p = $p->parentNode)) if ($p instanceof DOMElement && $p->hasAttribute('contenteditable')) { $inEditable = true; break; }
+			if ($inEditable) continue;
+			
 			parse_str(parse_url($src,PHP_URL_QUERY),$qs);
 		
 			if (isset($qs['w']) !== false) continue;
