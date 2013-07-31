@@ -15,6 +15,9 @@ class uBlob extends uBasicModule {
 		utopia::CancelTemplate();
 		$data = $rec[$_REQUEST['field']];
 
+		$table = $obj->fields[$_REQUEST['field']]['vtable']['tModule'];
+		$tableField = $obj->fields[$_REQUEST['field']]['field'];
+		
 		$filename = isset($_REQUEST['filename']) ? $_REQUEST['filename'] : $rec[$_REQUEST['field'].'_filename'];
 		$filetype = $rec[$_REQUEST['field'].'_filetype'];
 		$width = isset($_GET['w']) ? $_GET['w'] : NULL;
@@ -23,16 +26,18 @@ class uBlob extends uBasicModule {
 
 		if ($isImg && ($width || $height)) $filetype = 'image/png';
 		
-		$etag = utopia::checksum(array(base64_encode($data),$width,$height,$isImg));		
+		$idents = array($table,$tableField,strlen($data),$width,$height,$isImg);
+		$etag = utopia::checksum($idents);
 		
 		$attach = 'inline';
-		if (isset($_REQUEST['attach'])) {
-			$attach = $_REQUEST['attach'];
-		}
+		if (isset($_REQUEST['attach'])) $attach = $_REQUEST['attach'];
 		
 		utopia::Cache_Check($etag,$filetype,$filename,0,2592000,$attach);
+		
+		$cacheFile = uCache::retrieve($idents);
+		if ($cacheFile) $data = file_get_contents($cacheFile);
 
-		if ($isImg && ($width || $height)) {
+		if ($isImg && ($width || $height) && $cacheFile === FALSE) {
 			$src = imagecreatefromstring($data);
 			$img = utopia::constrainImage($src,$width,$height);
 			//    Image output
@@ -41,6 +46,9 @@ class uBlob extends uBasicModule {
 			imagedestroy($img);
 			$data = ob_get_contents();
 			ob_end_clean();
+			
+			// only need to cache the resized versions
+			uCache::store($idents,$data);
 		}
 		
 		utopia::Cache_Output($data,$etag,$filetype,$filename,0,2592000,$attach);
