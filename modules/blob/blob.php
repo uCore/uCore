@@ -19,7 +19,7 @@ class uBlob extends uBasicModule {
 		$tableField = $obj->fields[$_REQUEST['field']]['field'];
 		$fieldType = $obj->GetFieldType($_REQUEST['field']);
 		
-		if ($fieldType !== ftFILE && $fieldType !== ftIMAGE) {
+		if (file_exists(PATH_ABS_ROOT.$data)) {
 			$data = file_get_contents(PATH_ABS_ROOT.$data);
 		}
 		
