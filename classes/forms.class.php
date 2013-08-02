@@ -2368,8 +2368,8 @@ abstract class uDataModule extends uBasicModule {
 			$value = file_get_contents($fileInfo['tmp_name']);
 			$this->UpdateField($fieldAlias,$value,$pkVal);
 		} else {
-			$targetFile = utopia::checksum(array(time(),get_class($this),$pkVal,$fileInfo['name']));
-			$targetPath = 'uFiles/'.date('Y-m-d').'/';
+			$targetFile = utopia::checksum(array(time(),get_class($this),$pkVal,$fileInfo['name'],$fileInfo['type']));
+			$targetPath = 'uFiles/'.date('Y').'/'.date('m-d').'/';
 			if (!file_exists(PATH_ABS_ROOT.$targetPath)) mkdir(PATH_ABS_ROOT.$targetPath,0755,true);
 			copy($fileInfo['tmp_name'],PATH_ABS_ROOT.$targetPath.$targetFile);
 			$this->UpdateField($fieldAlias,$targetPath.$targetFile,$pkVal);
