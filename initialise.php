@@ -24,7 +24,7 @@ uEvents::TriggerEvent('ConfigDefined');
 if (!array_key_exists('jsDefine',$GLOBALS)) $GLOBALS['jsDefine'] = array();
 
 $rows = 0;
-$result = database::query('SHOW TABLE STATUS WHERE `name` = \'__table_checksum\'');
+$result = database::query('SHOW TABLE STATUS WHERE `name` = ?',array('__table_checksum'));
 if (!($r = $result->fetch())) {
         database::query('CREATE TABLE __table_checksum (`name` varchar(200) PRIMARY KEY, `checksum` varchar(40)) ENGINE='.MYSQL_ENGINE);
 } else {
