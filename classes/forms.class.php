@@ -2207,9 +2207,8 @@ abstract class uDataModule extends uBasicModule {
 				break;
 			case ftUPLOAD:
 				if ($value) {
-					$value = $this->GetUploadURL($fieldName,$pkVal);
-					//$value = utopia::GetRelativePath($value);
-					$value = "<a href=\"$value\">Download</a>";
+					$url = uBlob::GetLink(get_class($this),$fieldName,$pkVal);
+					$value = "<a href=\"$url\">Download</a>";
 				}
 				break;
 			default: $isNumeric = false;
@@ -2237,16 +2236,6 @@ abstract class uDataModule extends uBasicModule {
 		}
 
 		return $value;
-	}
-
-	public function GetUploadURL($fieldAlias,$pkVal) {
-		$filters = array(
-			'__ajax'=>'getUpload',
-			'f'		=>$fieldAlias,
-			'p'		=>$pkVal
-		);
-
-		return $this->GetURL($filters);
 	}
 
 	// TODO: Requests for XML data (ajax)
