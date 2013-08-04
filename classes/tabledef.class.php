@@ -257,10 +257,14 @@ abstract class uTableDef implements iUtopiaModule {
 		return "`$fieldName` ".implode(' ',$data);
 	}
 
+	private $isInitialised = false;
+	// create / update table
 	public function Initialise() {
-		// create / update table
-		// is table already existing?
 		if ($this->isDisabled) return;
+
+		if ($this->isInitialised === TRUE) return false;
+		$this->isInitialised = true;
+
 		$this->_SetupFields();
 		if (empty($this->fields)) return;
 		if (!$this->engine) $this->engine = MYSQL_ENGINE;
@@ -447,6 +451,7 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
+		$this->Initialise();
 		uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldName,,$pkVal)\n"));
 		if ($fieldType === NULL) $fieldType = $this->fields[$fieldName]['type'];
@@ -499,6 +504,7 @@ abstract class uTableDef implements iUtopiaModule {
 		uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 	}
 	public function LookupRecord($pkVal) {
+		$this->Initialise();
 		$stm = database::query('SELECT * FROM '.$this->tablename.' WHERE '.$this->GetPrimaryKey().' = ?',array($pkVal));
 		$row = $stm->fetch();
 		return $row;
