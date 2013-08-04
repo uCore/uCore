@@ -17,50 +17,7 @@ class tabledef_ModOpts extends uTableDef {
 }
 
 utopia::AddTemplateParser('option','modOpts::GetOption','.+');
-class modOpts extends uDataModule {
-	public function GetTitle() { return 'Options'; }
-	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT; }
-	public function GetTabledef() { return 'tabledef_ModOpts'; }
-	public function SetupFields() {
-		$this->CreateTable('opts');
-		$this->AddField('ident','ident','opts');
-		$this->AddField('group','group','opts');
-		$this->AddField('name','name','opts','Name');
-		$this->AddField('value','value','opts','Value',itTEXT);
-	}
-	public function SetupParents() {
-		self::AddOption('site_name','Site Name',NULL);
-		self::AddOption('site_url','Site URL',NULL,'http://'.$_SERVER['HTTP_HOST'].PATH_REL_ROOT);
-	}
-	public function RunModule() { }
-	public static $types = array();
-	public static function AddOption($ident,$name,$group=NULL,$init='',$fieldType=itTEXT,$values=NULL) {
-		if (!$group) $group = 'Site Options';
-		self::$types[$ident] = array($fieldType,$values,$name,$group,$init);
-		return self::GetOption($ident);
-	}
-	public static function GetOption($ident) {
-		$obj =& utopia::GetInstance(__CLASS__);
-		$rec = $obj->LookupRecord($ident);
-		if (!$rec) {
-			$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
-			return self::$types[$ident][4];
-		}
-		
-		// check group and name
-		if ($rec['name'] !== self::$types[$ident][2] || $rec['group'] !== self::$types[$ident][3]) {
-			$obj->UpdateFields(array('name'=>self::$types[$ident][2],'group'=>self::$types[$ident][3]),$ident);
-		}
-		
-		return $rec['value'];
-	}
-	public static function SetOption($ident,$value) {
-		$obj =& utopia::GetInstance(__CLASS__);
-		$obj->UpdateField('value',$value,$ident);
-	}
-}
-
-class modOptsList extends uListDataModule implements iAdminModule {
+class modOpts extends uListDataModule implements iAdminModule {
 	public function GetTitle() { 
 		$f =& $this->FindFilter('group');
 		if ($f['value']) return $f['value'];
@@ -72,6 +29,7 @@ class modOptsList extends uListDataModule implements iAdminModule {
 	public function SetupFields() {
 		$this->CreateTable('opts');
 		$this->AddField('ident','ident','opts');
+		$this->SetFieldOptions('ident',ALLOW_ADD);
 		$this->AddField('group','group','opts');
 		$this->AddField('name','name','opts','Name');
 		$this->AddField('value','value','opts','Value',itTEXT);
@@ -80,6 +38,8 @@ class modOptsList extends uListDataModule implements iAdminModule {
 		$this->AddOrderBy('name');
 	}
 	public function SetupParents() {
+		self::AddOption('site_name','Site Name');
+		self::AddOption('site_url','Site URL',NULL,'http://'.$_SERVER['HTTP_HOST'].PATH_REL_ROOT);
 		$this->AddParent('/');
 	}
 	public function RunModule() {
@@ -99,5 +59,41 @@ class modOptsList extends uListDataModule implements iAdminModule {
 			$valuesOverride = modOpts::$types[$row[$pk]][1];
 		}
 		return parent::GetCellData($fieldName, $row, $url, $inputTypeOverride, $valuesOverride);
+	}
+	public static $types = array();
+	public static function AddOption($ident,$name,$group=NULL,$init='',$fieldType=itTEXT,$values=NULL) {
+		if (!$group) $group = 'Site Options';
+		self::$types[$ident] = array($fieldType,$values,$name,$group,$init);
+		return self::GetOption($ident);
+	}
+	public static function GetOption($ident) {
+		$obj =& utopia::GetInstance(__CLASS__);
+		$obj->_SetupParents();
+		$obj->_SetupFields();
+		
+		$obj->BypassSecurity(true);
+		$rec = $obj->LookupRecord($ident,true);
+		$obj->BypassSecurity(false);
+		if (!$rec) {
+			$obj->BypassSecurity(true);
+			$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
+			$obj->BypassSecurity(false);
+			return self::$types[$ident][4];
+		}
+		
+		// check group and name
+		if ($rec['name'] !== self::$types[$ident][2] || $rec['group'] !== self::$types[$ident][3]) {
+			$obj->BypassSecurity(true);
+			$obj->UpdateFields(array('name'=>self::$types[$ident][2],'group'=>self::$types[$ident][3]),$ident);
+			$obj->BypassSecurity(false);
+		}
+		
+		return $rec['value'];
+	}
+	public static function SetOption($ident,$value) {
+		$obj =& utopia::GetInstance(__CLASS__);
+		$obj->BypassSecurity(true);
+		$obj->UpdateField('value',$value,$ident);
+		$obj->BypassSecurity(false);
 	}
 }
