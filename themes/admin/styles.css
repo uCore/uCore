@@ -39,7 +39,7 @@ nav li.active-link ul { display:block; }
 nav li { position:relative; }
 nav a:before { content:"\e819"; speak: none; font-size:14px; font-family:ucore-symbols; font-weight:normal; position:absolute; left:11px; color:#323a45; width:20px; text-align:center; top: 2px; line-height: 52px; }
 nav li._modlinks_udashboard a:before { content:"\e810"; }
-nav li._modlinks_modoptslist a:before { content:"\e806"; }
+nav li._modlinks_modopts a:before { content:"\e806"; }
 nav li._modlinks_internalmodule_reconfigure a:before { content:"\e805"; }
 nav li._modlinks_ucms_list a:before { content:"\e801"; }
 nav li._modlinks_module_newsadmin a:before { content:"\e80d"; }
@@ -50,8 +50,8 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 
 .module-container h1:before { speak: none; font-size:18px; font-family:ucore-symbols; font-weight:normal; position:absolute; left:20px; color:#8cc63f; width:20px; text-align:center; line-height: 52px; }
 
-.module-container.modOptsList h1 { padding-left:50px; }
-.module-container.modOptsList h1:before { content:"\e806"; }
+.module-container.modOpts h1 { padding-left:50px; }
+.module-container.modOpts h1:before { content:"\e806"; }
 
 .module-container { position:relative; display: inline-block; zoom: 1; *display: inline; min-width: 100%; overflow:hidden; }
 .module-container .linklist { position:absolute; top:0; right:40px; line-height:52px; }
@@ -64,7 +64,6 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 .widget-container { display: inline-block; zoom: 1; *display: inline; overflow:hidden;  vertical-align:top; 
 	min-width: 240px;
 	width: 50%;
-	vertical-align: top;
 	padding-right: 20px;
 	box-sizing: border-box;
 }
@@ -75,7 +74,7 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 .layoutListSection td { vertical-align:middle; }
 
 .layoutDetailSection td:first-child { width: 250px; }
-.module-container.modOptsList .layoutListSection td:first-child { width: 250px; }
+.module-container.modOpts .layoutListSection td:first-child { width: 250px; }
 
 th.sortable.sort-down:before { content:"\e824"; speak: none; font-size:18px; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; padding-right: 7px; }
 th.sortable.sort-up:before { content:"\e825"; speak: none; font-size:18px; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; padding-right: 7px; }
