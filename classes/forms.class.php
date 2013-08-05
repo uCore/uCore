@@ -621,15 +621,14 @@ abstract class uBasicModule implements iUtopiaModule {
 			if (preg_match('/'.$map.'/',$value,$matches)) {
 				unset($matches[0]);
 				foreach($matches as $key => $match) {
-				//	if ($match[0] == '{') continue;
 					$return[$replace[$key-1]] = $match;
 				}
 			}
 		}
 
 		// TODO: named filters not being picked up
-		$_GET = array_merge($_GET,$return);
-		$_REQUEST = array_merge($_REQUEST,$return);
+		$_GET = array_merge($return,$_GET);
+		$_REQUEST = array_merge($return,$_REQUEST);
 		return $return;
 	}
 
