@@ -190,8 +190,6 @@ uEvents::AddCallback('AfterInit','uUserLogin::IsLoggedIn',-1000);
 class uResetPassword extends uDataModule {
 	public function GetTitle() { return 'Reset Password'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
-	public function GetOptions() { return PERSISTENT | ALLOW_EDIT; }
-
 	public static $uuid = 'reset-password';
 
 	public function SetupParents() {
@@ -220,7 +218,9 @@ class uResetPassword extends uDataModule {
 		}
 		
 		$randKey = uCrypt::GetRandom(20);
+		$this->SetFieldOptions('email_confirm_code',ALLOW_EDIT);
 		$this->UpdateField('email_confirm_code',$randKey,$rec['user_id']);
+		$this->SetFieldOptions('email_confirm_code',NULL);
 
 		//email out verification
 		$name = $rec['username'] ? ' '.$rec['username'] : '';
@@ -262,7 +262,9 @@ class uResetPassword extends uDataModule {
 			if ($_POST['__newpass'] !== $_POST['__newpass_c']) {
 				uNotices::AddNotice('Password confirmation did not match, please try again.',NOTICE_TYPE_ERROR);
 			} else {
+				$this->SetFieldOptions('email_confirm_code',ALLOW_EDIT); $this->SetFieldOptions('password',ALLOW_EDIT);
 				$this->UpdateFields(array('email_confirm_code'=>'','password'=>$_POST['__newpass']),$rec['user_id']);
+				$this->SetFieldOptions('email_confirm_code',NULL); $this->SetFieldOptions('password',NULL);
 				echo '<p>You have successfully reset your password.</p>';
 				return;
 			}
