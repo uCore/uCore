@@ -3216,7 +3216,13 @@ abstract class uSingleDataModule extends uDataModule {
 			AjaxEcho("window.location.reload(false);");
 		elseif ($oldPkVal !== $pkVal) {
 			// updated PK
-			$url = $this->GetURL($pkVal);
+			$filters = $_GET; unset($filters['_n_'.$this->GetModuleId()]);
+
+			$f = $this->FindFilter($this->GetPrimaryKey());
+			if ($f) $filters['_f_'.$f['uid']] = $pkVal;
+			else $filters[$this->GetPrimaryKey()] = $filters;
+			
+			$url = $this->GetURL($filters);
 			AjaxEcho("window.location.replace('$url');");
 		}
 		return $ret;
