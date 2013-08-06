@@ -794,8 +794,6 @@ abstract class uBasicModule implements iUtopiaModule {
 abstract class uDataModule extends uBasicModule {
 	public $fields = array();
 	public $filters = array(FILTER_WHERE=>array(),FILTER_HAVING=>array());
-	public $pk = NULL;
-	public $pt = NULL;
 	public $sqlTableSetupFlat = NULL;
 	public $sqlTableSetup = NULL;
 	public $dataset = NULL;
@@ -1019,7 +1017,7 @@ abstract class uDataModule extends uBasicModule {
 			foreach ($this->fields[$field]['vtable']['joins'] as $from=>$to) {
 				if ($from == $field) {
 					if (!$rec) $rec = $this->LookupRecord($pkValue);
-					$defaultValue = $rec[$this->GetPrimaryKeyField($field)];
+					$defaultValue = $rec[$this->GetPrimaryKeyConstant($field)];
 					break;
 				}
 			}
@@ -1043,24 +1041,27 @@ abstract class uDataModule extends uBasicModule {
 		return utopia::DrawInput($fieldName,$inputType,$defaultValue,$values,$attributes);
 	}
 
-	public function GetPrimaryKeyField($fieldAlias=NULL) {
+	public function GetPrimaryKeyConstant($fieldAlias=NULL) {
 		if (!is_null($fieldAlias)) {
 			return '_'.$this->GetFieldProperty($fieldAlias,'tablename').'_pk';
 		}
 		return '_'.$this->sqlTableSetup['alias'].'_pk';
 	}
-	public function GetPrimaryKey($fieldAlias=NULL) {
+	
+	public function GetPrimaryKey() {
+		return $this->sqlTableSetup['pk'];
+	}
+
+	public $pkt = NULL;
+	public function GetPrimaryKeyTable($fieldAlias=NULL) {
 		if (!is_null($fieldAlias)) {
 			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
 			return $setup['pk'];
 		}
-		if ($this->pk == NULL && $this->GetTabledef() != NULL) {
-			$obj =& utopia::GetInstance($this->GetTabledef());
-			$this->pk = $obj->GetPrimaryKey();
-		}
-		return $this->pk;
+		return $this->sqlTableSetup['pk'];
 	}
 
+	public $pt = NULL;
 	public function GetPrimaryTable($fieldAlias=NULL) {
 		if (!is_null($fieldAlias)) {
 			$setup = $this->sqlTableSetupFlat[$this->GetFieldProperty($fieldAlias,'tablename')];
@@ -1224,7 +1225,8 @@ abstract class uDataModule extends uBasicModule {
 			}
 			$this->sqlTableSetup = $newTable;
 
-			$this->AddField($this->GetPrimaryKey(),$this->GetPrimaryKey(),$alias);
+			$this->AddField($newTable['pk'],$newTable['pk'],$alias);
+			$this->AddFilter($newTable['pk'],ctEQ,itNONE);
 			$this->AddField('_module',"'".get_class($this)."'",$alias);
 			return;
 		} else {
