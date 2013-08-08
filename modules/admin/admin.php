@@ -45,7 +45,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	}
 	public function UpdateHtaccess() {
 		if ($_SERVER['HTTP_HOST'] == 'cli') return; // don't rewrite htaccess for CLI
-		$rc = PATH_REL_CORE;
+		$coreOnly = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE);
 		$ucStart = '## uCore ##';
 		$ucEnd	 = '##-uCore-##';
 		$content = <<<FIN
@@ -85,7 +85,8 @@ FileETag MTime Size
 	RewriteCond %{REQUEST_FILENAME} -f
 	RewriteRule .* - [L]
 	
-	RewriteRule .*	{$rc}index.php [NE,L,QSA]
+	RewriteCond %{REQUEST_URI}	/(\~.*/)?
+	RewriteRule .*	/%1{$coreOnly}index.php [NE,L,QSA]
 </IfModule>
 FIN;
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
