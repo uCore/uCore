@@ -5,7 +5,7 @@ Options -Indexes
 	SetEnv HTTP_MOD_REWRITE On
 
 	RewriteEngine on
-	RewriteRule \.svn|\.git - [F,L]
+	RewriteRule \.svn|\.git|\.cache - [F,L]
 	ErrorDocument 403 "Access Forbidden"
 
 	RewriteRule ^$ %{REQUEST_URI}index.php [R=301]
