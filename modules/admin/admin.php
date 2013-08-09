@@ -85,7 +85,7 @@ FileETag MTime Size
 	RewriteCond %{REQUEST_FILENAME} -f
 	RewriteRule .* - [L]
 	
-	RewriteCond %{REQUEST_URI}	/(\~.*/)?
+	RewriteCond %{REQUEST_URI}	/(\~.*?/)?
 	RewriteRule .*	/%1{$coreOnly}index.php [NE,L,QSA]
 </IfModule>
 FIN;
