@@ -90,7 +90,7 @@ $(document).on('click','.btn-del',function(event) {
 });
 
 $(document).on('click','label',function(e) {
-	if ($(e.originalEvent.srcElement).is(':input')) return false;
+	if ($(e.originalEvent.srcElement).is(':input')) e.stopPropagation()
 });
 
 $(document).on('click','a.uPaginationLink',function(){
