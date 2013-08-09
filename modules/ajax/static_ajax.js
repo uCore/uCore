@@ -89,10 +89,6 @@ $(document).on('click','.btn-del',function(event) {
 	return false;
 });
 
-$(document).on('click','label',function(e) {
-	if ($(e.originalEvent.srcElement).is(':input')) e.stopPropagation()
-});
-
 $(document).on('click','a.uPaginationLink',function(){
 	$(this).attr('href',$(this).attr('href').replace(/#.+$/,'')+window.location.hash);
 });
