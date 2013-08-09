@@ -203,13 +203,13 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public static $tableChecksum = NULL;
-	public static function checksumValid($class,$checksum,$refresh=false) {
+	public static function checksumValid($table,$checksum,$refresh=false) {
 		if ($refresh || self::$tableChecksum === NULL) {
 			$stm = database::query('SELECT * FROM `__table_checksum`');
 			self::$tableChecksum = $stm->fetchAll();
 		}
 		foreach (self::$tableChecksum as $row) {
-			if ($row['name'] == TABLE_PREFIX.$class) return $row['checksum'] === $checksum;
+			if (strcasecmp($row['name'],$table) === 0) return $row['checksum'] === $checksum;
 		}
 		return FALSE;
 	}
@@ -287,7 +287,7 @@ abstract class uTableDef implements iUtopiaModule {
 			$this->CreateTable();
 		} else {
 			// checksum
-			if (!$renamed && self::checksumValid(get_class($this),$checksum)) return;
+			if (!$renamed && self::checksumValid($this->tablename,$checksum)) return;
 
 			$stm = database::query('SHOW FULL COLUMNS FROM `'.$this->tablename.'`');
 			if ($stm) $fullColumns = $stm->fetchAll();
