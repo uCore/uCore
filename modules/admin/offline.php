@@ -30,6 +30,7 @@ class module_Offline extends uBasicModule {
 	}
 	public static function DashboardWidget() {
 		if (modOpts::GetOption('site_online')) return;
+		if (!uUserRoles::IsAdmin()) return;
 		
 		$modOptsObj =& utopia::GetInstance('modOptsList');
 		$row = $modOptsObj->LookupRecord('site_online');
