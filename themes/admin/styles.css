@@ -165,4 +165,6 @@ nav li {
 	
 	.widget-container { min-width: 100%; }
 /*	nav > ul {position: absolute; top: 0; left: 0; bottom: 0; }*/
+
+	.module-container.modOpts .layoutListSection td:first-child { width: 150px; }
 }
