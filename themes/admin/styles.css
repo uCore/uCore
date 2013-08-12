@@ -73,7 +73,6 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 .layoutListSection tbody tr:nth-child(even) { background:#f0f0f0; }
 .layoutListSection td { vertical-align:middle; }
 
-.layoutDetailSection td:first-child { width: 250px; }
 .module-container.modOpts .layoutListSection td:first-child { width: 250px; }
 
 th.sortable.sort-down:before { content:"\e824"; speak: none; font-size:18px; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; padding-right: 7px; }
@@ -86,7 +85,7 @@ input, select, textarea, .inputtype { margin: 0; padding:6px; border: 1px solid 
 .ui-combobox .ui-combobox-toggle:before { content:"\e824"; font-size:1.1em; color:#8cc63f; font-family: "ucore-symbols"; }
 
 
-.layoutDetailSection .inputtype { width:300px; }
+input, select, textarea, .inputtype { width:300px; }
 .layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; }
 
 .inputtype.inputtype-combo.ui-combobox {
@@ -128,7 +127,7 @@ nav li {
 /* medium screen */
 @media screen and (max-width: 1280px) {
 	body { font-size: 0.9em }
-	input, select, textarea, .inputtype { width:180px; }
+	input, select, textarea, .inputtype { width:100%; }
 	.layoutListSection td, .layoutDetailSection td, .layoutListSection th { padding: 5px 10px; }
 }
 
@@ -139,11 +138,9 @@ nav li {
 	nav li a { height:18px; }
 	
 	body { font-size: 0.8em }
-	input, select, textarea, .inputtype { width:120px; }
 	.layoutListSection td, .layoutDetailSection td, .layoutListSection th { padding: 5px 5px; }
 	
-	.layoutDetailSection td input, .layoutDetailSection td select, .layoutDetailSection td textarea, .layoutDetailSection td .inputtype { width:210px; }
-	.layoutDetailSection td { display: block; padding-top:2px; padding-bottom:2px; }
+	.layoutDetailSection td { display:block; padding-top:2px; padding-bottom:2px; }
 	.layoutDetailSection td.fld { padding-top: 5px; font-weight:bold; }
 }
 
@@ -161,8 +158,6 @@ nav li {
 	body.open nav ul { height: auto;}
 	.mobile { display:initial; }
 	.icon-menu { position:absolute; font-size:14px; top:0; right:-42px; width:42px; height:52px; line-height:52px; background:#323a45; color: #8cc63f; text-align:center; border-right:1px solid #8cc63f; }
-	
-	input, select, textarea, .inputtype { display:block; width:100%; }
 	
 	.widget-container { min-width: 100%; }
 /*	nav > ul {position: absolute; top: 0; left: 0; bottom: 0; }*/
