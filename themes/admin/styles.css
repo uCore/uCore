@@ -69,7 +69,7 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 }
 
 
-.layoutListSection td, .layoutDetailSection td, .layoutListSection th { line-height:18px; padding:5px 20px; overflow: hidden; text-overflow: ellipsis; }
+.layoutListSection td, .layoutDetailSection td, .layoutListSection th { line-height:1.2em; padding:5px 20px; overflow: hidden; text-overflow: ellipsis; }
 .layoutListSection tbody tr:nth-child(even) { background:#f0f0f0; }
 .layoutListSection td { vertical-align:middle; }
 
