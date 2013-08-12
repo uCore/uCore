@@ -32,7 +32,7 @@ nav ul ul { display:none; }
 nav a { line-height:18px; color:#9ea7b3; display:block; padding:17px 5px 17px 44px; margin-bottom:1px; background: white; }
 nav a:hover { background-color:#8cc63f; color:white; }
 nav li li a{ background-color:#efefef; }
-nav li.active-link > a { background-color:#8cc63f; color:white }
+nav li.active-link > a, nav li.active-link-parent > a { background-color:#8cc63f; color:white }
 nav li.active-link ul { display:block; }
 
 
