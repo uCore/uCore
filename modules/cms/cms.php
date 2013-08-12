@@ -89,7 +89,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$relational = $this->GetNestedArray();
 		echo '<div id="tree" class="module-content">';
 
-		$modOptsObj =& utopia::GetInstance('modOptsList');
+		$modOptsObj =& utopia::GetInstance('modOpts');
 		$row = $modOptsObj->LookupRecord('default_template');
 		echo 'Default Template: '.$modOptsObj->GetCell('value',$row);
 
