@@ -32,7 +32,7 @@ class module_Offline extends uBasicModule {
 		if (modOpts::GetOption('site_online')) return;
 		if (!uUserRoles::IsAdmin()) return;
 		
-		$modOptsObj =& utopia::GetInstance('modOptsList');
+		$modOptsObj =& utopia::GetInstance('modOpts');
 		$row = $modOptsObj->LookupRecord('site_online');
 		echo '<p>This website is currently offline. Go Online? '.$modOptsObj->GetCell('value',$row).'</p>';
 	}

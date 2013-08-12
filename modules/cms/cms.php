@@ -92,7 +92,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
 		echo '<div style="white-space:nowrap"><a class="btn" href="'.$newUrl.'">New Page</a>';
 
-		$modOptsObj =& utopia::GetInstance('modOptsList');
+		$modOptsObj =& utopia::GetInstance('modOpts');
 		$row = $modOptsObj->LookupRecord('default_template');
 		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row);
 
