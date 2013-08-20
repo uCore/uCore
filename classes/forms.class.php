@@ -2309,13 +2309,6 @@ abstract class uDataModule extends uBasicModule {
 		if (array_key_exists('class',$attributes)) $attributes['class'] .= ' uFilter';
 		else $attributes['class'] = 'uFilter';
 
-		if ($filterInfo['it'] == itDATE) {
-			if (!array_key_exists('style',$attributes)) $attributes['style'] = array();
-			if (is_array($attributes['style']) && !array_key_exists('width',$attributes['style'])) {
-				$attributes['style']['width'] = '8.5em';
-			}
-		}
-
 		$spanAttr = BuildAttrString($spanAttributes);
 
 		return '<span '.$spanAttr.'>'.$pre.utopia::DrawInput('_f_'.$filterInfo['uid'],$filterInfo['it'],$default,$vals,$attributes,false).'</span>';
