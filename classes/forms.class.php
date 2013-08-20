@@ -1994,9 +1994,9 @@ abstract class uDataModule extends uBasicModule {
 				$val = '('.join(',',$vals).')';
 				break;
 				// convert dates to mysql version for filter
-			case ($inputType==itDATE): $val = "(STR_TO_DATE(?, '".FORMAT_DATE."'))"; $args[] = $value; break;
-			case ($inputType==itTIME): $val = "(STR_TO_DATE(?, '".FORMAT_TIME."'))"; $args[] = $value; break;
-			case ($inputType==itDATETIME): $val = "(STR_TO_DATE(?, '".FORMAT_DATETIME."'))"; $args[] = $value; break;
+			case ($inputType==itDATE): $value = strftime(FORMAT_DATE,utopia::strtotime($value)); $val = "(STR_TO_DATE(?, '".FORMAT_DATE."'))"; $args[] = $value; break;
+			case ($inputType==itTIME): $value = strftime(FORMAT_TIME,utopia::strtotime($value)); $val = "(STR_TO_DATE(?, '".FORMAT_TIME."'))"; $args[] = $value; break;
+			case ($inputType==itDATETIME): $value = strftime(FORMAT_DATETIME,utopia::strtotime($value)); $val = "(STR_TO_DATE(?, '".FORMAT_DATETIME."'))"; $args[] = $value; break;
 			default:
 				$val = '?'; $args[] = $value;
 				break;

@@ -1256,6 +1256,14 @@ class utopia {
 	}
 	
 	// converters
+	static function strtotime($string) {
+		$parsed = strptime($string,FORMAT_TIME);
+		if ($parsed===FALSE) $parsed = strptime($string,FORMAT_DATE);
+		if ($parsed===FALSE) $parsed = strptime($string,FORMAT_DATETIME);
+		if ($parsed!==FALSE) $parsed = mktime($parsed['tm_hour'], $parsed['tm_min'], $parsed['tm_sec'], 1 , $parsed['tm_yday'] + 1, $parsed['tm_year'] + 1900); 
+		else $parsed = strtotime($string);
+		return $parsed;
+	}
 	static function convDate($originalValue,$pkVal,$processedVal) {
 		if (!$originalValue) return '';
 		$t = strtotime( $originalValue );

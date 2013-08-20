@@ -464,11 +464,7 @@ abstract class uTableDef implements iUtopiaModule {
 			case ftTIME:
 			case ftDATETIME:	// datetime
 			case ftTIMESTAMP:
-				$parsed = strptime($newValue,FORMAT_TIME);
-				if ($parsed===FALSE) $parsed = strptime($newValue,FORMAT_DATE);
-				if ($parsed===FALSE) $parsed = strptime($newValue,FORMAT_DATETIME);
-				if ($parsed!==FALSE) $parsed = mktime($parsed['tm_hour'], $parsed['tm_min'], $parsed['tm_sec'], 1 , $parsed['tm_yday'] + 1, $parsed['tm_year'] + 1900); 
-				else $parsed = strtotime($newValue);
+				$parsed = utopia::strtotime($newValue);
 				$newValue = $newValue == '' ? 'NULL' : date('Y-m-d H:i:s',$parsed); break;
 			case ftFLOAT:		// float
 			case ftDECIMAL:		$l=setlocale(LC_ALL,'en_US'); $newValue = floatval($newValue); setlocale(LC_ALL,$l); break;
