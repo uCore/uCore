@@ -828,6 +828,10 @@ abstract class uDataModule extends uBasicModule {
 		if ($this->fieldsSetup == TRUE) return;
 		$this->fieldsSetup = TRUE;
 
+		$fltr =& $this->AddFilter(array($this,'GetGlobalSearch'),ctCUSTOM,itTEXT,null,null,'Global Search');
+		$fltr['uid'] = $this->GetModuleId().'_global_search_';
+		$fltr['attributes']['class'] = 'uGlobalSearch';
+		
 		uEvents::TriggerEvent('BeforeSetupFields',$this);
 		$this->SetupFields();
 		$this->SetupUnionFields();
@@ -836,10 +840,6 @@ abstract class uDataModule extends uBasicModule {
 			$obj->_SetupFields();
 		}
 		uEvents::TriggerEvent('AfterSetupFields',$this);
-		
-		$fltr =& $this->AddFilter(array($this,'GetGlobalSearch'),ctCUSTOM,itTEXT,null,null,'Global Search');
-		$fltr['uid'] = $this->GetModuleId().'_global_search_';
-		$fltr['attributes']['class'] = 'uGlobalSearch';
 	}
 	public function GetStringFields() {	
 		$ignoreTypes = array(ftIMAGE,ftFILE);		
