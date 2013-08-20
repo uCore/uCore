@@ -452,9 +452,6 @@ class utopia {
 			case itDATE:
 				//$formattedVal = ($defaultValue === SQL_FORMAT_EMPTY_TIMESTAMP) || ($defaultValue === SQL_FORMAT_EMPTY_DATE) || ($defaultValue === NULL) || ($defaultValue === '') ? '' : $defaultValue;//date('d/m/Y',strptime($defaultValue,'d/m/Y'));
 				$formattedVal = $defaultValue;
-				if (!isset($attributes['class'])) $attributes['class'] = '';
-				$attributes['class'] .= " dPicker";
-				$attr = BuildAttrString($attributes);
 				$out .= "<input type=\"text\" $attr value=\"$formattedVal\"/>";
 				break;
 			case itSCAN:

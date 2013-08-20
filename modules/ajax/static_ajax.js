@@ -218,23 +218,6 @@ function UpdateSelectedLinks() {
 	});
 }
 
-utopia.Initialise.add(InitDatePickers);
-function InitDatePickers() {
-	$('.dPicker').each(function () {
-		if ($(this).attr('hasDatepicker') != undefined) return;
-		//var newFormatDate = FORMAT_DATE.replace('%d','dd').replace('%b','M').replace('%Y','yy');
-		$(this).datepicker({changeMonth: true, changeYear: true, yearRange:'-90:+20',attachTo:'body',dateFormat:FORMAT_DATE,speed: ''});//, autoPopUp: 'button', buttonImage: '/images/datepicker.gif', buttonImageOnly: true });
-	});
-	$.datepicker.formatDate = DatePickerFormatDate;
-	$.datepicker.parseDate = DatePickerParseDate;
-}
-function DatePickerParseDate (format, value, shortYearCutoff, dayNamesShort, dayNames, monthNamesShort, monthNames) {
-	return Date.fromSqlFormat(format, value);
-}
-function DatePickerFormatDate (format, date, dayNamesShort, dayNames, monthNamesShort, monthNames) {
-	return date.sqlFormat(format);
-}
-
 utopia.Initialise.add(InitAutocomplete);
 function InitAutocomplete() {
 	var cache = {};
