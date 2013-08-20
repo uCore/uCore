@@ -29,6 +29,10 @@ $(function(){
 	</nav>
 	<div id="content">
 		{utopia.content}
+		<div class="footer">
+			<div>Powered by <a href="http://ucorecms.org" target="_blank">uCore CMS</a>. Running <?php include(PATH_ABS_CORE.'version.txt'); ?>.</div>
+			<div><a href="https://github.com/oridan/utopia" target="_blank">GitHub</a> | <a href="https://www.facebook.com/uCoreCMS" target="_blank">Facebook</a></div>
+		</div>
 	</div>
 </div>
 

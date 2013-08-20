@@ -73,6 +73,9 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 .layoutListSection tbody tr:nth-child(even) { background:#f0f0f0; }
 .layoutListSection td { vertical-align:middle; }
 
+.footer { text-align: right; font-size: 12px; margin-top: 20px; margin-bottom:20px; }
+.footer a { color:#8cc63f }
+
 .module-container.modOpts .layoutListSection td:first-child { width: 250px; }
 
 th.sortable.sort-down:before { content:"\e824"; speak: none; font-size:18px; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; padding-right: 7px; }
