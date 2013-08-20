@@ -2920,11 +2920,9 @@ abstract class uListDataModule extends uDataModule {
 		if (!$dataset) $dataset = $this->GetDataset();
 		$dataset->GetPage($page,$limit);
 		$num_rows = $dataset->CountRecords();
-		//if (!$tabTitle) $tabTitle = $this->GetTitle();
-		//if (!$tabOrder) $tabOrder = $this->GetSortOrder();
 
 		uEvents::TriggerEvent('OnShowDataList',$this);
-		//		LoadChildren(get_class($this));
+		
 		// first draw header for list
 		//		$fl = (flag_is_set($this->GetOptions(),ALLOW_FILTER)) ? ' filterable' : '';
 		if (!isset($GLOBALS['inlineListCount'])) $GLOBALS['inlineListCount'] = 0;
@@ -2987,7 +2985,7 @@ abstract class uListDataModule extends uDataModule {
 
 			// start of FIELD headers
 			$colcount = 0;
-			echo '<tr>';
+			echo '<tr class="field-headers">';
 			if ($this->flag_is_set(ALLOW_DELETE)) { echo '<th"></th>'; $colcount++; }
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
@@ -3003,7 +3001,7 @@ abstract class uListDataModule extends uDataModule {
 						break;
 					}
 				}
-				echo '<th class="sortable'.$icon.'" rel="'.$fieldName.'|'.$this->GetModuleId().'">';
+				echo '<th class="field-'.$fieldName.' sortable'.$icon.'" data-field="'.$fieldName.'" data-mid="'.$this->GetModuleId().'">';
 
 				// title
 				echo nl2br($fieldData['visiblename']);
@@ -3149,7 +3147,7 @@ abstract class uListDataModule extends uDataModule {
 			$foot .= '</tr>';
 		}
 
-		if (!empty($total)) {
+		if (!empty($total) && $this->flag_is_set(SHOW_TOTALS)) {
 			$foot .= '<tr>';
 			if ($this->flag_is_set(ALLOW_DELETE)) $foot .= "<td class=\"totals-ident\"></td>";
 			foreach ($this->fields as $fieldName => $fieldData) {
@@ -3157,7 +3155,7 @@ abstract class uListDataModule extends uDataModule {
 				$classes=array();
 				//if (array_key_exists($fieldName,$this->firsts)) $classes[] = 'sectionFirst';
 				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
-				if ($this->flag_is_set(SHOW_TOTALS) && array_key_exists($fieldName,$total)) {
+				if (array_key_exists($fieldName,$total)) {
 					$foot .= "<td$class><b>";
 					if ($totalShown[$fieldName] != $total[$fieldName])
 					$foot .= htmlentities($this->PreProcess($fieldName,$totalShown[$fieldName])).'(shown)<br/>';
