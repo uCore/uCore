@@ -111,13 +111,10 @@ $(document).ready(function(){
 	});
 	
 	$(document).on('click','th.sortable',function (e) {
-		var fieldname = $(this).attr('rel');
-		if (!fieldname) return;
+		var fieldname = $(this).attr('data-field');
+		var mID = $(this).attr('data-mid');
+		if (!fieldname || !mID) return;
 
-		var arr = fieldname.split('|');
-
-		var fieldname = arr[0];
-		var mID = arr[1];
 		var fullCurrent = gup('_s_' + mID);
 		var currentSort = '';
 

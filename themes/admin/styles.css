@@ -57,9 +57,8 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 .module-container .linklist { position:absolute; top:0; right:40px; line-height:52px; }
 .module-container .linklist li { margin-left:20px; }
 .module-container .linklist a { color:#ff5900; }
-.module-content { background:white; padding: 20px; margin-bottom: 20px; }
+.module-content { background:#f9f9f9; padding: 20px; margin-bottom: 20px; }
 .module-content table, table.module-content { width: 100%; border-spacing: 0;  }
-
 
 .widget-container { display: inline-block; zoom: 1; *display: inline; overflow:hidden;  vertical-align:top; 
 	min-width: 240px;
@@ -69,9 +68,12 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 }
 
 
-.layoutListSection td, .layoutDetailSection td, .layoutListSection th { line-height:1.2em; padding:5px 20px; overflow: hidden; text-overflow: ellipsis; }
+.layoutListSection.module-content { padding:0; }
+.layoutListSection td, .layoutDetailSection td, .layoutListSection th { line-height:1.2em; padding:5px 20px; overflow: hidden; text-overflow: ellipsis; height:42px; }
 .layoutListSection tbody tr:nth-child(even) { background:#f0f0f0; }
 .layoutListSection td { vertical-align:middle; }
+.layoutListSection thead tr { background:#d0d6dd; }
+.layoutListSection tr.field-headers { background:#f0f0f0; }
 
 .footer { text-align: right; font-size: 12px; margin-top: 20px; margin-bottom:20px; }
 .footer a { color:#8cc63f }
@@ -82,13 +84,11 @@ th.sortable.sort-down:before { content:"\e824"; speak: none; font-size:18px; fon
 th.sortable.sort-up:before { content:"\e825"; speak: none; font-size:18px; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; padding-right: 7px; }
 
 
-input, select, textarea, .inputtype { margin: 0; padding:6px; border: 1px solid #aaa; background:white; color:#362B36; width:210px; height:35px; line-height:21px; font-size:16px; font-family:Lato; box-sizing:border-box; }
-
 .ui-combobox .ui-combobox-toggle { border-left: 1px solid #aaa; }
 .ui-combobox .ui-combobox-toggle:before { content:"\e824"; font-size:1.1em; color:#8cc63f; font-family: "ucore-symbols"; }
 
 
-input, select, textarea, .inputtype { width:300px; }
+input, select, textarea, .inputtype { margin: 0; padding:6px; border: 1px solid #5e6d81; background:white; color:#362B36; width:300px; height:35px; line-height:21px; font-size:16px; font-family:Lato; box-sizing:border-box; }
 .layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; }
 
 .inputtype.inputtype-combo.ui-combobox {
