@@ -15,7 +15,7 @@ h2 { background:white; color: #8cc63f; font-size: 16px; margin:0; padding: 0 40p
 #content { margin-left:20px; margin-right: 20px; display:block; overflow: hidden; }
 
 
-a { color: #333; text-decoration:none }
+a { color: #5e6d81; text-decoration:none }
 a:hover { color: #8CC63F }
 a.ui-state-hover:hover { color: #333; }
 
@@ -67,6 +67,11 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 	box-sizing: border-box;
 }
 
+ul.pagination { font-size:1.1em; margin:0; }
+ul.pagination li { line-height: 16px; padding: 3px 5px; }
+ul.pagination li.previous a:before { content:"\e826"; speak: none; font-size:1.4em; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; vertical-align: -0.12em; margin-right: 5px; }
+ul.pagination li.next a:after { content:"\e827"; speak: none; font-size:1.4em; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; vertical-align: -0.12em; margin-left: 5px; }
+
 
 .layoutListSection.module-content { padding:0; }
 .layoutListSection td, .layoutDetailSection td, .layoutListSection th { line-height:1.2em; padding:5px 20px; overflow: hidden; text-overflow: ellipsis; height:42px; }
@@ -95,7 +100,14 @@ input, select, textarea, .inputtype { margin: 0; padding:6px; border: 1px solid 
 	border: 1px solid #aaa; background:white; color:#362B36;
 }
 
-td.uFilters .inputtype { width:auto }
+.module-content td.uFilters { padding:0; height:auto; }
+td.uFilters:before {  content:"\e81f"; speak: none; font-size:24px; font-family:ucore-symbols; font-weight:normal; background:#ff5900; color:white; padding:16px;}
+td.uFilters .inputtype { min-width:8.5em; width:8.5em; padding:15px; height:52px; border:0; border-right: 1px solid #d0d6dd; background:#dee3e9; color:#5e6d81 }
+td.uFilters .utopia-placeholder { color:#5e6d81 }
+td.uFilters ::-webkit-input-placeholder { /* WebKit browsers */ color: #5e6d81; }
+td.uFilters :-moz-placeholder { /* Mozilla Firefox 4 to 18 */ color: #5e6d81; }
+td.uFilters ::-moz-placeholder { /* Mozilla Firefox 19+ */ color: #5e6d81; }
+td.uFilters :-ms-input-placeholder { /* Internet Explorer 10+ */ color: #5e6d81; }
 
 .new-item { visibility:hidden; display:inline-block; zoom: 1; *display: inline; width:1em; height:1em; line-height:normal; }
 .new-item:before { content:"\e816"; speak: none; font-size:inherit; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; visibility:visible; }
