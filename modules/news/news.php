@@ -200,6 +200,7 @@ class module_NewsRSS extends uDataModule {
 			if ($row['author_email']) self::appendData($xml,$author,$row['author_email'],'email');
 		}
 		
+		header('Access-Control-Allow-Origin: *');
 		header('Content-Type: application/atom+xml',true);
 		echo $xml->saveXML();
 	}
