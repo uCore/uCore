@@ -2906,7 +2906,6 @@ abstract class uListDataModule extends uDataModule {
 		echo '<h1>'.$this->GetTitle().'</h1>';
 		echo '{list.'.get_class($this).'}';
 		
-		//	echo "showdata ".get_class($this)."\n";
 		array_sort_subkey($this->fields,'order');
 
 		$this->GetLimit($limit,$page);
@@ -2917,28 +2916,13 @@ abstract class uListDataModule extends uDataModule {
 		uEvents::TriggerEvent('OnShowDataList',$this);
 		
 		// first draw header for list
-		//		$fl = (flag_is_set($this->GetOptions(),ALLOW_FILTER)) ? ' filterable' : '';
 		if (!isset($GLOBALS['inlineListCount'])) $GLOBALS['inlineListCount'] = 0;
 		else $GLOBALS['inlineListCount']++;
 
-		//$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
-
-		//$layoutID = utopia::tab_ //$tabGroupName.'-'.get_class($this)."_list_".$GLOBALS['inlineListCount'];
-		//$metadataTitle = ' {tabTitle:\''.$tabTitle.'\', tabPosition:\''.$this->GetSortOrder().'\'}';
-		//echo "<div id=\"$layoutID\" class=\"draggable$metadataTitle\">";
 		ob_start();
 		if (!$this->isAjax) echo '<form class="uf" action="" onsubmit="this.action = window.location" method="post"><input type="hidden" name="__ajax" value="updateField">';
 		echo "<table class=\"".get_class($this)." layoutListSection module-content\">";
 
-		/*		echo "<colgroup>";
-		 // need first 'empty' column for buttons?
-		 if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) { echo "<col></col>"; }
-		 foreach ($this->fields as $fieldName => $fieldData) {
-			if ($fieldData['visiblename'] === NULL) continue;
-			$attr = $this->GetFieldType($fieldName) == ftCURRENCY ? ' align="char" char="."' : '';
-			echo "<col$attr></col>";
-			}
-			echo "</colgroup>\n";   */
 		$sectionFieldTitles = array();
 		// TODO: pagination for list record display
 		if (!$this->flag_is_set(LIST_HIDE_HEADER)) {
@@ -2958,7 +2942,7 @@ abstract class uListDataModule extends uDataModule {
 					if ($fieldData['visiblename'] === NULL) continue;
 					if ($sectionID === NULL) $sectionID = $fieldData['layoutsection'];
 
-					if ($fieldData['layoutsection'] !== $sectionID) {// || $fieldName == $lastFieldName) {
+					if ($fieldData['layoutsection'] !== $sectionID) {
 						// write the section, and reset the count
 						$sectionName = $this->layoutSections[$sectionID]['title'];
 						$secClass = empty($sectionName) ? '' : ' sectionHeader';
@@ -2967,7 +2951,6 @@ abstract class uListDataModule extends uDataModule {
 						$sectionID = $fieldData['layoutsection'];
 					}
 					$sectionFieldTitles[$sectionID] = array_key_exists($sectionID,$sectionFieldTitles) ? $sectionFieldTitles[$sectionID] : !empty($fieldData['visiblename']);
-					//if ($sectionCount == 0 && $sectionID > 0) $this->firsts[$fieldName] = true;
 					$sectionCount++;
 				}
 				$sectionName = $this->layoutSections[$sectionID]['title'];
@@ -3023,8 +3006,6 @@ abstract class uListDataModule extends uDataModule {
 			
 			if ($this->flag_is_set(ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
 				echo '<tr class="noprint"><td class="uFilters" colspan="'.$colcount.'">';
-			//	$v = isset($_GET['_g_'.$this->GetModuleId()]) ? $_GET['_g_'.$this->GetModuleId()] : '';
-			//	echo utopia::DrawInput('_g_'.$this->GetModuleId(),itTEXT,$v,null,array('class'=>'uFilter'));
 				
 				// other filters
 				foreach ($this->filters as $fType) {
@@ -3044,27 +3025,6 @@ abstract class uListDataModule extends uDataModule {
 			echo "</thead>\n";
 		}
 
-		//		if ($this->hasEditableFilters === true)
-		//			echo "</form>";
-		/*
-		 // is filterable?
-		 if (flag_is_set($this->GetOptions(),ALLOW_FILTER) && $this->hasEditableFilters === true) {
-			echo "<thead><form method=get><input type=hidden name='uuid' value='".$this->GetUUID()."'>"; // must have UUID for filters
-			echo "<th><input type=button onclick='rf(this)' value='F'></th>";
-			//if (flag_is_set($this->GetOptions(),ALLOW_DELETE)) echo "<th></th>";
-			$col = 1;
-			foreach ($this->fields as $fieldName => $fieldData) {
-			if (empty($fieldData['visiblename'])) continue;
-			$class = 'filter-HVAL-'.$col;
-			echo "<th class='filterheader' nowrap='nowrap'>";// class='$class'>";
-			if (flag_is_set($fieldData['options'],ALLOW_FILTER))
-			echo $this->GetFilterBox($fieldName,$col);
-			echo "</th>";
-			$col++;
-			}
-			echo "</form></thead>\n";
-			}
-			*/
 		// now display data rows
 		// process POST filters
 		$total = array();
@@ -3073,18 +3033,11 @@ abstract class uListDataModule extends uDataModule {
 		timer_start('display rows');
 
 		$gUrl = '';
-		//		$gUrl = $this->GetTargetUrl('*');
-		//		if (!empty($gUrl))
-		//			$gUrl = " l_url='$gUrl'";
 
 		$body = "<tbody$gUrl>";
 		if ($num_rows == 0) {
 		} else {
-			//			if ($result != FALSE && mysql_num_rows($result) > 200)
-			//				echo "<tr><td colspan=\"$colcount\">There are more than 200 rows. Please use the filters to narrow your results.</td></tr>";
 			$i = 0;
-			//$rows = $dataset->GetPage($page,$limit);
-			//foreach ($rows as $row) {
 			while (($row = $dataset->fetch())) {
 				$i++;
 				// move totals here
@@ -3096,7 +3049,6 @@ abstract class uListDataModule extends uDataModule {
 						case ftPERCENT:
 							if (!array_key_exists($fieldName,$total)) $total[$fieldName] = 0;
 							if (!array_key_exists($fieldName,$totalShown)) $totalShown[$fieldName] = 0;
-							//$pkVal = $row[$this->GetPrimaryKey()];
 							$preProcessValue = floatval(preg_replace('/[^0-9\.-]/','',$this->PreProcess($fieldName,$row[$fieldName],$row)));
 							if ($i <= 150) $totalShown[$fieldName] += $preProcessValue;
 							$total[$fieldName] += $preProcessValue;
@@ -3124,18 +3076,10 @@ abstract class uListDataModule extends uDataModule {
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$classes=array();
-				//if (array_key_exists($fieldName,$this->firsts)) $classes[] = 'sectionFirst';
 				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
-				//$this->PreProcess($fieldName,'');
-				//$enc_name = $this->GetEncodedFieldName($fieldName);
 				if ($this->flag_is_set(ALLOW_ADD,$fieldName))
 					$foot .= "<td$class>".$this->GetCell($fieldName, NULL).'</td>';
-				//if (array_key_exists('inputtype',$fieldData) && $fieldData['inputtype'] !== itNONE && flag_is_set($fieldData['options'],ALLOW_ADD)) {
-				//	$foot .= "<td$class>".$this->GetCell($fieldName, NULL).'</td>';
-					//$foot .= "<td$class><div id=\"$enc_name\">".$this->DrawSqlInput($fieldName).'</td>';
-				//} else
 				// TODO: Default value not showing on new records (list)
-				//$foot .= "<td$class><div id=\"$enc_name\">".$this->GetLookupValue($fieldName,$this->GetDefaultValue($fieldName)).'</td>';
 			}
 			$foot .= '</tr>';
 		}
@@ -3146,7 +3090,6 @@ abstract class uListDataModule extends uDataModule {
 			foreach ($this->fields as $fieldName => $fieldData) {
 				if ($fieldData['visiblename'] === NULL) continue;
 				$classes=array();
-				//if (array_key_exists($fieldName,$this->firsts)) $classes[] = 'sectionFirst';
 				$class = count($classes) > 0 ? ' class="'.join(' ',$classes).'"' : '';
 				if (array_key_exists($fieldName,$total)) {
 					$foot .= "<td$class><b>";
