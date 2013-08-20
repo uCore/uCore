@@ -2985,25 +2985,9 @@ abstract class uListDataModule extends uDataModule {
 			}
 			echo '</tr>'; // close column headers
 
-			$c = ob_get_contents();
+			$header_output = ob_get_contents();
 			ob_end_clean();
-			
-			$pagination = '';
-			if ($limit) {
-				$pages = max(ceil($num_rows / $limit),1);
-				ob_start();
-					utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
-					$pagination = ob_get_contents();
-				ob_end_clean();
-			}
-			
-			$pager = $num_rows > 100 ? '<span class="pager" style="float:right;"></span>' : '';
-			$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
-			$pager = '<div class="pagination right">'.$pagination.' '.utopia::DrawInput('_l_'.$this->GetModuleId(),itCOMBO,$limit,array(25=>'25 per page',50=>'50 per page',150=>'150 per page',0=>'Show All'),array('class'=>'uFilter uLimit')).'</div>';
-			if (!$this->flag_is_set(LIST_HIDE_STATUS)) {
-				echo '<tr class="noprint"><td colspan="'.$colcount.'"><span class="record-count">'.$records.'</span>'.$pager.'</td></tr>';
-			}
-			
+		
 			if ($this->flag_is_set(ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
 				echo '<tr class="noprint"><td class="uFilters" colspan="'.$colcount.'">';
 				
@@ -3020,7 +3004,7 @@ abstract class uListDataModule extends uDataModule {
 				echo '</td></tr>';
 			}
 
-			if ($num_rows > 0 || $this->flag_is_set(ALLOW_ADD) || $this->hasEditableFilters === true) echo $c;
+			if ($num_rows > 0 || $this->flag_is_set(ALLOW_ADD) || $this->hasEditableFilters === true) echo $header_output;
 
 			echo "</thead>\n";
 		}
@@ -3110,12 +3094,19 @@ abstract class uListDataModule extends uDataModule {
 		echo "</table>";//"</div>";
 		if (!$this->isAjax) echo '</form>';
 
+		if ($limit) {
+			$pages = max(ceil($num_rows / $limit),1);
+			ob_start();
+			utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
+			$pagination = ob_get_contents();
+			ob_end_clean();
+			if ($pagination) echo '<div class="pagination right module-content">'.$pagination.'</div>';
+		}
+		
 		$cont = ob_get_contents();
 		ob_end_clean();
 
 		echo $cont;
-	//	utopia::Tab_Add($tabTitle,$cont,$this->GetModuleId(),$tabGroupName,false,$tabOrder);
-	//	utopia::Tab_InitDraw($tabGroupName);
 	}
 
 	function DrawRow($row) {
