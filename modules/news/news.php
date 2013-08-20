@@ -167,6 +167,7 @@ class module_NewsRSS extends uDataModule {
 		$feed = $xml->createElement('feed');
 		//$feed->setAttribute('version','2.0');
 		$feed->setAttribute('xmlns','http://www.w3.org/2005/Atom');
+		$feed->setAttribute('xmlns:media','http://search.yahoo.com/mrss/');
 		$xml->appendChild($feed);
 		
 		$self = str_replace(' ','%20',htmlspecialchars($dom.$_SERVER['REQUEST_URI']));
@@ -193,6 +194,14 @@ class module_NewsRSS extends uDataModule {
 			$node = $xml->createElement('link'); $node->setAttribute('href',$url); $entry->appendChild($node);
 			self::appendData($xml,$entry,date(DATE_ATOM,strtotime($row['time'])),'updated');
 			self::appendData($xml,$entry,$summary,'summary');
+			
+			if ($row['image']) {
+				$node = $xml->createElement('media:thumbnail');
+				$node->setAttribute('width','150');
+				$node->setAttribute('height','150');
+				$node->setAttribute('url',$dom.uBlob::GetLink(get_class($this),'image',$row['news_id']).'?w=150&h=150');
+				$entry->appendChild($node);
+			}
 			
 			$author = $xml->createElement('author'); $entry->appendChild($author);
 			$authorname = $row['author_name'] ? $row['author_name'] : 'Unknown';
