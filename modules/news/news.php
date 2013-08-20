@@ -156,52 +156,63 @@ class module_NewsRSS extends uDataModule {
 	}
 	public function RunModule() {
 		utopia::CancelTemplate();
-		$dom = utopia::GetDomainName();
 		$siteName = modOpts::GetOption('site_name');
+		$schema = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] != 'off') ? 'https' : 'http';
+		$dom = $schema.'://'.utopia::GetDomainName();
 
-		$items = '';
+
+		$xml = new DOMDocument('1.0');
+		$xml->encoding = 'UTF-8';
+		$xml->formatOutput = true;
+		$feed = $xml->createElement('feed');
+		//$feed->setAttribute('version','2.0');
+		$feed->setAttribute('xmlns','http://www.w3.org/2005/Atom');
+		$xml->appendChild($feed);
+		
+		$self = str_replace(' ','%20',htmlspecialchars($dom.$_SERVER['REQUEST_URI']));
+		
+		$node = $xml->createElement('title',$siteName.' - Atom Feed'); $feed->appendChild($node);
+		$node = $xml->createElement('subtitle',$siteName.' - Atom Feed'); $feed->appendChild($node);
+		$node = $xml->createElement('id',$self); $feed->appendChild($node);
+		$node = $xml->createElement('link'); $node->setAttribute('href',$self); $node->setAttribute('rel','self'); $feed->appendChild($node);
+		$node = $xml->createElement('link'); $node->setAttribute('href',$dom.PATH_REL_ROOT); $feed->appendChild($node);
+		$updated = $xml->createElement('updated'); $updated->nodeValue = date(DATE_ATOM); $feed->appendChild($updated);
+
 		$obj = utopia::GetInstance('module_NewsDisplay');
-		$pubDate = null;
 		$dataset = $obj->GetDataset();
 		while (($row = $dataset->fetch())) {
-			$link = htmlentities('http://'.$dom.$obj->GetURL(array('news_id'=>$row['news_id'])));
-			$img = '';
-			if ($row['image']) $img = "\n".'  <media:thumbnail width="150" height="150" url="'.htmlentities('http://'.$dom.uBlob::GetLink(get_class($this),'image',$row['news_id']).'?w=150&h=150').'"/>';
-			$updated = date(DATE_ATOM,strtotime($row['time']));
-			if (!$pubDate || (strtotime($row['time']) > $pubDate)) $pubDate = strtotime($row['time']);
+			$summary = trim($obj->PreProcess('description',$row['description'],$row));
+			if (!$summary) continue;
+		
+			$url = $dom.$obj->GetURL(array('news_id'=>$row['news_id']),true);
 			
-			$content = $row['text'];
-			while (utopia::MergeVars($content));
-			$content = html_entity_decode(strip_tags($content),ENT_COMPAT,'UTF-8');
-			$summ = html_entity_decode(strip_tags($obj->PreProcess('description',$row['description'],$row)),ENT_COMPAT,'UTF-8');
+			$entry = $xml->createElement('entry'); $feed->appendChild($entry);
 			
-			$items .= <<<FIN
- <entry>
-  <author><name>{$row['author_name']}</name><email>{$row['author_email']}</email></author>
-  <title>{$row['heading']}</title>
-  <summary>{$summ}</summary>
-  <content>{$content}</content>
-  <link href="{$link}"/>
-  <id>{$link}</id>
-  <updated>{$updated}</updated>{$img}
- </entry>
-FIN;
+			self::appendData($xml,$entry,$row['heading'],'title');
+			self::appendData($xml,$entry,$url,'id');
+			$node = $xml->createElement('link'); $node->setAttribute('href',$url); $entry->appendChild($node);
+			self::appendData($xml,$entry,date(DATE_ATOM,strtotime($row['time'])),'updated');
+			self::appendData($xml,$entry,$summary,'summary');
+			
+			$author = $xml->createElement('author'); $entry->appendChild($author);
+			$authorname = $row['author_name'] ? $row['author_name'] : 'Unknown';
+			self::appendData($xml,$author,$authorname,'name');
+			if ($row['author_email']) self::appendData($xml,$author,$row['author_email'],'email');
 		}
-		$pubDate = date(DATE_ATOM,$pubDate);
-
+		
 		header('Content-Type: application/atom+xml',true);
-		header('Access-Control-Allow-Origin: *');
-		$self = htmlentities('http://'.$dom.$_SERVER['REQUEST_URI']);
-		echo <<<FIN
-<feed xmlns="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/">
- <link href="{$self}" rel="self" type="application/atom+xml" />
- <link href="http://{$dom}" />
- <title>{$siteName} News Feed</title>
- <id>{$self}</id>
- <updated>{$pubDate}</updated>
-{$items}
-</feed>
-FIN;
+		echo $xml->saveXML();
+	}
+	public static function appendData(&$xml,&$target,$data,$tag=null) {
+		$originalTarget = $target;
+		$node = null;
+		if (is_string($tag)) {
+			$node = $target->appendChild($xml->createElement($tag));
+			$target = $node;
+		}
+		$target->appendChild($xml->createCDATASection($data));
+		$target = $originalTarget;
+		return $node;
 	}
 }
 
