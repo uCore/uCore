@@ -38,47 +38,6 @@ function LoadModulesDir($indir, $recursive = TRUE) {
 	return $files;
 }
 
-function parseSqlTableSetupChildren($parent,&$qryString) {
-	$paraCount = 0;
-	if (!is_array($parent)) return 0;
-	if (!array_key_exists('children',$parent)) return 0;
-	//	$parent['children'] = array_reverse($parent['children']);
-	foreach ($parent['children'] as $child) {
-		$qryString.="\n {$child['joinType']} {$child['table']} AS {$child['alias']} ON ";
-		$joins = array();
-		foreach ($child['joins'] as $fromField => $toField) {
-			$ct = '=';
-			$fromFull = ($fromField[0] == "'" || $fromField[0] == '"' || stristr($fromField,'.') !== FALSE) ? $fromField : $parent['alias'].'.'.$fromField;//$child['alias'].'.'.$toField;
-			if (is_array($toField)) { // can process compare type also
-				$ct = $toField[0];
-				$toField = $toField[1];
-				$toFull = $toField;
-			} else
-			$toFull = ($toField[0] == "'" || $toField[0] == '"' || stristr($toField,'.') !== FALSE)? $toField : $child['alias'].'.'.$toField;
-			$joins[] = "$fromFull $ct $toFull";
-		}
-		$qryString.=join(' AND ',$joins);
-		$paraCount++;
-		$paraCount = $paraCount + parseSqlTableSetupChildren($child,$qryString);
-	}
-	return $paraCount;
-}
-
-function &recurseSqlSetupSearch(&$searchin,$searchfor) {
-	// is the current table?
-	if ($searchin['alias'] == $searchfor) { return $searchin; }
-
-	// if not, does it have children?
-	if (!empty($searchin['children'])) {
-		for ($i = 0, $maxCount = count($searchin['children']); $i < $maxCount; $i++) {
-			// check those children
-			if ($tbl =& recurseSqlSetupSearch($searchin['children'][$i],$searchfor)) return $tbl;
-		}
-	}
-	$false = FALSE;
-	return $false;
-}
-
 function retTrue() { return true; }
 function &ref_call_user_func_array($callable, $args)
 {
