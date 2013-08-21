@@ -5,6 +5,9 @@ timer_start('Load Files');
 LoadFiles();
 timer_end('Load Files');
 
+/**
+ * Strip slashes from http inputs if magic quotes is enabled
+ */
 if ($_POST && get_magic_quotes_gpc()) $_POST = utopia::stripslashes_deep($_POST);
 if ($_GET && get_magic_quotes_gpc()) $_GET = utopia::stripslashes_deep($_GET);
 if ($_REQUEST && get_magic_quotes_gpc()) $_REQUEST = utopia::stripslashes_deep($_REQUEST);

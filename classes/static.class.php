@@ -107,7 +107,7 @@ class utopia {
 	static function AddCSSFile($path,$start = false) {
 		uCSS::LinkFile($path,$start?-1:null);
 	}
-	/*
+	/**
 	 * Link a javascript file to the document
 	 *
 	 * @deprecated

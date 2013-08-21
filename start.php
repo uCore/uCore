@@ -1,10 +1,23 @@
 <?php
+
+/**
+ * Initialise global timer
+ */
 global $ucore_start_time;
 $ucore_start_time = microtime(true);
 
+/**
+ * shutdownErrorHandler is a shutdown function which disables the fatal error reporting outside of script runtime
+ */
 function shutdownErrorHandler() { error_reporting(0); }
 register_shutdown_function('shutdownErrorHandler');
 
+/**
+ * When running as Command Line Interface, for example crons, initialise some required server variables
+ * CLI execution is useful for bypassing the http server.
+ * Usage: php <path_to_core_index> <request_uri>
+ * Example: php uCore/index.php /
+ */
 if (PHP_SAPI == "cli") {
 	$_SERVER['HTTP_HOST'] = 'cli';
 	if (isset($argv[1])) $_SERVER['REQUEST_URI'] = $argv[1];
@@ -17,11 +30,16 @@ if (PHP_SAPI == "cli") {
 	parse_str($q,$_GET);
 }
 
-//--  Charset
+/**
+ * Initialise Character set to UTF8
+ */
 define('CHARSET_ENCODING'        , 'utf-8');
 define('SQL_CHARSET_ENCODING'    , 'utf8');
 define('SQL_COLLATION'           , 'utf8_general_ci');
 
+/**
+ * start GZIP if enabled on the server to compress output
+ */
 if (!ini_get('output_buffering')) ob_start();
 $enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
 define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
@@ -35,6 +53,22 @@ function fix_path($path,$slash = '') {
 	return str_replace($slash.$slash,$slash,$path);
 }
 
+/**
+ * Define constants for directory structure:
+ * PATH_ABS_CORE: absolute (server) path to core folder
+ * PATH_ABS_ROOT: absolute (server) path to document root
+ * PATH_ABS_SELF: absolute (server) path to called script
+ * PATH_REL_CORE: path to core folder relative to document root
+ * PATH_REL_ROOT: path to document relative to document root (including /~UserDir/)
+ * PATH_REL_SELF: path to called script relative to document root
+ * DEFAULT_FILE: relative path to core index.php
+ * PATH_ABS_CONFIG: absolute path to configuration file
+ * PATH_ABS_MODULES: absolute path to uModules folder
+ * PATH_ABS_TEMPLATES: absolute path to uTemplates folder (DEPRECIATED)
+ * PATH_ABS_THEMES: absolute path to uThemes folder
+ * PATH_FULL_ROOT: full URL to root including domain and schema
+ * PATH_FULL_CORE: full URL to core including domain and schema
+ */
 define('PATH_ABS_CORE',fix_path(dirname(__FILE__).DIRECTORY_SEPARATOR));
 define('PATH_ABS_ROOT',fix_path(realpath(PATH_ABS_CORE.'..').DIRECTORY_SEPARATOR));
 define('PATH_ABS_SELF',fix_path(realpath($_SERVER['PHP_SELF'])));
@@ -61,6 +95,10 @@ define('PATH_FULL_CORE',((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off
 
 define('MAX_ORDER',99999999);
 
+
+/**
+ * Initialise session
+ */
 ini_set('session.cookie_path',PATH_REL_ROOT);
 session_cache_limiter(false);
 session_name('ucore');
@@ -77,13 +115,23 @@ if (time() - $_SESSION['CREATED'] > 1800) { // session started more than 30 mina
 }
 $_SESSION['LAST_ACTIVITY'] = time();
 
+/**
+ * Initialise error handling
+ */
 include('error.php');
 
-// glob and load all functs files
+/**
+ * Glob and load all interfaces and functs scripts
+ */
 foreach (glob(PATH_ABS_CORE.'interfaces/*.php') as $fn) include($fn);
-
-// glob and load all functs files
 foreach (glob(PATH_ABS_CORE.'functs/*.php') as $fn) include($fn);
 
+/**
+ * Initialise the core configuration
+ */
 require(PATH_ABS_CORE.'setup.php');
+
+/**
+ * Run initialisation code
+ */
 require(PATH_ABS_CORE.'initialise.php'); // init

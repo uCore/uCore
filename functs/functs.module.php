@@ -1,19 +1,28 @@
 <?php
 
-function GetFiles($refresh = false) {
-  $files = array();
-    $files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'classes/')); // load base classes
-    $files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'modules/')); // load internal modules
-    $files = array_merge($files,LoadModulesDir(PATH_ABS_MODULES)); // load custom modules
-
-  return $files;
-}
+/**
+ * LoadFiles: includes all PHP files within the core and the uModules path
+ * @see LoadModulesDir
+ */
 function LoadFiles() {
-  $files = GetFiles();
-  if (!$files) return;
-  foreach ($files as $file) include($file);
+	$files = array();
+	$files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'classes/')); // load base classes
+	$files = array_merge($files,LoadModulesDir(PATH_ABS_CORE.'modules/')); // load internal modules
+	$files = array_merge($files,LoadModulesDir(PATH_ABS_MODULES)); // load custom modules
+	if (!$files) return;
+	foreach ($files as $file) include($file);
 }
 
+/**
+ * LoadModulesDir: finds php files to include, meeting specified critera.
+ * If current folder contains a file named '.u_noscan'. The current folder is skipped.
+ * If current folder contains a file named '.u_noscandeep'. No recursion is performed beneath the current folder.
+ * Skips subversion and git hidden folders.
+ *
+ * @param string $indir path of folder to search
+ * @param bool $recursive recurse into subdirectories
+ * @return array of absolute paths to php files within $indir folder
+ */
 function LoadModulesDir($indir, $recursive = TRUE) {
 	if (!is_dir($indir)) return array();
 	if (glob($indir.'.u_noscan')) return array();

@@ -1,5 +1,11 @@
 <?php
-abstract class sqlSchema extends PDO {
+
+/**
+ * sqlSchema provides easy access to calling functions and queries using PDO across various engines.
+ * Supports parameters by reference
+ */
+
+ abstract class sqlSchema extends PDO {
 	protected $servername	= '';
 	protected $port			= 3306;
 	protected $dbname		= '';

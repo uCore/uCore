@@ -1145,8 +1145,15 @@ abstract class uDataModule extends uBasicModule {
 		return array_key_exists($alias,$this->sqlTableSetupFlat);
 	}
 
-	// fromField is localField, toField is parentField -- pending global rename
-	//	public function CreateTable($alias, $tableModule=NULL, $parent=NULL, $fromField=NULL, $toField=NULL, $joinType='LEFT JOIN') {
+	/**
+	 * Creates a virtual table for use within the module.  Allowing access to fields within the database.
+	 * @param string $alias table alias
+	 * @param string $tableModule classname of the uTableDef
+	 * @param string $parent alias of the table to join to
+	 * @param mixed $joins string if fields to join have the same name, array to specify different fields array('parent_field'=>'local_field')
+	 * @param string $joinType specify the type of join to perform (default: LEFT JOIN)
+	 * @see AddField
+	 */
 	public function CreateTable($alias, $tableModule=NULL, $parent=NULL, $joins=NULL, $joinType='LEFT JOIN') {
 		// nested array
 		// first create the current alias
@@ -1346,6 +1353,10 @@ abstract class uDataModule extends uBasicModule {
 		unset($this->fields[$field]['style_fn']);
 	}
 
+	/**
+	 * Defines a virtual field in the module, allowing access to the data within the database.
+	 * @see CreateTable
+	 */
 	public function &AddField($aliasName,$fieldName,$tableAlias=NULL,$visiblename=NULL,$inputtype=itNONE,$values=NULL) {//,$options=0,$values=NULL) {
 		$this->_SetupFields();
 		if ($tableAlias === NULL) $tableAlias = $this->sqlTableSetup['alias'];
@@ -1690,7 +1701,7 @@ abstract class uDataModule extends uBasicModule {
 		return $from;
 	}
 	
-	/*
+	/**
 	 * Parses all tables defined with CreateTable and creates the JOIN statements for the sql query.
 	 * @see CreateTable, GetFromClause
 	 */
