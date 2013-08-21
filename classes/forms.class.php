@@ -1204,7 +1204,7 @@ abstract class uDataModule extends uBasicModule {
 		//		$this->sqlTableSetupFlat[$alias] = $newTable;
 
 		// search through the table setup looking for the $linkFrom alias
-		if (($srchParent =& recurseSqlSetupSearch($this->sqlTableSetup,$parent))) {
+		if (($srchParent =& $this->recurseSqlSetupSearch($this->sqlTableSetup,$parent))) {
 			// found, add it
 			if (!array_key_exists('children',$srchParent)) $srchParent['children'] = array();
 			$srchParent['children'][] = $newTable;
@@ -1683,11 +1683,56 @@ abstract class uDataModule extends uBasicModule {
 
 	public function GetFromClause() {
 		$from = "{$this->sqlTableSetup['table']} AS {$this->sqlTableSetup['alias']}";
-		$paraCount = parseSqlTableSetupChildren($this->sqlTableSetup,$from);
+		$paraCount = $this->parseSqlTableSetupChildren($this->sqlTableSetup,$from);
 		//		for ($i = 0; $i < $paraCount; $i++)
 		//			$from = '('.$from;
 		if ($from == ' AS ') return '';
 		return $from;
+	}
+	
+	/*
+	 * Parses all tables defined with CreateTable and creates the JOIN statements for the sql query.
+	 * @see CreateTable, GetFromClause
+	 */
+	public function parseSqlTableSetupChildren($parent,&$qryString) {
+		$paraCount = 0;
+		if (!is_array($parent)) return 0;
+		if (!array_key_exists('children',$parent)) return 0;
+		//	$parent['children'] = array_reverse($parent['children']);
+		foreach ($parent['children'] as $child) {
+			$qryString.="\n {$child['joinType']} {$child['table']} AS {$child['alias']} ON ";
+			$joins = array();
+			foreach ($child['joins'] as $fromField => $toField) {
+				$ct = '=';
+				$fromFull = ($fromField[0] == "'" || $fromField[0] == '"' || stristr($fromField,'.') !== FALSE) ? $fromField : $parent['alias'].'.'.$fromField;//$child['alias'].'.'.$toField;
+				if (is_array($toField)) { // can process compare type also
+					$ct = $toField[0];
+					$toField = $toField[1];
+					$toFull = $toField;
+				} else
+				$toFull = ($toField[0] == "'" || $toField[0] == '"' || stristr($toField,'.') !== FALSE)? $toField : $child['alias'].'.'.$toField;
+				$joins[] = "$fromFull $ct $toFull";
+			}
+			$qryString.=join(' AND ',$joins);
+			$paraCount++;
+			$paraCount = $paraCount + $this->parseSqlTableSetupChildren($child,$qryString);
+		}
+		return $paraCount;
+	}
+
+	public function &recurseSqlSetupSearch(&$searchin,$searchfor) {
+		// is the current table?
+		if ($searchin['alias'] == $searchfor) { return $searchin; }
+
+		// if not, does it have children?
+		if (!empty($searchin['children'])) {
+			for ($i = 0, $maxCount = count($searchin['children']); $i < $maxCount; $i++) {
+				// check those children
+				if ($tbl =& $this->recurseSqlSetupSearch($searchin['children'][$i],$searchfor)) return $tbl;
+			}
+		}
+		$false = FALSE;
+		return $false;
 	}
 
 	public function GetSelectStatement() {
