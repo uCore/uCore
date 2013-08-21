@@ -1046,6 +1046,7 @@ abstract class uDataModule extends uBasicModule {
 
 		if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
 		if ($this->isAjax) $attributes['class'] .= ' uf';
+		$attributes['class'] = trim($attributes['class']);
 
 		$fieldName = $this->CreateSqlField($of,$pkValue);
 		if ($inputType == itFILE) $attributes['id'] = $fieldName;
