@@ -111,6 +111,23 @@ td.uFilters :-moz-placeholder { /* Mozilla Firefox 4 to 18 */ color: #5e6d81; }
 td.uFilters ::-moz-placeholder { /* Mozilla Firefox 19+ */ color: #5e6d81; }
 td.uFilters :-ms-input-placeholder { /* Internet Explorer 10+ */ color: #5e6d81; }
 
+td.uFilters .inputtype.select2-container { padding:0; vertical-align:top; }
+td.uFilters .inputtype.select2-container a.select2-choice { padding:15px; border:none; box-shadow:none; -webkit-box-shadow:none; background:none; color:#5e6d81; }
+td.uFilters .inputtype.select2-container a.select2-choice:before { content: "\25be"; font-size: 1.9em; font-family: Arial; font-style: normal; font-weight: normal; speak: none; color:#ff5900; float:right }
+td.uFilters .inputtype.select2-container a.select2-choice .select2-arrow { border:none; background:none; }
+td.uFilters .inputtype.select2-container a.select2-choice .select2-arrow b { background:none; }
+.uFilter.select2-drop { background:#dee3e9; border:1px solid #d0d6dd; border-top:0; }
+.uFilter.select2-drop .select2-no-results { background:none; }
+
+.inputtype.select2-container { padding:0; }
+.inputtype.select2-container a.select2-choice { padding:6px; height:auto; line-height:inherit; border:none; box-shadow:none; -webkit-box-shadow:none; background:none; }
+.inputtype.select2-container a.select2-choice:before { content: "\25be"; font-size: 1.9em; font-family: Arial; font-style: normal; font-weight: normal; speak: none; color:#362B36; float:right }
+.inputtype.select2-container a.select2-choice .select2-arrow { border:none; background:none; }
+.inputtype.select2-container a.select2-choice .select2-arrow b { background:none; }
+.inputtype.select2-drop { height:auto; border-top:0; margin-top:-1px; }
+.inputtype.select2-drop.select2-drop-above { margin-top:1px; }
+
+
 .new-item { visibility:hidden; display:inline-block; zoom: 1; *display: inline; width:1em; height:1em; line-height:normal; }
 .new-item:before { content:"\e816"; speak: none; font-size:inherit; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; visibility:visible; }
 

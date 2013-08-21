@@ -3,15 +3,22 @@
 <head>
 <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
 <meta name="robots" content="noindex"/>
+<link href="{const.PATH_REL_CORE}themes/admin/select2/select2.css" rel="stylesheet" type="text/css">
 <link href="{const.PATH_REL_CORE}themes/admin/fontello/css/ucore-symbols.css" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
 <script src="{const.PATH_REL_CORE}themes/admin/html5shiv.js"></script>
+<script src="{const.PATH_REL_CORE}themes/admin/select2/select2.js"></script>
 <script>
 $(function(){
 	if ($('nav ul li').length) {
 		$(document).on('click touchstart','nav .icon-menu',function() { $('body').toggleClass('open'); return false; });
 	}
 });
+
+utopia.Initialise.add(InitCombo);
+function InitCombo() {
+	$('.inputtype-combo').select2({adaptDropdownCssClass:function(c){return c;},width:'element'});
+}
 </script>
 </head>
 <body class="u-admin">
