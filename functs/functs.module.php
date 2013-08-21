@@ -29,47 +29,6 @@ function LoadModulesDir($indir, $recursive = TRUE) {
 	return $files;
 }
 
-function &CallModuleFunc($classname,$funcname) {
-	trigger_error("CallModuleFunc is deprecated.", E_USER_DEPRECATED);
-	static $null = NULL;
-
-	if (!$classname) { ErrorLog("Executing function ($funcname) in null class<br/>".print_r(useful_backtrace(),true)); return $null; }
-	//ErrorLog("Calling {$classname}->{$funcname}");
-
-	// get args by reference.
-	$stack = debug_backtrace();
-	$args = array();
-	if (isset($stack[0]["args"]))
-		for($i=2; $i < count($stack[0]["args"]); $i++)
-			$args[$i-2] = & $stack[0]["args"][$i];
-
-	if (!method_exists($classname,$funcname)) { return $null; }
-
-	$instance =& utopia::GetInstance($classname);
-
-	if ($instance == NULL) { ErrorLog("Error Calling {$classname}->{$funcname}"); return $null;}
-
-	$call = array($instance,$funcname);
-	$return = call_user_func_array($call,$args);
-	return $return;
-}
-
-function &GetModuleVar($classname,$varname) {
-	trigger_error("GetModuleVar is deprecated.", E_USER_DEPRECATED);
-	$null = NULL;
-	if (($instance =& utopia::GetInstance($classname)) == NULL) return $null;
-	if (!property_exists($instance,$varname)) return $null;
-
-	return $instance->$varname;
-}
-
-function SetModuleVar($classname,$varname,$value) {
-	trigger_error("SetModuleVar is deprecated.", E_USER_DEPRECATED);
-	if (($instance =& utopia::GetInstance($classname)) == NULL) return NULL;
-
-	$instance->$varname = $value;
-}
-
 function parseSqlTableSetupChildren($parent,&$qryString) {
 	$paraCount = 0;
 	if (!is_array($parent)) return 0;

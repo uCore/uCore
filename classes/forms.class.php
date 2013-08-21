@@ -738,65 +738,6 @@ abstract class uBasicModule implements iUtopiaModule {
 	}
 	//	public function __construct() { $this->_SetupFields(); } //$this->SetupParents(); }
 	public abstract function RunModule();  // called when current_path = parent_path/<module_name>/
-
-
-	public function CreateParentNavButtons($parentName) {
-//		if ($this->navCreated) return;
-		//ErrorLog(get_class($this).' making buttons on '.$parentName);
-		if ($this->isDisabled) return;
-		if (!is_array($this->parents)) return;
-		if ($parentName !== utopia::GetCurrentModule()) return;
-		if (!array_key_exists($parentName,$this->parents)) return;
-
-//		$this->navCreated = true;
-		$sortOrder = $this->GetSortOrder();
-		$listDestination =  'child_buttons';
-		if ($this instanceof iAdminModule) {
-			if (get_class($this) == utopia::GetCurrentModule()) utopia::LinkList_Add($listDestination,'',NULL,-500);
-			$sortOrder = $sortOrder - 1000;
-		}
-
-			if ($parentName == '/') return;
-	//	$lm = utopia::GetVar('loadedModules',array());
-	//	foreach ($this->parents as $parentName => $linkArray) {
-//			$parentName = $linkArray['moduleName'];
-			if ($this->flag_is_set(NO_NAV)) return;
-	//		if (array_search($this,$lm,true) === FALSE) continue;
-
-			$cModuleObj =& utopia::GetInstance(utopia::GetCurrentModule());
-			if (($parentName != 'uDashboard' && ($obj instanceof iAdminModule)) && $parentName != utopia::GetCurrentModule()) return;
-			//echo get_class($this).' '.$parentName.'<br/>';
-
-			$parentObj =& utopia::GetInstance($parentName);
-			if (($parentObj instanceof iAdminModule) && !($cModuleObj instanceof iAdminModule)) return;
-
-			$linkArray = $this->parents[$parentName];
-			foreach ($linkArray as $linkInfo) {
-				if ($linkInfo['parentField'] !== NULL) continue; // has a parentField?  if so, ignore
-				$btnText = !empty($linkInfo['text']) ? $linkInfo['text'] : $this->GetTitle();
-				if (isset($linkInfo['fieldLinks']) && utopia::GetCurrentModule()) { // is linked to fields in the list
-					$cr = $cModuleObj->GetCurrentRecord();
-					if (is_array($linkInfo['fieldLinks']) && is_array($cr)) { // this link uses filters
-						$filters = array();
-						/*foreach ($linkInfo['fieldLinks'] as $fromField => $toField) {
-							if ($this->GetFilterValue($toField)) // if existing record --
-							$filters["filters[$toField]"] = $this->GetFilterValue($toField);
-							}*/
-						//print_r($linkInfo['fieldLinks']);
-						foreach ($linkInfo['fieldLinks'] as $li) {
-							//if ($this->GetFilterValue($this->FindFilter($li['fromField'],$li['ct']))) // if existing record --
-							if (array_key_exists($li['fromField'],$cr))
-							$filters["_f_".$li['toField']] = $cr[$li['fromField']];
-						}
-						utopia::LinkList_Add($listDestination,$btnText,$this->GetURL($filters),$sortOrder,NULL,array('class'=>'btn'));
-					}
-				} else { // not linked to fields (so no filters)
-					utopia::LinkList_Add($listDestination,$btnText,$this->GetURL(),$sortOrder,NULL,array('class'=>'btn'));
-					//	utopia::AppendVar('child_buttons',CreateNavButton($linkInfo['text'],$this->GetURL()));
-				}
-			}
-		//}
-	}
 }
 
 /**
