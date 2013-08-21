@@ -183,6 +183,7 @@ nav li {
 /* mobile */
 @media screen and (max-width:640px)  {
 	/* fix menu */
+	#user_welcome { display:none; }
 	body { transition:all 0.2s ease-in-out; }
 	body.open { left:181px; overflow-x: hidden; transform: translate(181px, 0); }
 	header { background-position-x:67px; }

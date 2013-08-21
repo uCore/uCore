@@ -25,7 +25,7 @@ function InitCombo() {
 
 <header><?php
 	$o = utopia::GetInstance('UserProfileDetail'); $r = $o->LookupRecord();
-	if ($r) echo '<i class="icon-user"></i> Hi, '.$r['visible_name'].' | ';
+	if ($r) echo '<span id="user_welcome"><i class="icon-user"></i> Hi, '.$r['visible_name'].' | </span>';
 	echo '<a href="{home_url}">Website</a>';
 	if ($r) echo ' | {logout}';
 ?></header>
