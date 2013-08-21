@@ -45,7 +45,6 @@ $enc = isset($_SERVER['HTTP_ACCEPT_ENCODING']) ? $_SERVER['HTTP_ACCEPT_ENCODING'
 define ('GZIP_ENABLED',substr_count($enc, 'gzip') || substr_count($enc, 'deflate'));
 if (GZIP_ENABLED) ob_start("ob_gzhandler"); else ob_start();
 
-date_default_timezone_set('GMT');
 
 function fix_path($path,$slash = '') {
 	if (!$slash) $slash = DIRECTORY_SEPARATOR;
