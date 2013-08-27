@@ -96,8 +96,9 @@ class uEmailTemplateAttachmentList extends uListDataModule implements iAdminModu
 	public function SetupFields() {
 		$this->CreateTable('docs');
 
-		$this->AddField('doc_id','doc_id','docs','docid');
-		$this->AddField('attachment','attachment','docs','Attachment',itFILE);
+		$this->AddField('doc_id','doc_id','docs');
+		$this->AddField('attachment_current','attachment','docs','Current Attachment');
+		$this->AddField('attachment','attachment','docs','Upload Attachment',itFILE);
 	}
 
 	public function RunModule() {
