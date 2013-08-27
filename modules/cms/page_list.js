@@ -25,7 +25,7 @@ function serialiseTree() {
 	return data;
 }
 function InitialiseTree() {
-	$('#tree ul').not($('#tree ul:first')).hide();
+	$('#tree ul ul').hide();
 	$('#tree').treeSort({init:RefreshIcons,change:dropped});
 }
 $(document).on('click','.cmsParentToggle',function (e) {

@@ -87,14 +87,14 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		echo '{list.'.get_class($this).'}';
 		
 		$relational = $this->GetNestedArray();
-		echo '<div id="tree" class="module-content">';
+		echo '<div class="module-content">';
 
 		$modOptsObj =& utopia::GetInstance('modOpts');
 		$row = $modOptsObj->LookupRecord('default_template');
 		echo 'Default Template: '.$modOptsObj->GetCell('value',$row);
 
 		echo '<hr>';
-		echo '<div id="uCMS_List">'.self::GetChildren($relational).'</div>';
+		echo '<div id="tree">'.self::GetChildren($relational).'</div>';
 		echo '</div>';
 
 		$editObj =& utopia::GetInstance('uCMS_Edit');
