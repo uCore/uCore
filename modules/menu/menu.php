@@ -49,6 +49,7 @@ class uMenu {
 			$items[] = $ret;
 			$lastWasBlank = empty($item['url']);
 		}
+		if (!$items) return '';
 		$ret = '<ul class="u-menu '.$group.'">'.implode('',$items).'</ul>';
 		return $ret;
 	}
