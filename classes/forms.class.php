@@ -352,18 +352,34 @@ abstract class uBasicModule implements iUtopiaModule {
 		
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
-		if (uEvents::TriggerEvent('BeforeRunModule',$this) === FALSE) return FALSE;
+		// BEFORE
+		ob_start();
+		$beforeResult = uEvents::TriggerEvent('BeforeRunModule',$this);
+		$beforeContent = ob_get_contents();
+		ob_end_clean();
+		if (utopia::UsingTemplate() && $beforeContent) $beforeContent = '<div class="module-container BeforeRunModule">'.$beforeContent.'</div>';
+		echo $beforeContent;
+		if ($beforeResult === FALSE) return FALSE;
 
+		// RUN
 		ob_start();
 		$result = $this->RunModule();
-		$c = ob_get_contents();
+		$runContent = ob_get_contents();
 		ob_end_clean();
-		if (utopia::UsingTemplate() && $c) $c = '<div class="module-container '.get_class($this).'">'.$c.'</div>';
-		echo $c;
+		if (utopia::UsingTemplate() && $runContent) $runContent = '<div class="module-container '.get_class($this).' RunModule">'.$runContent.'</div>';
+		echo $runContent;
 		if ($result === FALSE) return false;
 		$this->hasRun = true;
-
-		if (uEvents::TriggerEvent('AfterRunModule',$this) === FALSE) return FALSE;
+		
+		// AFTER
+		ob_start();
+		$afterResult = uEvents::TriggerEvent('AfterRunModule',$this);
+		$afterContent = ob_get_contents();
+		ob_end_clean();
+		if (utopia::UsingTemplate() && $afterContent) $afterContent = '<div class="module-container AfterRunModule">'.$afterContent.'</div>';
+		echo $afterContent;
+		if ($afterResult === FALSE) return FALSE;
+		
 	}
 
 	public $parentsAreSetup = false;
