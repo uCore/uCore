@@ -328,33 +328,6 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (!$message) $message = true;
 		$this->isDisabled = $message;
 	}
-
-	private $loaded = array();
-	public function LoadChildren($loadpoint) {
-		$class = get_class($this);
-		$children = utopia::GetChildren($class);
-
-		$keys = array_keys($children);
-		$size = sizeof($keys);
-
-		foreach ($children as $child) {
-			foreach ($child as $info) {
-				if (!isset($info['callback'])) continue;
-				if ($info['loadpoint'] !== $loadpoint) continue;
-
-				if (!isset($this->loaded[$info['moduleName']])) {
-					$this->loaded[$info['moduleName']] = true;
-					$obj =& utopia::GetInstance($info['moduleName']);
-					$result = $obj->LoadChildren(0);
-					if ($result === FALSE) continue;
-				}
-
-				$result = call_user_func($info['callback'],$class);
-				if ($result === FALSE) return FALSE;
-			}
-		}
-		return true;
-	}
 	
 	public function AssertURL($http_response_code = 301, $currentOnly = true) {
 		if (!$currentOnly || get_class($this) == utopia::GetCurrentModule()) {
@@ -380,8 +353,6 @@ abstract class uBasicModule implements iUtopiaModule {
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
 		if (uEvents::TriggerEvent('BeforeRunModule',$this) === FALSE) return FALSE;
-		$lc = $this->LoadChildren(0);
-		if ($lc !== TRUE && $lc !== NULL) return $lc;
 
 		ob_start();
 		$result = $this->RunModule();
@@ -393,8 +364,6 @@ abstract class uBasicModule implements iUtopiaModule {
 		$this->hasRun = true;
 
 		if (uEvents::TriggerEvent('AfterRunModule',$this) === FALSE) return FALSE;
-		$lc = $this->LoadChildren(1);
-		if ($lc !== TRUE && $lc !== NULL) return $lc;
 	}
 
 	public $parentsAreSetup = false;
@@ -415,15 +384,6 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function HasChild($childModule) {
 		$children = utopia::GetChildren(get_class($this));
 		return array_key_exists($childModule,$children);
-	}
-
-	public function AddParentCallback($parentModule,$callback,$loadpoint=1) {
-		$info = array('moduleName'=>get_class($this), 'callback' => $callback, 'loadpoint' => $loadpoint);
-		utopia::AddChild($parentModule,get_class($this),$info);
-	}
-	public function AddChildCallback($child,$callback,$loadpoint=1) {
-		$info = array('moduleName'=>get_class($this), 'callback' => $callback, 'loadpoint' => $loadpoint);
-		utopia::AddChild(get_class($this),$child,$info);
 	}
 
 	// parentModule =

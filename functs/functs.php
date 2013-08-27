@@ -523,24 +523,6 @@ function IsSelectStatement($str) {
 	return (strtolower(substr(trim($str,'('),0,6)) == 'select');
 }
 
-/* before an ajax script use the following:
-
-if (!RunAjaxScript(__FILE__)) return;
-
-This will prevent the file from being run without all children
-being loaded (security), and will prevent it from being 'included' */
-function RunAjaxScript($path) {
-	if (strpos($_SERVER['REQUEST_URI'],'?') !== FALSE)
-	$requestPath = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
-	else $requestPath = $_SERVER['REQUEST_URI'];
-
-	if ($requestPath !== str_replace($_SERVER['DOCUMENT_ROOT'],'',$path)) return FALSE; // is being included
-
-	LoadChildren('*'); // to ensure that security is passed on all ajax scripts
-	//utopia::CancelTemplate();
-	return true;
-}
-
 
 /**
  * Recursively copy file or folder from source to destination
