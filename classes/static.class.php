@@ -976,6 +976,29 @@ class utopia {
 		}
 		return ($string !== $start);
 	}
+	static function MergeFields(&$string,$row) {
+		if (preg_match_all('/{([a-z]+)\.([^{]+)}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
+			$searchArr = $matches[0];
+			$typeArr = isset($matches[1]) ? $matches[1] : false;
+			$varsArr = isset($matches[2]) ? $matches[2] : false;
+			foreach ($searchArr as $k => $search) {
+				$field = $varsArr[$k];
+				switch ($typeArr[$k]) {
+					case 'urlencode':
+						$replace = $row[$field];
+						$replace = rawurlencode($replace);
+						$string = str_replace($search,$replace,$string);
+						break;
+					case 'field':
+						$replace = $row[$field];
+						$string = str_replace($search,$replace,$string);
+						break;
+					default:
+				}
+			}
+		}
+		while (utopia::MergeVars($string));
+	}
 
 	static $templateParsers = array();
 	static function AddTemplateParser($ident,$function,$match='.+',$catchOutput = false) {
