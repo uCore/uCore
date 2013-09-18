@@ -320,7 +320,7 @@ function timer_end($timerName) {
 	if (!isset($timer['start_time'])) { /*echo "Timer ($timerName) not started.";*/ return; }
 
 	$timer['end_time'] = microtime(true)*1000;
-	$timer['time_taken'] = round($timer['end_time'] - $timer['start_time'],3);
+	$timer['time_taken'] = $timer['end_time'] - $timer['start_time'];
 
 	return $timer['time_taken'];
 }
