@@ -180,8 +180,8 @@ class uDataset {
 		}
 		
 		$this->query = "(SELECT $select$from$where$group$having1$order1)$union";
-		if ($having) $this->countQuery = "(SELECT SQL_CALC_FOUND_ROWS $select$from$where$group$having1$order1)$union LIMIT 0";
-		else $this->countQuery = "(SELECT SQL_CALC_FOUND_ROWS NULL$from$where$group ORDER BY NULL LIMIT 0)";
+		if ($having) $this->countQuery = "(SELECT COUNT(*)$select$from$where$group$having1$order1)$union";
+		else $this->countQuery = "(SELECT COUNT(*)$from$where$group ORDER BY NULL)";
 	}
 	
 	
@@ -195,8 +195,7 @@ class uDataset {
 	public function CountRecords() {
 		if ($this->recordCount === NULL) {
 			try {
-				database::query($this->countQuery,$this->args);
-				$this->recordCount = database::query('SELECT FOUND_ROWS()')->fetchColumn();
+				$this->recordCount = database::query($this->countQuery,$this->args)->fetchColumn();
 			} catch (Exception $e) { return 0; }
 		}
 		return $this->recordCount;
