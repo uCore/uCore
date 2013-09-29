@@ -2637,7 +2637,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($styles) $attr['style'] = $styles;
 		
 		$inputType = !is_null($inputTypeOverride) ? $inputTypeOverride : (isset($fieldData['inputtype']) ? $fieldData['inputtype'] : itNONE);
-		if ($inputType !== itNONE && ($inputTypeOverride || ($row !== NULL && $this->flag_is_set(ALLOW_EDIT)) || ($row === NULL  && $this->flag_is_set(ALLOW_ADD)))) {
+		if ($inputType !== itNONE && ($inputTypeOverride || ($row !== NULL && $this->flag_is_set(ALLOW_EDIT,$fieldName)) || ($row === NULL  && $this->flag_is_set(ALLOW_ADD,$fieldName)))) {
 			if ($inputType === itFILE) {
 				$ret = '';
 				if (!$value) {
