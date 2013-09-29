@@ -67,7 +67,7 @@ class uUserLogin extends uDataModule {
 	public static function GetLoginStatus() {
 		$u = self::IsLoggedIn();
 		if (!$u) return 'Log In';
-		$o =& utopia::GetInstance(__CLASS__);
+		$o = utopia::GetInstance(__CLASS__);
 		$rec = $o->LookupRecord($u);
 		return $rec['username'];
 	}
@@ -83,7 +83,7 @@ class uUserLogin extends uDataModule {
 		if (($userID = uUsersList::TestCredentials($un,$pw)) !== false) {
 			self::SetLogin($userID);
 			
-			$obj =& utopia::GetInstance(__CLASS__);
+			$obj = utopia::GetInstance(__CLASS__);
 			$rec = $obj->LookupRecord($userID,true);
 			// check if password is the most secure we can have.
 			if ($rec && !uCrypt::IsStrongest($pw,$rec['password'])) {
@@ -141,7 +141,7 @@ class uUserLogin extends uDataModule {
 	public function RunModule() {
 		if (self::IsLoggedIn()) {
 			// redirect to user profile
-			$o =& utopia::GetInstance('uUserProfile');
+			$o = utopia::GetInstance('uUserProfile');
 			$o->AssertURL(307,false);
 			return;
 		}

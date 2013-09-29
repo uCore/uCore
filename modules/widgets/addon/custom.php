@@ -21,7 +21,7 @@ class uCustomWidget implements iWidget {
 		$classes = utopia::GetModulesOf('uDataModule');
 		foreach ($classes as $classname=>$info) { // install tables
 			if (is_subclass_of($classname,'iAdminModule')) continue;
-			$o =& utopia::GetInstance($classname);
+			$o = utopia::GetInstance($classname);
 			if (!$o->HasRewrite()) continue;
 			$installed[$classname] = $classname;
 		}
@@ -51,7 +51,7 @@ class uCustomWidget implements iWidget {
 		$rec = $obj->LookupRecord($pkVal);
 		if (!$rec || !isset($rec['module']) || !$rec['module']) return NULL;
 		if (!class_exists($rec['module'])) return NULL;
-		$obj =& utopia::GetInstance($rec['module']);
+		$obj = utopia::GetInstance($rec['module']);
 		if (!$obj) return NULL;
 		
 		$arr = array();
@@ -71,7 +71,7 @@ class uCustomWidget implements iWidget {
 	public static function getPossibleFields($originalVal,$pk,$processedVal,$rec) {
 		if (!$rec || !isset($rec['module']) || !$rec['module']) return 'Please select a Data Source.';
 		if (!class_exists($rec['module'])) return 'Data Source does not exist';
-		$obj =& utopia::GetInstance($rec['module']);
+		$obj = utopia::GetInstance($rec['module']);
 		if (!$obj) return '';
 		$fields = $obj->fields;
 		$ret = '';
@@ -91,7 +91,7 @@ class uCustomWidget implements iWidget {
 	static function DrawData($rec) {
 		if (!$rec['module'] || !class_exists($rec['module'])) return $rec['no_rows'];
 
-		if (!($instance =& utopia::GetInstance($rec['module'],false))) {
+		if (!($instance = utopia::GetInstance($rec['module'],false))) {
 			return 'Could not load Data Source';
 		}
 	

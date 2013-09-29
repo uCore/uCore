@@ -24,7 +24,7 @@ class modLinks {
 				$parent = '_modlinks_';
 				if (isset($child['parent']) && $child['parent'] !=='/') $parent .= $child['parent'];
 
-				$obj =& utopia::GetInstance($mid);
+				$obj = utopia::GetInstance($mid);
 				$position = $obj->GetSortOrder();
 				if (isset($child['fieldLinks']) && $mid === $cm) $position = 0;
 				if ($position > $highestpos) $highestpos = $position;

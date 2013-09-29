@@ -21,7 +21,7 @@ class uDataOnly {
 	private static function doInject($obj) {
 		if (is_string($obj)) {
 			$parent = $obj;
-			$obj =& utopia::GetInstance($parent);
+			$obj = utopia::GetInstance($parent);
 		} else {
 			$parent = get_class($obj);
 		}
@@ -48,14 +48,14 @@ class uDataOnly {
 		$cm = utopia::GetCurrentModule();
 		if (!self::IsAllowed($cm)) {
 			// redirect to module
-			$obj =& utopia::GetInstance($cm);
+			$obj = utopia::GetInstance($cm);
 			header('Location: '.$obj->GetURL($qs)); return;
 		}
 		
 		try { // try to access it dataonly, if it fails for any reason, break out of , redirect
 			call_user_func(self::$types[$type]);
 		} catch (Exception $e) {
-			$obj =& utopia::GetInstance($cm);
+			$obj = utopia::GetInstance($cm);
 			header('Location: '.$obj->GetURL($qs)); return;
 		}
 	}
@@ -65,13 +65,13 @@ class uDataOnly {
 		
 		utopia::Cache_Check($etag,'application/json');
 
-		$obj =& utopia::GetInstance(utopia::GetCurrentModule());
+		$obj = utopia::GetInstance(utopia::GetCurrentModule());
 		$data = json_encode($obj->GetRawData());
 		utopia::Cache_Output($data,$etag,'application/json');
 	}
 
 	public static function csv() {
-		$obj =& utopia::GetInstance(utopia::GetCurrentModule());
+		$obj = utopia::GetInstance(utopia::GetCurrentModule());
 		$title = $obj->GetTitle();
 
 		$fields = $obj->fields;

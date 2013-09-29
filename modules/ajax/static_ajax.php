@@ -80,7 +80,7 @@ class internalmodule_StaticAjax {
 	public static function getUpload() {
 		//$module = utopia::UUIDExists($_GET['uuid']);
 		//print_r($module);
-		$obj =& utopia::GetInstance(utopia::GetCurrentModule());
+		$obj = utopia::GetInstance(utopia::GetCurrentModule());
 		$rec = $obj->LookupRecord($_GET['p']);
 		//print_r($rec);
 		if (!$rec) {
@@ -180,7 +180,7 @@ class internalmodule_StaticAjax {
 					$string = cbase64_decode($enc_name);
 
 					self::InterpretSqlString($string, $module, $field, $pkVal);
-					$obj =& utopia::GetInstance($module);
+					$obj = utopia::GetInstance($module);
 					$obj->ProcessUpdates($enc_name,$field,$fileInfo,$pkVal,true);
 				}
 			}

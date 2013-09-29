@@ -40,7 +40,7 @@ class uEvents {
 		if (is_object($object)) $module = get_class($object);
 		if (is_string($object)) {
 			$module = $object;
-			$object =& utopia::GetInstance($object);
+			$object = utopia::GetInstance($object);
 		}
 		$module = strtolower($module);
 		$eventName = strtolower($eventName);

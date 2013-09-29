@@ -116,7 +116,7 @@ FIN
 		// replace "$from" with "$to"
 	}
 	static function Init() {
-		$obj =& utopia::GetInstance(__CLASS__);
+		$obj = utopia::GetInstance(__CLASS__);
 		return array($obj->GetAjaxPath(),$obj->GetAjaxUploadPath());
 	}
 	function GetAjaxPath() {

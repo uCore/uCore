@@ -193,7 +193,7 @@ class utopia {
 		if (!self::ModuleExists($module)) return;
 		
 		$cm = utopia::GetCurrentModule();
-		$o =& utopia::GetInstance($cm);
+		$o = utopia::GetInstance($cm);
 		if (flag_is_set($o->GetOptions(),PERSISTENT)) return;
 		
 		utopia::SetVar('current_module',$module);

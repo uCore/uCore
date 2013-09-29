@@ -175,7 +175,7 @@ class uEmailer extends uDataModule {
 
 		if (!is_array($attachments)) $attachments = array($attachments);
 
-		$obj =& utopia::GetInstance('uEmailTemplateAttachmentList');
+		$obj = utopia::GetInstance('uEmailTemplateAttachmentList');
 		$obj->BypassSecurity(true);
 		$templateAttachments = $obj->GetDataset(array('doc_id'=>$ident))->GetFirst();
 		$obj->BypassSecurity(false);

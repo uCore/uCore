@@ -7,7 +7,7 @@ class uBreadcrumb {
 		self::$extras[] = array($name,$url);
 	}
 	static function GetTrail($start = null) {
-		$obj =& utopia::GetInstance('uCMS_List');
+		$obj = utopia::GetInstance('uCMS_List');
 		$arr = $obj->GetNestedArray();
 		$out = array();
 
@@ -18,7 +18,7 @@ class uBreadcrumb {
 			$out[$a[1]]=$a[0];//'<a href="'.$a[1].'">'.$a[0].'</a>';
 		}
 
-		$obj =& utopia::GetInstance('uCMS_View');
+		$obj = utopia::GetInstance('uCMS_View');
 		$row = uCMS_View::findPage();
 		do {
 			if (!$row) break;

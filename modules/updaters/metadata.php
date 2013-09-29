@@ -15,7 +15,7 @@ uEvents::AddCallback('AfterInit','remove_metadata_field','',MAX_ORDER+MAX_ORDER)
 
 function pull_from_meta_custom() {
 	try {
-		$obj =& utopia::GetInstance('uWidgets',false);
+		$obj = utopia::GetInstance('uWidgets',false);
 		$obj->BypassSecurity(true);
 
 		$ds = database::query('SELECT * FROM tabledef_Widgets WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uCustomWidget'));
@@ -35,7 +35,7 @@ uEvents::AddCallback('AfterInit','pull_from_meta_custom');
 
 function pull_from_meta_text() {
 	try {
-		$obj =& utopia::GetInstance('uWidgets',false);
+		$obj = utopia::GetInstance('uWidgets',false);
 		$obj->BypassSecurity(true);
 
 		$ds = database::query('SELECT * FROM tabledef_Widgets WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTextWidget'));
@@ -55,7 +55,7 @@ uEvents::AddCallback('AfterInit','pull_from_meta_text');
 
 function pull_from_meta_twitter() {
 	try {
-		$obj =& utopia::GetInstance('uWidgets',false);
+		$obj = utopia::GetInstance('uWidgets',false);
 		$obj->BypassSecurity(true);
 
 		$ds = database::query('SELECT * FROM tabledef_Widgets WHERE `block_type` = ? AND `__metadata` IS NOT NULL',array('uTwitterWidget'));
