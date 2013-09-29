@@ -246,13 +246,12 @@ class uDataset {
 		return $rows;
 	}
 	public function CreateRecord($row) {
-		if (!is_array($row)) return $row;
-		
+		if (!isset($row) || !is_array($row)) return $row;
+
 		// make link tables into array
 		foreach ($row as $field=>$val) {
+			if (empty($val)) continue;
 			if (!isset($this->module->fields[$field])) continue;
-			if (!is_string($val)) continue;
-			if (strpos($val,"\x1F") === FALSE) continue;
 			$fieldData = $this->module->fields[$field];
 			if (!isset($fieldData['vtable'])) continue;
 			if (!is_subclass_of($fieldData['vtable']['tModule'],'iLinkTable')) continue;
