@@ -350,7 +350,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		$beforeResult = uEvents::TriggerEvent('BeforeRunModule',$this);
 		$beforeContent = ob_get_contents();
 		ob_end_clean();
-		if (utopia::UsingTemplate() && $beforeContent) $beforeContent = '<div class="module-container BeforeRunModule">'.$beforeContent.'</div>';
+		if (utopia::UsingTemplate() && $beforeContent) $beforeContent = '<div class="module-container '.get_class($this).' BeforeRunModule">'.$beforeContent.'</div>';
 		echo $beforeContent;
 		if ($beforeResult === FALSE) return FALSE;
 
@@ -369,10 +369,9 @@ abstract class uBasicModule implements iUtopiaModule {
 		$afterResult = uEvents::TriggerEvent('AfterRunModule',$this);
 		$afterContent = ob_get_contents();
 		ob_end_clean();
-		if (utopia::UsingTemplate() && $afterContent) $afterContent = '<div class="module-container AfterRunModule">'.$afterContent.'</div>';
+		if (utopia::UsingTemplate() && $afterContent) $afterContent = '<div class="module-container '.get_class($this).' AfterRunModule">'.$afterContent.'</div>';
 		echo $afterContent;
 		if ($afterResult === FALSE) return FALSE;
-		
 	}
 
 	public $parentsAreSetup = false;
@@ -2888,7 +2887,7 @@ abstract class uListDataModule extends uDataModule {
 
 		ob_start();
 		if (!$this->isAjax) echo '<form class="uf" action="" onsubmit="this.action = window.location" method="post"><input type="hidden" name="__ajax" value="updateField">';
-		echo "<table class=\"".get_class($this)." layoutListSection module-content\">";
+		echo "<div class=\"table-wrapper\"><table class=\"".get_class($this)." layoutListSection module-content\">";
 
 		$sectionFieldTitles = array();
 		// TODO: pagination for list record display
@@ -2981,7 +2980,7 @@ abstract class uListDataModule extends uDataModule {
 		$total = array();
 		$totalShown = array();
 
-		timer_start('display rows');
+		timer_start('Draw Rows: '.get_class($this));
 
 		$gUrl = '';
 
@@ -2989,10 +2988,10 @@ abstract class uListDataModule extends uDataModule {
 		if ($num_rows == 0) {
 		} else {
 			$i = 0;
+			$fields = $this->GetFields();
 			while (($row = $dataset->fetch())) {
 				$i++;
 				// move totals here
-				$fields = $this->GetFields();
 				foreach ($fields as $fieldName => $fieldData) {
 					switch ($this->GetFieldType($fieldName)) {
 						case ftNUMBER:
@@ -3011,7 +3010,7 @@ abstract class uListDataModule extends uDataModule {
 			}
 		}
 		$body .= "</tbody>";
-		timer_end('display rows');
+		timer_end('Draw Rows: '.get_class($this));
 		$foot = '';
 		$canadd = false;
 		foreach ($this->fields as $fieldName => $fieldData) {
@@ -3058,7 +3057,7 @@ abstract class uListDataModule extends uDataModule {
 
 		echo $body;
 		// now finish table
-		echo "</table>";//"</div>";
+		echo "</table></div>";//"</div>";
 		if (!$this->isAjax) echo '</form>';
 
 		if ($limit) {
@@ -3187,7 +3186,7 @@ abstract class uSingleDataModule extends uDataModule {
 			}
 			
 			if (!$this->isAjax) $out .= '<form class="uf" action="" onsubmit="this.action = window.location" method="post">';
-			$out .= "<table class=\"module-content layoutDetailSection\">";
+			$out .= "<div class=\"table-wrapper\"><table class=\"module-content layoutDetailSection\">";
 
 			$fields = $this->GetFields(true,$sectionID);
 			$hasFieldHeaders = false;
@@ -3205,7 +3204,7 @@ abstract class uSingleDataModule extends uDataModule {
 				$out .= '<td>'.$this->GetCell($fieldName,$row,$targetUrl).'</td>';
 				$out .= "</tr>";
 			}
-			$out .= "</table>";
+			$out .= "</table></div>";
 			if (!$this->isAjax) $out .= '</form>';
 			//utopia::Tab_Add($SN,$out,$this->GetModuleId(),$tabGroupName,false,$order);
 			echo $out;
