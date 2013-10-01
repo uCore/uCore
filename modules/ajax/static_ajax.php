@@ -193,7 +193,7 @@ class internalmodule_StaticAjax {
 				$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
 				
 				self::InterpretSqlString($string, $module, $field, $pkVal);
-				$obj =& utopia::GetInstance($module);
+				$obj = utopia::GetInstance($module);
 				$obj->ProcessUpdates($enc_name,$field,$value,$pkVal);
 			}
 		}
