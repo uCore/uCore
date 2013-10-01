@@ -18,8 +18,9 @@ class uMODULENAME_List extends uListDataModule implements iAdminModule {
 		$this->AddField('id','id','mytable','ID');
 		$this->AddField('MY_FIELD','MY_FIELD','mytable','My Field');
 	}
-	public function SetupParents() {
-		$this->AddParent('/');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('/');
 	}
 	public function RunModule() {
 		$this->ShowData();
@@ -35,8 +36,9 @@ class uMODULENAME_Edit extends uSingleDataModule implements iAdminModule {
 		$this->AddField('id','id','mytable','ID');
 		$this->AddField('MY_FIELD','MY_FIELD','mytable','My Field',itTEXT);
 	}
-	public function SetupParents() {
-		$this->AddParent('uMODULENAME_List','id','*');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('uMODULENAME_List','id','*');
 	}
 	public function RunModule() {
 		$this->ShowData();

@@ -3,8 +3,7 @@
 /**
  * Initialise global timer
  */
-global $ucore_start_time;
-$ucore_start_time = microtime(true);
+define('UCORE_START_TIME',microtime(true));
 
 /**
  * shutdownErrorHandler is a shutdown function which disables the fatal error reporting outside of script runtime

@@ -7,10 +7,7 @@ class module_Offline extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return 'Site Offline'; }
 	public function GetOptions() { return NO_NAV; }
-	public function SetupParents() {
-		modOpts::AddOption('site_online','Site Online',NULL,0,itYESNO);
-	}
-
+	public function SetupParents() {}
 	private static $states = array();
 	public static function IgnoreClass($class,$state=true) {
 		self::$states[$class] = $state;
@@ -32,13 +29,27 @@ class module_Offline extends uBasicModule {
 		if (modOpts::GetOption('site_online')) return;
 		if (!uUserRoles::IsAdmin()) return;
 		
-		$modOptsObj =& utopia::GetInstance('modOpts');
+		$modOptsObj = utopia::GetInstance('modOpts');
 		$row = $modOptsObj->LookupRecord('site_online');
 		echo '<p>This website is currently offline. Go Online? '.$modOptsObj->GetCell('value',$row).'</p>';
 	}
-
 	public function RunModule() { uConfig::DownMaintenance(); }
+	public static function Initialise() {
+		modOpts::AddOption('site_online','Site Online',NULL,0,itYESNO);
+		uEvents::AddCallback('BeforeRunModule','module_Offline::siteOffline');
+	}
 }
+//uEvents::AddCallback('ShowDashboard','module_Offline::DashboardWidget',null,-999);
 
-uEvents::AddCallback('BeforeRunModule','module_Offline::siteOffline');
-uEvents::AddCallback('ShowDashboard','module_Offline::DashboardWidget',null,-999);
+class offlineWidget implements uDashboardWidget {
+	public static function Initialise() {}
+	public static function GetTitle() { return 'Offline'; }
+	public static function Draw25() {
+		if (modOpts::GetOption('site_online')) return;
+		if (!uUserRoles::IsAdmin()) return;
+		
+		$modOptsObj = utopia::GetInstance('modOpts');
+		$row = $modOptsObj->LookupRecord('site_online');
+		echo '<p>This website is currently offline. Go Online? '.$modOptsObj->GetCell('value',$row).'</p>';
+	}
+}

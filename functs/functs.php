@@ -270,6 +270,7 @@ function BuildAttrString($attrArray) {
 				$val = implode(';',$style);
 			} else $val = implode(' ',$val);
 		}
+		$val = trim($val);
 		$attrStrings[] = "$name=\"$val\"";
 	}
 

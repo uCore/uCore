@@ -37,10 +37,11 @@ class modOpts extends uListDataModule implements iAdminModule {
 		$this->AddFilter('group',ctEQ,itNONE);
 		$this->AddOrderBy('name');
 	}
-	public function SetupParents() {
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('/');
 		self::AddOption('site_name','Site Name');
 		self::AddOption('site_url','Site URL',NULL,'http://'.$_SERVER['HTTP_HOST'].PATH_REL_ROOT);
-		$this->AddParent('/');
 	}
 	public function RunModule() {
 		$groups = database::query('SELECT DISTINCT `group` FROM tabledef_ModOpts WHERE `group` IS NOT NULL ORDER BY (`group` = ?) DESC, `group` ASC',array('Site Options'))->fetchAll();
@@ -55,26 +56,50 @@ class modOpts extends uListDataModule implements iAdminModule {
 	public function GetCellData($fieldName, $row, $url = '', $inputTypeOverride=NULL, $valuesOverride=NULL) {
 		$pk = $this->GetPrimaryKey();
 		if ($fieldName == 'value' && isset(modOpts::$types[$row[$pk]])) {
-			$inputTypeOverride = modOpts::$types[$row[$pk]][0];
-			$valuesOverride = modOpts::$types[$row[$pk]][1];
+			if ($inputTypeOverride === null) $inputTypeOverride = modOpts::$types[$row[$pk]][0];
 		}
 		return parent::GetCellData($fieldName, $row, $url, $inputTypeOverride, $valuesOverride);
+	}
+	public function GetValues($alias,$pkVal=null,$stringify = FALSE) {
+		if ($alias !== 'value') return parent::GetValues($alias,$pkVal,$stringify);
+		if (!$pkVal) return null;
+		return modOpts::$types[$pkVal][1];
 	}
 	public static $types = array();
 	public static function AddOption($ident,$name,$group=NULL,$init='',$fieldType=itTEXT,$values=NULL) {
 		if (!$group) $group = 'Site Options';
 		self::$types[$ident] = array($fieldType,$values,$name,$group,$init);
-		return self::GetOption($ident);
+		//INIT return self::GetOption($ident);
 	}
-	public static function GetOption($ident) {
-		$obj =& utopia::GetInstance(__CLASS__);
+	
+	protected static $_optionCache = null;
+	protected static function GetCachedItem($ident) {
+		$obj = utopia::GetInstance(__CLASS__);
 		$obj->_SetupParents();
 		$obj->_SetupFields();
+		if (self::$_optionCache === NULL) {
+			$obj->BypassSecurity(true);
+			$rows = $obj->GetDataset(null,true)->fetchAll();
+			$obj->BypassSecurity(false);
+			foreach ($rows as $row) {
+				self::$_optionCache[$row['ident']] = $row;
+			}
+		}
+		if (isset(self::$_optionCache[$ident])) return self::$_optionCache[$ident];
+		return null;
+	}
+	protected static function SetCacheValue($ident,$value) {
+		// ensure cache is created
+		self::GetCachedItem($ident);
+		self::$_optionCache[$ident]['value'] = $value;
+	}
+	
+	public static function GetOption($ident) {
+		$obj = utopia::GetInstance(__CLASS__);
 		
-		$obj->BypassSecurity(true);
-		$rec = $obj->LookupRecord($ident,true);
-		$obj->BypassSecurity(false);
-		if (!$rec) {
+		$cache = self::GetCachedItem($ident);
+		
+		if (!$cache) {
 			$obj->BypassSecurity(true);
 			$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
 			$obj->BypassSecurity(false);
@@ -82,18 +107,20 @@ class modOpts extends uListDataModule implements iAdminModule {
 		}
 		
 		// check group and name
-		if ($rec['name'] !== self::$types[$ident][2] || $rec['group'] !== self::$types[$ident][3]) {
+		if ($cache['name'] !== self::$types[$ident][2] || $cache['group'] !== self::$types[$ident][3]) {
 			$obj->BypassSecurity(true);
 			$obj->UpdateFields(array('name'=>self::$types[$ident][2],'group'=>self::$types[$ident][3]),$ident);
 			$obj->BypassSecurity(false);
 		}
 		
-		return $rec['value'];
+		return $cache['value'];
 	}
 	public static function SetOption($ident,$value) {
 		$obj = utopia::GetInstance(__CLASS__);
 		$obj->BypassSecurity(true);
 		$obj->UpdateField('value',$value,$ident);
 		$obj->BypassSecurity(false);
+		
+		self::SetCacheValue($ident,$value);
 	}
 }

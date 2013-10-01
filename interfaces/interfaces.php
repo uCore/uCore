@@ -1,9 +1,16 @@
 <?php
 
 /**
+ * iInit: impliment static initialiser run before all events
+ */
+interface iInit {
+	public static function Initialise();
+}
+
+/**
  * iUtopiaModule: Identifying interface for utopia modules
  */
-interface iUtopiaModule {}
+interface iUtopiaModule extends iInit {}
 
 /**
  * iRestrictedAccess: used to define modules which utilise User Roles
@@ -33,6 +40,19 @@ interface iWidget {
 	static function DrawData($data);
 }
 
+
+/**
+ * iDashboardWidget: displayed on the dashboard, customisable dashboard per user.
+ * Three different sizes of widget: Full(100), Half(50), Quarter(25)
+ */
+interface uDashboardWidget extends iUtopiaModule,iRestrictedAccess {
+	static function GetTitle();
+	//static function Draw100() { }
+	//static function Draw50() { }
+	//static function Draw25() { }
+}
+ 
+ 
 /*
  interface iOutput {
  // ShowData is the main function which processes each field in turn and returns the resulting html to be output to the browser.

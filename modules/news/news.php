@@ -36,8 +36,9 @@ class tabledef_NewsTable extends uTableDef {
 
 class module_NewsAdmin extends uListDataModule implements iAdminModule {
 	public function GetSortOrder() { return -9800; }
-	public function SetupParents() {
-		$this->AddParent('/');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('/');
 	}
 	public function GetTitle() { return 'Articles'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
@@ -62,8 +63,9 @@ class module_NewsAdmin extends uListDataModule implements iAdminModule {
 }
 
 class module_NewsAdminDetail extends uSingleDataModule implements iAdminModule {
-	public function SetupParents() {
-		$this->AddParent('module_NewsAdmin','news_id','*');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('module_NewsAdmin','news_id','*');
 	}
 	public function GetTitle() { return 'Edit Article'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER | ALLOW_ADD | NO_NAV | ALLOW_EDIT; }
@@ -74,15 +76,15 @@ class module_NewsAdminDetail extends uSingleDataModule implements iAdminModule {
 		$this->CreateTable('author','tabledef_Users','news',array('author'=>'user_id'));
 
 		$this->AddField('time','time','news','Post Date',itDATE);
-		$this->AddField('author','author','news','Author',itSUGGEST,'SELECT user_id,username FROM '.TABLE_PREFIX.'tabledef_Users ORDER BY username');
+		$this->AddField('author','author','news','Author',itCOMBO,'SELECT user_id,username FROM '.TABLE_PREFIX.'tabledef_Users ORDER BY username');
 		$this->SetDefaultValue('author',uUserLogin::IsLoggedIn());
 
 		$this->AddField('heading','heading','news','Title',itTEXT);
 		$this->AddField('description','description','news','Description',itTEXT);
-		$this->FieldStyles_Set('description',array('width'=>'60%'));
-		$this->AddField('tags','tag','tags','tags',itTEXT);
+	//	$this->FieldStyles_Set('description',array('width'=>'60%'));
+		$this->AddField('tags','tag','tags','tags',itTEXT,'SELECT DISTINCT tag FROM tabledef_NewsTags');
 		$this->AddPreProcessCallback('tags',array($this,'ppTag'));
-		$this->FieldStyles_Set('tags',array('width'=>'60%'));
+	//	$this->FieldStyles_Set('tags',array('width'=>'60%'));
 		
 		$this->AddField('featured','featured','news','Featured',itCHECKBOX);
 		
@@ -240,13 +242,15 @@ class module_NewsTags extends uDataModule {
 
 class module_NewsDisplay extends uDataModule {
 	public function GetTitle() { return 'Latest News'; }
-	public function SetupParents() {
-		$this->SetRewrite('{heading}-{news_id}',true);
+	public static function Initialise() {
 		modOpts::AddOption('news_per_page','Articles Per Page','Articles',2);
 		modOpts::AddOption('news_widget_archive','Archive Widget','Articles','article-archive');
 		modOpts::AddOption('news_widget_article','Article Widget','Articles','article');
 		
 		uSearch::AddSearchRecipient(__CLASS__,array('heading','text'),'heading','text');
+	}
+	public function SetupParents() {
+		$this->SetRewrite('{heading}-{news_id}',true);
 	}
 	public function GetTabledef() { return 'tabledef_NewsTable'; }
 	public function SetupFields() {

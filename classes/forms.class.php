@@ -105,11 +105,11 @@ class uFilter {
 }
 
 class uDataset {
-	private $module = null;
-	private $query = null;
-	private $countQuery = null;
-	private $args = array();
-	private $recordCount = null;
+	protected $module = null;
+	protected $query = null;
+	protected $countQuery = null;
+	protected $args = array();
+	protected $recordCount = null;
 	
 	public function __construct($module,$filter,$clearFilters) {
 		// initialise count
@@ -261,6 +261,7 @@ class uDataset {
  * No field or data access is available, use uDataModule and its decendants.
  */
 abstract class uBasicModule implements iUtopiaModule {
+	public static function Initialise() {}
 /*  static $singleton = NULL;
   public static function &call($method) {
     $null = NULL;
@@ -301,19 +302,9 @@ abstract class uBasicModule implements iUtopiaModule {
 
 	public $tabGroup = NULL;
 	
-	private $isSecurePage = false;
+	protected $isSecurePage = false;
 	public function SetSecure() {
 		$this->isSecurePage = true;
-	}
-
-	private $isInitialised = false;
-	public function Initialise() {
-		if ($this->isInitialised === TRUE) return false;
-		$this->isInitialised = true;
-
-		// setup parents
-		$this->_SetupParents();
-		return true;
 	}
 
 	public $isDisabled = false;
@@ -345,6 +336,22 @@ abstract class uBasicModule implements iUtopiaModule {
 		
 		if ($this->isDisabled) { echo $this->isDisabled; return; }
 
+
+		// build linklist of children
+		$children = utopia::GetChildren(get_class($this));
+		foreach ($children as $child => $links) {
+			$obj = utopia::GetInstance($child);
+			foreach ($links as $info) {
+				if ($obj->flag_is_set(ALLOW_ADD)
+						&& !$this->flag_is_set(ALLOW_ADD)
+						&& is_subclass_of($child,'uSingleDataModule')
+						&& ($info['parentField'] === NULL || $info['parentField'] === '*')) {
+					$url = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>'1'));
+					utopia::LinkList_Add('list_functions:'.get_class($this),null,CreateNavButton('New '.$obj->itemName,$url,array('class'=>'new-item')),1);
+				}
+			}
+		}
+		
 		// BEFORE
 		ob_start();
 		$beforeResult = uEvents::TriggerEvent('BeforeRunModule',$this);
@@ -427,86 +434,20 @@ abstract class uBasicModule implements iUtopiaModule {
 			}
 		}
 
-		if (is_array($fieldLinks)) {
-			foreach ($fieldLinks as &$linkInfo) {
-				if (empty($linkInfo['ct'])) $linkInfo['ct'] = ctEQ;
-				if (is_subclass_of($this,'uDataModule')) {
-					$fltr =& $this->FindFilter($linkInfo['toField'],$linkInfo['ct'],itNONE,FILTER_WHERE);
-					if ($fltr === NULL) {
-						$fltr =& $this->AddFilterWhere($linkInfo['toField'],$linkInfo['ct']);
-						$uid = $fltr['uid'];
-						//$fltr =& $this->GetFilterInfo($uid);
-					} else $uid = $fltr['uid'];
-					$fltr['linkFrom'] = $parentModule.':'.$linkInfo['fromField'];
-					$linkInfo['_toField'] = $linkInfo['toField'];
-					$linkInfo['toField'] = $uid;
-				}
-				//				if (is_numeric($key)) {
-				//					unset($fieldLinks[$key]);
-				//					$fieldLinks[$val] = $val;
-			}	}//	}
+		if (isset($fieldLinks) && !is_array($fieldLinks)) // must be null or array
+			trigger_error('Cannot add parent ('.$parentModule.') of '.get_called_class().', fieldLinks parameter is an invalid type.',E_USER_ERROR);
 
-	/*	if (utopia::GetCurrentModule() == get_class($this)) {
-			if ($parentModule === '/') $pm = utopia::GetCurrentModule();
-			else $pm = $parentModule;
-			$filters = NULL;
-			if ($fieldLinks && !$parentField) {
-				$filters = array();
-				foreach ($fieldLinks as $link) {
-					//print_r($link);
-					if (array_key_exists('_f_'.$link['toField'],$_GET))
-						$filters[$link['fromField']] = $_GET['_f_'.$link['toField']];
-				}
-			}
-			breadcrumb::AddModule($pm,$filters,0,utopia::GetCurrentModule());
-		}*/
-
-		//if (!array_key_exists('children',$GLOBALS)) $GLOBALS['children'] = array();
-/*		$children = utopia::GetChildren($parentModule);
-		// check parent field hasnt already been selected
-		if ($parentField !== NULL && $parentField !== '*') {
-			//if (array_key_exists($parentModule,$children))
-			foreach ($children as $childName => $links) {
-				foreach ($links as $link) {
-					//if ($child['moduleName'] !== get_class($this)) continue;
-					if (!isset($link['parentField'])) continue;
-					if ($link['parentField'] == $parentField) {
-						//trigger_error('Cannot add parent ('.$parentModule.') of '.get_class($this).', parentField ('.$parentField.') has already been defined in '.$child['moduleName'].'.',E_USER_ERROR);
-						return;
-					}
-				}
-			}
-		}
-*/
-
-		if (!is_null($fieldLinks) && !is_array($fieldLinks)) // must be null or array
-			trigger_error('Cannot add parent ('.$parentModule.') of '.get_class($this).', fieldLinks parameter is an invalid type.',E_USER_ERROR);
-
-		$info = array('moduleName'=>get_class($this), 'parentField'=>$parentField, 'fieldLinks' => $fieldLinks, 'text' => $text);
-		$this->parents[$parentModule][] = $info;
-		utopia::AddChild($parentModule, get_class($this), $info);
-
-		// build linklist
-		$pm = $parentModule;
-		if ($pm == '/') $pm = utopia::GetCurrentModule();
-		if ($pm == '') $pm = 'uDashboard';
-		$obj =& utopia::GetInstance($pm);
-		if ($this->flag_is_set(ALLOW_ADD)
-				&& !$obj->flag_is_set(ALLOW_ADD)
-				&& is_subclass_of(get_class($this),'uSingleDataModule')
-				&& ($info['parentField'] === NULL || $info['parentField'] === '*')) {
-			$url = $this->GetURL(array('_n_'.$this->GetModuleId()=>'1'));
-			utopia::LinkList_Add('list_functions:'.($pm),null,CreateNavButton('New '.$this->itemName,$url,array('class'=>'new-item')),1);
-		}
+		$info = array('moduleName'=>get_called_class(), 'parentField'=>$parentField, 'fieldLinks' => $fieldLinks, 'text' => $text);
+		utopia::AddChild($parentModule, get_called_class(), $info);
 		
 		return $fieldLinks;
 	}
 
-	public function AddChild($childModule,$fieldLinks=NULL,$parentField=NULL,$text=NULL) {
+	public static function AddChild($childModule,$fieldLinks=NULL,$parentField=NULL,$text=NULL) {
 		//$childModule = (string)$childModule;
 		//echo "addchild $childModule<br/>";
-		$obj =& utopia::GetInstance($childModule);
-		$obj->AddParent(get_class($this),$fieldLinks,$parentField,$text);
+		//$obj = utopia::GetInstance($childModule);
+		$childModule::AddParent(get_called_class(),$fieldLinks,$parentField,$text);
 	}
 
 	/**
@@ -524,12 +465,9 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function GetVar($varname) {
 		return $this->$varname;
 	}
-	final public function GetUUID() {
-		$class = get_class($this);
-		try {
-			$x = new ReflectionClass($class);
-			if ($x->getStaticPropertyValue('uuid')) return $x->getStaticPropertyValue('uuid');
-		} catch(Exception $e) {}
+	final static public function GetUUID() {
+		$class = get_called_class();
+		if (isset($class::$uuid)) return $class::$uuid;
 		$uuid = preg_replace('((.{8})(.{4})(.{4})(.{4})(.+))','$1-$2-$3-$4-$5',md5($class));
 		return $uuid;
 	}
@@ -666,44 +604,13 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function IsInstalled() {
 		return utopia::ModuleExists(get_class($this));
 	}
-	public function InstallModule() {
-		// module should be installed
-		// create a new record in "db_modules" - with UUID, module_parent, tablename, title
-		$uuids = $this->GetUUID();
-		if (!is_array($uuids)) $uuids = array($uuids);
-		foreach ($uuids as $uuid) {
-			//echo $uuid.'<br/>';
-			$row = utopia::UUIDExists($uuid);
-			if ($row === FALSE) {
-				//echo "not installed:".get_class($this);
-				//if (($row = $this->IsInstalled()) == FALSE) {
-				//DebugMail('not installed',get_class($this));
-				$active = $this->flag_is_set(INSTALL_INACTIVE) ? '0' : '1';
-				database::query('INSERT INTO internal_modules (`uuid`,`module_name`,`module_active`) VALUES (?,?,?)',array($uuid,get_class($this),$active));
-			} else {
-				$qry = 'UPDATE internal_modules SET `uuid` = ?, `module_name` = ?, `sort_order` = ?';
-				$args = array($uuid,get_class($this),$this->GetSortOrder);
-				if ($this->flag_is_set(ALWAYS_ACTIVE))
-					$qry .= ', `module_active` = 1';
-
-				$qry .= ' WHERE `uuid = ?';
-				$args[] = $row['uuid'];
-				database::query($qry,$args);
-			}
-		}
-		//		$GLOBALS['modules'][$this->GetUUID()] = get_class($this);
-	}
-
-	public function HookEvent($eventName,$funcName) {
-		$GLOBALS['events'][$eventName][] = get_class($this).".$funcName";
-	}
 
 	public function GetSortOrder() {
 		//if (is_object($module)) $module = get_class($module);
 //		if (get_class($this) == utopia::GetCurrentModule()) return 1;
 		return NULL;
 	}
-	//	public function __construct() { $this->_SetupFields(); } //$this->SetupParents(); }
+	public function __construct() { if (!defined('INIT_COMPLETE')) throw new Exception('No instances should be created until init is complete'); $this->_SetupParents(); }
 	public abstract function RunModule();  // called when current_path = parent_path/<module_name>/
 }
 
@@ -712,6 +619,8 @@ abstract class uBasicModule implements iUtopiaModule {
  *
  */
 abstract class uDataModule extends uBasicModule {
+	public function __construct() { parent::__construct(); $this->_SetupFields();}
+
 	public $fields = array();
 	public $filters = array(FILTER_WHERE=>array(),FILTER_HAVING=>array());
 	public $sqlTableSetupFlat = NULL;
@@ -842,6 +751,7 @@ abstract class uDataModule extends uBasicModule {
 			$filters[$fltr['fieldName']] = $val;
 			unset($filters[$uid]);
 		}
+
 		if (array_key_exists($this->GetPrimaryKey(), $filters)) {
 			foreach ($this->rewriteMapping as $seg) {
 				if (preg_match_all('/{([a-zA-Z0-9_]+)}/',$seg,$matches)) {
@@ -867,7 +777,7 @@ abstract class uDataModule extends uBasicModule {
 			if ($f) $filters = array('_f_'.$f['uid']=>$filters);
 			else $filters = array($this->GetPrimaryKey()=>$filters);
 		}
-
+		
 		foreach ($this->filters as $filterType) {
 			foreach ($filterType as $filterSet) {
 				foreach ($filterSet as $filter) {
@@ -899,12 +809,6 @@ abstract class uDataModule extends uBasicModule {
 		}
 		$this->RewriteFilters($filters);
 		return parent::GetURL($filters);
-	}
-
-	public function Initialise() {
-		if (!parent::Initialise()) return false;
-		$this->_SetupFields();
-		return true;
 	}
 
 	public function GetEncodedFieldName($field,$pkValue=NULL) {
@@ -1191,41 +1095,35 @@ abstract class uDataModule extends uBasicModule {
 		}
 	}
 
-	public function GetValues($alias,$pkVal=null) {
+	public function GetValues($alias,$pkVal=null,$stringify = FALSE) {
+		if (!is_string($alias)) return;
+		
+		$values = null;
 		if (!isset($this->fields[$alias])) {
 			$fltr =& $this->FindFilter($alias);
-			return $fltr['values'];
+			$values = $fltr['values'];
+			if (!is_array($values) && is_string($fltr['fieldName']) && isset($this->fields[$fltr['fieldName']])) $values = $this->GetValues($fltr['fieldName'],$pkVal,$stringify);
+		} else {
+			$values = $this->fields[$alias]['values'];
 		}
 
-		if (isset($this->fields[$alias]['values']) && is_callable($this->fields[$alias]['values'])) {
-			return call_user_func_array($this->fields[$alias]['values'],array($this,$alias,$pkVal));
-		}
-
-		return $this->FindValues($alias,isset($this->fields[$alias]['values'])?$this->fields[$alias]['values']:NULL);
-	}
-
-	public function FindValues($aliasName,$values,$stringify = FALSE) {
-		if (is_callable($values)) return $values;
-
-		$arr = NULL;
-
-		if (is_array($values)) {
-			$arr = $values;
-		} elseif (IsSelectStatement($values)) {
-			$arr = database::getKeyValuePairs($values);
+		if (is_callable($values)) return call_user_func_array($values,array($this,$alias,$pkVal));
+		
+		if (!is_array($values) && IsSelectStatement($values)) {
+			$values = database::getKeyValuePairs($values);
 		}
 		
-		if ($stringify && is_array($arr) && $arr) {
-			$arr = array_combine(array_values($arr),array_values($arr));
+		if ($stringify && is_array($values) && $values) {
+			$values = array_combine(array_values($values),array_values($values));
 		}
-		return $arr;
+		return $values;
 	}
 
 	public function SetFieldOptions($alias,$newoptions) {
 		$this->SetFieldProperty($alias,'options',$newoptions);
 	}
 
-	private $spacerCount = NULL;
+	protected $spacerCount = NULL;
 	public function AddSpacer($text = '&nbsp;',$titleText = '') {
 		if ($this->spacerCount === NULL) $this->spacerCount = 0;
 		$this->AddField("__spacer_{$this->spacerCount}__","'$text'",'',"$titleText");
@@ -1266,7 +1164,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 	}
 
-	private $defaultStyles = array();
+	protected $defaultStyles = array();
 	public function FieldStyles_SetDefault($inputType,$style) {
 		if (!is_array($style)) { ErrorLog("Field Style is not an array ($field)"); return; }
 		$this->defaultStyles[$inputType] = $style;
@@ -1391,7 +1289,7 @@ abstract class uDataModule extends uBasicModule {
 		}
 		return $this->fields[$aliasName];
 	}
-	private $insertBefore = null;
+	protected $insertBefore = null;
 	public function SetAddFieldPosition($before=null) {
 		$this->insertBefore = $before;
 	}
@@ -1526,14 +1424,14 @@ abstract class uDataModule extends uBasicModule {
 		return $this->AddFilter_internal($fieldName,$compareType,$inputType,$value,$values,FILTER_HAVING,$title);
 	}
 
-	private $filterCount = 0;
+	protected $filterCount = 0;
 	public function GetNewUID($fieldName) {
 		$this->filterCount++;
 		return $this->GetModuleId().'_'.$this->filterCount;
 	}
 
 	// private - must use addfilter or addfilterwhere.
-	private function &AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) {
+	protected function &AddFilter_internal($fieldName,$compareType,$inputType=itNONE,$dvalue=NULL,$values=NULL,$filterType=NULL,$title=NULL) {
 		// if no filter, or filter has default, or filter is link - create new filter
 		$fd =& $this->FindFilter($fieldName,$compareType,$inputType);
 		if (!$fd || $fd['default'] !== NULL) {
@@ -1753,6 +1651,7 @@ abstract class uDataModule extends uBasicModule {
 			if ($set && $ftypeID !== $set) continue;
 			foreach ($filterType as $fsetID => $filterset) {
 				if (is_array($filterset)) foreach ($filterset as $arrID => $filterInfo) {
+					if ($filterInfo['uid'] === $fieldName) return $this->filters[$ftypeID][$fsetID][$arrID];
 					if ($filterInfo['fieldName'] != $fieldName) continue;
 					if ($compareType !== NULL && $filterInfo['ct'] !== $compareType) continue;
 					if ($inputType !== NULL && $filterInfo['it'] !== $inputType) continue;
@@ -2066,8 +1965,8 @@ abstract class uDataModule extends uBasicModule {
 
 	public $limit = NULL;
 
-	private $queryChecksum = NULL;
-	private $explainQuery = false;
+	protected $queryChecksum = NULL;
+	protected $explainQuery = false;
 	/**
 	 * Get a dataset based on setup.
 	 * @returns MySQL Dataset
@@ -2232,7 +2131,6 @@ abstract class uDataModule extends uBasicModule {
 
 		$default = $this->GetFilterValue($filterInfo['uid']);
 
-		$vals = $filterInfo['values'];
 		$pre = '';
 		$emptyVal = '';
 		if (!empty($filterInfo['title'])) {
@@ -2252,11 +2150,10 @@ abstract class uDataModule extends uBasicModule {
 					$emptyVal = $this->fields[$fieldName]['visiblename'].' '.htmlentities($filterInfo['ct']); break;
 			}
 		}
-		if ($vals === true && isset($this->fields[$fieldName])) {
-			$vals = $this->fields[$fieldName]['values'];
-		}
+		//$vals = $filterInfo['values'];
+		//if (!is_array($vals))
+		$vals = $this->GetValues($filterInfo['uid']);
 		
-		$vals = $this->FindValues($fieldName,$vals);
 		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA) {
 			if (isset($values[$default])) $default = $values[$default];
 			$vals = cbase64_encode(get_class($this).':'.$fieldName);
@@ -2355,7 +2252,7 @@ abstract class uDataModule extends uBasicModule {
 	}
 		
 	// returns a string pointing to a new url, TRUE if the update succeeds, false if it fails, and null to refresh the page
-	private $noDefaults = FALSE;
+	protected $noDefaults = FALSE;
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
 		$this->_SetupFields();
 		if (!array_key_exists($fieldAlias,$this->fields)) { return; }
@@ -2763,8 +2660,10 @@ abstract class uDataModule extends uBasicModule {
 				$value = $row[$linkInfo['fromField']]; // use actual value, getting the real value on every field causes a lot of lookups, the requested field must be the field that stores the actual value
 			}
 			//echo $value."<br/>";
+			$obj = utopia::GetInstance($targetModule);
+			$fltr = $obj->FindFilter($linkInfo['toField']);
 			if ($value !== NULL)
-				$newFilter['_f_'.$linkInfo['toField']] = $value;
+				$newFilter['_f_'.$fltr['uid']] = $value;
 		}
 		return $newFilter;
 		//print_r(array_merge($newFilter,$additional));

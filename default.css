@@ -3,7 +3,7 @@ body.centerWrap { text-align:center }
 div.centerWrap { width: 950px; margin: 0 auto; position: relative; text-align:left }
 html.wait * { cursor:wait !important; }
 
-.uDebug { white-space:pre-wrap; background:white; color:black; text-align:left; clear:both; }
+.uDebug { white-space:pre-wrap; background:white; color:black; text-align:left; clear:both; font-size:11px; }
 
 .uHidden { width:0 !important;height:0 !important;border:0 !important;padding:0 !important;margin:0 !important;position:absolute !important; }
 

@@ -1,8 +1,21 @@
 <?php
 
-uEvents::AddCallback('ProcessDomDocument','uJavascript::LinkToDocument');
-uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument',null,MAX_ORDER);
 class uJavascript extends uBasicModule {
+	public static function Initialise() {
+		uEvents::AddCallback('ProcessDomDocument','uJavascript::LinkToDocument');
+		uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument',null,MAX_ORDER);
+		
+		self::LinkFile('/javascript.js',-10);
+		self::LinkFile(dirname(__FILE__).'/jQuery/jquery-1.10.2.min.js',-100);
+		self::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui-1.10.3.min.js',-99);
+		self::IncludeFile(dirname(__FILE__).'/javascript.js',-999);
+		
+		module_Offline::IgnoreClass(__CLASS__);
+	}
+	public static $uuid = 'javascript.js';
+	public function SetupParents() {
+		$this->SetRewrite(true);
+	}
 	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
 		array_sort_subkey(self::$linkFiles,'order');
@@ -80,12 +93,10 @@ class uJavascript extends uBasicModule {
 	public static function AddText($text) {
 		self::$script_include .= "\n$text";
 	}
-	public static $uuid = 'javascript.js';
 
-	public function SetupParents() {
-		module_Offline::IgnoreClass(__CLASS__);
-		$this->SetRewrite(true);
-		self::LinkFile($this->GetURL(),-10);
+	private static $jsDefine = array('FORMAT_DATETIME','FORMAT_DATE','FORMAT_TIME','USE_TABS','PATH_REL_ROOT','PATH_REL_CORE','PATH_FULL_ROOT','PATH_FULL_CORE');
+	public static function JsDefine($vars) {
+		self::$jsDefine = array_unique(array_merge(self::$jsDefine,(array)$vars));
 	}
 
 	public function RunModule() {
@@ -115,10 +126,7 @@ class uJavascript extends uBasicModule {
 
 	static function GetJavascriptConstants() {
 		$body = '';
-		array_push($GLOBALS['jsDefine'],'FORMAT_DATETIME','FORMAT_DATE','FORMAT_TIME','USE_TABS','PATH_REL_ROOT','PATH_REL_CORE','PATH_FULL_ROOT','PATH_FULL_CORE');
-		$GLOBALS['jsDefine'] = array_unique($GLOBALS['jsDefine']);
-		if (array_key_exists('jsDefine',$GLOBALS))
-		foreach ($GLOBALS['jsDefine'] as $var) {
+		foreach (self::$jsDefine as $var) {
 			if (!defined($var)) continue;
 			$val = is_numeric(constant($var)) ? constant($var) : '\''.constant($var).'\'';
 			$body .= "var $var = $val;\n";
@@ -142,7 +150,3 @@ class uJavascript extends uBasicModule {
 		return $body;
 	}
 }
-
-uJavascript::LinkFile(dirname(__FILE__).'/jQuery/jquery-1.10.2.min.js',-100);
-uJavascript::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui-1.10.3.min.js',-99);
-uJavascript::IncludeFile(dirname(__FILE__).'/javascript.js',-999);

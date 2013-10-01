@@ -117,6 +117,9 @@ class utopia {
 	}
 
 	private static $allmodules = NULL;
+	/**
+	 * GetModules:  Returns an array of all registered class names which are derived from iUtopiaModule
+	 */
 	static function GetModules($refresh=false) {
 		if (self::$allmodules === NULL || $refresh) {
 			$rows = array();
@@ -128,7 +131,7 @@ class utopia {
 				if (!$ref->implementsInterface('iUtopiaModule')) continue;
 
 				$parents = array_values(class_parents($class));
-                                $interfaces = $ref->getInterfaceNames();
+				$interfaces = $ref->getInterfaceNames();
 				
 				$class = array('module_name'=>$class);
 				$class['module_id'] = $id;
@@ -136,8 +139,7 @@ class utopia {
 				$class['uuid'] = null;
 
 				if ($ref->isSubclassOf('uBasicModule')) {
-					$obj =& utopia::GetInstance($class['module_name']);
-					$class['uuid'] = $obj->GetUUID();
+					$class['uuid'] = $class['module_name']::GetUUID();
 				}
 				$rows[$class['module_name']] = $class;
 			}
@@ -177,6 +179,9 @@ class utopia {
 		return $inputs;
 	}
 
+	/**
+	 * GetRewriteURL: Returns the current URL with PATH_REL_ROOT trimmed from the start
+	 */
 	static function GetRewriteURL() {
 		$REQUESTED_URL = array_key_exists('HTTP_X_REWRITE_URL',$_SERVER) ? $_SERVER['HTTP_X_REWRITE_URL'] : $_SERVER['REQUEST_URI'];
 		$REQUESTED_URL = preg_replace('/\?.*/i','',$REQUESTED_URL);
@@ -198,7 +203,11 @@ class utopia {
 		
 		utopia::SetVar('current_module',$module);
 	}
+	
 	private static $cmCache = array();
+	/**
+	 * GetCurrentModule: Returns class name of module to run (syn: current module)
+	 */
 	static function GetCurrentModule() {
 		// cm variable
 		if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
@@ -227,15 +236,11 @@ class utopia {
 		return 'uCMS_View';
 	}
 
+	private static $launchers = array();
+	static function QueueLauncher($module) {
+		self::$launchers[] = $module;
+	}
 	static function Launcher($module = NULL) {
-		// requesting a real path?
-		$path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
-		if (is_file(PATH_ABS_ROOT.$path) && $path !== PATH_REL_CORE.'index.php') {
-			self::CancelTemplate();
-			include(PATH_ABS_ROOT.$path);
-			self::Finish();
-		}
-
 		if ($module == NULL) $module = self::GetCurrentModule();
 
 		if (!utopia::ModuleExists($module)) {
@@ -243,13 +248,18 @@ class utopia {
 		}
 
 		utopia::SetVar('current_module',$module);
-		$obj =& utopia::GetInstance($module);
-		utopia::SetVar('title',$obj->GetTitle());
+		self::QueueLauncher($module);
+		
+		$currentModule = reset(self::$launchers);
+		do {
+			$obj = utopia::GetInstance($currentModule);
+			utopia::SetVar('title',$obj->GetTitle());
 
-		// run module
-		timer_start('Run Module');
-		$obj->_RunModule();
-		timer_end('Run Module');
+			// run module
+			timer_start('Run Module: '.$currentModule);
+			$obj->_RunModule();
+			timer_end('Run Module: '.$currentModule);
+		} while (($currentModule = next(self::$launchers)));
 	}
 
 	static $instances = array();
@@ -617,13 +627,15 @@ class utopia {
 	}*/
 
 	/*  LINKLIST  */
+	static $lists = array();
 	static function DrawList($id) {
 		$replacement = utopia::LinkList_Get($id).utopia::LinkList_Get('list_functions:'.$id);
 		return $replacement;
 	}
 	static function LinkList_Add($listName,$text,$url,$order = 100,$listAttrs = NULL,$linkAttrs = NULL) {
-		$list =& utopia::GetVar("linklist_$listName");
-		if ($list == NULL) $list = array();
+		if (!isset(self::$lists["linklist_$listName"])) self::$lists["linklist_$listName"] = array();
+		$list =& self::$lists["linklist_$listName"];
+		//if ($list == NULL) $list = array();
 //$bt = useful_backtrace(0,4);
 		$list[] = array('text'=>$text,'url'=>$url,'order'=>$order,'attrList'=>$listAttrs,'attrLink'=>$linkAttrs);//,$bt);
 	}
@@ -631,7 +643,7 @@ class utopia {
 	static function LinkList_Get($listName,$id=NULL,$listAttrs = NULL,$linkAttrs = NULL) {
 		if (!$id) $id = "ulist_$listName";
 		$id = " id=\"$id\"";
-		$list = utopia::GetVar("linklist_$listName");
+		$list =& self::$lists["linklist_$listName"];
 		if (!is_array($list)) return;
 
 		array_sort_subkey($list,'order');
@@ -1397,7 +1409,8 @@ class utopia {
 		return $value;
 	}
 	static function checksum($val) {
-		return md5(json_encode($val));
+		if (!is_string($val)) $val = json_encode($val);
+		return md5($val).sha1($val);
 	}
 	static function GetMimeType($path) {
 		$cType = NULL;

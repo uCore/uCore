@@ -34,15 +34,16 @@ class uEmailTemplateList extends uListDataModule implements iAdminModule {
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 	public function GetSortOrder() { return -8800; }
 
-	public function SetupParents() {
-		$this->AddParent('');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('');
 	}
 
 	public function SetupFields() {
-		$this->CreateTable('docs');
+		$this->CreateTable('templates');
 
-		$this->AddField('ident','identifier','docs','Ident');
-		$this->AddField('subject','subject','docs','Subject');
+		$this->AddField('ident','identifier','templates','Ident');
+		$this->AddField('subject','subject','templates','Subject');
 	}
 
 	public function RunModule() {
@@ -55,17 +56,18 @@ class uEmailTemplateDetails extends uSingleDataModule implements iAdminModule {
 	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 
-	public function SetupParents() {
-		$this->AddParent('uEmailTemplateList','ident','*');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('uEmailTemplateList','ident','*');
 	}
 
 	public function SetupFields() {
-		$this->CreateTable('docs');
+		$this->CreateTable('templates');
 
-		$this->AddField('ident','identifier','docs','Ident',itTEXT);
-		$this->AddField('subject','subject','docs','Subject',itTEXT);
+		$this->AddField('ident','identifier','templates','Ident',itTEXT);
+		$this->AddField('subject','subject','templates','Subject',itTEXT);
 		$this->AddField('fields',array($this,'getTemplateFields'),NULL,'Fields Available');
-		$this->AddField('body','body','docs','Body',itHTML);
+		$this->AddField('body','body','templates','Body',itHTML);
 		$this->FieldStyles_Set('body',array('width'=>'100%','height'=>'20em'));
 	}
 	public function getTemplateFields($_,$pk) {
@@ -87,25 +89,27 @@ class uEmailTemplateAttachmentList extends uListDataModule implements iAdminModu
 	public function GetTitle() { return 'Attachments'; }
 	public function GetOptions() { return ALLOW_ADD | ALLOW_EDIT | ALLOW_DELETE; }
 	public function GetTabledef() { return 'tabledef_EmailTemplateAttachments'; }
-	public function SetupParents() {
-		$this->AddParent('uEmailTemplateDetails',array('ident'=>'doc_id'));
+	public static function Initialise() {
+		uEvents::AddCallback('AfterRunModule','uEmailTemplateAttachmentList::ParentLoad','uEmailTemplateDetails');
+		self::AddParent('uEmailTemplateDetails',array('ident'=>'doc_id'));
 	}
-	public function ParentLoad() {
-		$this->ShowData();
+	public function SetupParents() {}
+	public static function ParentLoad() {
+		$thisObj = utopia::GetInstance(__CLASS__);
+		$thisObj->ShowData();
 	}
 	public function SetupFields() {
-		$this->CreateTable('docs');
+		$this->CreateTable('templates');
 
-		$this->AddField('doc_id','doc_id','docs');
-		$this->AddField('attachment_current','attachment','docs','Current Attachment');
-		$this->AddField('attachment','attachment','docs','Upload Attachment',itFILE);
+		$this->AddField('doc_id','doc_id','templates');
+		$this->AddField('attachment_current','attachment','templates','Current Attachment');
+		$this->AddField('attachment','attachment','templates','Upload Attachment',itFILE);
 	}
 
 	public function RunModule() {
 		$this->ShowData();
 	}
 }
-uEvents::AddCallback('AfterRunModule',array(utopia::GetInstance('uEmailTemplateAttachmentList'),'ParentLoad'),'uEmailTemplateDetails');
 
 class uEmailer extends uDataModule {
 	// title: the title of this page, to appear in header box and navigation
@@ -113,29 +117,30 @@ class uEmailer extends uDataModule {
 	public function GetOptions() { return ALLOW_FILTER | ALLOW_ADD | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_EmailTemplates'; }
 
-	public function SetupParents() {
+	public static function Initialise() {
 		modOpts::AddOption('smtp_host','SMTP Host','Emails','localhost');
 		modOpts::AddOption('smtp_port','SMTP Port','Emails',25);
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
 		modOpts::AddOption('emailer_from','Mailer From','Emails',ADMIN_EMAIL);
 		modOpts::AddOption('return_path','Return Path','Emails');
-		uEvents::AddCallback('AfterInit',array($this,'InitialiseTemplates'));
+		uEvents::AddCallback('AfterInit','uEmailer::InitialiseTemplates');
 	}
+	public function SetupParents() {}
 
 	public function SetupFields() {
-		$this->CreateTable('docs');
+		$this->CreateTable('templates');
 
-		$this->AddField('ident','identifier','docs','Ident');
-		$this->AddField('subject','subject','docs','Subject');
-		$this->AddField('body','body','docs','Body');
+		$this->AddField('ident','identifier','templates','Ident');
+		$this->AddField('subject','subject','templates','Subject');
+		$this->AddField('body','body','templates','Body');
 	}
 
 	public function RunModule() { }
 
 	public function ShowData() { }
 
-	public function InitialiseTemplates() {
+	public static function InitialiseTemplates() {
 		foreach (self::$init as $ident => $data) {
 			self::GetTemplate($ident);
 		}
@@ -150,20 +155,23 @@ class uEmailer extends uDataModule {
 		);
 	}
 
+	private static $_templateCache;
 	public static function GetTemplate($ident) {
-		$obj =& utopia::GetInstance(__CLASS__);
-		$row = $obj->LookupRecord(array('ident'=>$ident));
-		// if no doc, create it and alert admin
-		if (!$row) {
-			$pk = null;
-			$obj->UpdateField('ident',$ident,$pk);
-			if (isset(self::$init[$ident])) {
-				$obj->UpdateField('subject',self::$init[$ident]['subject'],$pk);
-				$obj->UpdateField('body',self::$init[$ident]['content'],$pk);
-			}
-			uNotices::AddNotice('No email template found called '.$ident.'.  This has been created automatically.',NOTICE_TYPE_WARNING);
-			$row = $obj->LookupRecord($pk);
+		$obj = utopia::GetInstance(__CLASS__);
+		if (self::$_templateCache === null) self::$_templateCache = $obj->GetDataset()->fetchAll();
+//		$row = $obj->LookupRecord(array('ident'=>$ident));
+		foreach (self::$_templateCache as $row) {
+			if ($row['ident'] == $ident) return $row;
 		}
+		// if no doc, create it and alert admin
+		$pk = null;
+		$obj->UpdateField('ident',$ident,$pk);
+		if (isset(self::$init[$ident])) {
+			$obj->UpdateField('subject',self::$init[$ident]['subject'],$pk);
+			$obj->UpdateField('body',self::$init[$ident]['content'],$pk);
+		}
+		uNotices::AddNotice('No email template found called '.$ident.'.  This has been created automatically.',NOTICE_TYPE_WARNING);
+		$row = $obj->LookupRecord($pk);
 
 		return $row;
 	}

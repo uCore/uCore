@@ -1,17 +1,19 @@
 <?php
 define('itFILEMANAGER' ,'fileman');
 class fileManager extends uBasicModule implements iAdminModule {
+	public static function Initialise() {
+		utopia::RegisterAjax('media','fileManager::RunPopup');
+		self::AddParent('/');
+	}
 	public function GetSortOrder() { return -8900; }
 	function GetTitle() { return 'Media'; }
-	function SetupParents() {
-		$this->AddParent('/');
-		utopia::RegisterAjax('media',array($this,'RunPopup'));
-	}
-	function RunPopup() {
+	function SetupParents() {}
+	static function RunPopup() {
 		utopia::SetTitle('Browse Media');
 		uEvents::RemoveCallback('ProcessDomDocument','uAdminBar::ProcessDomDocument');
 		utopia::UseTemplate(TEMPLATE_BLANK); utopia::$noSnip = true;
-		$this->_RunModule();
+		$o = utopia::GetInstance('fileManager');
+		$o->_RunModule();
 	}
 	function RunModule() {
 		echo '<h1>'.$this->GetTitle().'</h1>';

@@ -5,7 +5,13 @@ class adminLogout extends uBasicModule {
 	public static $uuid = 'logout';
 	public function SetupParents() {
 		$this->SetRewrite(true);
-		utopia::AddTemplateParser('logout','<a href="'.$this->GetURL().'">Log Out</a>','');
+	}
+	public static function Initialise() {
+		uEvents::AddCallback('AfterRunModule','adminLogout::Setup',utopia::GetCurrentModule());
+	}
+	public static function Setup() {
+		$o = utopia::GetInstance(__CLASS__);
+		utopia::AddTemplateParser('logout','<a href="'.$o->GetURL().'">Log Out</a>','');
 	}
 	public function RunModule() {
 		$_SESSION = array();
@@ -26,14 +32,22 @@ class adminLogout extends uBasicModule {
 }
 
 
-utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
-utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
-utopia::AddTemplateParser('login_status','uUserLogin::GetLoginStatus','');
-utopia::AddTemplateParser('login','uUserLogin::LoginForm','',true);
-uEvents::AddCallback('BeforeRunModule','uUserLogin::checkLogin');
 class uUserLogin extends uDataModule {
+	public static function Initialise() {
+		utopia::AddTemplateParser('login_user','uUserLogin::GetLoginUserBox','');
+		utopia::AddTemplateParser('login_pass','uUserLogin::GetLoginPassBox','');
+		utopia::AddTemplateParser('login_status','uUserLogin::GetLoginStatus','');
+		utopia::AddTemplateParser('login','uUserLogin::LoginForm','',true);
+		uEvents::AddCallback('BeforeRunModule','uUserLogin::checkLogin');
+		
+		uCSS::IncludeFile(dirname(__FILE__).'/login.css');
+		uEvents::AddCallback('AfterInit','uUserLogin::CheckSession');
+	}
+	public function SetupParents() {
+		$this->SetRewrite(true);
+	}
 	// title: the title of this page, to appear in header box and navigation
-	public function GetTitle() { return 'User Log In'; }
+	public function GetTitle() { return 'Log In'; }
 	public function GetOptions() { return ALWAYS_ACTIVE | NO_HISTORY | PERSISTENT | NO_NAV; }
 	public static $uuid = 'login';
 	public function GetTabledef() { return 'tabledef_Users'; }
@@ -47,18 +61,11 @@ class uUserLogin extends uDataModule {
 		$this->AddField('can_login','(!({email_confirm} <=> {username}))','users');
 		$this->AddFilter('can_login',ctEQ,itNONE,1);
 	}
-
-	public function SetupParents() {
-		uCSS::IncludeFile(dirname(__FILE__).'/login.css');
-
-		uEvents::AddCallback('AfterInit',array($this,'CheckSession'));
-
-		$this->SetRewrite(true);
-	}
 	
-	public function CheckSession() {
+	public static function CheckSession() {
+		$o = utopia::GetInstance(__CLASS__);
 		if (!isset($_SESSION['current_user'])) return;
-		$rec = $this->LookupRecord($_SESSION['current_user']);
+		$rec = $o->LookupRecord($_SESSION['current_user']);
 		if (!$rec) {
 			uNotices::AddNotice('Your user no longer exists.',NOTICE_TYPE_ERROR);
 			unset($_SESSION['current_user']);
@@ -124,8 +131,9 @@ class uUserLogin extends uDataModule {
 
 		$parent = get_class($object);
 		if ($parent == utopia::GetCurrentModule() && $parent !== __CLASS__ && !AjaxEcho('window.location.reload();')) {
-			$obj =& utopia::GetInstance(__CLASS__);
-			$obj->_RunModule();
+			utopia::QueueLauncher(__CLASS__);
+			//$obj = utopia::GetInstance(__CLASS__);
+			//$obj->_RunModule();
 		}
 		return FALSE;
 	}
@@ -149,20 +157,19 @@ class uUserLogin extends uDataModule {
 	}
 	public static function LoginForm() {
 		if (self::IsLoggedIn()) return;
-		?>
-		<div id="login-register-wrap">
-			<div id="login-wrap">
+		
+		?><div class="login-wrap widget-container">
 			<h1>Log In</h1>
-			<form action="" method="POST">
+			<form class="module-content" action="<?php echo $_SERVER['REQUEST_URI']; ?>" method="POST">
 			<div class="form-field">
 			<label for="__login_u">Email/Username</label>{login_user}
 			</div>
 			<div class="form-field">
 			<label for="__login_p">Password</label>{login_pass}
 			</div>
-			<label><input type="checkbox" value="1" name="remember_me" /> Remember Me</label>
-		<?php
-		$o =& utopia::GetInstance('uResetPassword');
+			<label><input type="checkbox" value="1" name="remember_me" /> Remember Me</label><?php
+			
+		$o = utopia::GetInstance('uResetPassword');
 		echo utopia::DrawInput('',itSUBMIT,'Log In',null,array('class'=>'right'));
 		echo '<a href="'.$o->GetURL(null).'" class="forgotten-password">Forgotten Password?</a>';
 		echo '</form><script type="text/javascript">$(function (){$(\'#__login_u\').focus()})</script>';
@@ -171,8 +178,6 @@ class uUserLogin extends uDataModule {
 
 		// register
 		uEvents::TriggerEvent('AfterShowLogin');
-		
-		echo '</div>';
 	}
 }
 uEvents::AddCallback('AfterInit','uUserLogin::IsLoggedIn',-1000);

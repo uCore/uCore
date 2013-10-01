@@ -19,6 +19,8 @@ class uSitemap extends uBasicModule {
 		$this->SetRewrite(array('{group}'));
 	}
 	public function RunModule() {
+		uEvents::TriggerEvent('InitSitemap');
+
 		$grp = isset($_GET['group']) ? $_GET['group'] : '';
 		if (!isset(self::$items[$grp])) utopia::PageNotFound();
 		

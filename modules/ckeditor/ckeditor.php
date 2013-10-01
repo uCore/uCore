@@ -5,17 +5,23 @@ class module_CKEditor extends uBasicModule {
 	// title: the title of this page, to appear in header box and navigation
 	public function GetTitle() { return ''; }
 	public function GetOptions() { return ALLOW_FILTER; }
-
-	public function SetupParents() {
-		utopia::AddInputType(itRICHTEXT,array($this,'drti_func'));
-		utopia::AddInputType(itHTML,array($this,'drti_func'));
-		self::InitScript();
+	public static function Initialise() {
+		utopia::AddInputType(itRICHTEXT,'module_CKEditor::drti_func');
+		utopia::AddInputType(itHTML,'module_CKEditor::drti_func');
 		uJavascript::IncludeFile(dirname(__FILE__).'/lib/ckeditor.js',1000);
 		uJavascript::IncludeFile(dirname(__FILE__).'/ckeditor.js',1005);
 		uCSS::IncludeFile(dirname(__FILE__).'/ckeditor.css');
-		uEvents::AddCallback('AfterRunModule',array($this,'MediaScript'),'fileManager');
+		uEvents::AddCallback('AfterRunModule','module_CKEditor::MediaScript','fileManager');
+
+		$basepath = utopia::GetRelativePath(dirname(__FILE__).'/lib/');
+		uJavascript::IncludeText(<<< FIN
+var CKEDITOR_BASEPATH = '$basepath/';
+var FILE_BROWSE_URL = PATH_REL_CORE+'index.php?__ajax=media';
+FIN
+);
 	}
-	public function MediaScript() {
+	public function SetupParents() { }
+	public static function MediaScript() {
 		if (!isset($_REQUEST['__ajax']) || $_REQUEST['__ajax'] !== 'media') return;
 		uJavascript::AddText(<<<FIN
 	$(function(){
@@ -30,22 +36,8 @@ FIN
 );
 echo '<style>.ui-widget{font-size:0.8em}body{font-family:Arial}</style>';
 	}
-	private static $hasDrawnJS = false;
-	static function InitScript() {
-		if (!self::$hasDrawnJS) {
-			self::$hasDrawnJS = true;
-			list($fileManagerPath,$uploadPath) = uUploads::Init();
-			$basepath = utopia::GetRelativePath(dirname(__FILE__).'/lib/');
-			uJavascript::IncludeText(<<< FIN
-var CKEDITOR_BASEPATH = '$basepath/';
-var FILE_BROWSE_URL = PATH_REL_CORE+'index.php?__ajax=media';
-FIN
-);
-		}
-	}
 
-	function drti_func($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
-		
+	static function drti_func($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
 		if (!is_array($attributes)) $attributes = array();
 		if (isset($attributes['class'])) $attributes['class'] .= ' ckEditReplace';
 		else $attributes['class'] = 'ckEditReplace';

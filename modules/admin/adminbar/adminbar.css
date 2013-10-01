@@ -66,7 +66,7 @@
 .admin-bar .inputtype { padding:5px; height:auto; line-height:normal; width:100%; box-sizing:border-box; border: 1px solid #ABADB3; margin:3px 0; font-size: 12px; box-shadow: none; border-radius: 0; color:#333; }
 .admin-bar .inputtype.inputtype-combo.ui-combobox { width:100% }
 
-.admin-bar .menu_0 {
+.admin-bar .first-child {
 	background:url("images/adminbar-bg.png") repeat-x;
 	border-bottom:1px solid #aaa;
 }

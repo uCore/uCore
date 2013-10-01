@@ -63,8 +63,14 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 	public function GetTitle() { return 'User Details'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_ADD; }
-	public function SetupParents() {
-		$this->AddParent('uUsersList','user_id','*');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('uUsersList','user_id','*');
+		uEvents::AddCallback('AfterRunModule','UserProfileDetail::RunChild','uUserProfile',101);
+	}
+	public static function RunChild() {
+		$o = utopia::GetInstance(__CLASS__);
+		$o->RunModule();
 	}
 	public function RunModule() {
 		$this->ShowData();
@@ -114,4 +120,3 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 		parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
 }
-uEvents::AddCallback('AfterRunModule',array(utopia::GetInstance('UserProfileDetail'),'RunModule'),'uUserProfile',101);

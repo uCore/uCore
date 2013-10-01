@@ -1,11 +1,4 @@
-#login-register-wrap { white-space:nowrap; }
-#login-wrap p, #register-wrap p { white-space:normal; }
-#login-wrap .form-field, #register-wrap .form-field { margin-bottom:15px; }
-#login-wrap .form-field input, #register-wrap .form-field input { display:block; margin:2px; margin-left:0; font-size: 16px; padding: 5px; height:auto; line-height:initial; width: 285px; border: 1px solid #ccc; }
-
-#login-wrap, #register-wrap { width:300px; display:inline-block; zoom: 1; *display: inline; vertical-align: top; padding:10px 25px }
-#login-register-wrap #register-wrap { border-left: 1px solid #ccc }
-.uRegisterUser #register-wrap .tag { display:none; }
-
-#login-wrap .forgotten-password { float:right; clear:both; margin-top:10px; }
-
+.login-wrap .form-field, .register-wrap .form-field { margin-bottom:15px; }
+.login-wrap .form-field input, .register-wrap .form-field input { width:100%; margin:5px 0; box-sizing:border-box; }
+.login-wrap, .register-wrap { display:inline-block; vertical-align: top; }
+.login-wrap .forgotten-password { float:right; clear:both; margin-top:10px; }

@@ -96,9 +96,6 @@ class uCustomWidget implements iWidget {
 		}
 	
 		$instance->_SetupParents(); $instance->_SetupFields();
-		foreach ($instance->fields as $fieldName => $fieldInfo) {
-			if (isset($fieldInfo['ismetadata']) && !isset($rec[$fieldName])) $rec[$fieldName] = null;
-		}
 		
 		// clear filters
 		$rec['clear_filter'] = (array)utopia::jsonTryDecode($rec['clear_filter']);

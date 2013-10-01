@@ -79,8 +79,9 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		return array('color'=>'#999');
 	}
 
-	public function SetupParents() {
-		$this->AddParent('/');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('/');
 	}
 
 	public function RunModule() {
@@ -194,15 +195,18 @@ class uRegisterUser extends uDataModule {
 
 		uEmailer::InitialiseTemplate('account_activate','Confirm your email address','<p>Please verify your email by clicking the link below:</p><p><a href="{home_url_abs}/{activate_link}">{home_url_abs}/{activate_link}</a></p>',array('email','active_link'));
 	}
-	public function SetupParents() {
-		$this->SetRewrite(false);
-		uEvents::AddCallback('AfterShowLogin',array($this,'RegisterLink'));
+	public static function Initialise() {
+		uEvents::AddCallback('AfterShowLogin','uRegisterUser::RegisterLink');
 		modOpts::AddOption('open_user_registration','Allow User Registrations',NULL,false,itYESNO);
 	}
+	public function SetupParents() {
+		$this->SetRewrite(false);
+	}
 	public static $uuid = 'register';
-	public function RegisterLink() {
+	public static function RegisterLink() {
+		$o = utopia::GetInstance(__CLASS__);
 		if (!modOpts::GetOption('open_user_registration')) return;
-		if ($usr = $this->RegisterForm()) {
+		if ($usr = $o->RegisterForm()) {
 			uVerifyEmail::VerifyAccount($usr);
 			echo '<p>Thank you for creating an account.  We need to verify your email before you can continue.</p>';
 			echo '<p>Please check your inbox, and follow the instructions we have sent you.</p>';
@@ -274,10 +278,10 @@ class uRegisterUser extends uDataModule {
 				return $pk;
 			} while (false);
 		}
-		?>
-		<div id="register-wrap">
+		
+		?><div class="register-wrap widget-container">
 		<h1>Create an Account</h1>
-		<form class="register-user oh" action="<?php echo $this->GetURL(); ?>" method="POST">
+		<form class="module-content register-user oh" action="<?php echo $this->GetURL(); ?>" method="POST">
 			<div class="form-field"><label for="username">Email:</label>
 			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" /></div>
 			<div class="form-field"><label for="username2">Confirm Email:</label>
@@ -300,8 +304,7 @@ class uRegisterUser extends uDataModule {
 		$('#username').change(regValidate).change();
 		$('#username2').change(regValidate).change();
 		</script>
-		</div>
-		<?php
+		</div><?php
 	}
 }
 
