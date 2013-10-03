@@ -480,24 +480,6 @@ class utopia {
 				$formattedVal = $defaultValue;
 				$out .= "<input type=\"text\" $attr value=\"$formattedVal\"/>";
 				break;
-			case itSCAN:
-				$out .= '<applet code="com.asprise.util.jtwain.web.UploadApplet.class"
-	codebase="http://asprise.com/product/jtwain/files/"
-	archive="JTwain.jar"
-	width="600" height="470">
-	<param name="DOWNLOAD_URL" value="http://asprise.com/product/jtwain/files/AspriseJTwain.dll">
-	<param name="DLL_NAME" value="AspriseJTwain.dll">
-	<param name="UPLOAD_URL" value="http://'.$_SERVER['HTTP_HOST'].'/internal/ajax/update.php?uuid='.$_REQUEST['uuid'].'">
-	<param name="UPLOAD_PARAM_NAME" value="'.$fieldName.'">
-	<param name="UPLOAD_EXTRA_PARAMS" value="">
-	<param name="UPLOAD_OPEN_URL" value="http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'">
-	<param name="UPLOAD_OPEN_TARGET" value="_self">
-	Oops, Your browser does not support Java applet!
-</applet>';
-				//$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
-				//$defaultValue = htmlentities($defaultValue);
-				//$out .= "<input type=\"file\" $attr value=\"$defaultValue\">";
-				break;
 			case itCUSTOM:
 				//	ErrorLog(get_class($this).': Unhandled input type itCUSTOM');
 				break;
