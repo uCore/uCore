@@ -414,7 +414,7 @@ abstract class uTableDef implements iUtopiaModule {
 			database::query($qry);
 		}
 
-		uEvents::AddCallback('AfterInit',array($this,'TableChangedCallback'));
+		uEvents::TriggerEvent('TableChanged',$this);
 	}
 	private static function keyDiff($arr1,$arr2) {
 		$diff = array();
@@ -449,13 +449,7 @@ abstract class uTableDef implements iUtopiaModule {
 		//echo "$qry\n";
 		database::query($qry);
 
-		uEvents::AddCallback('AfterInit',array($this,'TableCreatedCallback'));
-	}
-	public function TableCreatedCallback() {
 		uEvents::TriggerEvent('TableCreated',$this);
-	}
-	public function TableChangedCallback() {
-		uEvents::TriggerEvent('TableChanged',$this);
 	}
 	
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
