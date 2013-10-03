@@ -481,7 +481,8 @@ final class utopia {
 				$out .= "<input type=\"text\" $attr value=\"$formattedVal\"/>";
 				break;
 			default:
-				ErrorLog("Unrecognized input type ($inputType) on field ($fieldName)");
+				$defaultValue = str_replace('"','&quot;',$defaultValue);
+				$out .= "<input type=\"$inputType\" $attr value=\"$defaultValue\"/>";
 				break;
 		}
 
