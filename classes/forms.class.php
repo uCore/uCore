@@ -24,7 +24,6 @@ define('itFILE'		,'file');
 define('itDATE'		,'date');
 define('itTIME'		,'time');
 define('itDATETIME'	,'datetime');
-define('itCUSTOM'	,'~~custom~~');
 
 //--  FilterCompareType
 define('ctCUSTOM'	,'{custom}');

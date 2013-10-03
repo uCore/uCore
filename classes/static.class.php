@@ -480,9 +480,6 @@ class utopia {
 				$formattedVal = $defaultValue;
 				$out .= "<input type=\"text\" $attr value=\"$formattedVal\"/>";
 				break;
-			case itCUSTOM:
-				//	ErrorLog(get_class($this).': Unhandled input type itCUSTOM');
-				break;
 			default:
 				ErrorLog("Unrecognized input type ($inputType) on field ($fieldName)");
 				break;
