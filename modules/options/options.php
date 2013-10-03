@@ -46,6 +46,9 @@ class modOpts extends uListDataModule implements iAdminModule {
 	public function RunModule() {
 		$groups = database::query('SELECT DISTINCT `group` FROM tabledef_ModOpts WHERE `group` IS NOT NULL ORDER BY (`group` = ?) DESC, `group` ASC',array('Site Options'))->fetchAll();
 
+		$ids = array_keys(self::$types);
+		$this->AddFilter('ident',ctIN,itNONE,$ids);
+
 		$f =& $this->FindFilter('group');
 		foreach ($groups as $group) {
 			$group = $group['group'];
