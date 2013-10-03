@@ -21,7 +21,7 @@ utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 utopia::AddTemplateParser('setrequest','utopia::setRequest');
 utopia::AddTemplateParser('setget','utopia::setGet');
 
-class utopia {
+final class utopia {
 	private static $children = array();
 	static function AddChild($parent, $child, $info) {
 		$info['parent'] = $parent;
