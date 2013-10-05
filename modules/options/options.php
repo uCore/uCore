@@ -11,7 +11,7 @@ class tabledef_ModOpts extends uTableDef {
 		$this->AddField('ident',ftVARCHAR,100);
 		$this->AddField('group',ftVARCHAR,100);
 		$this->AddField('name',ftVARCHAR,100);
-		$this->AddField('value',ftLONGTEXT);
+		$this->AddField('value',ftTEXT);
 		$this->SetPrimaryKey('ident');
 	}
 }
@@ -66,20 +66,18 @@ class modOpts extends uListDataModule implements iAdminModule {
 	public function GetValues($alias,$pkVal=null,$stringify = FALSE) {
 		if ($alias !== 'value') return parent::GetValues($alias,$pkVal,$stringify);
 		if (!$pkVal) return null;
+		if (!isset(modOpts::$types[$pkVal])) return null;
 		return modOpts::$types[$pkVal][1];
 	}
 	public static $types = array();
 	public static function AddOption($ident,$name,$group=NULL,$init='',$fieldType=itTEXT,$values=NULL) {
 		if (!$group) $group = 'Site Options';
 		self::$types[$ident] = array($fieldType,$values,$name,$group,$init);
-		//INIT return self::GetOption($ident);
 	}
 	
 	protected static $_optionCache = null;
 	protected static function GetCachedItem($ident) {
 		$obj = utopia::GetInstance(__CLASS__);
-		$obj->_SetupParents();
-		$obj->_SetupFields();
 		if (self::$_optionCache === NULL) {
 			$obj->BypassSecurity(true);
 			$rows = $obj->GetDataset(null,true)->fetchAll();
@@ -89,7 +87,7 @@ class modOpts extends uListDataModule implements iAdminModule {
 			}
 		}
 		if (isset(self::$_optionCache[$ident])) return self::$_optionCache[$ident];
-		return null;
+		return false;
 	}
 	protected static function SetCacheValue($ident,$value) {
 		// ensure cache is created
@@ -99,8 +97,12 @@ class modOpts extends uListDataModule implements iAdminModule {
 	
 	public static function GetOption($ident) {
 		$obj = utopia::GetInstance(__CLASS__);
-		
 		$cache = self::GetCachedItem($ident);
+		
+		if (!isset(self::$types[$ident])) {
+			if ($cache) return $cache['value'];
+			return FALSE;
+		}
 		
 		if (!$cache) {
 			$obj->BypassSecurity(true);
@@ -121,6 +123,9 @@ class modOpts extends uListDataModule implements iAdminModule {
 	public static function SetOption($ident,$value) {
 		$obj = utopia::GetInstance(__CLASS__);
 		$obj->BypassSecurity(true);
+		if (self::GetCachedItem($ident) === false) {
+			$obj->UpdateField('ident',$ident);
+		}
 		$obj->UpdateField('value',$value,$ident);
 		$obj->BypassSecurity(false);
 		
