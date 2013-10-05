@@ -643,7 +643,7 @@ abstract class uDataModule extends uBasicModule {
 		if ($this->fieldsSetup == TRUE) return;
 		$this->fieldsSetup = TRUE;
 
-		$fltr =& $this->AddFilter(array($this,'GetGlobalSearch'),ctCUSTOM,'search',null,null,'Global Search');
+		$fltr =& $this->AddFilter(array($this,'GetGlobalSearch'),ctCUSTOM,'search',null,null,'Search');
 		$fltr['uid'] = $this->GetModuleId().'_global_search_';
 		$fltr['attributes']['class'] = 'uGlobalSearch';
 		
