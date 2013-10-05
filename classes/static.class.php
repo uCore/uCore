@@ -429,36 +429,6 @@ final class utopia {
 					$out .= "<optgroup label=\"No longer available\"><option selected=\"selected\">$defaultValue</option></optgroup>";
 				}
 				$out .= "</select>";
-				//				} else if (is_string($possibleValues)) { // autocomplete info
-				//					$out .= "<input type=\"text\" $attr class=\"autocomplete\" gv=\"$possibleValues\" value=\"$defaultValue\">\n";
-				//				}
-				break;
-			case itSUGGEST:
-				//				if (is_array($possibleValues)) { // array of combos
-				//					$out .= "<select $attr><option value=\"\"></option>";
-				//					foreach ($possibleValues as $name => $val) {
-				//						if (empty($val)) continue;
-				//						$selected = ($val == $defaultValue) ? ' selected="true"' : '';
-				//						$out .= "<option value=\"$val\"$selected>$name</option>";
-				//					}
-				//					$out .= "</select>";
-				//				} else if (is_string($possibleValues)) { // autocomplete info
-				//
-				if (!isset($attributes['class'])) $attributes['class'] = '';
-				$attributes['class'] .= " autocomplete {gv:'$possibleValues'}";
-				$attr = BuildAttrString($attributes);
-				$out .= "<input type=\"text\" $attr value=\"$defaultValue\"/>\n";
-				//				}
-				break;
-			case itSUGGESTAREA:
-				//AA $defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
-				//	settype($possibleValues,'integer');
-				//	$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " cols=\"$possibleValues\" rows=\"".floor($possibleValues*0.08)."\"" : "";
-				//					$out .= "<textarea $attr $ml>$defaultValue</textarea>";
-				if (!isset($attributes['class'])) $attributes['class'] = '';
-				$attributes['class'] .= " autocomplete {gv:'$possibleValues'}";
-				$attr = BuildAttrString($attributes);
-				$out .= "<textarea $attr>$defaultValue</textarea>\n";
 				break;
 			case itLISTBOX:
 				if (!is_array($possibleValues)) { ErrorLog('Listbox field specified but no possible values found'); return ''; }

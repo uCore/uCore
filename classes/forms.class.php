@@ -16,8 +16,6 @@ define('itPLAINPASSWORD','plain_password');
 
 define('itTEXT'		,'text');
 define('itTEXTAREA'	,'textarea');
-define('itSUGGEST'	,'suggest');
-define('itSUGGESTAREA'	,'suggestarea');
 define('itCOMBO'	,'combo');
 define('itLISTBOX'	,'listbox');
 define('itFILE'		,'file');
@@ -844,17 +842,7 @@ abstract class uDataModule extends uBasicModule {
 			}
 		}
 
-		// its a suggest, so lv should be information to lookup with ajax
-		// cannot place in switch due to spliting of shared properties (size/cols+rows)
-
-		if ($inputType == itSUGGEST || $inputType == itSUGGESTAREA) {
-			if (isset($values[$defaultValue])) $defaultValue = $values[$defaultValue];
-			$values = cbase64_encode(get_class($this).':'.$field);
-		}
-		//		else // dont want to set onchange for suggestions
-		//if (!array_key_exists('onchange',$attributes)) $attributes['onchange']='uf(this);';
-
-		if (!array_key_exists('class',$attributes)) $attributes['class'] = '';
+		if (!isset($attributes['class'])) $attributes['class'] = '';
 		if ($this->isAjax) $attributes['class'] .= ' uf';
 		$attributes['class'] = trim($attributes['class']);
 
@@ -1273,8 +1261,6 @@ abstract class uDataModule extends uBasicModule {
 			//case itNONE: // commented to prevent huge memory usage on BLOB fields.  Set Values to true if you need it!
 			case itCOMBO:
 			case itOPTION:
-			case itSUGGEST:
-			case itSUGGESTAREA:
 				$values = true;
 			default:
 				break;
@@ -1450,8 +1436,6 @@ abstract class uDataModule extends uBasicModule {
 			case itNONE:
 			case itCOMBO:
 			case itOPTION:
-			case itSUGGEST:
-			case itSUGGESTAREA:
 				$values = true;
 			default:
 				break;
@@ -2152,11 +2136,6 @@ abstract class uDataModule extends uBasicModule {
 		//if (!is_array($vals))
 		$vals = $this->GetValues($filterInfo['uid']);
 		
-		if ($filterInfo['it'] == itSUGGEST || $filterInfo['it'] == itSUGGESTAREA) {
-			if (isset($values[$default])) $default = $values[$default];
-			$vals = cbase64_encode(get_class($this).':'.$fieldName);
-		}
-		
 		if (isset($vals['']) && $vals[''] === FALSE && isset($vals[$filterInfo['default']])) {
 			$vals[''] = $vals[$filterInfo['default']];
 			if ($default == $filterInfo['default']) $default = '';
@@ -2273,12 +2252,6 @@ abstract class uDataModule extends uBasicModule {
 		
 		$tbl		= $this->fields[$fieldAlias]['vtable'];
 		$values		= $this->GetValues($fieldAlias,$pkVal);
-
-	/*	if ($newValue !== NULL && $newValue !== '' && is_numeric($newValue) && $this->fields[$fieldAlias]['inputtype'] == itSUGGEST || $this->fields[$fieldAlias]['inputtype'] == itSUGGESTAREA) {
-			$valSearch = (is_assoc($values)) ? array_flip($values) : $values;
-			$srch = array_search($newValue, $valSearch);
-			if ($srch !== FALSE) $newValue = $srch;
-		}*/
 
 		$fieldType = $this->GetFieldType($fieldAlias);
 		
