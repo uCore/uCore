@@ -4,7 +4,6 @@ class uStaticAjax implements iInit {
 	static function Initialise() {
 		// register ajax
 		utopia::RegisterAjax('updateField','uStaticAjax::UpdateField');
-		utopia::RegisterAjax('filterText','uStaticAjax::FilterText');
 		utopia::RegisterAjax('Suggest','uStaticAjax::getComboVals');
 		utopia::RegisterAjax('getUpload','uStaticAjax::getUpload');
 		utopia::RegisterAjax('getCompressed','uStaticAjax::getCompressed');
@@ -101,50 +100,6 @@ class uStaticAjax implements iInit {
 		utopia::Cache_Check($etag,$cType,basename($path),$fileMod);
 
 		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
-	}
-
-	public static function FilterText() {
-		$font   = 2;
-		$width  = ImageFontWidth($font) * strlen($_GET['t']);
-		$height = ImageFontHeight($font);
-
-		$img = imagecreate($width,$height);
-		$bg = imagecolorallocate($img, 0, 255, 0);
-		$bg = imagecolortransparent($img,$bg);
-		$textcolor = imagecolorallocate($img, 200, 200, 200);
-		imagefill($img, 0, 0, $bg);
-		imagestring($img,$font,0,0,$_GET['t'],$textcolor);
-
-
-		function output_handler($img) {
-			return utopia::Cache_Output($img,sha1($img),'image/gif',"fltrText_".strip_tags($_GET['t']).".gif");
-		}
-
-		//    Image output
-		ob_start("output_handler");
-		imagegif($img);
-		imagedestroy($img);
-		ob_end_flush();
-		die();
-		/*
-		 // always modified
-		 $expires = 60 * 60 * 24 * 5;
-		 $exp_gmt = gmdate("D, d M Y H:i:s", time() + $expires )." GMT";
-		 $mod_gmt = gmdate("D, d M Y H:i:s", time() + (3600 * -5 * 24 * 365) )." GMT";
-		 $exp_gmt = gmdate("D, d M Y H:i:s", filemtime($_SERVER['SCRIPT_FILENAME'])+ $expires);
-		 $mod_gmt = gmdate("D, d M Y H:i:s", filemtime($_SERVER['SCRIPT_FILENAME']));
-
-		 ini_set('zlib.output_compression','off');
-		 header("Content-Encoding: ");
-
-		 header('Content-Type: image/gif');
-		 header("Content-Disposition: inline; filename=fltrText_".strip_tags($_GET['t']).".gif");
-		 header("Expires: $exp_gmt");
-		 header("Last-Modified: $mod_gmt");
-		 header("Cache-Control: public, max-age=$expires");
-
-		 imagegif($im);
-		 die();*/
 	}
 
 	public static function UpdateField() {
