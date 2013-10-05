@@ -1,16 +1,12 @@
 <?php
 
 /**
- * iInit: impliment static initialiser run before all events
+ * iUtopiaModule: Identifying interface for utopia modules
+ * forces an initialisation function
  */
-interface iInit {
+interface iUtopiaModule {
 	public static function Initialise();
 }
-
-/**
- * iUtopiaModule: Identifying interface for utopia modules
- */
-interface iUtopiaModule extends iInit {}
 
 /**
  * iRestrictedAccess: used to define modules which utilise User Roles

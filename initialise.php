@@ -24,7 +24,7 @@ uConfig::ValidateConfig();
 uEvents::TriggerEvent('ConfigDefined');
 
 timer_start('Static Initialise');
-$allmodules = utopia::GetModulesOf('iInit');
+$allmodules = utopia::GetModulesOf('iUtopiaModule');
 foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to be setup fully
 	timer_start('Init: '.$row['module_name']);
 	$row['module_name']::Initialise();

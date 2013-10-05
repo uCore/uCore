@@ -1,6 +1,6 @@
 <?php
 
-class uStaticAjax implements iInit {
+class uStaticAjax implements iUtopiaModule {
 	static function Initialise() {
 		// register ajax
 		utopia::RegisterAjax('updateField','uStaticAjax::UpdateField');
