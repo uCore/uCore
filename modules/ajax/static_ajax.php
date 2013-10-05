@@ -1,19 +1,17 @@
 <?php
 
-// dependancies
-// check dependancies exist - Move to install?
+class uStaticAjax implements iInit {
+	static function Initialise() {
+		// register ajax
+		utopia::RegisterAjax('updateField','uStaticAjax::UpdateField');
+		utopia::RegisterAjax('filterText','uStaticAjax::FilterText');
+		utopia::RegisterAjax('Suggest','uStaticAjax::getComboVals');
+		utopia::RegisterAjax('getUpload','uStaticAjax::getUpload');
+		utopia::RegisterAjax('getCompressed','uStaticAjax::getCompressed');
+		utopia::RegisterAjax('getParserContent','uStaticAjax::getParserContent');
 
-// register ajax
-utopia::RegisterAjax('updateField','internalmodule_StaticAjax::UpdateField');
-utopia::RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
-utopia::RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
-utopia::RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
-utopia::RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
-utopia::RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
-
-uEvents::AddCallback('AfterInit','internalmodule_StaticAjax::RunAjax',null,MAX_ORDER+MAX_ORDER);
-
-class internalmodule_StaticAjax {
+		uEvents::AddCallback('AfterInit','uStaticAjax::RunAjax',null,MAX_ORDER+MAX_ORDER);
+	}
 	static function RunAjax() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
 		
