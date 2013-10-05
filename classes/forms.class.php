@@ -2808,8 +2808,8 @@ abstract class uListDataModule extends uDataModule {
 				$o = $this->GetOrderBy(true);
 				if (is_array($o)) foreach ($o as $order) {
 					if (strpos($order,'`'.$fieldName.'`') !== FALSE) {
-						$icon = ' sort-down';
-						if (stripos($order,'desc') !== FALSE) $icon = ' sort-up';
+						$icon = ' sort-up';
+						if (stripos($order,'desc') !== FALSE) $icon = ' sort-down';
 						break;
 					}
 				}
