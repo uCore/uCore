@@ -17,7 +17,7 @@ $(function(){
 
 utopia.Initialise.add(InitCombo);
 function InitCombo() {
-	$('.inputtype-combo').select2({adaptDropdownCssClass:function(c){return c;},width:'element'});
+	$('.inputtype-combo').select2({adaptDropdownCssClass:function(c){return c;}});
 }
 </script>
 </head>
