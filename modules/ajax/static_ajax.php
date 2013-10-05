@@ -152,49 +152,25 @@ class uStaticAjax implements iUtopiaModule {
 		}
 	}
 
-	public static function getComboVals() {
-		if (!array_key_exists('term',$_GET)) die('[]');
-		if (!array_key_exists('gv',$_GET)) die('[]');
+	public static function getValues() {
+		if (!isset($_GET['source'])) die('[]');
+		$term = isset($_GET['term']) ? $_GET['term'] : '';
 
-		$tmp = cbase64_decode($_GET['gv']);
-		//if (!$tmp) return;
-		if (strpos($tmp,':') !== FALSE) {
-			list($module,$field) = explode(':',$tmp);
-			$obj =& utopia::GetInstance($module);
-			$obj->_SetupFields();
-			$vals = $obj->GetValues($field);
-		} elseif (strpos($tmp,'|') !== FALSE) {
-			list($module,$field) = explode('|',$tmp);
-			$obj =& utopia::GetInstance($module);
-			$obj->_SetupFields();
-			$fltr = $obj->FindFilter($field);
-			$vals = $fltr['values'];
-		}
-		$out = '';
-		$linebreaks = array("\n\r","\n","\r\r");
+		$tmp = cbase64_decode($_GET['source']);
+		if (strpos($tmp,':') === FALSE) return '';
+		
+		list($module,$field) = explode(':',$tmp);
+		$obj = utopia::GetInstance($module);
+		$vals = $obj->GetValues($field);
+
 		$found = array();
-		if (!$_GET['term']) $found[] = array('value'=>'','label'=>'-','key'=>'');
 		if (is_array($vals)) foreach ($vals as $key=>$value) {
-			if (empty($key) && empty($value)) continue;
-			$label = $value.($key == $value ? '' : ' ('.$key.')');
-			if (empty($_GET['term']) || stripos($label, $_GET['term']) !== false) {
-				$f = array(
-					'value'	=> $key,
-					'label' => $label,
-				);
-				$found[] = $f;
-			}
-		}
-		// value, label, desc, icon;
-
-		if (!is_assoc($vals)) {
-			// this is an array of values, so make 'value' = 'key' and remove 'desc' and 'label'
-			foreach ($found as $k=>$v) {
-				if (!isset($v['key'])) print_r($v);
-				$found[$k]['value'] = $v['key'];
-				unset($found[$k]['label']);
-				unset($found[$k]['desc']);
-			}
+			if ($term && !(stripos($key,$term) || stripos($value,$term))) continue;
+			$f = array(
+				'key'	=> $key,
+				'value' => $value,
+			);
+			$found[] = $f;
 		}
 
 		echo json_encode($found);
