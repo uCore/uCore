@@ -2,9 +2,11 @@
 
 class uStaticAjax implements iUtopiaModule {
 	static function Initialise() {
+		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
+
 		// register ajax
 		utopia::RegisterAjax('updateField','uStaticAjax::UpdateField');
-		utopia::RegisterAjax('Suggest','uStaticAjax::getComboVals');
+		utopia::RegisterAjax('getValues','uStaticAjax::getValues');
 		utopia::RegisterAjax('getUpload','uStaticAjax::getUpload');
 		utopia::RegisterAjax('getCompressed','uStaticAjax::getCompressed');
 		utopia::RegisterAjax('getParserContent','uStaticAjax::getParserContent');
@@ -12,8 +14,6 @@ class uStaticAjax implements iUtopiaModule {
 		uEvents::AddCallback('AfterInit','uStaticAjax::RunAjax',null,MAX_ORDER+MAX_ORDER);
 	}
 	static function RunAjax() {
-		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
-		
 		// process ajax function
 		if (array_key_exists('__ajax',$_REQUEST)) {
 			$ajaxIdent	= $_REQUEST['__ajax'];
