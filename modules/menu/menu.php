@@ -20,7 +20,6 @@ class uMenu extends uDataModule implements iAdminModule {
 		$this->AddField('data','data','menu','Data');
 	}
 	public static function Initialise() {
-		self::AddParent('');
 		utopia::AddTemplateParser('menu1','uMenu::GetMenu','.*');
 		utopia::AddTemplateParser('menu','uMenu::GetNestedMenu','.*');
 		utopia::AddTemplateParser('sitemap','uMenu::DrawNestedMenu','');
@@ -29,9 +28,9 @@ class uMenu extends uDataModule implements iAdminModule {
 	public function RunModule() {
 		// button to generate primary menu from old code
 		// 'parent' of uCMS should no longer be used anywhere
+		return;
 		$obj = utopia::GetInstance('uCMS_List');
 		$rel = $obj->GetNestedArray();
-print_r($rel);
 		$rows = $this->GetDataset()->fetchAll();
 	}
 
