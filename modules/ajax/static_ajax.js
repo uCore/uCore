@@ -45,7 +45,7 @@ $(document).on('submit','form',function (event) { $(".uFilter, :input[placeholde
 utopia.Initialise.add(function(){ $('.uFilter').each(function(){ if ($(this).data('ov')) return; $(this).data('ov',$(this).val()); }) });
 $(document).on('click','.uFilter',function (event) {this.focus(); event.stopPropagation(); return false;});
 $(document).on('keydown','.uFilter',function (event) { if ((event.charCode == '13' || event.keyCode == '13') && (!$(this).is('TEXTAREA') && !$(this).is('SELECT'))) this.blur(); });
-// allow text to be selected in the table headers without it breaking the antiselect code of tablesorter2
+
 $(document).on('selectstart','.uFilter',function (event) {event.stopPropagation(); return true;});
 $(document).on('blur','.uFilter',function (event) {setTimeout(function(){ReloadFilters();},100);});
 
@@ -111,13 +111,10 @@ $(document).ready(function(){
 	});
 	
 	$(document).on('click','th.sortable',function (e) {
-		var fieldname = $(this).attr('rel');
-		if (!fieldname) return;
+		var fieldname = $(this).attr('data-field');
+		var mID = $(this).attr('data-mid');
+		if (!fieldname || !mID) return;
 
-		var arr = fieldname.split('|');
-
-		var fieldname = arr[0];
-		var mID = arr[1];
 		var fullCurrent = gup('_s_' + mID);
 		var currentSort = '';
 
@@ -166,11 +163,6 @@ function RefreshTables() {
 	$('.layoutListSection TBODY TR').removeClass('odd even');
 	$('.layoutListSection TBODY TR:odd').addClass('odd');
 	$('.layoutListSection TBODY TR:even').addClass('even');
-}
-
-utopia.Initialise.add(InitTabs);
-function InitTabs() {
-	$(".tabGroup").tabs();
 }
 
 utopia.Initialise.add(UpdateSelectedLinks);
@@ -226,59 +218,17 @@ function UpdateSelectedLinks() {
 	});
 }
 
-utopia.Initialise.add(InitDatePickers);
-function InitDatePickers() {
-	$('.dPicker').each(function () {
-		if ($(this).attr('hasDatepicker') != undefined) return;
-		//var newFormatDate = FORMAT_DATE.replace('%d','dd').replace('%b','M').replace('%Y','yy');
-		$(this).datepicker({changeMonth: true, changeYear: true, yearRange:'-90:+20',attachTo:'body',dateFormat:FORMAT_DATE,speed: ''});//, autoPopUp: 'button', buttonImage: '/images/datepicker.gif', buttonImageOnly: true });
-	});
-	$.datepicker.formatDate = DatePickerFormatDate;
-	$.datepicker.parseDate = DatePickerParseDate;
-}
-function DatePickerParseDate (format, value, shortYearCutoff, dayNamesShort, dayNames, monthNamesShort, monthNames) {
-	return Date.fromSqlFormat(format, value);
-}
-function DatePickerFormatDate (format, date, dayNamesShort, dayNames, monthNamesShort, monthNames) {
-	return date.sqlFormat(format);
-}
-
-utopia.Initialise.add(InitAutocomplete);
-function InitAutocomplete() {
-	var cache = {};
-	$('.autocomplete').autocomplete({
-		source: function(request, response) {
-			if ( request.term in cache ) {
-				response( cache[ request.term ] );
-				return;
-			}
-
-			request.gv = $(this.element).metadata().gv;
-			$.ajax({
-				url: PATH_REL_CORE+'index.php?__ajax=Suggest',
-				dataType: "json",
-				data: request,
-				success: function( data ) {
-					cache[ request.term ] = data;
-					response( data );
-				}
-			});
-		},
-		select: function (event,ui) {
-			// is filter?
-			$(this).trigger('change');
-		},
-		minLength:0,delay:200
-	}).each(function () {
-		$(this).data( "ui-autocomplete" )._renderItem = function( ul, item ) {
-			var desc = item.desc ? '<br><span style="font-size:0.7em">' + item.desc + '</span>' : '';
-			return $( "<li></li>" )
-				.data( "ui-autocomplete-item", item )
-				.append( "<a>" + item.label + desc + "</a>" )
-				.appendTo( ul );
-		};
+function GetFieldValues(callback,source,term) {
+	$.ajax({
+		url: PATH_REL_CORE+'index.php?__ajax=getValues',
+		dataType: "json",
+		data: {source:source,term:term},
+		global:false,
+		cache:true,
+		success: callback
 	});
 }
+
 function gup( name ){ name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]"); var regexS = "[\\?&/]"+name+"=([^&#]*)"; var regex = new RegExp( regexS ); var results = regex.exec( window.location.href ); if( results == null ) return ""; else return decodeURIComponent(results[1].replace(/\+/g,' ')); }
 
 function empty(subject) {

@@ -38,7 +38,7 @@ class uSearch extends uBasicModule {
 			$module = $row[1];
 			$pkVal = $row[2];
 			$info = $row[3];
-			$obj =& utopia::GetInstance($module);
+			$obj = utopia::GetInstance($module);
 			$data = $obj->LookupRecord($pkVal);
 			$url = $obj->GetURL($pkVal);
 			$title = word_trim(html2txt($data[$info[1]]),10,true);
@@ -64,7 +64,7 @@ class uSearch extends uBasicModule {
 		
 		foreach (self::$recipients as $module => $info) {
 			$fields = $info[0];
-			$obj =& utopia::GetInstance($module);
+			$obj = utopia::GetInstance($module);
 			$pk = $obj->GetPrimaryKey();
 			$dataset = $obj->GetDataset();
 			while (($row = $dataset->fetch())) {

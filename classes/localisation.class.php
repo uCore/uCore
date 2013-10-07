@@ -199,7 +199,7 @@ class uLocale implements ArrayAccess {
 	public static function ListLocale($format='',$keyFormat='%C',$noLimit=false) {
 		if ($format === '') $format = self::$defaultFormat;
 
-		$cacheid = json_encode(array($format,$keyFormat,$noLimit));
+		$cacheid = md5(json_encode(array($format,$keyFormat,$noLimit)));
 		if (isset(self::$listCache[$cacheid])) return self::$listCache[$cacheid];
 
 		$locales = self::GetLocaleCache();

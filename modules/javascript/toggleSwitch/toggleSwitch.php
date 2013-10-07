@@ -1,10 +1,11 @@
 <?php
 
-utopia::AddInputType('itYESNO',array('jQuery_toggleSwitch','DrawToggleSwitch'));
-utopia::AddInputType('itONOFF',array('jQuery_toggleSwitch','DrawToggleSwitch'));
+utopia::AddInputType('itYESNO','ToggleSwitch::DrawToggleSwitch');
+utopia::AddInputType('itONOFF','ToggleSwitch::DrawToggleSwitch');
 
-class jQuery_toggleSwitch extends uBasicModule{
-	public function SetupParents() {
+uEvents::AddCallback('BeforeInit','ToggleSwitch::Init');
+class ToggleSwitch {
+	public static function Init() {
 		uCSS::IncludeFile(dirname(__FILE__).'/toggleSwitch.css');
 		uJavascript::IncludeFile(dirname(__FILE__).'/toggleSwitch.js');
 		uJavascript::IncludeText(<<<FIN
@@ -13,7 +14,6 @@ utopia.Initialise.add(function () { $(".inputtype-itYESNO:not(.switched)").addCl
 FIN
 );
 	}
-	public function RunModule() {}
 	static function DrawToggleSwitch($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
 		return utopia::DrawInput($fieldName,itCHECKBOX,$defaultValue,$possibleValues,$attributes,$noSubmit);
 	}

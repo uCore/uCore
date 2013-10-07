@@ -1,11 +1,5 @@
 <?php
 
-uCSS::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui.min.css',-99);
-uCSS::IncludeFile(PATH_REL_CORE.'default.css');
-uCSS::IncludeFile(PATH_REL_CORE.'modules/javascript/js/jquery.auto-complete.css');
-
-uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
-uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument',null,MAX_ORDER);
 class uCSS extends uBasicModule {
 	static function LinkToDocument($obj,$event,$templateDoc) {
 		$head = $templateDoc->getElementsByTagName('head')->item(0);
@@ -75,15 +69,22 @@ class uCSS extends uBasicModule {
 		foreach (self::$linkFiles as $link) if ($link['path'] == $path) return;
 		self::$linkFiles[] = array('path'=>$path,'order'=>$order);
 	}
+	
+	public static function Initialise() {
+		uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
+		uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument',null,MAX_ORDER);
+		
+		self::LinkFile('/styles.css',-10);
+		self::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui.min.css',-99);
+		self::IncludeFile(PATH_REL_CORE.'default.css');
+		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 
-	public function SetupParents() {
 		module_Offline::IgnoreClass(__CLASS__);
-		$this->SetRewrite(true);
-		self::LinkFile($this->GetURL(),-10);
-
-		uCSS::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 	}
+	public function SetupParents() {
+		$this->SetRewrite(true);
 
+	}
 	public function RunModule() {
 		utopia::CancelTemplate();
 

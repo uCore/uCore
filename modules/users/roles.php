@@ -26,20 +26,23 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		
 		$this->AddFilter('role_id',ctNOTEQ,itNONE,-1);
 	}
+	public static function Initialise() {
+		uEvents::AddCallback('AfterInit','uUserRoles::AssertAdminRole');
+		self::AddParent('uUsersList');
+	}
 
 	public function SetupParents() {
-		$this->AddParent('uUsersList');
-		uEvents::AddCallback('AfterInit',array($this,'AssertAdminRole'));
 	}
-	public function AssertAdminRole() {
-		$this->BypassSecurity(true);
-		$rec = $this->LookupRecord(-1,true);
-		$this->BypassSecurity(false);
+	public static function AssertAdminRole() {
+		$obj = utopia::GetInstance(__CLASS__);
+		$obj->BypassSecurity(true);
+		$rec = $obj->LookupRecord(-1,true);
+		$obj->BypassSecurity(false);
 		if (!$rec) { // insert directly to table to avoid checking permissions
-			$o =& utopia::GetInstance('tabledef_UserRoles');
+			$tbl = utopia::GetInstance('tabledef_UserRoles');
 			$pk = null;
-			$o->UpdateField($o->GetPrimaryKey(),-1,$pk);
-			$o->UpdateField('name','Site Administrator',$pk);
+			$tbl->UpdateField($tbl->GetPrimaryKey(),-1,$pk);
+			$tbl->UpdateField('name','Site Administrator',$pk);
 		}
 	}
 	private static $roleCache = null;
@@ -47,13 +50,13 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		uUserLogin::TryLogin();
 		if (!isset($_SESSION['current_user'])) return FALSE;
 		if (!self::$roleCache) {
-			$obj =& utopia::GetInstance('uUsersList');
+			$obj = utopia::GetInstance('uUsersList');
 			$obj->BypassSecurity(true);
 			$user = $obj->LookupRecord(array('user_id'=>$_SESSION['current_user']),true);
 			$obj->BypassSecurity(false);
 			if ($user['_roles_pk'] === NULL) return FALSE;
 
-			$obj =& utopia::GetInstance('uUserRoles');
+			$obj = utopia::GetInstance('uUserRoles');
 			$obj->BypassSecurity(true);
 			$role = $obj->LookupRecord($user['_roles_pk'],true); // clear fixed filters
 			$obj->BypassSecurity(false);
@@ -69,18 +72,19 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 	private static $modules = array();
 	private static function InitModules() {
 		if (self::$modules) return;
-		$modules = utopia::GetModules();
+		$modules = utopia::GetModulesOf('iRestrictedAccess');
 		foreach ($modules as $k => $v) {
-			$o =& utopia::GetInstance($k);
-			if (!($o instanceof iRestrictedAccess)) unset($modules[$k]);
-			else $modules[$k] = $o->GetTitle();
+//			$o = utopia::GetInstance($k);
+	//		if (!($o instanceof iRestrictedAccess)) unset($modules[$k]);
+			//else
+			$modules[$k] = $k;//$o->GetTitle();
 		}
 		self::$modules = $modules;
 	}
 	private static $linked = array();
 	public static function LinkRoles($id,$modules) {
-		$o =& utopia::GetInstance(__CLASS__);
-		$o->_SetupFields();
+//		$o = utopia::GetInstance(__CLASS__);
+//		$o->_SetupFields();
 		if (!is_array($modules)) $modules = array($modules);
 		$modules = array_filter($modules);
 		if (!$modules) return;

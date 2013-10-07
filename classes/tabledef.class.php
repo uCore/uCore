@@ -4,7 +4,7 @@
 define('ftNONE'				,'');
 define('ftVARCHAR'			,'varchar');
 define('ftTEXT'				,'text');
-define('ftMEDIUMTEXT'			,'mediumtext');
+define('ftMEDIUMTEXT'		,'mediumtext');
 define('ftLONGTEXT'			,'longtext');
 // time
 define('ftDATE'				,'date');
@@ -58,6 +58,9 @@ abstract class uTableDef implements iUtopiaModule {
 	public $engine = NULL;
 	public $auto_increment = null;
 	protected $customscript = '';
+	
+	public static function Initialise() {}
+	
 	public abstract function SetupFields();
 
 	private $isDisabled = false;
@@ -202,16 +205,26 @@ abstract class uTableDef implements iUtopiaModule {
 		return FALSE;
 	}
 
-	public static $tableChecksum = NULL;
+	private static $tableChecksum = array();
+	public static function initChecksums() {
+		if (!self::$tableChecksum) {
+			$file = uCache::retrieve('__table_checksum',false);
+			if ($file) self::$tableChecksum = parse_ini_string(file_get_contents($file));
+		}
+	}
 	public static function checksumValid($table,$checksum,$refresh=false) {
-		if ($refresh || self::$tableChecksum === NULL) {
-			$stm = database::query('SELECT * FROM `__table_checksum`');
-			self::$tableChecksum = $stm->fetchAll();
+		self::initChecksums();
+		return isset(self::$tableChecksum[$table]) && self::$tableChecksum[$table] === $checksum;
+	}
+	public static function addChecksum($table,$checksum) {
+		self::initChecksums();
+		self::$tableChecksum[$table] = $checksum;
+		
+		$file = '';
+		foreach (self::$tableChecksum as $k=>$v) {
+			$file .= $k.' = '.$v.PHP_EOL;
 		}
-		foreach (self::$tableChecksum as $row) {
-			if (strcasecmp($row['name'],$table) === 0) return $row['checksum'] === $checksum;
-		}
-		return FALSE;
+		uCache::store('__table_checksum',$file);
 	}
 	
 	private function GetColDef($fieldName,$current = null,$position = null) {
@@ -257,9 +270,9 @@ abstract class uTableDef implements iUtopiaModule {
 		return "`$fieldName` ".implode(' ',$data);
 	}
 
-	private $isInitialised = false;
+	protected $isInitialised = false;
 	// create / update table
-	public function Initialise() {
+	public function AssertTable() {
 		if ($this->isDisabled) return;
 
 		if ($this->isInitialised === TRUE) return false;
@@ -297,7 +310,8 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 
 		if ($this->customscript) database::query($this->customscript);
-		database::query('INSERT INTO `__table_checksum` VALUES (?,?) ON DUPLICATE KEY UPDATE `checksum` = ?',array($this->tablename,$checksum,$checksum));
+		self::addChecksum($this->tablename,$checksum);
+		//database::query('INSERT INTO `__table_checksum` VALUES (?,?) ON DUPLICATE KEY UPDATE `checksum` = ?',array($this->tablename,$checksum,$checksum));
 	}
 
 	function RefreshTable($rows) {
@@ -400,7 +414,7 @@ abstract class uTableDef implements iUtopiaModule {
 			database::query($qry);
 		}
 
-		uEvents::AddCallback('AfterInit',array($this,'TableChangedCallback'));
+		uEvents::TriggerEvent('TableChanged',$this);
 	}
 	private static function keyDiff($arr1,$arr2) {
 		$diff = array();
@@ -435,13 +449,7 @@ abstract class uTableDef implements iUtopiaModule {
 		//echo "$qry\n";
 		database::query($qry);
 
-		uEvents::AddCallback('AfterInit',array($this,'TableCreatedCallback'));
-	}
-	public function TableCreatedCallback() {
 		uEvents::TriggerEvent('TableCreated',$this);
-	}
-	public function TableChangedCallback() {
-		uEvents::TriggerEvent('TableChanged',$this);
 	}
 	
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
@@ -451,7 +459,7 @@ abstract class uTableDef implements iUtopiaModule {
 	}
 
 	public function UpdateField($fieldName,$newValue,&$pkVal=NULL,$fieldType=NULL) {
-		$this->Initialise();
+		$this->AssertTable();
 		uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldName,,$pkVal)\n"));
 		if ($fieldType === NULL) $fieldType = $this->fields[$fieldName]['type'];
@@ -464,11 +472,7 @@ abstract class uTableDef implements iUtopiaModule {
 			case ftTIME:
 			case ftDATETIME:	// datetime
 			case ftTIMESTAMP:
-				$parsed = strptime($newValue,FORMAT_TIME);
-				if ($parsed===FALSE) $parsed = strptime($newValue,FORMAT_DATE);
-				if ($parsed===FALSE) $parsed = strptime($newValue,FORMAT_DATETIME);
-				if ($parsed!==FALSE) $parsed = mktime($parsed['tm_hour'], $parsed['tm_min'], $parsed['tm_sec'], 1 , $parsed['tm_yday'] + 1, $parsed['tm_year'] + 1900); 
-				else $parsed = strtotime($newValue);
+				$parsed = utopia::strtotime($newValue);
 				$newValue = $newValue == '' ? 'NULL' : date('Y-m-d H:i:s',$parsed); break;
 			case ftFLOAT:		// float
 			case ftDECIMAL:		$l=setlocale(LC_ALL,'en_US'); $newValue = floatval($newValue); setlocale(LC_ALL,$l); break;
@@ -504,7 +508,7 @@ abstract class uTableDef implements iUtopiaModule {
 		uEvents::TriggerEvent('AfterUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 	}
 	public function LookupRecord($pkVal) {
-		$this->Initialise();
+		$this->AssertTable();
 		$stm = database::query('SELECT * FROM '.$this->tablename.' WHERE '.$this->GetPrimaryKey().' = ?',array($pkVal));
 		$row = $stm->fetch();
 		return $row;

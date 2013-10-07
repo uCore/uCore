@@ -101,7 +101,7 @@ class uConfig {
 			}
 
 			try {
-				database::query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
+//				database::query('SHOW TABLES FROM `'.SQL_DBNAME.'`');
 			} catch (Exception $e) {
 				self::$configVars['SQL_SERVER']['notice'] = $e->getMessage();
 			}
@@ -125,7 +125,7 @@ class uConfig {
 		return true;
 	}
 	static function ShowConfig() {
-		$submitText = 'Make It So!';
+		$submitText = 'Confirm';
 		if (!self::$isValid) {
 			$rc = '/'.ltrim(preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',PATH_REL_CORE),'/');
 			utopia::UseTemplate($rc.'themes/install');
@@ -170,7 +170,7 @@ FIN;
 			echo '</td></tr>';
 		}
 		$_SESSION['__config_validate'] = true;
-		echo '</table><input type="submit" value="'.$submitText.'"></form>';
+		echo '</table><input class="btn" type="submit" value="'.$submitText.'"></form>';
 		if (!self::$isValid) utopia::Finish();
 	}
 	static function DownMaintenance() {

@@ -5,7 +5,7 @@
 .cmsItem { margin-top:1px; padding:1px 0 0 16px; position:relative; cursor:pointer; }
 .cmsItemText { overflow:hidden; }
 .cmsItemText:hover { background-color: #D5E2EA; }
-.cmsItemText a.cmsItemLink { display:block; padding:3px 0 3px 3px; }
+.cmsItemText a.cmsItemLink { display:block; line-height:32px;  }
 .cmsItemText a.cmsItemLink:hover { color:black; }
 .cmsItemActions { float:right; padding-left:10px; position:relative; }
 .cmsItemActions a { background-color:white !important; }
@@ -13,7 +13,9 @@
 
 
 .cmsItem .cmsItem { padding-top:1px; min-height:18px; }
-.cmsItem .cmsParentToggle { margin-left:-16px }
+.cmsItem .cmsParentToggle { margin-left:-16px; position: absolute; top:7px;left:10px; vertical-align:center;}
+.cmsItem .cmsParentToggle:before { content:"\e827"; font-size:1.1em; color:#8cc63f; font-family: "ucore-symbols"; }
+.cmsItem .cmsParentToggle.open:before { content:"\e824"; }
 
 .publish-buttons .btn { margin: 0 0 0 5px; }
 .admin-bar .edit-page-link { position:absolute; top:0; right:0; }

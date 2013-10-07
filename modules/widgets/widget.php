@@ -17,7 +17,7 @@ class tabledef_Widgets extends uTableDef {
 class uWidgets_List extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Widgets'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER; }
-	public function GetSortOrder() { return -8800; }
+	public function GetSortOrder() { return -9700; }
 	public function GetTabledef() { return 'tabledef_Widgets'; }
 	public function SetupFields() {
 		$this->CreateTable('blocks');
@@ -25,9 +25,10 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 		$this->AddField('block_id','block_id','blocks','ID');
 		$this->AddField('block_type','block_type','blocks','Type');
 	}
-	public function SetupParents() {
-		utopia::RegisterAjax('getWidgets',array($this,'getWidgets'));
-		$this->AddParent('/');
+	public function SetupParents() {}
+	public static function Initialise() {
+		utopia::RegisterAjax('getWidgets','uWidgets_List::getWidgets');
+		self::AddParent('/');
 	}
 	public function getWidgets() {
 		// static
@@ -36,11 +37,12 @@ class uWidgets_List extends uListDataModule implements iAdminModule {
 			$rows[] = array('block_id'=>$name,'block_type'=>'Fixed Widgets');
 		}
 		// widgets
-		$widgets = $this->GetDataset()->fetchAll();
+		$o = utopia::GetInstance(__CLASS__);
+		$widgets = $o->GetDataset()->fetchAll();
 		array_sort_subkey($widgets,'block_type');
 		$rows = array_merge($rows,$widgets);
 
-		$obj =& utopia::GetInstance('uWidgets');
+		$obj = utopia::GetInstance('uWidgets');
 		$newUrl = $obj->GetURL();
 
 		$rows = array($newUrl, $rows);
@@ -76,9 +78,10 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		}
 		$this->AddField('block_type','block_type','blocks','Type',itCOMBO,$installed);
 	}
-	public function SetupParents() {
+	public function SetupParents() {}
+	public static function Initialise() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/widget.js');
-		$this->AddParent('uWidgets_List','widget_id','*');
+		self::AddParent('uWidgets_List','widget_id','*');
 	}
 
 	private $initialisedType = false;
@@ -98,18 +101,14 @@ class uWidgets extends uSingleDataModule implements iAdminModule {
 		return $ret;
 	}
 	public function RunModule() {
-		$fltr = $this->FindFilter($this->GetPrimaryKey(),ctEQ,itNONE);
-		$v = $this->GetFilterValue($fltr['uid']);
-		if ($v) {
-			$rec = $this->LookupRecord();
-			$this->InitInstance($rec['block_type']);
-		}
+		$rec = $this->LookupRecord();
+		$this->InitInstance($rec['block_type']);
 
 		$this->ShowData();
 	}
 
 	static function DrawWidget($rec) {
-		$obj =& utopia::GetInstance('uWidgets',false);
+		$obj = utopia::GetInstance('uWidgets',false);
 		if (!is_array($rec)) {
 			if (self::StaticWidgetExists($rec)) return call_user_func(self::$staticWidgets[$rec]);
 			$obj->BypassSecurity(true);

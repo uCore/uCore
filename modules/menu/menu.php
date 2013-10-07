@@ -1,9 +1,40 @@
 <?php
 
-utopia::AddTemplateParser('menu1','uMenu::GetMenu','.*');
-utopia::AddTemplateParser('menu','uMenu::GetNestedMenu','.*');
-utopia::AddTemplateParser('sitemap','uMenu::DrawNestedMenu','');
-class uMenu {
+class menus extends uTableDef {
+	public function SetupFields() {
+		$this->AddField('menu_id',ftNUMBER);
+		$this->AddField('ident',ftVARCHAR,30);
+		$this->AddField('data',ftTEXT);
+
+		$this->SetPrimaryKey('menu_id');
+		$this->SetIndexField('ident');
+	}
+}
+
+
+class uMenu extends uDataModule implements iAdminModule {
+	public function GetTableDef() { return 'menus'; }
+	public function SetupFields() {
+		$this->CreateTable('menu');
+		$this->AddField('ident','ident','menu','Ident');
+		$this->AddField('data','data','menu','Data');
+	}
+	public static function Initialise() {
+		self::AddParent('');
+		utopia::AddTemplateParser('menu1','uMenu::GetMenu','.*');
+		utopia::AddTemplateParser('menu','uMenu::GetNestedMenu','.*');
+		utopia::AddTemplateParser('sitemap','uMenu::DrawNestedMenu','');
+	}
+	public function SetupParents() {}
+	public function RunModule() {
+		// button to generate primary menu from old code
+		// 'parent' of uCMS should no longer be used anywhere
+		$obj = utopia::GetInstance('uCMS_List');
+		$rel = $obj->GetNestedArray();
+print_r($rel);
+		$rows = $this->GetDataset()->fetchAll();
+	}
+
 	private static $items = array();
 	public static function &AddItem($id,$text,$url,$group='',$attr=null,$pos=null) {
 		if ($group === NULL) $group = '';
@@ -34,7 +65,10 @@ class uMenu {
 		$items = array();
 		foreach (self::$items[$group] as $item) {
 			if (empty($item['url']) && $lastWasBlank) continue;
-			$attrs = BuildAttrString($item['attr']);
+			$attrs = $item['attr'];
+			if (isset($attrs['class'])) $attrs['class'] .= ' '.strtolower($item['id']);
+			else $attrs['class'] = strtolower($item['id']);
+			$attrs = BuildAttrString($attrs);
 
 			$ret = '<li '.$attrs.'>';
 			if (!empty($item['url']))
@@ -46,6 +80,7 @@ class uMenu {
 			$items[] = $ret;
 			$lastWasBlank = empty($item['url']);
 		}
+		if (!$items) return '';
 		$ret = '<ul class="u-menu '.$group.'">'.implode('',$items).'</ul>';
 		return $ret;
 	}

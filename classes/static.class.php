@@ -21,7 +21,7 @@ utopia::SetVar('tp',PATH_REL_CORE.'images/tp.gif');
 utopia::AddTemplateParser('setrequest','utopia::setRequest');
 utopia::AddTemplateParser('setget','utopia::setGet');
 
-class utopia {
+final class utopia {
 	private static $children = array();
 	static function AddChild($parent, $child, $info) {
 		$info['parent'] = $parent;
@@ -107,7 +107,7 @@ class utopia {
 	static function AddCSSFile($path,$start = false) {
 		uCSS::LinkFile($path,$start?-1:null);
 	}
-	/*
+	/**
 	 * Link a javascript file to the document
 	 *
 	 * @deprecated
@@ -117,6 +117,9 @@ class utopia {
 	}
 
 	private static $allmodules = NULL;
+	/**
+	 * GetModules:  Returns an array of all registered class names which are derived from iUtopiaModule
+	 */
 	static function GetModules($refresh=false) {
 		if (self::$allmodules === NULL || $refresh) {
 			$rows = array();
@@ -128,7 +131,7 @@ class utopia {
 				if (!$ref->implementsInterface('iUtopiaModule')) continue;
 
 				$parents = array_values(class_parents($class));
-                                $interfaces = $ref->getInterfaceNames();
+				$interfaces = $ref->getInterfaceNames();
 				
 				$class = array('module_name'=>$class);
 				$class['module_id'] = $id;
@@ -136,8 +139,7 @@ class utopia {
 				$class['uuid'] = null;
 
 				if ($ref->isSubclassOf('uBasicModule')) {
-					$obj =& utopia::GetInstance($class['module_name']);
-					$class['uuid'] = $obj->GetUUID();
+					$class['uuid'] = $class['module_name']::GetUUID();
 				}
 				$rows[$class['module_name']] = $class;
 			}
@@ -177,6 +179,9 @@ class utopia {
 		return $inputs;
 	}
 
+	/**
+	 * GetRewriteURL: Returns the current URL with PATH_REL_ROOT trimmed from the start
+	 */
 	static function GetRewriteURL() {
 		$REQUESTED_URL = array_key_exists('HTTP_X_REWRITE_URL',$_SERVER) ? $_SERVER['HTTP_X_REWRITE_URL'] : $_SERVER['REQUEST_URI'];
 		$REQUESTED_URL = preg_replace('/\?.*/i','',$REQUESTED_URL);
@@ -193,12 +198,16 @@ class utopia {
 		if (!self::ModuleExists($module)) return;
 		
 		$cm = utopia::GetCurrentModule();
-		$o =& utopia::GetInstance($cm);
+		$o = utopia::GetInstance($cm);
 		if (flag_is_set($o->GetOptions(),PERSISTENT)) return;
 		
 		utopia::SetVar('current_module',$module);
 	}
+	
 	private static $cmCache = array();
+	/**
+	 * GetCurrentModule: Returns class name of module to run (syn: current module)
+	 */
 	static function GetCurrentModule() {
 		// cm variable
 		if (utopia::VarExists('current_module')) return utopia::GetVar('current_module');
@@ -227,15 +236,11 @@ class utopia {
 		return 'uCMS_View';
 	}
 
+	private static $launchers = array();
+	static function QueueLauncher($module) {
+		self::$launchers[] = $module;
+	}
 	static function Launcher($module = NULL) {
-		// requesting a real path?
-		$path = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
-		if (is_file(PATH_ABS_ROOT.$path) && $path !== PATH_REL_CORE.'index.php') {
-			self::CancelTemplate();
-			include(PATH_ABS_ROOT.$path);
-			self::Finish();
-		}
-
 		if ($module == NULL) $module = self::GetCurrentModule();
 
 		if (!utopia::ModuleExists($module)) {
@@ -243,13 +248,18 @@ class utopia {
 		}
 
 		utopia::SetVar('current_module',$module);
-		$obj =& utopia::GetInstance($module);
-		utopia::SetVar('title',$obj->GetTitle());
+		self::QueueLauncher($module);
+		
+		$currentModule = reset(self::$launchers);
+		do {
+			$obj = utopia::GetInstance($currentModule);
+			utopia::SetVar('title',$obj->GetTitle());
 
-		// run module
-		timer_start('Run Module');
-		$obj->_RunModule();
-		timer_end('Run Module');
+			// run module
+			timer_start('Run Module: '.$currentModule);
+			$obj->_RunModule();
+			timer_end('Run Module: '.$currentModule);
+		} while (($currentModule = next(self::$launchers)));
 	}
 
 	static $instances = array();
@@ -270,7 +280,23 @@ class utopia {
 		if (self::$finished) return;
 		self::$finished = true;
 		while (ob_get_level() > 3) ob_end_flush();
-		include(PATH_ABS_CORE.'finalise.php');
+		
+		timer_start('Output Template');
+		utopia::OutputTemplate();
+		timer_end('Output Template');
+
+		if (isset($GLOBALS['timers']) && utopia::DebugMode()) {
+			echo '<pre class="uDebug"><table>';
+			foreach ($GLOBALS['timers'] as $name => $info) {
+				if (!is_array($info)) continue;
+				$time = !array_key_exists('time_taken',$info) ? timer_end($name) : $info['time_taken'];
+				$time = number_format($time,2);
+				echo '<tr><td style="vertical-align:top;border-top:1px solid black">'.$time.'</td><td style="vertical-align:top;border-top:1px solid black">'.$name.PHP_EOL.$info['info'].'</td></tr>';
+			}
+			echo '</table></pre>';
+		}
+
+		header('X-Runtime: '.number_format((microtime(true)-UCORE_START_TIME)*1000).'ms');
 	}
 
 	private static $customInputs = array();
@@ -403,36 +429,6 @@ class utopia {
 					$out .= "<optgroup label=\"No longer available\"><option selected=\"selected\">$defaultValue</option></optgroup>";
 				}
 				$out .= "</select>";
-				//				} else if (is_string($possibleValues)) { // autocomplete info
-				//					$out .= "<input type=\"text\" $attr class=\"autocomplete\" gv=\"$possibleValues\" value=\"$defaultValue\">\n";
-				//				}
-				break;
-			case itSUGGEST:
-				//				if (is_array($possibleValues)) { // array of combos
-				//					$out .= "<select $attr><option value=\"\"></option>";
-				//					foreach ($possibleValues as $name => $val) {
-				//						if (empty($val)) continue;
-				//						$selected = ($val == $defaultValue) ? ' selected="true"' : '';
-				//						$out .= "<option value=\"$val\"$selected>$name</option>";
-				//					}
-				//					$out .= "</select>";
-				//				} else if (is_string($possibleValues)) { // autocomplete info
-				//
-				if (!isset($attributes['class'])) $attributes['class'] = '';
-				$attributes['class'] .= " autocomplete {gv:'$possibleValues'}";
-				$attr = BuildAttrString($attributes);
-				$out .= "<input type=\"text\" $attr value=\"$defaultValue\"/>\n";
-				//				}
-				break;
-			case itSUGGESTAREA:
-				//AA $defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
-				//	settype($possibleValues,'integer');
-				//	$ml = (is_numeric($possibleValues) && $possibleValues > 0) ? " cols=\"$possibleValues\" rows=\"".floor($possibleValues*0.08)."\"" : "";
-				//					$out .= "<textarea $attr $ml>$defaultValue</textarea>";
-				if (!isset($attributes['class'])) $attributes['class'] = '';
-				$attributes['class'] .= " autocomplete {gv:'$possibleValues'}";
-				$attr = BuildAttrString($attributes);
-				$out .= "<textarea $attr>$defaultValue</textarea>\n";
 				break;
 			case itLISTBOX:
 				if (!is_array($possibleValues)) { ErrorLog('Listbox field specified but no possible values found'); return ''; }
@@ -452,34 +448,11 @@ class utopia {
 			case itDATE:
 				//$formattedVal = ($defaultValue === SQL_FORMAT_EMPTY_TIMESTAMP) || ($defaultValue === SQL_FORMAT_EMPTY_DATE) || ($defaultValue === NULL) || ($defaultValue === '') ? '' : $defaultValue;//date('d/m/Y',strptime($defaultValue,'d/m/Y'));
 				$formattedVal = $defaultValue;
-				if (!isset($attributes['class'])) $attributes['class'] = '';
-				$attributes['class'] .= " dPicker";
-				$attr = BuildAttrString($attributes);
 				$out .= "<input type=\"text\" $attr value=\"$formattedVal\"/>";
 				break;
-			case itSCAN:
-				$out .= '<applet code="com.asprise.util.jtwain.web.UploadApplet.class"
-	codebase="http://asprise.com/product/jtwain/files/"
-	archive="JTwain.jar"
-	width="600" height="470">
-	<param name="DOWNLOAD_URL" value="http://asprise.com/product/jtwain/files/AspriseJTwain.dll">
-	<param name="DLL_NAME" value="AspriseJTwain.dll">
-	<param name="UPLOAD_URL" value="http://'.$_SERVER['HTTP_HOST'].'/internal/ajax/update.php?uuid='.$_REQUEST['uuid'].'">
-	<param name="UPLOAD_PARAM_NAME" value="'.$fieldName.'">
-	<param name="UPLOAD_EXTRA_PARAMS" value="">
-	<param name="UPLOAD_OPEN_URL" value="http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'].'">
-	<param name="UPLOAD_OPEN_TARGET" value="_self">
-	Oops, Your browser does not support Java applet!
-</applet>';
-				//$defaultValue = htmlentities($defaultValue,ENT_QUOTES,CHARSET_ENCODING);
-				//$defaultValue = htmlentities($defaultValue);
-				//$out .= "<input type=\"file\" $attr value=\"$defaultValue\">";
-				break;
-			case itCUSTOM:
-				//	ErrorLog(get_class($this).': Unhandled input type itCUSTOM');
-				break;
 			default:
-				ErrorLog("Unrecognized input type ($inputType) on field ($fieldName)");
+				$defaultValue = str_replace('"','&quot;',$defaultValue);
+				$out .= "<input type=\"$inputType\" $attr value=\"$defaultValue\"/>";
 				break;
 		}
 
@@ -604,13 +577,15 @@ class utopia {
 	}*/
 
 	/*  LINKLIST  */
+	static $lists = array();
 	static function DrawList($id) {
 		$replacement = utopia::LinkList_Get($id).utopia::LinkList_Get('list_functions:'.$id);
 		return $replacement;
 	}
 	static function LinkList_Add($listName,$text,$url,$order = 100,$listAttrs = NULL,$linkAttrs = NULL) {
-		$list =& utopia::GetVar("linklist_$listName");
-		if ($list == NULL) $list = array();
+		if (!isset(self::$lists["linklist_$listName"])) self::$lists["linklist_$listName"] = array();
+		$list =& self::$lists["linklist_$listName"];
+		//if ($list == NULL) $list = array();
 //$bt = useful_backtrace(0,4);
 		$list[] = array('text'=>$text,'url'=>$url,'order'=>$order,'attrList'=>$listAttrs,'attrLink'=>$linkAttrs);//,$bt);
 	}
@@ -618,7 +593,7 @@ class utopia {
 	static function LinkList_Get($listName,$id=NULL,$listAttrs = NULL,$linkAttrs = NULL) {
 		if (!$id) $id = "ulist_$listName";
 		$id = " id=\"$id\"";
-		$list = utopia::GetVar("linklist_$listName");
+		$list =& self::$lists["linklist_$listName"];
 		if (!is_array($list)) return;
 
 		array_sort_subkey($list,'order');
@@ -979,6 +954,29 @@ class utopia {
 		}
 		return ($string !== $start);
 	}
+	static function MergeFields(&$string,$row) {
+		if (preg_match_all('/{([a-z]+)\.([^{]+)}/Ui',$string,$matches,PREG_PATTERN_ORDER)) {
+			$searchArr = $matches[0];
+			$typeArr = isset($matches[1]) ? $matches[1] : false;
+			$varsArr = isset($matches[2]) ? $matches[2] : false;
+			foreach ($searchArr as $k => $search) {
+				$field = $varsArr[$k];
+				switch ($typeArr[$k]) {
+					case 'urlencode':
+						$replace = $row[$field];
+						$replace = rawurlencode($replace);
+						$string = str_replace($search,$replace,$string);
+						break;
+					case 'field':
+						$replace = $row[$field];
+						$string = str_replace($search,$replace,$string);
+						break;
+					default:
+				}
+			}
+		}
+		while (utopia::MergeVars($string));
+	}
 
 	static $templateParsers = array();
 	static function AddTemplateParser($ident,$function,$match='.+',$catchOutput = false) {
@@ -1256,6 +1254,14 @@ class utopia {
 	}
 	
 	// converters
+	static function strtotime($string) {
+		$parsed = strptime($string,FORMAT_TIME);
+		if ($parsed===FALSE) $parsed = strptime($string,FORMAT_DATE);
+		if ($parsed===FALSE) $parsed = strptime($string,FORMAT_DATETIME);
+		if ($parsed!==FALSE) $parsed = mktime($parsed['tm_hour'], $parsed['tm_min'], $parsed['tm_sec'], 1 , $parsed['tm_yday'] + 1, $parsed['tm_year'] + 1900); 
+		else $parsed = strtotime($string);
+		return $parsed;
+	}
 	static function convDate($originalValue,$pkVal,$processedVal) {
 		if (!$originalValue) return '';
 		$t = strtotime( $originalValue );
@@ -1353,7 +1359,8 @@ class utopia {
 		return $value;
 	}
 	static function checksum($val) {
-		return md5(json_encode($val));
+		if (!is_string($val)) $val = json_encode($val);
+		return md5($val).sha1($val);
 	}
 	static function GetMimeType($path) {
 		$cType = NULL;

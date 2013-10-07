@@ -1,17 +1,19 @@
 <?php
 define('PATH_UPLOADS',PATH_ABS_ROOT.'uUploads');
 class uUploads extends uBasicModule {
-	public static $uuid = 'uploads';
-	function SetupParents() {
-		$this->SetRewrite(TRUE);
-		utopia::RegisterAjax('fileManagerAjax',array($this,'ajax'));
-		utopia::AddInputType(itFILEMANAGER,array($this,'show_fileman'));
+	public static function Initialise() {
+		utopia::RegisterAjax('fileManagerAjax','uUploads::ajax');
+		utopia::AddInputType(itFILEMANAGER,'uUploads::show_fileman');
 
 		jqFileManager::SetDocRoot(PATH_ABS_ROOT);
 		jqFileManager::SetRelRoot(PATH_REL_ROOT);
 		
 		uJavascript::IncludeFile(jqFileManager::GetPathJS());
 		uCSS::IncludeFile(jqFileManager::GetPathCSS());
+	}
+	public static $uuid = 'uploads';
+	function SetupParents() {
+		$this->SetRewrite(TRUE);
 	}
 	function RunModule() {
 		$uuid = $this->GetUUID(); if (is_array($uuid)) $uuid = reset($uuid);
@@ -76,7 +78,7 @@ class uUploads extends uBasicModule {
 		if (!move_uploaded_file($fileInfo['tmp_name'],$targetFile)) return FALSE;
 		return $targetFile;
 	}
-	function show_fileman($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
+	static function show_fileman($fieldName,$inputType,$defaultValue='',$possibleValues=NULL,$attributes = NULL,$noSubmit = FALSE) {
 		list($path) = self::Init();
 		//if (!is_array($attributes)) $attributes = array();
 		//$attributes['onclick'] = 'alert("moo");return false;';
@@ -95,7 +97,7 @@ FIN
 			'<input id="'.$fieldName.'" type="button" onclick="$(\'#fileMan\').fileManager({ajaxPath:\''.$path.'\'}).on(\'dblclick\',\'.fmFile\',function(event) {filesel(\''.$fieldName.'\',$(this).data(\'item\'))}).dialog();" value="Choose File">';
 		//return $out.$defaultValue.utopia::DrawInput($fieldName,itBUTTON,'Choose File',$possibleValues,$attributes,$noSubmit);
 	}
-	function ajax() {
+	static function ajax() {
 		header("X-Robots-Tag: noindex", true);
 
 		utopia::CancelTemplate();
@@ -116,7 +118,7 @@ FIN
 		// replace "$from" with "$to"
 	}
 	static function Init() {
-		$obj =& utopia::GetInstance(__CLASS__);
+		$obj = utopia::GetInstance(__CLASS__);
 		return array($obj->GetAjaxPath(),$obj->GetAjaxUploadPath());
 	}
 	function GetAjaxPath() {

@@ -40,9 +40,10 @@ class uCache {
 	 * @return absolute path to cache file
 	 */
 	private static function getPath($identifiers) {
-		$cachePath = PATH_ABS_CORE.'.cache';
-		if (!file_exists($cachePath)) mkdir($cachePath);
+		$cachePath = PATH_ABS_CORE.'.cache/';
 		$checksum = utopia::checksum($identifiers);
-		return $cachePath.'/'.$checksum.'.cache';
+		$cachePath .= substr($checksum,0,3).'/'.substr($checksum,3,3).'/';
+		if (!file_exists($cachePath)) mkdir($cachePath,0777,true);
+		return $cachePath.$checksum;
 	}
 }

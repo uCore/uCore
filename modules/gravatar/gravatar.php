@@ -4,7 +4,7 @@ utopia::AddTemplateParser('gravatar','uGravatar::GetImage');
 class uGravatar {
 	public static function GetImageField($originalValue,$pkVal,$value,$rec,$fieldName) {
 		if (!$originalValue) return '';
-		$o =& utopia::GetInstance($rec['_module']);
+		$o = utopia::GetInstance($rec['_module']);
 		$size = $o->GetFieldProperty($fieldName,'size');
 		
 		return self::GetImage($originalValue,$size);

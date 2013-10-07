@@ -58,40 +58,34 @@ class tabledef_Users extends uTableDef {
 
 class uUsersList extends uListDataModule implements iAdminModule {
 	public function GetTitle() { return 'Users'; }
-	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_ADD | ALLOW_DELETE | ALLOW_EDIT | ALLOW_FILTER; }
-
+	public function GetOptions() { return ALWAYS_ACTIVE | ALLOW_DELETE | ALLOW_EDIT | ALLOW_FILTER; }
+	public function GetSortOrder() { return 10000-3; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function SetupFields() {
 		$this->CreateTable('users');
 		$this->CreateTable('roles','tabledef_UserRoles','users',array('role'=>'role_id'));
 		
-		$fld =& $this->AddField('gravatar','username','users',''); $fld['size'] = 24;
-		$this->AddPreProcessCallback('gravatar',array('uGravatar','GetImageField'));
-		
-		$this->AddField('username','username','users','Username',itTEXT);
+		$this->AddField('username','username','users','Username');
+		$this->ConditionalStyle_Set('username',array($this,'isvalidated'));
 		$this->AddField('role','role','users','Role',itCOMBO,'SELECT role_id,name FROM '.TABLE_PREFIX.'tabledef_UserRoles ORDER BY role_id');
 		$this->AddField('last_login','last_login','users','Last Login');
 		$this->AddField('password','password','users','Change Password',itPASSWORD);
 		$this->AddField('email_confirm','email_confirm','users');
 		$this->AddField('email_confirm_code','email_confirm_code','users');
-		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users','Validate');
-		$this->AddPreProcessCallback('validated',array($this,'ValidateButtons'));
-		$this->SetFieldProperty('validated','nolink',true);
+		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users');
+	}
+	public function isvalidated($field,$record) {
+		if ($record['validated']) return;
+		return array('color'=>'#999');
 	}
 
-	public function SetupParents() {
-		$this->AddParent('/');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('/');
 	}
 
 	public function RunModule() {
 		$this->ShowData();
-	}
-	
-	public function ValidateButtons($originalValue,$pkVal,$value,$rec,$fieldName) {
-		if ($originalValue == 1 || $pkVal === NULL) {
-			return '';
-		}
-		return $this->DrawSqlInput('_validate_user','Force Validate',$pkVal,NULL,itBUTTON).$this->DrawSqlInput('_validate_send','Send Validation',$pkVal,NULL,itBUTTON);
 	}
 	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
@@ -99,13 +93,11 @@ class uUsersList extends uListDataModule implements iAdminModule {
 			uNotices::AddNotice('You cannot edit your own role',NOTICE_TYPE_ERROR);
 			return;
 		}
-		if ($fieldAlias == '_validate_user') return $this->UpdateField('email_confirm_code',true,$pkVal);
-		if ($fieldAlias == '_validate_send') { uVerifyEmail::VerifyAccount($pkVal); return; }
 		parent::UpdateField($fieldAlias,$newValue,$pkVal);
 	}
 	
 	public static function TestCredentials($username,$password) {
-		$obj =& utopia::GetInstance(__CLASS__);
+		$obj = utopia::GetInstance(__CLASS__);
 		$obj->BypassSecurity(true);
 		$rec = $obj->LookupRecord(array('username'=>$username));
 		$obj->BypassSecurity(false);
@@ -117,28 +109,31 @@ class uUsersList extends uListDataModule implements iAdminModule {
 }
 
 class uAssertAdminUser extends uBasicModule {
-	public function GetTitle() { return 'Create Admin User'; }
-	public function SetupParents() {
-		uEvents::AddCallback('AfterInit',array($this,'AssertAdminUser'));
+	public static function Initialise() {
+		uEvents::AddCallback('AfterInit','uAssertAdminUser::AssertAdminUser');
 		module_Offline::IgnoreClass(__CLASS__);
 	}
-	public function AssertAdminUser() {
+	public function GetTitle() { return 'Create Admin User'; }
+	public function SetupParents() {
+	}
+	public static function AssertAdminUser() {
 		// admin user exists?
-		$obj =& utopia::GetInstance('uUsersList');
+		$obj = utopia::GetInstance('uUsersList');
 		$obj->BypassSecurity(true);
 		$rec = $obj->LookupRecord(array('role'=>-1,'validated'=>1),true);
 		$obj->BypassSecurity(false);
 		if ($rec) return;
 
 		// module is persist?
-		$curr =& utopia::GetInstance(utopia::GetCurrentModule());
+		$curr = utopia::GetInstance(utopia::GetCurrentModule());
 		if (flag_is_set($curr->GetOptions(),PERSISTENT)) return;
 
 		// redirect to this module
-		$this->AssertURL(307,false);
+		$o = utopia::GetInstance(__CLASS__);
+		$o->AssertURL(307,false);
 	}
 	public function RunModule() {
-		$obj =& utopia::GetInstance('uUsersList');
+		$obj = utopia::GetInstance('uUsersList');
 		$obj->BypassSecurity(true);
 		$rec = $obj->LookupRecord(array('role'=>-1,'validated'=>1),true);
 		$obj->BypassSecurity(false);
@@ -163,7 +158,7 @@ class uAssertAdminUser extends uBasicModule {
 		}
 		
 		// now register user
-		$regObj =& utopia::GetInstance('uRegisterUser');
+		$regObj = utopia::GetInstance('uRegisterUser');
 		$user_id = $regObj->RegisterForm();
 		// login as this user, then perform the update
 
@@ -200,15 +195,18 @@ class uRegisterUser extends uDataModule {
 
 		uEmailer::InitialiseTemplate('account_activate','Confirm your email address','<p>Please verify your email by clicking the link below:</p><p><a href="{home_url_abs}/{activate_link}">{home_url_abs}/{activate_link}</a></p>',array('email','active_link'));
 	}
-	public function SetupParents() {
-		$this->SetRewrite(false);
-		uEvents::AddCallback('AfterShowLogin',array($this,'RegisterLink'));
+	public static function Initialise() {
+		uEvents::AddCallback('AfterShowLogin','uRegisterUser::RegisterLink');
 		modOpts::AddOption('open_user_registration','Allow User Registrations',NULL,false,itYESNO);
 	}
+	public function SetupParents() {
+		$this->SetRewrite(false);
+	}
 	public static $uuid = 'register';
-	public function RegisterLink() {
+	public static function RegisterLink() {
+		$o = utopia::GetInstance(__CLASS__);
 		if (!modOpts::GetOption('open_user_registration')) return;
-		if ($usr = $this->RegisterForm()) {
+		if ($usr = $o->RegisterForm()) {
 			uVerifyEmail::VerifyAccount($usr);
 			echo '<p>Thank you for creating an account.  We need to verify your email before you can continue.</p>';
 			echo '<p>Please check your inbox, and follow the instructions we have sent you.</p>';
@@ -266,7 +264,7 @@ class uRegisterUser extends uDataModule {
 				}
 				
 				// user already exists?
-				//$this =& utopia::GetInstance('uUsersList');
+				//$this = utopia::GetInstance('uUsersList');
 				$rec = $this->LookupRecord(array('username'=>$_POST['username']));
 				if ($rec) {
 					uNotices::AddNotice('Username already exists.',NOTICE_TYPE_ERROR);
@@ -280,10 +278,10 @@ class uRegisterUser extends uDataModule {
 				return $pk;
 			} while (false);
 		}
-		?>
-		<div id="register-wrap">
+		
+		?><div class="register-wrap widget-container">
 		<h1>Create an Account</h1>
-		<form class="register-user oh" action="{home_url}register" method="POST">
+		<form class="module-content register-user oh" action="<?php echo $this->GetURL(); ?>" method="POST">
 			<div class="form-field"><label for="username">Email:</label>
 			<input type="text" name="username" id="username" value="<?php echo isset($_POST['username']) ? htmlentities(utf8_decode($_POST['username'])):''; ?>" /></div>
 			<div class="form-field"><label for="username2">Confirm Email:</label>
@@ -306,8 +304,7 @@ class uRegisterUser extends uDataModule {
 		$('#username').change(regValidate).change();
 		$('#username2').change(regValidate).change();
 		</script>
-		</div>
-		<?php
+		</div><?php
 	}
 }
 
@@ -346,11 +343,11 @@ class uVerifyEmail extends uDataModule {
 			uUserLogin::SetLogin($rec['user_id']);
 			uNotices::AddNotice('Thank you!  Your email address has been successfully validated.');
 		}
-		$o =& utopia::GetInstance('uUserProfile');
+		$o = utopia::GetInstance('uUserProfile');
 		header('Location: '.$o->GetURL());
 	}
 	public static function VerifyAccount($user_id) {
-		$o =& utopia::GetInstance(__CLASS__);
+		$o = utopia::GetInstance(__CLASS__);
 		$rec = $o->LookupRecord($user_id);
 
 		// already verified
@@ -360,7 +357,7 @@ class uVerifyEmail extends uDataModule {
 		$randKey = uCrypt::GetRandom(20);
 		$o->UpdateField('email_confirm_code',$randKey,$user_id);
 		$url = $o->GetURL(array('c'=>$randKey));
-		$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
+		//$url = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/','',$url);
 		uNotices::AddNotice('Please check '.$rec['email_confirm'].' for a validation link.');
 		uEmailer::SendEmailTemplate('account_activate',array('email'=>$rec['email_confirm'],'activate_link'=>$url),'email');
 		return false;
@@ -368,7 +365,7 @@ class uVerifyEmail extends uDataModule {
 }
 
 class uUserProfile extends uSingleDataModule {
-	public function GetTitle() { return 'User Profile'; }
+	public function GetTitle() { return 'Account Details'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetSortOrder() { return 10000000; }
@@ -376,7 +373,6 @@ class uUserProfile extends uSingleDataModule {
 	public function SetupFields() {
 		$this->CreateTable('users');
 		
-		$this->NewSection('Account Details');
 		$this->AddField('user_id','user_id','users');
 		$this->AddSpacer('<b style="font-size:1.1em">Change Email</b>');
 		$this->AddSpacer('We will send a message to your new email address.  You must click the verification link to complete this process.');
@@ -400,15 +396,14 @@ class uUserProfile extends uSingleDataModule {
 	public function RunModule() {
 		$l = uUserLogin::IsLoggedIn();
 		if (!$l) {
-			$obj =& utopia::GetInstance('uUserLogin');
+			$obj = utopia::GetInstance('uUserLogin');
 			$obj->_RunModule();
 			return;
 		}
-		echo '<h1>User Profile</h1>';
 		$this->ShowData();
 	}
 	public static function GetCurrentUser() {
-		$o =& utopia::GetInstance(__CLASS__);
+		$o = utopia::GetInstance(__CLASS__);
 		return $o->LookupRecord();
 	}
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {

@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * All errors are converted to Exceptions so they can be caught.
+ * The default exception handler emails ADMIN_EMAIL (defined in the config) and displays a clean error to the screen
+ */
+
 ini_set('html_errors','Off');
 set_error_handler('uErrorHandler::ThrowException');
 set_exception_handler('uErrorHandler::EchoException');
@@ -22,6 +28,9 @@ class uErrorHandler {
 	}
 }
 
+/**
+ * DebugMail sends an email to ADMIN_EMAIL (defined in the config) with additional useful information
+ */
 function DebugMail($subject,$message) {
 	if (!defined('ADMIN_EMAIL')) return;
 

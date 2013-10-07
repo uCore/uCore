@@ -1,22 +1,19 @@
 <?php
 
-// dependancies
-// check dependancies exist - Move to install?
-
-// register ajax
-utopia::RegisterAjax('updateField','internalmodule_StaticAjax::UpdateField');
-utopia::RegisterAjax('filterText','internalmodule_StaticAjax::FilterText');
-utopia::RegisterAjax('Suggest','internalmodule_StaticAjax::getComboVals');
-utopia::RegisterAjax('getUpload','internalmodule_StaticAjax::getUpload');
-utopia::RegisterAjax('getCompressed','internalmodule_StaticAjax::getCompressed');
-utopia::RegisterAjax('getParserContent','internalmodule_StaticAjax::getParserContent');
-
-uEvents::AddCallback('AfterInit','internalmodule_StaticAjax::RunAjax',null,MAX_ORDER+MAX_ORDER);
-
-class internalmodule_StaticAjax {
-	static function RunAjax() {
+class uStaticAjax implements iUtopiaModule {
+	static function Initialise() {
 		uJavascript::IncludeFile(dirname(__FILE__).'/static_ajax.js');
-		
+
+		// register ajax
+		utopia::RegisterAjax('updateField','uStaticAjax::UpdateField');
+		utopia::RegisterAjax('getValues','uStaticAjax::getValues');
+		utopia::RegisterAjax('getUpload','uStaticAjax::getUpload');
+		utopia::RegisterAjax('getCompressed','uStaticAjax::getCompressed');
+		utopia::RegisterAjax('getParserContent','uStaticAjax::getParserContent');
+
+		uEvents::AddCallback('AfterInit','uStaticAjax::RunAjax',null,MAX_ORDER+MAX_ORDER);
+	}
+	static function RunAjax() {
 		// process ajax function
 		if (array_key_exists('__ajax',$_REQUEST)) {
 			$ajaxIdent	= $_REQUEST['__ajax'];
@@ -80,7 +77,7 @@ class internalmodule_StaticAjax {
 	public static function getUpload() {
 		//$module = utopia::UUIDExists($_GET['uuid']);
 		//print_r($module);
-		$obj =& utopia::GetInstance(utopia::GetCurrentModule());
+		$obj = utopia::GetInstance(utopia::GetCurrentModule());
 		$rec = $obj->LookupRecord($_GET['p']);
 		//print_r($rec);
 		if (!$rec) {
@@ -103,50 +100,6 @@ class internalmodule_StaticAjax {
 		utopia::Cache_Check($etag,$cType,basename($path),$fileMod);
 
 		utopia::Cache_Output(file_get_contents($path),$etag,$cType,basename($path),$fileMod);
-	}
-
-	public static function FilterText() {
-		$font   = 2;
-		$width  = ImageFontWidth($font) * strlen($_GET['t']);
-		$height = ImageFontHeight($font);
-
-		$img = imagecreate($width,$height);
-		$bg = imagecolorallocate($img, 0, 255, 0);
-		$bg = imagecolortransparent($img,$bg);
-		$textcolor = imagecolorallocate($img, 200, 200, 200);
-		imagefill($img, 0, 0, $bg);
-		imagestring($img,$font,0,0,$_GET['t'],$textcolor);
-
-
-		function output_handler($img) {
-			return utopia::Cache_Output($img,sha1($img),'image/gif',"fltrText_".strip_tags($_GET['t']).".gif");
-		}
-
-		//    Image output
-		ob_start("output_handler");
-		imagegif($img);
-		imagedestroy($img);
-		ob_end_flush();
-		die();
-		/*
-		 // always modified
-		 $expires = 60 * 60 * 24 * 5;
-		 $exp_gmt = gmdate("D, d M Y H:i:s", time() + $expires )." GMT";
-		 $mod_gmt = gmdate("D, d M Y H:i:s", time() + (3600 * -5 * 24 * 365) )." GMT";
-		 $exp_gmt = gmdate("D, d M Y H:i:s", filemtime($_SERVER['SCRIPT_FILENAME'])+ $expires);
-		 $mod_gmt = gmdate("D, d M Y H:i:s", filemtime($_SERVER['SCRIPT_FILENAME']));
-
-		 ini_set('zlib.output_compression','off');
-		 header("Content-Encoding: ");
-
-		 header('Content-Type: image/gif');
-		 header("Content-Disposition: inline; filename=fltrText_".strip_tags($_GET['t']).".gif");
-		 header("Expires: $exp_gmt");
-		 header("Last-Modified: $mod_gmt");
-		 header("Cache-Control: public, max-age=$expires");
-
-		 imagegif($im);
-		 die();*/
 	}
 
 	public static function UpdateField() {
@@ -180,7 +133,7 @@ class internalmodule_StaticAjax {
 					$string = cbase64_decode($enc_name);
 
 					self::InterpretSqlString($string, $module, $field, $pkVal);
-					$obj =& utopia::GetInstance($module);
+					$obj = utopia::GetInstance($module);
 					$obj->ProcessUpdates($enc_name,$field,$fileInfo,$pkVal,true);
 				}
 			}
@@ -193,55 +146,31 @@ class internalmodule_StaticAjax {
 				$string = cbase64_decode($enc_name); // cbase adds/subtracts the missing = padding (to keep html compliance with fieldnames)
 				
 				self::InterpretSqlString($string, $module, $field, $pkVal);
-				$obj =& utopia::GetInstance($module);
+				$obj = utopia::GetInstance($module);
 				$obj->ProcessUpdates($enc_name,$field,$value,$pkVal);
 			}
 		}
 	}
 
-	public static function getComboVals() {
-		if (!array_key_exists('term',$_GET)) die('[]');
-		if (!array_key_exists('gv',$_GET)) die('[]');
+	public static function getValues() {
+		if (!isset($_GET['source'])) die('[]');
+		$term = isset($_GET['term']) ? $_GET['term'] : '';
 
-		$tmp = cbase64_decode($_GET['gv']);
-		//if (!$tmp) return;
-		if (strpos($tmp,':') !== FALSE) {
-			list($module,$field) = explode(':',$tmp);
-			$obj =& utopia::GetInstance($module);
-			$obj->_SetupFields();
-			$vals = $obj->GetValues($field);
-		} elseif (strpos($tmp,'|') !== FALSE) {
-			list($module,$field) = explode('|',$tmp);
-			$obj =& utopia::GetInstance($module);
-			$obj->_SetupFields();
-			$fltr = $obj->FindFilter($field);
-			$vals = $fltr['values'];
-		}
-		$out = '';
-		$linebreaks = array("\n\r","\n","\r\r");
+		$tmp = cbase64_decode($_GET['source']);
+		if (strpos($tmp,':') === FALSE) return '';
+		
+		list($module,$field) = explode(':',$tmp);
+		$obj = utopia::GetInstance($module);
+		$vals = $obj->GetValues($field);
+
 		$found = array();
-		if (!$_GET['term']) $found[] = array('value'=>'','label'=>'-','key'=>'');
 		if (is_array($vals)) foreach ($vals as $key=>$value) {
-			if (empty($key) && empty($value)) continue;
-			$label = $value.($key == $value ? '' : ' ('.$key.')');
-			if (empty($_GET['term']) || stripos($label, $_GET['term']) !== false) {
-				$f = array(
-					'value'	=> $key,
-					'label' => $label,
-				);
-				$found[] = $f;
-			}
-		}
-		// value, label, desc, icon;
-
-		if (!is_assoc($vals)) {
-			// this is an array of values, so make 'value' = 'key' and remove 'desc' and 'label'
-			foreach ($found as $k=>$v) {
-				if (!isset($v['key'])) print_r($v);
-				$found[$k]['value'] = $v['key'];
-				unset($found[$k]['label']);
-				unset($found[$k]['desc']);
-			}
+			if ($term && !(stripos($key,$term) || stripos($value,$term))) continue;
+			$f = array(
+				'key'	=> $key,
+				'value' => $value,
+			);
+			$found[] = $f;
 		}
 
 		echo json_encode($found);

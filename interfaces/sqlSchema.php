@@ -1,5 +1,11 @@
 <?php
-abstract class sqlSchema extends PDO {
+
+/**
+ * sqlSchema provides easy access to calling functions and queries using PDO across various engines.
+ * Supports parameters by reference
+ */
+
+ abstract class sqlSchema extends PDO {
 	protected $servername	= '';
 	protected $port			= 3306;
 	protected $dbname		= '';
@@ -63,25 +69,12 @@ abstract class sqlSchema extends PDO {
 			$qry = '{'.$qry.'}';
 		}
 
-	//	try {
-			if ($this->columnBindings && $this->engine == 'sqlsrv') {
-				return $this->callWithSqlSrv($qry);
-			}
-			return $this->callWithPDO($qry);
-	/*	} catch (Exception $e) {
-			$backtrace = debug_backtrace();
-			$caller = next($backtrace);
-			//print_r($caller);
-			//echo $e->getMessage();
-			//echo $e->getCode();
-			//echo $caller['file'];
-			//echo $caller['line'];
-			echo $e->getMessage();
-			//throw new ErrorException($e->getMessage(), $e->getCode(), 1, $caller['file'], $caller['line'],$e);
-		}*/
+		if ($this->columnBindings && $this->engine == 'sqlsrv') {
+			return $this->callWithSqlSrv($qry);
+		}
+		return $this->callWithPDO($qry);
 	}
 	private function &callWithSqlSrv($qry) {
-//		$serverName = "(local)";
 		$connectionInfo = array( "UID" => $this->username, "PWD" => $this->password, "Database"=>$this->dbname);
 		$conn = sqlsrv_connect( $this->servername, $connectionInfo);
 		$params = array();
@@ -168,8 +161,6 @@ abstract class sqlSchema extends PDO {
 		if (!isset($this->sqlsrvStatement)) return false;
 
 		if (!sqlsrv_fetch($this->sqlsrvStatement)) return false;
-//		if (!sqlsrv_next_result($this->sqlsrvStatement)) return false; // resultset
-//		echo 'a';
 		
 		foreach ($this->columnBindings as $k=>$col) {
 			if ($col[1]) $col[0] = sqlsrv_get_field($this->sqlsrvStatement, $k, SQLSRV_PHPTYPE_STREAM( SQLSRV_ENC_CHAR));

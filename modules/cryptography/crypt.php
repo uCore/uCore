@@ -89,16 +89,12 @@ uCrypt::RegisterClass('uCryptPlain',999999);
 
 class uCrypt {
 	public static function GetRandom($length,$charset = 'abcdefghijklmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789') {
-		srand((double)microtime()*1000000); // start the random generator
-		$str='';
-		for ($i=0;$i<$length;$i++) {
-			$str .= substr ($charset, rand() % strlen($charset), 1);
-		}
-		return $str;
+		$charset = str_shuffle($charset);
+		return substr($charset,0,$length);
 	}
-	public static function Encrypt($string) {
+	public static function Encrypt($string,$salt = null) {
 		foreach (self::$classes as $class=>$order) {
-			$result = call_user_func($class.'::Encrypt',$string);
+			$result = call_user_func($class.'::Encrypt',$string,$salt);
 			if ($result && strlen($result) > 13) return $result;
 		}
 		// fallback

@@ -1,23 +1,27 @@
 <?php
 define('itFILEMANAGER' ,'fileman');
 class fileManager extends uBasicModule implements iAdminModule {
-	public function GetSortOrder() { return -8700; }
-	function GetTitle() { return 'Media'; }
-	function SetupParents() {
-		$this->AddParent('/');
-		utopia::RegisterAjax('media',array($this,'RunPopup'));
+	public static function Initialise() {
+		utopia::RegisterAjax('media','fileManager::RunPopup');
+		self::AddParent('/');
 	}
-	function RunPopup() {
+	public function GetSortOrder() { return -8900; }
+	function GetTitle() { return 'Media'; }
+	function SetupParents() {}
+	static function RunPopup() {
 		utopia::SetTitle('Browse Media');
 		uEvents::RemoveCallback('ProcessDomDocument','uAdminBar::ProcessDomDocument');
 		utopia::UseTemplate(TEMPLATE_BLANK); utopia::$noSnip = true;
-		$this->_RunModule();
+		$o = utopia::GetInstance('fileManager');
+		$o->_RunModule();
 	}
 	function RunModule() {
+		echo '<h1>'.$this->GetTitle().'</h1>';
+		echo '{list.'.get_class($this).'}';
 		list($path,$pathUpload) = uUploads::Init();
 		$relRoot = PATH_REL_ROOT;
 
-		echo '<div>Uploads <span id="mediaPath"></span></div><div id="fileMan"></div>';
+		echo '<div class="module-content">You are here: Uploads <span id="mediaPath"></span><div id="fileMan"></div></div>';
 		$pluploadOpts = '';
 		if (class_exists('uPlupload')) {
 			$jsOptionVar = 'filemanagerOptions';

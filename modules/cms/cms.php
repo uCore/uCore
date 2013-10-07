@@ -6,7 +6,7 @@ class tabledef_CMS extends uTableDef {
 	public function SetupFields() {
 		$this->AddField('cms_id',ftVARCHAR,150);
 		$this->AddField('parent',ftVARCHAR,150);
-		$this->AddField('rewrite',ftVARCHAR,200);
+		//$this->AddField('rewrite',ftVARCHAR,200);
 		$this->AddField('position',ftNUMBER);
 		$this->AddField('nav_text',ftVARCHAR,66);
 		$this->AddField('template',ftVARCHAR,50);
@@ -49,7 +49,7 @@ class uCMS_List extends uDataModule implements iAdminModule {
 	public function GetTitle() { return 'Pages'; }
 	public function GetOptions() { return ALLOW_DELETE | ALLOW_FILTER | ALLOW_EDIT; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
-	public function GetSortOrder() { return -8900; }
+	public function GetSortOrder() { return -9900; }
 	public function SetupFields() {
 		$this->CreateTable('cms');
 		$this->AddField('cms_id','cms_id','cms','Page ID');
@@ -66,55 +66,46 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->AddField('content_published_time','content_published_time','cms');
 		$this->AddField('is_published','is_published','cms');
 	}
-	public function SetupParents() {
+	public static function Initialise() {
 		uCSS::IncludeFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.css'));
-
 		$nTemplates = utopia::GetTemplates(false,true);
 		$dTemplate = '/'.basename(PATH_REL_CORE).'/themes/default';
 		modOpts::AddOption('default_template','Default Template',NULL,$dTemplate,itCOMBO,$nTemplates);
 
-		$this->AddParent('/');
-		utopia::RegisterAjax('reorderCMS',array($this,'reorderCMS'));
-		
+		utopia::RegisterAjax('reorderCMS','uCMS_List::reorderCMS');
 		uUserRoles::LinkRoles('Page Editor',array('uCMS_List','uCMS_Edit'));
+
+		self::AddParent('/');		
 	}
+	public function SetupParents() {}
 	public function DeleteRecord($pkVal) {
 		parent::DeleteRecord($pkVal);
 		AjaxEcho('window.location.reload();');
 	}
 	public function RunModule() {
-		$tabGroupName = utopia::Tab_InitGroup();
-		ob_start();
-
-		$obj =& utopia::GetInstance('uCMS_Edit');
-		$newUrl = $obj->GetURL(array('_n_'.$obj->GetModuleId()=>1));
+		echo '<h1>'.$this->GetTitle().'</h1>';
+		echo '{list.'.get_class($this).'}';
+		
 		$relational = $this->GetNestedArray();
-		echo '<table style="width:100%"><tr><td id="tree" style="position:relative;vertical-align:top">';
-		echo '<div style="white-space:nowrap"><a class="btn" href="'.$newUrl.'">New Page</a>';
+		echo '<div class="module-content">';
 
-		$modOptsObj =& utopia::GetInstance('modOpts');
+		$modOptsObj = utopia::GetInstance('modOpts');
 		$row = $modOptsObj->LookupRecord('default_template');
-		echo '<br>Default Template: '.$modOptsObj->GetCell('value',$row);
+		echo 'Default Template: '.$modOptsObj->GetCell('value',$row);
 
 		echo '<hr>';
-		echo '<div id="uCMS_List">'.self::GetChildren($relational).'</div>';
-		echo '</div></td>';
-		echo '<td style="width:100%;vertical-align:top; border-left:1px solid #333"><div style="width:100%" id="previewFrame"><div style="padding:10px">Click on a page to the left to edit it.</div></div></td></tr></table>';
+		echo '<div id="tree">'.self::GetChildren($relational).'</div>';
+		echo '</div>';
 
-		$editObj =& utopia::GetInstance('uCMS_Edit');
+		$editObj = utopia::GetInstance('uCMS_Edit');
 		$editLink = $editObj->GetURL();
 		$fid = $editObj->FindFilter('cms_id');
 
 		uJavascript::LinkFile(dirname(__FILE__).'/page_list.js');
-		
-		$c = ob_get_contents();
-		ob_end_clean();
-		utopia::Tab_Add('Page Editor',$c,$this->GetModuleId(),$tabGroupName,false);
-		utopia::Tab_InitDraw($tabGroupName);
 	}
 	public static function RefreshList() {
 		if (utopia::GetCurrentModule() !== __CLASS__) return;
-		$obj =& utopia::GetInstance(__CLASS__);
+		$obj = utopia::GetInstance(__CLASS__);
 		$relational = $obj->GetNestedArray();
 		$r = $obj->GetChildren($relational);
 		// javascript: find open folders (visible ui-treesort-folder with visible ul)
@@ -127,9 +118,9 @@ class uCMS_List extends uDataModule implements iAdminModule {
 	static function GetChildren($children) {
 		if (!$children) return '';
 		array_sort_subkey($children,'position');
-		$editObj =& utopia::GetInstance('uCMS_Edit');
-		$listObj =& utopia::GetInstance('uCMS_List');
-		$viewObj =& utopia::GetInstance('uCMS_View');
+		$editObj = utopia::GetInstance('uCMS_Edit');
+		$listObj = utopia::GetInstance('uCMS_List');
+		$viewObj = utopia::GetInstance('uCMS_View');
 
 		$ret = '<ul class="cmsTree">';
 		foreach ($children as $child) {
@@ -163,7 +154,8 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		$this->BypassSecurity(false);
 
 		$relational = array();
-		while ($row = $dataset->fetch()) {
+		$rows = uCMS_View::fetchAll();
+		foreach ($rows as $row) {
 			$row['children'] = array();
 			$relational[$row['cms_id']] = $row;
 		}
@@ -196,15 +188,16 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		return false;
 	}
 
-	public function reorderCMS() {
+	public static function reorderCMS() {
+		$o = utopia::GetInstance('uCMS_List');
 		utopia::cancelTemplate();
 		if (!$_POST['data']) return;
 		$data = json_decode($_POST['data'],true);
 		foreach ($data as $cms_id => $val) {
 			list($newParent,$pos) = explode(':',$val);
-			$obj =& utopia::GetInstance('uCMS_View');
+			$obj = utopia::GetInstance('uCMS_View');
 			$oldURL = $obj->GetURL($cms_id);
-			$this->UpdateFields(array('parent'=>$newParent,'position'=>$pos),$cms_id);
+			$o->UpdateFields(array('parent'=>$newParent,'position'=>$pos),$cms_id);
 			$newURL = $obj->GetURL($cms_id);
 		}
 	}
@@ -250,7 +243,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		}
 
 		// preview, publish, revert (red)
-		$obj =& utopia::GetInstance('uCMS_View');
+		$obj = utopia::GetInstance('uCMS_View');
 		$preview = CreateNavButton('Preview',$obj->GetURL(array('cms_id'=>$pkVal,'preview'=>1)),array('target'=>'_blank','title'=>'Preview this page'));
 		$revert = $this->DrawSqlInput('revert','Revert',$pkVal,array('title'=>'Reset to published version','class'=>'page-revert'),itBUTTON);
 		$publish = $this->DrawSqlInput('publish','Publish',$pkVal,array('title'=>'Make this page live','class'=>'page-publish btn-green'),itBUTTON);
@@ -266,31 +259,6 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 				}
 			}
 			return $value;
-	}
-	public function getWidgetPlaceholder() {
-		if (func_num_args() > 0) {
-			$id = func_get_arg(0);
-		} else {
-			$id = $_GET['id'];
-		}
-
-		$obj =& utopia::GetInstance('uWidgets');
-		$url = $obj->GetURL($id);
-
-		$rep = uWidgets::DrawWidget($id);
-		$ele = str_get_html('<div style="display:inline">'.$rep.'</div>');
-
-		$delBtn = '<input type="button" value="Remove" onclick="var a = this.parentNode; while (a.className.indexOf(\'uWidgetPlaceholder\')==-1) { a = a.parentNode } a.parentNode.removeChild(a);">';
-		$editBtn = uWidgets::IsStaticWidget($id) ? '' : '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
-		$addition = '<div class="uWidgetHeader">'.$delBtn.$editBtn.$id.'</div>';
-
-		$ele = $ele->root->children[0];
-		$ele->class .= ' uWidgetPlaceholder';
-		$ele->title = $id;
-		$ele->innertext = $addition.$ele->innertext;
-
-		if (func_num_args() > 0) return $ele;
-		echo $ele;
 	}
 	
 	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
@@ -343,7 +311,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$ret = parent::UpdateField($fieldAlias,$newValue,$pkVal);
 		
 		if ($pkVal !== $oPk) {
-			$o =& utopia::GetInstance('uCMS_View');
+			$o = utopia::GetInstance('uCMS_View');
 			$url = $o->GetURL(array('cms_id'=>$pkVal,'edit'=>1));
 			AjaxEcho("window.location.replace('$url');");
 		}
@@ -354,18 +322,16 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		return $ret;
 	}
 	public function getPossibleBlocks($val,$pk,$original) {
-		$obj =& utopia::GetInstance('uWidgets_List');
+		$obj = utopia::GetInstance('uWidgets_List');
 		$ds = $obj->GetDataset();
 		$rows = $ds->fetchAll();
 		foreach (uWidgets::$staticWidgets as $widgetID => $callback) $rows[]['block_id'] = $widgetID;
 		return '<span class="btn" onclick="ChooseWidget()">Insert Widget</span>';
 	}
-	public function SetupParents() {
-		utopia::RegisterAjax('getWidgetPlaceholder',array($this,'getWidgetPlaceholder'));
-		$this->AddParent('uCMS_List','cms_id');
-	}
-	public function getEditor($id = '') {
-		$canEdit = uEvents::TriggerEvent('CanAccessModule',$this) !== FALSE;
+	public function SetupParents() {}
+	public static function getEditor($id = '') {
+		$thisObj = utopia::GetInstance(__CLASS__);
+		$canEdit = uEvents::TriggerEvent('CanAccessModule',$thisObj) !== FALSE;
 		// get content
 		$rec = uCMS_View::findPage();
 		if(!$rec) return; // page not found
@@ -383,11 +349,11 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		
 		if ($canEdit && isset($_GET['edit'])) {
 			$rec['content:'.$id] = $content[$id];
-			return $this->GetCell('content:'.$id,$rec);
+			return $thisObj->GetCell('content:'.$id,$rec);
 		}
 		
 		$content = $content[$id];
-		$content = $this->PreProcess('content',$content,$rec);
+		$content = $thisObj->PreProcess('content',$content,$rec);
 		utopia::MergeVars($content);
 			
 		return $content;
@@ -397,15 +363,16 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		return parent::ResetField($fieldAlias,$pkVal);
 	}
 	static $editCallbackDone = false;
-	public function editPageCallback() {
-		if (uEvents::TriggerEvent('CanAccessModule',$this) === FALSE) return;
+	public static function editPageCallback() {
+		$thisObj = utopia::GetInstance(__CLASS__);
+		if (uEvents::TriggerEvent('CanAccessModule',$thisObj) === FALSE) return;
 		if (self::$editCallbackDone) return;
 		self::$editCallbackDone = true;
 
 		$rec = uCMS_View::findPage();
 		if (!$rec) return;
 		if (!isset($_GET['edit'])) {
-			$obj =& utopia::GetInstance('uCMS_View');
+			$obj = utopia::GetInstance('uCMS_View');
 			$editURL = $obj->GetURL(array('cms_id'=>$rec['cms_id'],'edit'=>1));
 			uAdminBar::AddItem('<a class="btn" href="'.$editURL.'">Edit Page</a>',FALSE,null,'edit-page-link');
 			return;
@@ -414,19 +381,19 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		uJavascript::LinkFile(utopia::GetRelativePath(dirname(__FILE__).'/cms.js'),9999);
 
 		ob_start();
-		$this->ClearFilters();
-		$this->AddFilter('cms_id',ctEQ,itNONE,$rec['cms_id']);
-		$this->fields['content']['visiblename'] = NULL;
-		$this->fields['publishing']['visiblename'] = NULL;
-		$this->tabGroup = '_ADMIN_EDIT_';
-		$this->ShowData();
-		$this->tabGroup = NULL;
+		$thisObj->ClearFilters();
+		$thisObj->AddFilter('cms_id',ctEQ,itNONE,$rec['cms_id']);
+		$thisObj->fields['content']['visiblename'] = NULL;
+		$thisObj->fields['publishing']['visiblename'] = NULL;
+		$thisObj->tabGroup = '_ADMIN_EDIT_';
+		$thisObj->ShowData();
+		$thisObj->tabGroup = NULL;
 		$c = ob_get_contents();
 		ob_end_clean();
-		$pubCell = '<span class="right publish-buttons" style="padding-left:10px">'.$this->GetCell('publishing',$rec).'</span>';
+		$pubCell = '<span class="right publish-buttons" style="padding-left:10px">'.$thisObj->GetCell('publishing',$rec).'</span>';
 
 		
-		$obj =& utopia::GetInstance('uCMS_View');
+		$obj = utopia::GetInstance('uCMS_View');
 		$url = $obj->GetURL(array('cms_id'=>$rec['cms_id']));
 
 		uAdminBar::AddItem('<span class="left">Page Information</span>'.$pubCell,$c);
@@ -453,13 +420,49 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$o->UpdateField('publish',true,$pk);
 		$o->BypassSecurity(false);
 	}
+	public static function getWidgetPlaceholder() {
+		if (func_num_args() > 0) {
+			$id = func_get_arg(0);
+		} else {
+			$id = $_GET['id'];
+		}
+
+		$obj = utopia::GetInstance('uWidgets');
+		$url = $obj->GetURL($id);
+
+		$rep = uWidgets::DrawWidget($id);
+		$ele = str_get_html('<div style="display:inline">'.$rep.'</div>');
+
+		$delBtn = '<input type="button" value="Remove" onclick="var a = this.parentNode; while (a.className.indexOf(\'uWidgetPlaceholder\')==-1) { a = a.parentNode } a.parentNode.removeChild(a);">';
+		$editBtn = uWidgets::IsStaticWidget($id) ? '' : '<input type="button" value="Edit" onclick="window.top.location = \''.$url.'\'">';
+		$addition = '<div class="uWidgetHeader">'.$delBtn.$editBtn.$id.'</div>';
+
+		$ele = $ele->root->children[0];
+		$ele->class .= ' uWidgetPlaceholder';
+		$ele->title = $id;
+		$ele->innertext = $addition.$ele->innertext;
+
+		if (func_num_args() > 0) return $ele;
+		echo $ele;
+	}
+	public static function Initialise() {
+		utopia::RegisterAjax('getWidgetPlaceholder','uCMS_Edit::getWidgetPlaceholder');
+		utopia::AddTemplateParser('content','uCMS_Edit::getEditor','.*');
+		uEvents::AddCallback('BeforeRunModule','uCMS_Edit::editPageCallback',null,-9999);
+		self::AddParent('uCMS_List','cms_id');
+	}
 }
 uEvents::AddCallback('TableCreated','uCMS_Edit::DefaultPages','tabledef_CMS');
-utopia::AddTemplateParser('content',array(utopia::GetInstance('uCMS_Edit'),'getEditor'),'.*');
-uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_Edit'),'editPageCallback'),null,-9999);
 
-uEvents::AddCallback('BeforeRunModule',array(utopia::GetInstance('uCMS_View'),'assertContent'),null,9999);
 class uCMS_View extends uSingleDataModule {
+	public static function Initialise() {
+		uEvents::AddCallback('BeforeRunModule','uCMS_View::assertContent',null,9999);
+		uEvents::AddCallback('AfterInit','uCMS_View::InitSitemap');
+//		uEvents::AddCallback('InitSitemap','uCMS_View::InitSitemap');
+		uEvents::AddCallback('ProcessDomDocument','uCMS_View::ProcessDomDocument');
+		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
+		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');
+	}
 	public function GetOptions() { return ALLOW_FILTER; }
 	public function GetTabledef() { return 'tabledef_CMS'; }
 	static function last_updated() {
@@ -467,7 +470,8 @@ class uCMS_View extends uSingleDataModule {
 		return $page['updated'];
 	}
 	private static $asserted = false;
-	public function assertContent() {
+	public static function assertContent() {
+		$o = utopia::GetInstance(__CLASS__);
 		if (self::$asserted) return;
 		self::$asserted = true;
 		$rec = self::findPage();
@@ -483,7 +487,7 @@ class uCMS_View extends uSingleDataModule {
 
 		utopia::SetVar('cms_id',$rec['cms_id']);
 		utopia::SetVar('cms_parent_id',$rec['parent']);
-		$path = $this->GetCmsParents($rec['cms_id']);
+		$path = $o->GetCmsParents($rec['cms_id']);
 		utopia::SetVar('cms_parents',$path);
 		utopia::SetVar('cms_root_id',reset($path));
 		utopia::SetDescription($rec['description']);
@@ -540,13 +544,10 @@ class uCMS_View extends uSingleDataModule {
 		$this->AddField('noindex','noindex','cms','noindex');
 		$this->AddField('nofollow','nofollow','cms','nofollow');
 		//$this->AddFilter('cms_id',ctEQ);
+		$this->AddOrderBy('parent,position');
 	}
 
 	public function SetupParents() {
-		uEvents::AddCallback('AfterInit',array($this,'InitSitemap'));
-		uEvents::AddCallback('ProcessDomDocument','uCMS_View::ProcessDomDocument');
-		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
-		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');
 		$this->SetRewrite(true);
 	}
 	static function ProcessDomDocument($obj,$event,$templateDoc) {
@@ -574,9 +575,10 @@ class uCMS_View extends uSingleDataModule {
 			}
 		}
 	}
-	function InitSitemap() {
-		$ds = $this->GetDataset(NULL,true);
-		while (($row = $ds->fetch())) {
+	static function InitSitemap() {
+		$o = utopia::GetInstance(__CLASS__);
+		$rows = self::fetchAll();
+		foreach ($rows as $row) {
 			if ($row['noindex']) continue;
 
 			// is published
@@ -584,7 +586,7 @@ class uCMS_View extends uSingleDataModule {
 			if (!$row['is_published']) continue;
 
 			$title = $row['nav_text'] ? $row['nav_text'] : $row['title'];
-			$url = $this->GetURL($row['cms_id']);
+			$url = $o->GetURL($row['cms_id']);
 
 			// add to menu
 			if (!$row['hide']) {
@@ -597,9 +599,17 @@ class uCMS_View extends uSingleDataModule {
 			uSitemap::AddItem('http://'.utopia::GetDomainName().$url,$additional);
 		}
 	}
+	private static $cache = null;
+	public static function fetchAll() {
+		if (self::$cache === null) {
+			$o = utopia::GetInstance(__CLASS__);
+			self::$cache = $o->GetDataset()->fetchAll();
+		}
+		return self::$cache;
+	}
 
 	static function GetHomepage() {
-		$obj =& utopia::GetInstance('uCMS_View');
+		$obj = utopia::GetInstance('uCMS_View');
 		$row = $obj->LookupRecord(array('is_home'=>'1'),true);
 		if (!$row) $row = $obj->LookupRecord();
 		if ($row) return $row;
@@ -615,11 +625,11 @@ class uCMS_View extends uSingleDataModule {
 		if ($uri === PATH_REL_ROOT) return self::GetHomepage();
 		if (strpos($uri,PATH_REL_CORE.'index.php') === 0) return FALSE;
 		
-		$obj =& utopia::GetInstance('uCMS_View');
+		$obj = utopia::GetInstance('uCMS_View');
 		
 		$cm = utopia::GetCurrentModule();
 		if ($cm && $cm !== __CLASS__) {
-			$o =& utopia::GetInstance(utopia::GetCurrentModule());
+			$o = utopia::GetInstance(utopia::GetCurrentModule());
 			$uuid = $o->GetUUID();
 			$uuid = explode('/',$uuid);
 			$uuid = end($uuid);
@@ -648,42 +658,37 @@ class uCMS_View extends uSingleDataModule {
 	}
 	
 	private static $parentsCache = array();
-	public function GetCmsParents($cms_id,$includeSelf=true) {
+	public static function getParentCache() {
 		if (!self::$parentsCache) {
-			$ds = $this->GetDataset();
-			while (($row = $ds->fetch())) {
+			$rows = self::fetchAll();
+			foreach ($rows as $row) {
 				$parent = $row['parent'];
 				if ($row['is_home']) $parent = false;
-				self::$parentsCache[$row['cms_id']] = $parent;
+				self::$parentsCache[$row['cms_id']] = array();
+				if ($parent) self::$parentsCache[$row['cms_id']][] = $parent;
+				if (isset(self::$parentsCache[$parent]) && self::$parentsCache[$parent]) {
+					self::$parentsCache[$row['cms_id']] = array_merge(self::$parentsCache[$parent],self::$parentsCache[$row['cms_id']]);
+				}
 			}
 		}
-		
-		$parents = array();
+		return self::$parentsCache;
+	}
+	public function GetCmsParents($cms_id,$includeSelf=true) {
+		$parents = self::getParentCache();
+		$parents = $parents[$cms_id];
 		if ($includeSelf) $parents[] = $cms_id;
-		while ($cms_id && isset(self::$parentsCache[$cms_id]) && self::$parentsCache[$cms_id]) {
-			$parents[] = self::$parentsCache[$cms_id];
-			$cms_id = self::$parentsCache[$cms_id];
-		}
-		$parents = array_reverse($parents);
 		return $parents;
 	}
 	public function IsHome($cms_id) {
-		if (!self::$parentsCache) {
-			$ds = $this->GetDataset();
-			while (($row = $ds->fetch())) {
-				$parent = $row['parent'];
-				if ($row['is_home']) $parent = false;
-				self::$parentsCache[$row['cms_id']] = $parent;
-			}
-		}
-		if (!isset(self::$parentsCache[$cms_id])) return false;
-		return self::$parentsCache[$cms_id] === false;
+		$parents = self::getParentCache();
+		if (!isset($parents[$cms_id])) return false;
+		return $parents[$cms_id] === false;
 	}
 
 	static function GetTemplate($id) {
 		$template = NULL;
 		while ($id != NULL) {
-			$obj =& utopia::GetInstance('uCMS_View');
+			$obj = utopia::GetInstance('uCMS_View');
 			$rec = $obj->LookupRecord($id);
 			if ($rec['template']) { $template = $rec['template']; break; }
 			$id = $rec['parent'];

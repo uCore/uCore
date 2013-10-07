@@ -24,6 +24,7 @@ class tabledef_UserProfile extends uTableDef {
 	}
 }
 class UserProfileDetail extends uSingleDataModule {
+	public function GetTitle() { return 'My Profile'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_ADD; }
 	public function SetupParents() { }
@@ -34,7 +35,6 @@ class UserProfileDetail extends uSingleDataModule {
 	public function SetupFields() {
 		$this->CreateTable('user');
 		$this->CreateTable('detail','tabledef_UserProfile','user','user_id');
-		$this->NewSection('My Profile');
 		$this->AddSpacer('<b style="font-size:1.2em">Personal Details</b>');
 		
 		$l = uUserLogin::IsLoggedIn();
@@ -63,8 +63,14 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 	public function GetTitle() { return 'User Details'; }
 	public function GetTabledef() { return 'tabledef_Users'; }
 	public function GetOptions() { return ALLOW_EDIT | ALLOW_ADD; }
-	public function SetupParents() {
-		$this->AddParent('uUsersList','user_id','*');
+	public function SetupParents() {}
+	public static function Initialise() {
+		self::AddParent('uUsersList','user_id','*');
+		uEvents::AddCallback('AfterRunModule','UserProfileDetail::RunChild','uUserProfile',101);
+	}
+	public static function RunChild() {
+		$o = utopia::GetInstance(__CLASS__);
+		$o->RunModule();
 	}
 	public function RunModule() {
 		$this->ShowData();
@@ -73,13 +79,15 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 		$this->CreateTable('user');
 		$this->CreateTable('detail','tabledef_UserProfile','user','user_id');
 		
-		$this->AddSpacer('<b style="font-size:1.2em">Account Details</b>');
+		$this->NewSection('Account Details');
 		
 		$this->AddField('username','username','user','Email',itTEXT);
 		$this->AddField('password','password','user','Password',itPASSWORD);
+		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','user','Validation');
+		$this->AddPreProcessCallback('validated',array($this,'ValidateButtons'));
+		$this->SetFieldProperty('validated','nolink',true);
 		
-		$this->AddSpacer();
-		$this->AddSpacer('<b style="font-size:1.2em">Personal Details</b>');
+		$this->NewSection('Personal Details');
 		
 		$this->AddField('user_id_detail','user_id','detail');
 		
@@ -95,5 +103,20 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 		$this->AddField('country','country','detail','Country',itTEXT);
 		$this->AddField('postcode','postcode','detail','Post Code',itTEXT);
 	}
+	
+	public function ValidateButtons($originalValue,$pkVal,$value,$rec,$fieldName) {
+		if ($originalValue == 1 || $pkVal === NULL) {
+			return 'Done';
+		}
+		return $this->DrawSqlInput('_validate_user','Force Validate',$pkVal,NULL,itBUTTON).$this->DrawSqlInput('_validate_send','Send Validation',$pkVal,NULL,itBUTTON);
+	}
+	public function UpdateField($fieldAlias,$newValue,&$pkVal=NULL) {
+		if ($fieldAlias == 'role' && isset($_SESSION['current_user']) && $pkVal == $_SESSION['current_user']) {
+			uNotices::AddNotice('You cannot edit your own role',NOTICE_TYPE_ERROR);
+			return;
+		}
+		if ($fieldAlias == '_validate_user') return $this->UpdateField('email_confirm_code',true,$pkVal);
+		if ($fieldAlias == '_validate_send') { uVerifyEmail::VerifyAccount($pkVal); return; }
+		parent::UpdateField($fieldAlias,$newValue,$pkVal);
+	}
 }
-uEvents::AddCallback('AfterRunModule',array(utopia::GetInstance('UserProfileDetail'),'RunModule'),'uUserProfile',101);

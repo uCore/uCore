@@ -270,6 +270,7 @@ function BuildAttrString($attrArray) {
 				$val = implode(';',$style);
 			} else $val = implode(' ',$val);
 		}
+		$val = trim($val);
 		$attrStrings[] = "$name=\"$val\"";
 	}
 
@@ -293,7 +294,7 @@ function GetQSPairs($url) {
 }
 
 function UrlReadable($string) {
-	return preg_replace('/[^\pL0-9a-z\-_\.~]+/iu','-',$string);
+	return preg_replace('/[^\pL0-9a-z\-_~]+/iu','-',$string);
 }
 
 function DONT_USE_uuid()
@@ -320,7 +321,7 @@ function timer_end($timerName) {
 	if (!isset($timer['start_time'])) { /*echo "Timer ($timerName) not started.";*/ return; }
 
 	$timer['end_time'] = microtime(true)*1000;
-	$timer['time_taken'] = round($timer['end_time'] - $timer['start_time'],3);
+	$timer['time_taken'] = $timer['end_time'] - $timer['start_time'];
 
 	return $timer['time_taken'];
 }
@@ -521,24 +522,6 @@ function fixdateformat($string) {
 function IsSelectStatement($str) {
 	if (!is_string($str)) return false;
 	return (strtolower(substr(trim($str,'('),0,6)) == 'select');
-}
-
-/* before an ajax script use the following:
-
-if (!RunAjaxScript(__FILE__)) return;
-
-This will prevent the file from being run without all children
-being loaded (security), and will prevent it from being 'included' */
-function RunAjaxScript($path) {
-	if (strpos($_SERVER['REQUEST_URI'],'?') !== FALSE)
-	$requestPath = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'?'));
-	else $requestPath = $_SERVER['REQUEST_URI'];
-
-	if ($requestPath !== str_replace($_SERVER['DOCUMENT_ROOT'],'',$path)) return FALSE; // is being included
-
-	LoadChildren('*'); // to ensure that security is passed on all ajax scripts
-	//utopia::CancelTemplate();
-	return true;
 }
 
 

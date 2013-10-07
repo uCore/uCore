@@ -34,16 +34,17 @@ CKEDITOR.on('instanceReady',function(info) {
 	info.editor.on('blur',_ckOnUpdate,null,oldData);
 });
 
-	
 function initCKE() {
 	$('.ckEditReplace').each(function() {
 		if ($(this).attr('name') && CKEDITOR.instances[$(this).attr('name')]) return false;
 		var config = {};
 		if ($(this).data('toolbar')) config.toolbar = $(this).data('toolbar');
-		if ($(this).is('[contenteditable]'))
-			CKEDITOR.inline(this,config);
-		else
-			CKEDITOR.replace(this,config);
+		try {
+			if ($(this).is('[contenteditable]'))
+				CKEDITOR.inline(this,config);
+			else
+				CKEDITOR.replace(this,config);
+		} catch (e) {}
 	});
 }
 utopia.Initialise.add(initCKE);

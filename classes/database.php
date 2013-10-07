@@ -8,19 +8,27 @@ class mainSchema extends sqlSchema {
 }
 class database {
 	private static $conn = null;
-	static function connect() {
-		$conn = new mainSchema(array(PDO::ATTR_PERSISTENT => true, PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8', PDO::MYSQL_ATTR_FOUND_ROWS => true));
+	static function connect($force = false) {
+		if (!self::$conn || $force) self::$conn = new mainSchema(array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
 	
-		if (!$conn) {
+		if (!self::$conn) {
 			echo "Cannot connect to SQL server.<br>";
 			return false;
 		}
 
-		return $conn;
+		return self::$conn;
 	}
 	
-	static $queryCount = 0;
-	static function &query($query, $args=NULL) { $false = FALSE;
+	static function &query($query, $args=NULL) {
+		try {
+			return self::_query($query,$args);
+		} catch (Exception $e) {
+			self::connect(true);
+		}
+	}
+	private static $queryCount = 0;
+	private static function &_query($query, $args=NULL) {
+		$false = FALSE;
 		if (empty($query)) return $false;
 		if (!isset($GLOBALS['sql_query_count']))
 			$GLOBALS['sql_query_count'] = 0;
