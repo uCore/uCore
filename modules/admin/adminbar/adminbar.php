@@ -1,7 +1,9 @@
 <?php
 
-uEvents::AddCallback('ProcessDomDocument','uAdminBar::ProcessDomDocument');
-class uAdminBar {
+class uAdminBar implements iUtopiaModule {
+	public static function Initialise() {
+		uEvents::AddCallback('ProcessDomDocument','uAdminBar::ProcessDomDocument');
+	}
 	static $items = array();
 	public static function AddItem($menu=FALSE,$body=FALSE,$order=null,$class='') {
 		if ($order === null) $order = count(self::$items);
