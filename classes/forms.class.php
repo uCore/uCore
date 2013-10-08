@@ -2634,10 +2634,11 @@ abstract class uDataModule extends uBasicModule {
 				$value = $row[$linkInfo['fromField']]; // use actual value, getting the real value on every field causes a lot of lookups, the requested field must be the field that stores the actual value
 			}
 			//echo $value."<br/>";
-			$obj = utopia::GetInstance($targetModule);
-			$fltr = $obj->FindFilter($linkInfo['toField']);
-			if ($value !== NULL)
-				$newFilter['_f_'.$fltr['uid']] = $value;
+			if ($value !== NULL) {
+				$obj = utopia::GetInstance($targetModule);
+				$fltr = $obj->FindFilter($linkInfo['toField']);
+				if ($fltr) $newFilter['_f_'.$fltr['uid']] = $value;
+			}
 		}
 		return $newFilter;
 		//print_r(array_merge($newFilter,$additional));
