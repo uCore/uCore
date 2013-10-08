@@ -1696,16 +1696,19 @@ abstract class uDataModule extends uBasicModule {
 			$parents = utopia::GetParents(get_class($this));
 			foreach ($parents as $parent => $childLinks) {
 				if ($parent == '/') $parent = utopia::GetCurrentModule();
+				if (!$parent || !class_exists($parent)) continue;
 				$parentObj = utopia::GetInstance($parent);
 				foreach ($childLinks as $info) {
-					if (isset($info['fieldLinks'])) foreach ($info['fieldLinks'] as $link) {
-						if ($link['toField'] == $filterData['fieldName']) {
-							$row = $parentObj->GetCurrentRecord($refresh);
-							if (!$row && !$refresh) $row = $parentObj->GetCurrentRecord(true);
-							if (isset($row[$link['fromField']])) return $row[$link['fromField']];
-							
-							$fltrLookup =& $parentObj->FindFilter($link['fromField'],ctEQ);
-							return $parentObj->GetFilterValue($fltrLookup['uid']);
+					if (isset($info['fieldLinks'])) {
+						foreach ($info['fieldLinks'] as $link) {
+							if ($link['toField'] == $filterData['fieldName']) {
+								$row = $parentObj->GetCurrentRecord($refresh);
+								if (!$row && !$refresh) $row = $parentObj->GetCurrentRecord(true);
+								if (isset($row[$link['fromField']])) return $row[$link['fromField']];
+								
+								$fltrLookup =& $parentObj->FindFilter($link['fromField'],ctEQ);
+								return $parentObj->GetFilterValue($fltrLookup['uid']);
+							}
 						}
 					}
 				}
