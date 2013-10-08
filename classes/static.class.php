@@ -23,14 +23,13 @@ utopia::AddTemplateParser('setget','utopia::setGet');
 
 final class utopia {
 	private static $children = array();
+	private static $parents = array();
 	static function AddChild($parent, $child, $info) {
 		$info['parent'] = $parent;
-		if (isset(self::$children[$parent]) && isset(self::$children[$parent][$child])) {
-			foreach (self::$children[$parent][$child] as $compare) {
-				if ($info == $compare) return;
-			}
-		}
+		$info['child'] = $child;
+		
 		self::$children[$parent][$child][] = $info;
+		self::$parents[$child][$parent][] = $info;
 	}
 
 	static function GetChildren($parent) {
@@ -51,6 +50,10 @@ final class utopia {
 		$arr = array_merge($catchAll,$baseModule,$currentModule,$specific);
 
 		return $arr;
+	}
+	
+	static function GetParents($child) {
+		return (isset(self::$parents[$child])) ? self::$parents[$child] : array();
 	}
 
 	static function SetTitle($text) {

@@ -433,7 +433,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		if (isset($fieldLinks) && !is_array($fieldLinks)) // must be null or array
 			trigger_error('Cannot add parent ('.$parentModule.') of '.get_called_class().', fieldLinks parameter is an invalid type.',E_USER_ERROR);
 
-		$info = array('moduleName'=>get_called_class(), 'parentField'=>$parentField, 'fieldLinks' => $fieldLinks, 'text' => $text);
+		$info = array('parentField'=>$parentField, 'fieldLinks' => $fieldLinks, 'text' => $text);
 		utopia::AddChild($parentModule, get_called_class(), $info);
 		
 		return $fieldLinks;
@@ -1678,31 +1678,24 @@ abstract class uDataModule extends uBasicModule {
 		$filterData = $this->GetFilterInfo($uid);
 		if (!is_array($filterData)) return NULL;
 
-		// ptime static filter value
-		// this line grabs STATIC filters (filters set by code), this enforced if the input type is null
-		//if (isset($filterData['default'])) $defaultValue = $filterData['default'];
-		$defaultValue = array_key_exists('value',$filterData) ? $filterData['value'] : $filterData['default'];
+		if (isset($filterData['value'])) return $filterData['value'];
 
-		// for union modules, we cannot get a value form currentmodule because it is itself, part of the query
+		// for union modules, we cannot get a value from currentmodule because it is itself, part of the query
 		if ($filterData['it'] === itNONE && utopia::GetCurrentModule() !== get_class($this) && (!isset($this->UNION_MODULE) || $this->UNION_MODULE !== TRUE)) {
-			if (array_key_exists('linkFrom',$filterData)) {
-				list($linkParent,$linkFrom) = explode(':',$filterData['linkFrom']);
-				// linkparent is loaded?  if not then we dont really want to use it as a filter.....
-				if ($linkParent == utopia::GetCurrentModule()) {
-					$linkParentObj = utopia::GetInstance($linkParent);
-					$row = $linkParentObj->GetCurrentRecord($refresh);
-					if (!$row && !$refresh) $row = $linkParentObj->GetCurrentRecord(true);
-
-					if (is_array($row) && array_key_exists($linkFrom,$row)) {
-						return $row[$linkFrom];
-					} else {// if the filter value of the parent is null (if we're updating for example), then we want to get the value of the filter
-						$fltrLookup =& $linkParentObj->FindFilter($linkFrom,ctEQ);
-						$val = NULL;
-						// stop lookup callbacks
-						if (is_array($fltrLookup) && array_key_exists('linkFrom',$fltrLookup) && stristr($fltrLookup['linkFrom'],get_class($this)) === FALSE)
-							$val = $linkParentObj->GetFilterValue($fltrLookup['uid']);
-
-						if ($val!==NULL) return $val;
+			$parents = utopia::GetParents(get_class($this));
+			foreach ($parents as $parent => $childLinks) {
+				if ($parent == '/') $parent = utopia::GetCurrentModule();
+				$parentObj = utopia::GetInstance($parent);
+				foreach ($childLinks as $info) {
+					if (isset($info['fieldLinks'])) foreach ($info['fieldLinks'] as $link) {
+						if ($link['toField'] == $filterData['fieldName']) {
+							$row = $parentObj->GetCurrentRecord($refresh);
+							if (!$row && !$refresh) $row = $parentObj->GetCurrentRecord(true);
+							if (isset($row[$link['fromField']])) return $row[$link['fromField']];
+							
+							$fltrLookup =& $parentObj->FindFilter($link['fromField'],ctEQ);
+							return $parentObj->GetFilterValue($fltrLookup['uid']);
+						}
 					}
 				}
 			}
@@ -1711,7 +1704,7 @@ abstract class uDataModule extends uBasicModule {
 		$filters = GetFilterArray();
 		if (isset($filters[$uid])) return $filters[$uid];
 
-		return $defaultValue;
+		return $filterData['default'];
 	}
 
 	public function GetTableProperty($alias,$property) {
@@ -2571,7 +2564,7 @@ abstract class uDataModule extends uBasicModule {
 			$targetFilter = NULL;
 		}
 		
-		$obj = utopia::GetInstance($info['moduleName']);
+		$obj = utopia::GetInstance($info['child']);
 		return $obj->GetURL($targetFilter);
 	}
 
@@ -2599,7 +2592,7 @@ abstract class uDataModule extends uBasicModule {
 		//echo "<br/>$field:";
 		// fieldLinks: array: parentField => childField
 		// need to replace the values
-		$targetModule = $info['moduleName'];
+		$targetModule = $info['child'];
 		$newFilter = array();
 //		$additional = array();
 		//print_r($info['fieldLinks']);
