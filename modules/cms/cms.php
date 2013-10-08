@@ -662,8 +662,11 @@ class uCMS_View extends uSingleDataModule {
 		if (!self::$parentsCache) {
 			$rows = self::fetchAll();
 			foreach ($rows as $row) {
+				if ($row['is_home']) {
+					self::$parentsCache[$row['cms_id']] = false;
+					continue;
+				}
 				$parent = $row['parent'];
-				if ($row['is_home']) $parent = false;
 				self::$parentsCache[$row['cms_id']] = array();
 				if ($parent) self::$parentsCache[$row['cms_id']][] = $parent;
 				if (isset(self::$parentsCache[$parent]) && self::$parentsCache[$parent]) {
