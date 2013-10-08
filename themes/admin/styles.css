@@ -127,7 +127,7 @@ td.uFilters .inputtype.select2-container a.select2-choice .select2-arrow { displ
 .inputtype.select2-container-multi.select2-container-active .select2-choices { border:0; background:transparent; }
 
 
-.new-item { visibility:hidden; display:inline-block;width:1em; height:1em; line-height:normal; }
+.new-item { visibility:hidden; display:inline-block;width:1em; height:1em; line-height:normal; overflow: hidden; }
 .new-item:before { content:"\e816"; speak: none; font-size:inherit; font-family:ucore-symbols; font-weight:normal; color:#8cc63f; visibility:visible; }
 
 .export { visibility:hidden; display:inline-block;width:1em; height:1em; line-height:normal; }
