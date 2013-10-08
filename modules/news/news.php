@@ -243,7 +243,6 @@ class module_NewsTags extends uDataModule {
 class module_NewsDisplay extends uDataModule {
 	public function GetTitle() { return 'Latest News'; }
 	public static function Initialise() {
-		modOpts::AddOption('news_per_page','Articles Per Page','Articles',2);
 		modOpts::AddOption('news_widget_archive','Archive Widget','Articles','article-archive');
 		modOpts::AddOption('news_widget_article','Article Widget','Articles','article');
 		
