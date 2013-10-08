@@ -615,7 +615,18 @@ abstract class uBasicModule implements iUtopiaModule {
  *
  */
 abstract class uDataModule extends uBasicModule {
-	public function __construct() { parent::__construct(); $this->_SetupFields();}
+	public function __construct() {
+		parent::__construct();
+		$this->_SetupFields();
+		$parents = utopia::GetParents(get_class($this));
+		foreach ($parents as $parent => $pArr) {
+			foreach ($pArr as $info) {
+				if (isset($info['fieldLinks'])) foreach ($info['fieldLinks'] as $link) {
+					$this->AddFilter($link['toField'],ctEQ,itNONE);
+				}
+			}
+		}
+	}
 
 	public $fields = array();
 	public $filters = array(FILTER_WHERE=>array(),FILTER_HAVING=>array());
