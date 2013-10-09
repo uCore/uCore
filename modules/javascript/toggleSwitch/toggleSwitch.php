@@ -2,10 +2,8 @@
 
 utopia::AddInputType('itYESNO','ToggleSwitch::DrawToggleSwitch');
 utopia::AddInputType('itONOFF','ToggleSwitch::DrawToggleSwitch');
-
-uEvents::AddCallback('BeforeInit','ToggleSwitch::Init');
-class ToggleSwitch {
-	public static function Init() {
+class ToggleSwitch implements iUtopiaModule {
+	public static function Initialise() {
 		uCSS::IncludeFile(dirname(__FILE__).'/toggleSwitch.css');
 		uJavascript::IncludeFile(dirname(__FILE__).'/toggleSwitch.js');
 		uJavascript::IncludeText(<<<FIN
