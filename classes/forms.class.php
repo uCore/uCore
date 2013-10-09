@@ -2045,11 +2045,12 @@ abstract class uDataModule extends uBasicModule {
 		if ($forceType === NULL) $forceType = $realType;
 		switch ($forceType) {
 			case ftFILE:
-				$filename = '';
-				$link = uBlob::GetLink(get_class($this),$fieldName,$pkVal);
-				if ($rec && isset($rec[$fieldName.'_filename']) && $rec[$fieldName.'_filename']) $filename = '<b><a target="_blank" href="'.$link.'">'.$rec[$fieldName.'_filename'].'</a></b> - ';
-				if (!strlen($value)) $value = '';
-				else $value = $filename.round(strlen($value)/1024,2).'Kb<br/>';
+				if ($value) {
+					$filename = ($rec && isset($rec[$fieldName.'_filename']) && $rec[$fieldName.'_filename']) ? $rec[$fieldName.'_filename'] : 'Download';
+					$link = uBlob::GetLink(get_class($this),$fieldName,$pkVal,$filename);
+					$link = '<b><a target="_blank" href="'.$link.'">'.$filename.'</a></b> - ';
+					$value = $link.round(strlen($value)/1024,2).'Kb<br/>';
+				}
 				break;
 			case ftIMAGE:
 				if (!$value) break;
