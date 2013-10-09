@@ -124,7 +124,7 @@ class uEmailer extends uDataModule {
 		modOpts::AddOption('smtp_port','SMTP Port','Emails',25);
 		modOpts::AddOption('smtp_user','SMTP Username','Emails','');
 		modOpts::AddOption('smtp_pass','SMTP Password','Emails','',itPLAINPASSWORD);
-		modOpts::AddOption('emailer_from','Mailer From','Emails',ADMIN_EMAIL);
+		modOpts::AddOption('emailer_from','Mailer From','Emails');
 		modOpts::AddOption('return_path','Return Path','Emails');
 		uEvents::AddCallback('AfterInit','uEmailer::InitialiseTemplates');
 	}
@@ -226,8 +226,10 @@ class uEmailer extends uDataModule {
 		
 		$mailer = Swift_Mailer::newInstance(self::$mailTransport);
 		$message = Swift_Message::newInstance();
-		
-		$sender = self::ConvertEmails(modOpts::GetOption('emailer_from'));
+
+		$sender = modOpts::GetOption('emailer_from');
+		if (!$sender) $sender = ADMIN_EMAIL;
+		$sender = self::ConvertEmails($sender);
 		$message->setSender($sender);
 		
 		$return = modOpts::GetOption('return_path');
