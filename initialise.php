@@ -19,10 +19,6 @@ header('Vary: if-none-match, accept-encoding');
 ob_start('utopia::output_buffer',2);
 register_shutdown_function('utopia::Finish');
 
-uConfig::DefineConfig();
-uConfig::ValidateConfig();
-uEvents::TriggerEvent('ConfigDefined');
-
 timer_start('Static Initialise');
 $allmodules = utopia::GetModulesOf('iUtopiaModule');
 foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to be setup fully
@@ -31,6 +27,10 @@ foreach ($allmodules as $row) { // must run second due to requiring GLOB_MOD to 
 	timer_end('Init: '.$row['module_name']);
 }
 timer_end('Static Initialise');
+
+uConfig::DefineConfig();
+uConfig::ValidateConfig();
+uEvents::TriggerEvent('ConfigDefined');
 
 timer_start('Before Init');
 uEvents::TriggerEvent('BeforeInit');
