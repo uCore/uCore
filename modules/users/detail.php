@@ -32,6 +32,10 @@ class UserProfileDetail extends uSingleDataModule {
 		if (!($l = uUserLogin::IsLoggedIn())) return;
 		$this->ShowData();
 	}
+	public static function RunChild() {
+		$o = utopia::GetInstance(__CLASS__);
+		$o->RunModule();
+	}
 	public function SetupFields() {
 		$this->CreateTable('user');
 		$this->CreateTable('detail','tabledef_UserProfile','user','user_id');
@@ -67,10 +71,6 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 	public static function Initialise() {
 		self::AddParent('uUsersList','user_id','*');
 		uEvents::AddCallback('AfterRunModule','UserProfileDetail::RunChild','uUserProfile',101);
-	}
-	public static function RunChild() {
-		$o = utopia::GetInstance(__CLASS__);
-		$o->RunModule();
 	}
 	public function RunModule() {
 		$this->ShowData();
