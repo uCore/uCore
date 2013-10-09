@@ -73,17 +73,19 @@ class uCSS extends uBasicModule {
 	public static function Initialise() {
 		uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
 		uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument',null,MAX_ORDER);
+		uEvents::AddCallback('AfterInit','uCSS::LinkGlobal');
 		
 		self::LinkFile('/styles.css',-10);
 		self::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui.min.css',-99);
 		self::IncludeFile(PATH_REL_CORE.'default.css');
-		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');
 
 		module_Offline::IgnoreClass(__CLASS__);
 	}
+	public static function LinkGlobal() {
+		self::IncludeFile(PATH_REL_ROOT.TEMPLATE_ADMIN.'/global.css');		
+	}
 	public function SetupParents() {
 		$this->SetRewrite(true);
-
 	}
 	public function RunModule() {
 		utopia::CancelTemplate();
