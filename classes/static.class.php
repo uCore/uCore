@@ -300,6 +300,7 @@ final class utopia {
 		}
 
 		header('X-Runtime: '.number_format((microtime(true)-UCORE_START_TIME)*1000).'ms');
+		die;
 	}
 
 	private static $customInputs = array();
