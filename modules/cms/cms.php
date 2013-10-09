@@ -551,6 +551,7 @@ class uCMS_View extends uSingleDataModule {
 		$this->SetRewrite(true);
 	}
 	static function ProcessDomDocument($obj,$event,$templateDoc) {
+		if (!defined('INIT_COMPLETE')) return;
 		$page = self::findPage();
 		
 		// set body class to cms_id
