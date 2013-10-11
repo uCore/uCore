@@ -1263,23 +1263,28 @@ final class utopia {
 		if ($parsed===FALSE) $parsed = strptime($string,FORMAT_DATE);
 		if ($parsed===FALSE) $parsed = strptime($string,FORMAT_DATETIME);
 		if ($parsed!==FALSE) $parsed = mktime($parsed['tm_hour'], $parsed['tm_min'], $parsed['tm_sec'], 1 , $parsed['tm_yday'] + 1, $parsed['tm_year'] + 1900); 
-		else $parsed = strtotime($string);
+		else {
+			$old = date_default_timezone_get();
+			date_default_timezone_set('UTC');
+			$parsed = strtotime($string);
+			date_default_timezone_set($old);
+		}
 		return $parsed;
 	}
 	static function convDate($originalValue,$pkVal,$processedVal) {
 		if (!$originalValue) return '';
-		$t = strtotime( $originalValue );
+		$t = self::strtotime( $originalValue );
 		return strftime(FORMAT_DATE,$t);
 	}
 	static function convTime($originalValue,$pkVal,$processedVal) {
 		if (!$originalValue) return '';
-		$t = strtotime( $originalValue );
+		$t = self::strtotime( $originalValue );
 		return strftime(FORMAT_TIME,$t);
 	}
 	static function convDateTime($originalValue,$pkVal,$processedVal) {
 		if (!$originalValue) return '';
-		$t = strtotime( $originalValue );
-		$hasTime = ($t % 86400) !== 0;
+		$t = self::strtotime( $originalValue );
+		$hasTime = ($t % 86400);
 		if ($hasTime) return strftime(FORMAT_DATETIME,$t);
 		return strftime(FORMAT_DATE,$t);
 	}
