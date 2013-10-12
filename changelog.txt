@@ -1,0 +1,34 @@
+Tagging the v2.0.5 release.
+fix record count
+remove timezone ambiguity in strtotime
+use buttons instead of spans for fields in emailer and customwidget
+
+Tagging the v2.0.4 release.
+move config definition after static initialisation
+utilise static initialise
+move global include to AfterInit due to config dependancy
+dont process if not initialised
+dont use ADMIN_EMAIL in static initialise
+fix relroot to work on windows servers too
+die after finish to allow scripts (like setup) to terminate execution
+input font size should match parent by default
+optimise ftFILE preprocessor
+move RunChild to correct class *oops*
+
+Tagging the v2.0.3 release.
+check that parent exists before trying to get filter value from it
+
+Tagging the v2.0.2 release.
+fix issue with detection of home in GetCmsParents
+fix style of new-item in admin theme
+remove obsolete news_per_page option (set in widget limit)
+
+Tagging the v2.0.1 release.
+if uEmailer fields is callable, run it
+improve GetTargetFilters a little
+setup child filters on construct
+improve AddParent/AddChild, add GetParents, and fix GetFilterValue to read from parent
+move event callback into Initialise function
+allow editor fields to trigger preprocess updates again
+hide unfinished uMenu
+
