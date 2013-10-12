@@ -1,4 +1,5 @@
 Tagging the v2.0.5 release.
+add changelog
 fix record count
 remove timezone ambiguity in strtotime
 use buttons instead of spans for fields in emailer and customwidget
