@@ -176,8 +176,8 @@ class uDataset {
 		}
 		
 		$this->query = "(SELECT $select$from$where$group$having1$order1)$union";
-		if ($having) $this->countQuery = "(SELECT COUNT(*)$select$from$where$group$having1$order1)$union";
-		else $this->countQuery = "(SELECT COUNT(*)$from$where$group ORDER BY NULL)";
+		if ($having) $this->countQuery = "(SELECT COUNT(*) FROM ((SELECT $select$from$where$group$having1$order1)$union) AS `_`)";
+		else $this->countQuery = "(SELECT COUNT(*) FROM (SELECT NULL$from$where$group ORDER BY NULL) as `_`)";
 	}
 	
 	
