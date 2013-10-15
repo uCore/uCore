@@ -644,8 +644,7 @@ final class utopia {
 
 	/* TEMPLATE */
 	public static function GetTemplates($includeDefault=false,$includeCore=true) {
-		$userTemplates = glob(PATH_ABS_TEMPLATES.'*'); // find all user templates
-		$userTemplates = array_merge($userTemplates,glob(PATH_ABS_THEMES.'*')); // find all user templates
+		$userTemplates = array_merge(array_filter((array)glob(PATH_ABS_TEMPLATES.'*')),array_filter((array)glob(PATH_ABS_THEMES.'*'))); // find all user templates
 
 		$adminTemplates = glob(PATH_ABS_CORE.'themes/*'); // find all admin templates
 		$nTemplates = array();
