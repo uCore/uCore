@@ -19,10 +19,9 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 
 	public function GetTabledef() { return 'tabledef_UserRoles'; }
 	public function SetupFields() {	
-		self::InitModules();
 		$this->CreateTable('roles');
 		$this->AddField('name','name','roles','Name',itTEXT);
-		$this->AddField('allow','allow','roles','Allowed Modules',itCHECKBOX,self::$modules);
+		$this->AddField('allow','allow','roles','Allowed Modules',itCHECKBOX,'uUserRoles::GetModules');
 		
 		$this->AddFilter('role_id',ctNOTEQ,itNONE,-1);
 	}
@@ -69,30 +68,31 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		return ($role && $role[0] === '-1');
 	}
 	
-	private static $modules = array();
-	private static function InitModules() {
-		if (self::$modules) return;
+	public static function GetModules() {
 		$modules = utopia::GetModulesOf('iRestrictedAccess');
 		foreach ($modules as $k => $v) {
-//			$o = utopia::GetInstance($k);
-	//		if (!($o instanceof iRestrictedAccess)) unset($modules[$k]);
-			//else
-			$modules[$k] = $k;//$o->GetTitle();
+			$modules[$k] = $k;
 		}
-		self::$modules = $modules;
+
+		foreach (self::$linked as $k => $mods) {
+			// unset all mods
+			foreach ($mods as $m) unset($modules[$m]);
+			// add k to modules
+			$modules[$k] = $k;
+		}
+
+		// remove custom roles
+		foreach (self::$customRoles as $k => $c) {
+			unset($modules[$k]);
+		}
+
+		return $modules;
 	}
 	private static $linked = array();
 	public static function LinkRoles($id,$modules) {
-//		$o = utopia::GetInstance(__CLASS__);
-//		$o->_SetupFields();
 		if (!is_array($modules)) $modules = array($modules);
 		$modules = array_filter($modules);
 		if (!$modules) return;
-		
-		foreach (self::$modules as $t => $mod) {
-			if (array_search($t,$modules) !== FALSE) unset(self::$modules[$t]);
-		}
-		self::$modules[$id] = $id;
 		
 		if (!isset(self::$linked[$id])) self::$linked[$id] = array();
 		self::$linked[$id] = array_merge(self::$linked[$id],$modules);
@@ -115,8 +115,6 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		// only valid for iRestrictedAccess modules
 		if (!($object instanceof iRestrictedAccess)) return true;
 		
-		self::InitModules();
-		
 		$role = self::GetUserRole();
 		if ($role) {
 			if (!is_array($role[1])) $role[1] = array($role[1]);
@@ -128,10 +126,6 @@ class uUserRoles extends uListDataModule implements iAdminModule {
 		return false;
 	}
 	public static function NoRole($module) {
-		self::InitModules();
-		foreach (self::$modules as $mod => $title) {
-			if ($mod === $module) unset(self::$modules[$mod]);
-		}
 		self::AddCustomRole($module,'uUserRoles::RetTrue');
 	}
 	private static function RetTrue() {
