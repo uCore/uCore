@@ -83,6 +83,7 @@ class UserDetailAdmin extends uSingleDataModule implements iAdminModule {
 		
 		$this->AddField('username','username','user','Email',itTEXT);
 		$this->AddField('password','password','user','Password',itPASSWORD);
+		$this->AddField('email_confirm_code','email_confirm_code','user');
 		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','user','Validation');
 		$this->AddPreProcessCallback('validated',array($this,'ValidateButtons'));
 		$this->SetFieldProperty('validated','nolink',true);
