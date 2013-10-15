@@ -51,6 +51,7 @@ class tabledef_Users extends uTableDef {
 				parent::UpdateField('email_confirm_code','',$pkVal);
 				if ($old != $new) uEvents::TriggerEvent('UsernameChanged',NULL,array($old,$new));
 			}
+			return;
 		}
 		parent::UpdateField($fieldName,$newValue,$pkVal,$fieldType);
 	}
