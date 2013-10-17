@@ -925,8 +925,7 @@ final class utopia {
 		$replace = call_user_func_array($parser[0],$args);
 
 		if ($parser[1]) {
-			$replace = ob_get_contents();
-			ob_end_clean();
+			$replace = ob_get_clean();
 		}
 		return $replace;
 	}
@@ -983,9 +982,8 @@ final class utopia {
 		$string = preg_replace('/\<\?\s/i','<?php ',$string);
 
 		ob_start();
-			eval('?>'.$string.'<?php ');
-			$string = ob_get_contents();
-		ob_end_clean();
+		eval('?>'.$string.'<?php ');
+		$string = ob_get_clean();
 		
 		return $string;
 	}

@@ -349,8 +349,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		// BEFORE
 		ob_start();
 		$beforeResult = uEvents::TriggerEvent('BeforeRunModule',$this);
-		$beforeContent = ob_get_contents();
-		ob_end_clean();
+		$beforeContent = ob_get_clean();
 		if (utopia::UsingTemplate() && $beforeContent) $beforeContent = '<div class="module-container '.get_class($this).' BeforeRunModule">'.$beforeContent.'</div>';
 		echo $beforeContent;
 		if ($beforeResult === FALSE) return FALSE;
@@ -358,8 +357,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		// RUN
 		ob_start();
 		$result = $this->RunModule();
-		$runContent = ob_get_contents();
-		ob_end_clean();
+		$runContent = ob_get_clean();
 		if (utopia::UsingTemplate() && $runContent) $runContent = '<div class="module-container '.get_class($this).' RunModule">'.$runContent.'</div>';
 		echo $runContent;
 		if ($result === FALSE) return false;
@@ -368,8 +366,7 @@ abstract class uBasicModule implements iUtopiaModule {
 		// AFTER
 		ob_start();
 		$afterResult = uEvents::TriggerEvent('AfterRunModule',$this);
-		$afterContent = ob_get_contents();
-		ob_end_clean();
+		$afterContent = ob_get_clean();
 		if (utopia::UsingTemplate() && $afterContent) $afterContent = '<div class="module-container '.get_class($this).' AfterRunModule">'.$afterContent.'</div>';
 		echo $afterContent;
 		if ($afterResult === FALSE) return FALSE;
@@ -2827,8 +2824,7 @@ abstract class uListDataModule extends uDataModule {
 			}
 			echo '</tr>'; // close column headers
 
-			$header_output = ob_get_contents();
-			ob_end_clean();
+			$header_output = ob_get_clean();
 		
 			if ($this->flag_is_set(ALLOW_FILTER) && $this->hasEditableFilters === true && $this->hideFilters !== TRUE) {
 				echo '<tr class="noprint"><td class="uFilters" colspan="'.$colcount.'">';
@@ -2940,13 +2936,11 @@ abstract class uListDataModule extends uDataModule {
 			$pages = max(ceil($num_rows / $limit),1);
 			ob_start();
 			utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
-			$pagination = ob_get_contents();
-			ob_end_clean();
+			$pagination = ob_get_clean();
 			if ($pagination) echo '<div class="pagination right module-content">'.$pagination.'</div>';
 		}
 		
-		$cont = ob_get_contents();
-		ob_end_clean();
+		$cont = ob_get_clean();
 
 		echo $cont;
 	}
@@ -3021,9 +3015,8 @@ abstract class uSingleDataModule extends uDataModule {
 		if ($limit) {
 			$pages = max(ceil($num_rows / $limit),1);
 			ob_start();
-				utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
-				$pagination = ob_get_contents();
-			ob_end_clean();
+			utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
+			$pagination = ob_get_clean();
 		}
 		$records = ($num_rows == 0) ? "There are no records to display." : 'Total Rows: '.$num_rows;
 		$pager = '<div class="right">'.$pagination.'</div>';

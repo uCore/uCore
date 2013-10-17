@@ -58,8 +58,7 @@ class uUploads extends uBasicModule {
 				$cType = 'image/png';
 				$fileName = str_replace(".$ext",'.png',$fileName);
 			}
-			$output = ob_get_contents();
-			ob_end_clean();
+			$output = ob_get_clean();
 			imagedestroy($img);
 			
 			// only need to cache the resized versions

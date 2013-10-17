@@ -172,11 +172,10 @@ class uCustomWidget implements iWidget {
 		// process full doc
 		$ret = str_ireplace('{total}',$total,$ret);
 		if ($page !== NULL && is_numeric($limit)) {
-			ob_start();
 			$pages = max(ceil($total / $limit),1);
+			ob_start();
 			$cPage = utopia::OutputPagination($pages,'_p_'.$rec['block_id']);
-			$ret = str_ireplace('{pagination}',ob_get_contents(),$ret);
-			ob_end_clean();
+			$ret = str_ireplace('{pagination}',ob_get_clean(),$ret);
 			$ret = str_ireplace('{pages}',$pages,$ret);
 			$ret = str_ireplace('{current_page}',$cPage,$ret);
 		}

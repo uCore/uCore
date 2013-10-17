@@ -49,8 +49,7 @@ class uBlob extends uBasicModule {
 			ob_start();
 			imagepng($img);
 			imagedestroy($img);
-			$data = ob_get_contents();
-			ob_end_clean();
+			$data = ob_get_clean();
 			
 			// only need to cache the resized versions
 			uCache::store($idents,$data);

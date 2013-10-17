@@ -51,8 +51,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 		// get large widget area
 		ob_start();
 		uEvents::TriggerEvent('ShowDashboard');
-		$largeContent = ob_get_contents();
-		ob_end_clean();
+		$largeContent = ob_get_clean();
 		if ($largeContent) echo '<div class="dash-large">'.$largeContent.'</div>';
 
 		
@@ -66,8 +65,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 			if ($ref->hasMethod('Draw100')) $wid::Draw100();
 			elseif ($ref->hasMethod('Draw50')) $wid::Draw50();
 			elseif ($ref->hasMethod('Draw25')) $wid::Draw25();
-			$content = ob_get_contents();
-			ob_end_clean();
+			$content = ob_get_clean();
 			if (!$content) continue;
 			$smallContent .= '<div class="widget-container '.$wid.'"><h1>'.$wid::GetTitle().'</h1><div class="module-content">'.$content.'</div></div>';
 		}

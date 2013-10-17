@@ -388,8 +388,7 @@ class uCMS_Edit extends uSingleDataModule implements iAdminModule {
 		$thisObj->tabGroup = '_ADMIN_EDIT_';
 		$thisObj->ShowData();
 		$thisObj->tabGroup = NULL;
-		$c = ob_get_contents();
-		ob_end_clean();
+		$c = ob_get_clean();
 		$pubCell = '<span class="right publish-buttons" style="padding-left:10px">'.$thisObj->GetCell('publishing',$rec).'</span>';
 
 		
