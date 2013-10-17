@@ -4,7 +4,6 @@ define('TEMPLATE_DEFAULT','__default__');
 
 utopia::AddTemplateParser('utopia','utopia::parseVars');
 utopia::AddTemplateParser('list','utopia::DrawList');
-utopia::AddTemplateParser('tab','utopia::Tab_GetOutput');
 utopia::AddTemplateParser('get','utopia::parseGet');
 utopia::AddTemplateParser('post','utopia::parsePost');
 utopia::AddTemplateParser('request','utopia::parseRequest');
@@ -498,87 +497,6 @@ final class utopia {
 		else
 			self::$globalVariables[$var] = $text;
 	}
-
-	/*  TABS  */
-	private static $tabGroups = array();
-	private static $tabOrderCount = 1;
-	static function Tab_InitGroup($tabGroup=NULL) {
-		if (!$tabGroup) $tabGroup = utopia::GetCurrentModule().'-tabs';
-		if (isset(self::$tabGroups[$tabGroup])) return $tabGroup;
-		//			echo '<div class="tabGroup" id="'.$tabGroup.'"><ul></ul></div>';
-		self::$tabGroups[$tabGroup] = array();
-		return $tabGroup;
-	}
-	static function Tab_Add($tabTitle,$tabContent,$tabID,$tabGroup=NULL,$isURL=false,$order=NULL) {
-		if ($order === NULL) $order = count(self::$tabGroups[$tabGroup]);
-		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
-		$tabID .= '-'.UrlReadable($tabTitle);
-		if (isset(self::$tabGroups[$tabGroup]['tab'.$tabID])) { ErrorLog("TabID ($tabID) already exists in Group ($tabGroup)"); return; }
-		self::$tabGroups[$tabGroup][$tabID] = array('id'=>$tabID,'title'=>$tabTitle,'content'=>$tabContent,'isURL'=>$isURL,'order'=>$order);
-	}
-	static function Tab_GetCount($tabGroup=NULL) {
-		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
-		return count(self::$tabGroups[$tabGroup]);
-	}
-	static function Tab_GetOutput($group) {
-		ob_start();
-		self::Tab_DrawGroup($group);
-		$c = ob_get_contents();
-		ob_end_clean();
-		return $c;
-	}
-	static function Tab_DrawGroup($tabGroup=NULL,$extraClasses="") {
-		if (!$tabGroup) $tabGroup = self::Tab_InitGroup();
-		$tabGroupArray = self::$tabGroups[$tabGroup];
-		if (count($tabGroupArray) <= 1) { $tabInfo = reset($tabGroupArray); echo $tabInfo['content']; return; }
-
-		array_sort_subkey($tabGroupArray,'order');
-
-		echo '<div class="tabGroup '.$extraClasses.'" id="'.$tabGroup.'">';
-		echo '<ul>';
-		foreach ($tabGroupArray as $tabID =>$tabInfo) {
-			if ($tabInfo['isURL'])
-			echo '<li><a href="'.$tabInfo['content'].'"><span>'.$tabInfo['title'].'</span></a></li>';
-			else
-			echo '<li><a href="#'.$tabID.'"><span>'.$tabInfo['title'].'</span></a></li>';
-		}
-		echo '</ul>';
-		foreach ($tabGroupArray as $tabID => $tabInfo) {
-			if ($tabInfo['isURL']) continue;
-			echo '<div id="'.$tabID.'" class="{tabTitle:\''.$tabInfo['title'].'\'}">'.$tabInfo['content']."</div>\n";
-		}
-		echo '</div>'; // cose container
-	}
-	private static $tabs_drawing = array();
-	static function Tab_InitDraw($tabGroup) {
-		if (isset($_REQUEST['__ajax'])) return;
-		if (array_search($tabGroup,self::$tabs_drawing) !== FALSE) return;
-		self::$tabs_drawing[] = $tabGroup;
-		echo '{tab.'.$tabGroup.'}';
-		//ob_start();
-	}
-/*	static function Tab_FinaliseDrawing() {
-		if (count(self::$tabs_drawing)<=0) return;
-		ob_flush();
-		$body = utopia::GetVar('content');
-		foreach (self::$tabs_drawing as $group) {
-			ob_start();
-			self::Tab_DrawGroup($group);
-			$tabBlock = ob_get_contents();
-			ob_end_clean();
-			$
-			utopia::SetVar('content',str_replace('{tab.'.$group.'}', $tabBlock, $body));
-		}
-		return;
-		$contents = "";
-		foreach (self::$tabs_drawing as $group) {
-			$contents = $contents.ob_get_contents();
-			ob_end_clean();
-			//$tabGroupArray = self::$tabGroups[$group]; foreach ($tabGroupArray as $tabID => $tabInfo) echo "$tabID:{$tabInfo['order']}<br>";
-			self::Tab_DrawGroup($group);
-		}
-		echo $contents;
-	}*/
 
 	/*  LINKLIST  */
 	static $lists = array();

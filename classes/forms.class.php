@@ -296,8 +296,6 @@ abstract class uBasicModule implements iUtopiaModule {
 	public function GetDescription() {}
 	public function GetKeywords() {}
 
-	public $tabGroup = NULL;
-	
 	protected $isSecurePage = false;
 	public function SetSecure() {
 		$this->isSecurePage = true;
@@ -3048,8 +3046,6 @@ abstract class uSingleDataModule extends uDataModule {
 		$order = $this->GetSortOrder();
 		
 		$extraCount = 1;
-//		if (!flag_is_set($this->GetOptions(), NO_TABS))
-		//$tabGroupName = utopia::Tab_InitGroup($this->tabGroup);
 		$secCount = count($this->layoutSections);
 		foreach ($this->layoutSections as $sectionID => $sectionInfo) {
 			$out = '';
@@ -3084,12 +3080,9 @@ abstract class uSingleDataModule extends uDataModule {
 			}
 			$out .= "</table></div>";
 			if (!$this->isAjax) $out .= '</form>';
-			//utopia::Tab_Add($SN,$out,$this->GetModuleId(),$tabGroupName,false,$order);
 			echo $out;
 		}
 
 		if ($num_rows > 1) echo '<div class="oh"><b>'.$records.'</b>'.$pager.'</div>';
-
-		//utopia::Tab_InitDraw($tabGroupName);
 	}
 }
