@@ -1,10 +1,21 @@
-Tagging the v2.0.5 release.
+- Tagging the v2.0.6 release.
+fix for installing ucore into subfolders, also fix ~UserDir
+utilise ob_get_clean where appropriate
+remove Tab support
+remove unnecessary scan for stylesheets - was used for cloning stylesheets into tinymce, no longer required with contenteditable
+fix problems with user roles
+break out when validating email
+fix force validation
+fix bug with finding templates
+remove options from htaccess
+
+- Tagging the v2.0.5 release.
 add changelog
 fix record count
 remove timezone ambiguity in strtotime
 use buttons instead of spans for fields in emailer and customwidget
 
-Tagging the v2.0.4 release.
+- Tagging the v2.0.4 release.
 move config definition after static initialisation
 utilise static initialise
 move global include to AfterInit due to config dependancy
@@ -16,15 +27,15 @@ input font size should match parent by default
 optimise ftFILE preprocessor
 move RunChild to correct class *oops*
 
-Tagging the v2.0.3 release.
+- Tagging the v2.0.3 release.
 check that parent exists before trying to get filter value from it
 
-Tagging the v2.0.2 release.
+- Tagging the v2.0.2 release.
 fix issue with detection of home in GetCmsParents
 fix style of new-item in admin theme
 remove obsolete news_per_page option (set in widget limit)
 
-Tagging the v2.0.1 release.
+- Tagging the v2.0.1 release.
 if uEmailer fields is callable, run it
 improve GetTargetFilters a little
 setup child filters on construct
