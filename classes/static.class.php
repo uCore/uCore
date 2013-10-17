@@ -726,26 +726,9 @@ final class utopia {
 		}
 		
 		$namedcss = $template.'/styles.css';
-		$templatefile = $template.'/template.php';
 		
 		if (file_exists($namedcss)) $cssfiles[] = $namedcss;
 		
-		// parse template file for additional styles
-		if (class_exists('DOMDocument')) {
-			$doc = new DOMDocument();
-			try {
-				$doc->loadHTML(file_get_contents($templatefile));
-			} catch (Exception $e) { }
-			foreach ($doc->getElementsByTagName('link') as $link) {
-				if ($link->getAttribute('rel') == 'stylesheet') {
-					$v = $link->getAttribute('href');
-					self::MergeVars($v);
-					$v = preg_replace('/^'.preg_quote(PATH_REL_ROOT,'/').'/',PATH_ABS_ROOT,$v);
-					$cssfiles[] = $v;
-				}
-			}
-		}
-
 		return $cssfiles;
 	}
 	private static $doneCSS = false;
