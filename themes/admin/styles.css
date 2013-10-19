@@ -55,14 +55,14 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 .module-container h2 { position:relative; white-space:nowrap; padding: 0 20px; }
 .module-container h1:before { speak: none; font-size:18px; font-family:ucore-symbols; font-weight:normal; position: relative; color:#8cc63f; text-align:center; line-height: 52px; padding-right: 10px; }
 .module-container.modOpts h1:before { content:"\e806"; }
-.module-content { background:#f9f9f9; padding: 20px; margin:0 0 20px 0; overflow:hidden; }
+.module-content { background:#f9f9f9; color:#5e6d81; padding: 20px; margin:0 0 20px 0; overflow:hidden; }
 .module-content table, table.module-content { width: 100%; border-spacing: 0;  }
 .table-wrapper { max-width: 100%; overflow-x: auto; margin-bottom:20px; }
 .table-wrapper .module-content { margin-bottom:0; }
 
 .widget-container { display:inline-block; overflow:hidden; vertical-align:top; width: 100%; padding: 0 10px; box-sizing: border-box; }
 
-ul.pagination { font-size:1.1em; margin:0; }
+ul.pagination { margin:0; }
 ul.pagination li { line-height: 16px; padding: 3px 5px; }
 ul.pagination li.previous a:before { content:"\e826"; speak: none; font-size:1.4em; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; vertical-align: -0.12em; margin-right: 5px; }
 ul.pagination li.next a:after { content:"\e827"; speak: none; font-size:1.4em; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; vertical-align: -0.12em; margin-left: 5px; }
