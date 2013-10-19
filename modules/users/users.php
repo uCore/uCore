@@ -70,7 +70,7 @@ class uUsersList extends uListDataModule implements iAdminModule {
 		$this->ConditionalStyle_Set('username',array($this,'isvalidated'));
 		$this->AddField('role','role','users','Role',itCOMBO,'SELECT role_id,name FROM '.TABLE_PREFIX.'tabledef_UserRoles ORDER BY role_id');
 		$this->AddField('last_login','last_login','users','Last Login');
-		$this->AddField('password','password','users','Change Password',itPASSWORD);
+		$this->AddField('password','password','users');
 		$this->AddField('email_confirm','email_confirm','users');
 		$this->AddField('email_confirm_code','email_confirm_code','users');
 		$this->AddField('validated','({email_confirm} = \'\' OR {email_confirm} IS NULL)','users');
