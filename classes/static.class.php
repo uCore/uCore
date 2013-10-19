@@ -1112,6 +1112,7 @@ final class utopia {
 	static function Cache_Output($data,$etag,$contentType,$filename='',$modified=0,$age=2592000,$disposition='inline') {
 		self::Cache_Check($etag,$contentType,$filename,$modified,$age,$disposition);
 		echo $data;
+		utopia::Finish();
 	}
 
 	static function Breakout($text) {
