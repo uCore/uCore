@@ -277,10 +277,7 @@ final class utopia {
 		return self::$instances[$class];
 	}
 
-	static $finished = false;
 	static function Finish() {
-		if (self::$finished) return;
-		self::$finished = true;
 		while (ob_get_level() > 3) ob_end_flush();
 		
 		timer_start('Output Template');
