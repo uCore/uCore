@@ -2931,16 +2931,15 @@ abstract class uListDataModule extends uDataModule {
 		echo "</table></div>";//"</div>";
 		if (!$this->isAjax) echo '</form>';
 
-		echo '<div class="right module-content">Showing '.(($page*$limit)+1).' - '.min(($page*$limit)+$limit,$num_rows).' of '.$num_rows.'</div>';
-		
 		if ($limit) {
 			$pages = max(ceil($num_rows / $limit),1);
 			ob_start();
 			utopia::OutputPagination($pages,'_p_'.$this->GetModuleId());
 			$pagination = ob_get_clean();
-			if ($pagination) echo '<div class="cb pagination right module-content">'.$pagination.'</div>';
+			if ($pagination) echo '<div class="pagination right module-content">'.$pagination.'</div>';
 		}
-		
+		echo '<div class="right module-content">Showing '.(($page*$limit)+1).' - '.min(($page*$limit)+$limit,$num_rows).' of '.$num_rows.'</div>';
+
 		$cont = ob_get_clean();
 
 		echo $cont;

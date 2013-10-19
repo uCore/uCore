@@ -63,9 +63,9 @@ nav li._modlinks_uemailtemplatelist a:before { content:"\e81b"; }
 .widget-container { display:inline-block; overflow:hidden; vertical-align:top; width: 100%; padding: 0 10px; box-sizing: border-box; }
 
 ul.pagination { margin:0; }
-ul.pagination li { line-height: 16px; padding: 3px 5px; }
-ul.pagination li.previous a:before { content:"\e826"; speak: none; font-size:1.4em; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; vertical-align: -0.12em; margin-right: 5px; }
-ul.pagination li.next a:after { content:"\e827"; speak: none; font-size:1.4em; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; vertical-align: -0.12em; margin-left: 5px; }
+ul.pagination li { line-height: 16px; padding: 0 5px; }
+ul.pagination li.previous a:before { content:"\e826"; speak: none; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; margin-right: 5px; }
+ul.pagination li.next a:after { content:"\e827"; speak: none; font-family:ucore-symbols; font-weight:normal; color:#ff5900; width:20px; text-align:center; margin-left: 5px; }
 
 
 .layoutListSection.module-content { padding:0; }
