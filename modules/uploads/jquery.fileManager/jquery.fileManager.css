@@ -2,7 +2,7 @@
 	background-image:url(images/file64.png); background-repeat:no-repeat; background-position:top center;
 	padding-bottom:1em; overflow:visible; border: 1px solid transparent; }
 .fmBase .label, .fmBase textarea { position:absolute; top:70px;left:-8px;right:-8px; text-align:center; overflow:hidden; font-family: Arial; font-size:15px;
-	resize:none; background:white; margin:1px; max-height: 35px; text-overflow: ellipsis; }
+	resize:none; background:white; margin:1px; max-height: 35px; text-overflow: ellipsis; height:auto; width:auto; }
 .fmFolder { background-image:url(images/folder64.png) !important; }
 .fmTrash { background-image:url(images/fulltrash64.png) !important; cursor:default; float:right; }
 .fmIconHighlight { background-color:gold; }
