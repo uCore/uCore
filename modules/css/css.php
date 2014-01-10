@@ -74,8 +74,8 @@ class uCSS extends uBasicModule {
 		uEvents::AddCallback('ProcessDomDocument','uCSS::LinkToDocument');
 		uEvents::AddCallback('ProcessDomDocument','uCSS::ProcessDomDocument',null,MAX_ORDER);
 		uEvents::AddCallback('AfterInit','uCSS::LinkGlobal');
-		
-		self::LinkFile('/styles.css',-10);
+
+		self::LinkFile(PATH_REL_ROOT.'styles.css',-10);
 		self::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui.min.css',-99);
 		self::IncludeFile(PATH_REL_CORE.'default.css');
 

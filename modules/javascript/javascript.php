@@ -4,8 +4,8 @@ class uJavascript extends uBasicModule {
 	public static function Initialise() {
 		uEvents::AddCallback('ProcessDomDocument','uJavascript::LinkToDocument');
 		uEvents::AddCallback('ProcessDomDocument','uJavascript::ProcessDomDocument',null,MAX_ORDER);
-		
-		self::LinkFile('/javascript.js',-10);
+
+		self::LinkFile(PATH_REL_ROOT.'javascript.js',-10);
 		self::LinkFile(dirname(__FILE__).'/jQuery/jquery-1.10.2.min.js',-100);
 		self::LinkFile(dirname(__FILE__).'/jQuery/jquery-ui-1.10.3.min.js',-99);
 		self::IncludeFile(dirname(__FILE__).'/javascript.js',-999);
