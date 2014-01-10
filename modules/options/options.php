@@ -106,7 +106,8 @@ class modOpts extends uListDataModule implements iAdminModule {
 		
 		if (!$cache) {
 			$obj->BypassSecurity(true);
-			$obj->UpdateFields(array('ident'=>$ident,'value'=>self::$types[$ident][4]));
+			$obj->UpdateField('ident',$ident);
+			$obj->UpdateField('value',self::$types[$ident][4],$ident);
 			$obj->BypassSecurity(false);
 			return self::$types[$ident][4];
 		}
