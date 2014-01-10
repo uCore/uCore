@@ -297,8 +297,18 @@ abstract class uTableDef implements iUtopiaModule {
 		$checksum = utopia::checksum(array($oldTable,$this->tablename,$this->engine,$this->fields,$this->primary,$this->unique,$this->index,$this->customscript));
 
 		if (!$tableExists) { // create table
-			$this->CreateTable();
-		} else {
+			try {
+				$this->CreateTable();
+			} catch (Exception $e) {
+				if ($e->getCode() == 1050) {
+					$tableExists = true;
+				} else {
+					throw $e;
+				}
+			}
+		}
+
+		if ($tableExists) {
 			// checksum
 			if (!$renamed && self::checksumValid($this->tablename,$checksum)) return;
 
