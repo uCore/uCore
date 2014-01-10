@@ -122,10 +122,12 @@ class modOpts extends uListDataModule implements iAdminModule {
 	}
 	public static function SetOption($ident,$value) {
 		$obj = utopia::GetInstance(__CLASS__);
-		$obj->BypassSecurity(true);
 		if (self::GetCachedItem($ident) === false) {
+			$obj->BypassSecurity(true);
 			$obj->UpdateField('ident',$ident);
+			$obj->BypassSecurity(false);
 		}
+		$obj->BypassSecurity(true);
 		$obj->UpdateField('value',$value,$ident);
 		$obj->BypassSecurity(false);
 		
