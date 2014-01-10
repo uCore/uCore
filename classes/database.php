@@ -24,6 +24,7 @@ class database {
 			return self::_query($query,$args);
 		} catch (Exception $e) {
 			self::connect(true);
+			return self::_query($query,$args);
 		}
 	}
 	private static $queryCount = 0;
