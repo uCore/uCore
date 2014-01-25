@@ -18,11 +18,7 @@ class uBlob extends uBasicModule {
 		$table = $obj->fields[$_REQUEST['field']]['vtable']['tModule'];
 		$tableField = $obj->fields[$_REQUEST['field']]['field'];
 		$fieldType = $obj->GetFieldType($_REQUEST['field']);
-		
-		if (file_exists(PATH_ABS_ROOT.$data)) {
-			$data = file_get_contents(PATH_ABS_ROOT.$data);
-		}
-		
+
 		$filename = isset($_REQUEST['filename']) ? $_REQUEST['filename'] : $rec[$_REQUEST['field'].'_filename'];
 		$filetype = $rec[$_REQUEST['field'].'_filetype'];
 		$width = isset($_GET['w']) ? $_GET['w'] : NULL;
@@ -30,15 +26,15 @@ class uBlob extends uBasicModule {
 		$isImg = preg_match('/^image\//',$filetype);
 
 		if ($isImg && ($width || $height)) $filetype = 'image/png';
-		
+
 		$idents = array($table,$tableField,strlen($data),$width,$height,$isImg);
 		$etag = utopia::checksum($idents);
-		
+
 		$attach = 'inline';
 		if (isset($_REQUEST['attach'])) $attach = $_REQUEST['attach'];
-		
+
 		utopia::Cache_Check($etag,$filetype,$filename,0,2592000,$attach);
-		
+
 		$cacheFile = uCache::retrieve($idents);
 		if ($cacheFile) $data = file_get_contents($cacheFile);
 
@@ -50,11 +46,11 @@ class uBlob extends uBasicModule {
 			imagepng($img);
 			imagedestroy($img);
 			$data = ob_get_clean();
-			
+
 			// only need to cache the resized versions
 			uCache::store($idents,$data);
 		}
-		
+
 		utopia::Cache_Output($data,$etag,$filetype,$filename,0,2592000,$attach);
 	}
 	static function GetLink($module,$field,$pk,$filename=NULL) {
