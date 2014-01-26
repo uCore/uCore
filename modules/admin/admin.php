@@ -138,7 +138,7 @@ FIN;
 	
 	private static function updateFile($file,$content,$ucStart='## uCore ##',$ucEnd='##-uCore-##') {
 		if ($ucStart == $ucEnd) throw new Exception('Start and end tags cannot be equal');
-		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
+		$search = PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
 		$fileContents = '';
 		if (file_exists($file)) $fileContents = file_get_contents($file);
 		if (strpos($fileContents,$search) === FALSE) {
