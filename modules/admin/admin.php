@@ -123,7 +123,7 @@ FIN;
 		
 		$content = <<<FIN
 if (!-e \$request_filename) {
-	rewrite .* {$relroot}/index.php;
+	rewrite .* {$relroot}index.php;
 }
 FIN;
 		self::updateFile(PATH_ABS_ROOT.'.nginx',$content);
