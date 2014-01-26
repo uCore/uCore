@@ -77,8 +77,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	public static function UpdateHtaccess() {
 		if ($_SERVER['HTTP_HOST'] == 'cli') return; // don't rewrite htaccess for CLI
 		$relcore = preg_replace('/^\/~[^\/]+/','',PATH_REL_CORE);
-		$ucStart = '## uCore ##';
-		$ucEnd	 = '##-uCore-##';
+		$relroot = preg_replace('/^\/~[^\/]+/','',PATH_REL_ROOT);
 		$content = <<<FIN
 #don't use file id in ETag
 FileETag MTime Size
@@ -117,25 +116,44 @@ FileETag MTime Size
 	RewriteRule .* - [L]
 	
 	RewriteCond %{REQUEST_URI}	(/~[^/]+)?
-	RewriteRule .*	%1{$relcore}index.php [NE,L,QSA]
+	RewriteRule .*	%1{$relroot}index.php [NE,L,QSA]
 </IfModule>
 FIN;
+		self::updateFile(PATH_ABS_ROOT.'.htaccess',$content);
+		
+		$content = <<<FIN
+if (!-e \$request_filename) {
+	rewrite .* {$relroot}/index.php;
+}
+FIN;
+		self::updateFile(PATH_ABS_ROOT.'.nginx',$content);
+		
+		if (!file_exists(PATH_ABS_ROOT.'index.php')) {
+			file_put_contents(PATH_ABS_ROOT.'index.php',"<?php
+	include('$relcore/start.php');
+	utopia::Launcher();
+?>");
+		}
+	}
+	
+	private static function updateFile($file,$content,$ucStart='## uCore ##',$ucEnd='##-uCore-##') {
+		if ($ucStart == $ucEnd) throw new Exception('Start and end tags cannot be equal');
 		$search = PHP_EOL.PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
-		$htaccess = '';
-		if (file_exists(PATH_ABS_ROOT.'.htaccess')) $htaccess = file_get_contents(PATH_ABS_ROOT.'.htaccess');
-		if (strpos($htaccess,$search) === FALSE) {
+		$fileContents = '';
+		if (file_exists($file)) $fileContents = file_get_contents($file);
+		if (strpos($fileContents,$search) === FALSE) {
 			// first remove existing (outdated)
-			$s = strpos($htaccess,$ucStart);
-			$e = strrpos($htaccess,$ucEnd); // PHP5
-			//$e = strpos(strrev($htaccess),strrev($ucEnd)); // PHP4
+			$s = strpos($fileContents,$ucStart);
+			$e = strrpos($fileContents,$ucEnd); // PHP5
+			//$e = strpos(strrev($fileContents),strrev($ucEnd)); // PHP4
 			if ($s !== FALSE && $e !== FALSE) {
 				$e += strlen($ucEnd); // PHP5
-				//$e = strlen($htaccess) - $e; // PHP4
-				$htaccess = substr_replace($htaccess,'',$s,$e);
+				//$e = strlen($fileContents) - $e; // PHP4
+				$fileContents = substr_replace($fileContents,'',$s,$e);
 			}
 
-			$htaccess = trim($htaccess).$search;
-			file_put_contents(PATH_ABS_ROOT.'.htaccess',$htaccess);
+			$fileContents = trim($fileContents).$search;
+			file_put_contents($file,$fileContents);
 			return true;
 		}
 	}
