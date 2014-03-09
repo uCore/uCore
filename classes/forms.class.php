@@ -1773,7 +1773,7 @@ abstract class uDataModule extends uBasicModule {
 
 		$fieldToCompare = $fieldName;
 		
-		if (is_callable($fieldToCompare)) return $this->ReplaceFields(call_user_func_array($fieldToCompare,array($value,&$args)));
+		if (is_array($fieldToCompare) && is_callable($fieldToCompare)) return $this->ReplaceFields(call_user_func_array($fieldToCompare,array($value,&$args)));
 
 		if ($filterData['type'] == FILTER_WHERE) {
 			$fieldToCompare = $this->ReplaceFields($fieldToCompare);
