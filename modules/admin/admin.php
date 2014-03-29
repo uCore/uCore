@@ -127,15 +127,14 @@ if (!-e \$request_filename) {
 }
 FIN;
 		self::updateFile(PATH_ABS_ROOT.'.nginx',$content);
-		
-		if (!file_exists(PATH_ABS_ROOT.'index.php')) {
-			file_put_contents(PATH_ABS_ROOT.'index.php',"<?php include('{$relcore}start.php'); utopia::Launcher();");
-		}
+
+		$content = "include('{$relcore}start.php'); utopia::Launcher();";
+		self::updateFile(PATH_ABS_ROOT.'index.php',$content,"<?php /* uCore */\n","\n/*-uCore-*/ ?>");
 	}
 	
-	private static function updateFile($file,$content,$ucStart='## uCore ##',$ucEnd='##-uCore-##') {
+	private static function updateFile($file,$content,$ucStart="\n\n## uCore ##\n",$ucEnd="\n##-uCore-##") {
 		if ($ucStart == $ucEnd) throw new Exception('Start and end tags cannot be equal');
-		$search = PHP_EOL.PHP_EOL.$ucStart.PHP_EOL.$content.PHP_EOL.$ucEnd;
+		$search = $ucStart.$content.$ucEnd;
 		$fileContents = '';
 		if (file_exists($file)) $fileContents = file_get_contents($file);
 		if (strpos($fileContents,$search) === FALSE) {
