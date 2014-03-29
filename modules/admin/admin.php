@@ -76,7 +76,7 @@ class uDashboard extends uBasicModule implements iAdminModule {
 	}
 	public static function UpdateHtaccess() {
 		if ($_SERVER['HTTP_HOST'] == 'cli') return; // don't rewrite htaccess for CLI
-		$relcore = preg_replace('/^\/~[^\/]+/','',PATH_REL_CORE);
+		$relcore = ltrim(preg_replace('/^\/~[^\/]+/','',PATH_REL_CORE),'/');
 		$relroot = preg_replace('/^\/~[^\/]+/','',PATH_REL_ROOT);
 		$content = <<<FIN
 #don't use file id in ETag
@@ -129,10 +129,7 @@ FIN;
 		self::updateFile(PATH_ABS_ROOT.'.nginx',$content);
 		
 		if (!file_exists(PATH_ABS_ROOT.'index.php')) {
-			file_put_contents(PATH_ABS_ROOT.'index.php',"<?php
-	include('$relcore/start.php');
-	utopia::Launcher();
-?>");
+			file_put_contents(PATH_ABS_ROOT.'index.php',"<?php include('{$relcore}start.php'); utopia::Launcher();");
 		}
 	}
 	
