@@ -36,15 +36,14 @@ class uUploads extends uBasicModule {
 		$w = isset($_GET['w']) ? $_GET['w'] : NULL;
 		$h = isset($_GET['h']) ? $_GET['h'] : NULL;
 		
-		$idents = array($_SERVER['REQUEST_URI'],$fileMod,$fileSize,$w,$h);
-		$etag = utopia::checksum($idents);
-		utopia::Cache_Check($etag,$cType,$fileName);
-
-		$cacheFile = uCache::retrieve($idents);
-		if ($cacheFile) $output = file_get_contents($cacheFile);
-		else $output = file_get_contents($path);
-
-		if (stripos($cType,'image/') !== FALSE && ($w || $h) && $cacheFile === FALSE) {
+		if (stripos($cType,'image/') !== FALSE && ($w || $h)) {
+			$idents = array($_SERVER['REQUEST_URI'],$fileMod,$fileSize,$w,$h);
+			$etag = utopia::checksum($idents);
+			utopia::Cache_Check($etag,$cType,$fileName);
+			$cacheFile = uCache::retrieve($idents);
+			if ($cacheFile) $output = file_get_contents($cacheFile);
+			else $output = file_get_contents($path);
+		
 			// check w and h
 			$img = imagecreatefromstring($output);
 			$img = utopia::constrainImage($img,$w,$h);
@@ -63,9 +62,45 @@ class uUploads extends uBasicModule {
 			
 			// only need to cache the resized versions
 			uCache::store($idents,$output);
+			utopia::Cache_Output($output,$etag,$cType,$fileName);
+		} else {
+			header('Content-Type: ' . $cType);
+			self::resumableOutput($path);
 		}
 
-		utopia::Cache_Output($output,$etag,$cType,$fileName);
+	}
+	static function resumableOutput($path) {
+		session_write_close();
+		while (ob_get_level()) ob_end_clean();
+		header('Content-Encoding: identity');
+		header('Accept-Ranges: bytes');
+		header("Content-Transfer-Encoding: binary");
+		header("Connection: close" );
+		$filesize = filesize($path);
+		$f = fopen($path,'r');
+
+		//header('Content-Type: text/plain',true);
+		if (isset($_SERVER['HTTP_RANGE'])) {
+			preg_match('/bytes=(\d+)\-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
+			$offset = intval($matches[1]);
+			$length = (isset($matches[2]) ? intval($matches[2]) : $filesize - 1) - $offset;
+			header('HTTP/1.1 206 Partial Content');
+			header('Content-Range: bytes ' . $offset . '-' . ($offset + $length) . '/' . $filesize);
+			header("Content-Length: " . $length);
+			fseek($f,$offset);
+		} else {
+			$length = $filesize;
+			header("Content-Length: " . $filesize);
+			rewind($f);
+		}
+
+		while ($length) { // Read in blocks of 8KB so we don't chew up memory on the server
+			$read = ($length > 8192) ? 8192 : $length;
+			$length -= $read;
+			echo fread($f,$read);
+		}
+		fclose($f);
+		exit;
 	}
 	static function UploadFile($fileInfo,$targetFile,$relativeToUpload=true) {
 		// build dir path
