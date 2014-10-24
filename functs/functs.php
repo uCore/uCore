@@ -292,7 +292,7 @@ function GetQSPairs($url) {
 }
 
 function UrlReadable($string) {
-	return preg_replace('/[^\pL0-9a-z\-_~]+/iu','-',$string);
+	return preg_replace('/\-+/','-',preg_replace('/[^\pL0-9a-z\-_~]+/iu','-',$string));
 }
 
 function DONT_USE_uuid()
