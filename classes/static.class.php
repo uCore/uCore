@@ -142,6 +142,9 @@ final class utopia {
 
 				if ($ref->isSubclassOf('uBasicModule')) {
 					$class['uuid'] = $class['module_name']::GetUUID();
+					if (is_array($class['uuid'])){
+						$class['uuid'] = $class['uuid'][0];
+					}
 				}
 				$rows[$class['module_name']] = $class;
 			}
