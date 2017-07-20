@@ -243,6 +243,7 @@ class module_NewsTags extends uDataModule {
 class module_NewsDisplay extends uDataModule {
 	public function GetTitle() { return 'Latest News'; }
 	public static function Initialise() {
+		uEvents::AddCallback('InitSitemap','module_NewsDisplay::InitSitemap');
 		modOpts::AddOption('news_widget_archive','Archive Widget','Articles','article-archive');
 		modOpts::AddOption('news_widget_article','Article Widget','Articles','article');
 		
@@ -357,6 +358,21 @@ class module_NewsDisplay extends uDataModule {
 		$link->setAttribute('title',modOpts::GetOption('site_name').' News Feed');
 		$link->setAttribute('href',$rssobj->GetURL());
 		$head->appendChild($link);
+	}
+	static function InitSitemap() {
+		$o = utopia::GetInstance(__CLASS__);
+		$rows = $o->GetDataset()->fetchAll();
+		foreach ($rows as $row) {
+			if ($row['noindex']) continue;
+
+			//if ($row['time'] == '0000-00-00 00:00:00') continue;
+
+			$title = $row['heading'];
+			$url = $o->GetURL($row['news_id']);
+
+			// add to sitemap
+			uSitemap::AddItem('http://'.utopia::GetDomainName().$url,array(),'news');
+		}
 	}
 	
 	public static function AddUserFields($o,$e) {
