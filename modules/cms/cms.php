@@ -457,6 +457,7 @@ class uCMS_View extends uSingleDataModule {
 	public static function Initialise() {
 		uEvents::AddCallback('BeforeRunModule','uCMS_View::assertContent',null,9999);
 		uEvents::AddCallback('AfterRunModule','uCMS_View::InitSitemap');
+		uEvents::AddCallback('InitSitemap','uCMS_View::InitSitemap');
 		uEvents::AddCallback('ProcessDomDocument','uCMS_View::ProcessDomDocument');
 		uWidgets::AddStaticWidget('page_updated','uCMS_View::last_updated');
 		uSearch::AddSearchRecipient(__CLASS__,array('title','content_published'),'title','content_published');
