@@ -371,7 +371,8 @@ class module_NewsDisplay extends uDataModule {
 			$url = $o->GetURL($row['news_id']);
 
 			// add to sitemap
-			uSitemap::AddItem('http://'.utopia::GetDomainName().$url,array(),'news');
+			$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+			uSitemap::AddItem($protocol . utopia::GetDomainName().$url,array(),'news');
 		}
 	}
 	

@@ -596,7 +596,8 @@ class uCMS_View extends uSingleDataModule {
 			// add to sitemap
 			$additional = array();
 			if ($row['is_home']) $additional['priority'] = 1;
-			uSitemap::AddItem('http://'.utopia::GetDomainName().$url,$additional);
+			$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+			uSitemap::AddItem($protocol . utopia::GetDomainName().$url,$additional);
 		}
 	}
 	private static $cache = null;
