@@ -35,7 +35,11 @@ class uUploads extends uBasicModule {
 		$fileSize = filesize($path);
 		$w = isset($_GET['w']) ? $_GET['w'] : NULL;
 		$h = isset($_GET['h']) ? $_GET['h'] : NULL;
-		
+
+		if (!is_numeric($w) || !is_numeric($h)) {
+			utopia::PageNotFound();
+		}
+
 		if (stripos($cType,'image/') !== FALSE && ($w || $h)) {
 			$idents = array($_SERVER['REQUEST_URI'],$fileMod,$fileSize,$w,$h);
 			$etag = utopia::checksum($idents);
