@@ -36,7 +36,7 @@ class uUploads extends uBasicModule {
 		$w = isset($_GET['w']) ? $_GET['w'] : NULL;
 		$h = isset($_GET['h']) ? $_GET['h'] : NULL;
 
-		if (!is_numeric($w) || !is_numeric($h)) {
+                if (($w && !is_numeric($w)) || ($h && !is_numeric($h))) {
 			utopia::PageNotFound();
 		}
 
