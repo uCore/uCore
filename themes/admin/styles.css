@@ -2,7 +2,7 @@
  green: #8CC63F
 */
 html { height:100%; }
-body { text-align:left !important; text-align:center; margin:0; font-family: Lato; font-size:16px; background: #eaedf1; min-width:100%;min-height:100%; max-width:100%; display:inline-block;}
+body { text-align:left !important; text-align:center; margin:0; font-family: Lato, Open Sans, Helvetica, sans-serif; font-size:16px; background: #eaedf1; min-width:100%;min-height:100%; max-width:100%; display:inline-block;}
 #wrap { width:100%; margin:0 auto; text-align:left; background:white; }
 
 
@@ -88,7 +88,7 @@ th.sortable.sort-up:before { content:"\e825"; speak: none; font-size:18px; font-
 
 
 input, select, textarea, .inputtype,
-input.inputtype, select.inputtype, textarea.inputtype, div.inputtype { margin: 0; padding:6px; border: 1px solid #5e6d81; background:white; color:#362B36; width:300px; height:35px; line-height:21px; font-size:1em; font-family:Lato; box-sizing:border-box; }
+input.inputtype, select.inputtype, textarea.inputtype, div.inputtype { margin: 0; padding:6px; border: 1px solid #5e6d81; background:white; color:#362B36; width:300px; height:35px; line-height:21px; font-size:1em; font-family:Lato, Open Sans, Helvetica, sans-serif; box-sizing:border-box; }
 .layoutDetailSection .inputtype.inputtype-checkbox { min-width:0; width:auto; height:auto; }
 .layoutDetailSection td.fld { width: 250px; }
 .layoutListSection .inputtype  { width:100%; }
