@@ -90,7 +90,9 @@ class uCMS_List extends uDataModule implements iAdminModule {
 		echo '<div class="module-content">';
 
 		$modOptsObj = utopia::GetInstance('modOpts');
+		$modOptsObj->BypassSecurity(true);
 		$row = $modOptsObj->LookupRecord('default_template');
+		$modOptsObj->BypassSecurity(false);
 		echo 'Default Template: '.$modOptsObj->GetCell('value',$row);
 
 		echo '<hr>';
