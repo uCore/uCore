@@ -423,7 +423,9 @@ final class utopia
     }
     self::$finished = true;
     while(ob_get_level() > 3)
+    {
       ob_end_flush();
+    }
 
     timer_start('Output Template');
     utopia::OutputTemplate();
@@ -1139,7 +1141,8 @@ final class utopia
         $template = get_include_contents($templatePath);
         // mergevars
         while(self::MergeVars($template))
-          ;
+        {
+        }
         // setvar
         self::SetVar('content', $template);
       }
@@ -1151,7 +1154,8 @@ final class utopia
     ob_end_clean();
 
     while(self::MergeVars($template))
-      ;
+    {
+    }
 
     $template = str_replace(
       '<head>',
@@ -1295,7 +1299,8 @@ final class utopia
     while(false);
 
     while(self::MergeVars($template))
-      ;
+    {
+    }
 
     if(isset($_GET['callback']))
     {
@@ -1334,7 +1339,9 @@ final class utopia
       {
         // if contains another pragma then skip it, pick up post-merged on next pass.
         while(preg_match('/{(.+)}/Ui', $search, $res, 0, 1))
+        {
           $search = $res[0];
+        }
 
         foreach(self::$templateParsers as $ident => $arr)
         {
@@ -1414,7 +1421,8 @@ final class utopia
       }
     }
     while(utopia::MergeVars($string))
-      ;
+    {
+    }
   }
 
   static $templateParsers = [];
@@ -2024,9 +2032,13 @@ final class utopia
       return 0;
     }
     while(count($matches1) < 4)
+    {
       $matches1[] = 0;
+    }
     while(count($matches2) < 4)
+    {
       $matches2[] = 0;
+    }
     foreach($matches1 as $k => $v)
     {
       if($v == $matches2[$k])
