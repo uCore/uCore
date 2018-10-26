@@ -69,10 +69,8 @@ function fix_path($path, $slash = '')
  * Define constants for directory structure:
  * PATH_ABS_CORE: absolute (server) path to core folder
  * PATH_ABS_ROOT: absolute (server) path to document root
- * PATH_ABS_SELF: absolute (server) path to called script
  * PATH_REL_CORE: path to core folder relative to document root
  * PATH_REL_ROOT: path to document relative to document root (including /~UserDir/)
- * PATH_REL_SELF: path to called script relative to document root
  * DEFAULT_FILE: relative path to core index.php
  * PATH_ABS_CONFIG: absolute path to configuration file
  * PATH_ABS_MODULES: absolute path to uModules folder
@@ -83,17 +81,10 @@ function fix_path($path, $slash = '')
  */
 define('PATH_ABS_CORE', fix_path(dirname(__FILE__) . DIRECTORY_SEPARATOR));
 define('PATH_ABS_ROOT', fix_path(realpath(PATH_ABS_CORE . '..') . DIRECTORY_SEPARATOR));
-define('PATH_ABS_SELF', fix_path(realpath($_SERVER['PHP_SELF'])));
 
 $coreDiff = fix_path(preg_replace('/^' . preg_quote(PATH_ABS_ROOT, '/') . '/', '', PATH_ABS_CORE), '/');
-$called = get_included_files();
-$called = $called[0];
-$diff = preg_replace('/^' . preg_quote(PATH_ABS_ROOT, '/') . '/', '', $called);
-$relroot = preg_replace('/' . preg_quote(fix_path($diff, '/'), '/') . '$/', '', $_SERVER['SCRIPT_NAME']);
-
-define('PATH_REL_ROOT', $relroot);
+define('PATH_REL_ROOT', '/');
 define('PATH_REL_CORE', fix_path(PATH_REL_ROOT . $coreDiff, '/'));
-define('PATH_REL_SELF', fix_path(PATH_REL_ROOT . basename(PATH_ABS_SELF), '/'));
 
 define('DEFAULT_FILE', PATH_REL_CORE . 'index.php');
 
