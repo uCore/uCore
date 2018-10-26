@@ -138,15 +138,13 @@ final class utopia
 
   static function AddMetaTag($name, $content)
   {
-    $nifunc = create_function(
-      '$obj,$event,$doc',
-      '
-			$head = $doc->getElementsByTagName("head")->item(0);
-			$node = $doc->createElement("meta");
-			$node->setAttribute("name","' . $name . '"); $node->setAttribute("content","' . $content . '");
-			$head->appendChild($node);
-		'
-    );
+    $nifunc = function ($obj, $event, $doc) use ($name, $content) {
+      $head = $doc->getElementsByTagName("head")->item(0);
+      $node = $doc->createElement("meta");
+      $node->setAttribute("name", "'.$name.'");
+      $node->setAttribute("content", "'.$content.'");
+      $head->appendChild($node);
+    };
     uEvents::AddCallback('ProcessDomDocument', $nifunc);
   }
 
