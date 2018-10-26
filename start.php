@@ -6,13 +6,6 @@
 define('UCORE_START_TIME', microtime(true));
 
 /**
- * shutdownErrorHandler is a shutdown function which disables the fatal error reporting outside of script runtime
- */
-function shutdownErrorHandler() { error_reporting(0); }
-
-register_shutdown_function('shutdownErrorHandler');
-
-/**
  * When running as Command Line Interface, for example crons, initialise some required server variables
  * CLI execution is useful for bypassing the http server.
  * Usage: php <path_to_core_index> <request_uri>
