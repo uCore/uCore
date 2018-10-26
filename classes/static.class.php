@@ -368,6 +368,32 @@ final class utopia
 
   static function Launcher($module = null)
   {
+    $path = PATH_ABS_ROOT . ltrim($_SERVER['REQUEST_URI'], '/');
+    $path = parse_url($path, PHP_URL_PATH);
+    $ext = substr($path, strrpos($path, '.'));
+    if(is_file($path) && ($ext !== '.php'))
+    {
+      switch($ext)
+      {
+        case '.css';
+          $contentType = 'text/css';
+          break;
+        case '.js';
+          $contentType = 'application/javascript';
+          break;
+        default:
+          $contentType = utopia::GetMimeType($path);
+          break;
+      }
+
+      utopia::CancelTemplate();
+
+      $etag = utopia::checksum([$_SERVER['REQUEST_URI'], filemtime($path), filesize($path)]);
+      utopia::Cache_Check($etag, $contentType, basename($path));
+      utopia::Cache_Output(file_get_contents($path), $etag, $contentType, basename($path));
+      return;
+    }
+
     if($module == null)
     {
       $module = self::GetCurrentModule();
