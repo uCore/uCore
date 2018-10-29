@@ -29,7 +29,7 @@ define('SQL_NULL'			,'null');
 define('SQL_NOT_NULL'		,'not null');
 
 define('TABLE_PREFIX',''); //uConfig::AddConfigVar('TABLE_PREFIX','Table Prefix','');
-define('MYSQL_ENGINE','MyISAM'); //uConfig::AddConfigVar('MYSQL_ENGINE','MySQL Engine','InnoDB',array('MyISAM','InnoDB'));
+define('MYSQL_ENGINE','InnoDB'); //uConfig::AddConfigVar('MYSQL_ENGINE','MySQL Engine','InnoDB',array('MyISAM','InnoDB'));
 
 interface iLinkTable {}
 
@@ -58,9 +58,9 @@ abstract class uTableDef implements iUtopiaModule {
 	public $engine = NULL;
 	public $auto_increment = null;
 	protected $customscript = '';
-	
+
 	public static function Initialise() {}
-	
+
 	public abstract function SetupFields();
 
 	private $isDisabled = false;
@@ -72,7 +72,7 @@ abstract class uTableDef implements iUtopiaModule {
 	public function _SetupFields() {
 		if ($this->fieldsSetup == TRUE) return;
 		$this->fieldsSetup = TRUE;
-		
+
 		uEvents::TriggerEvent('BeforeSetupFields',$this);
 		$this->SetupFields();
 		uEvents::TriggerEvent('AfterSetupFields',$this);
@@ -111,7 +111,7 @@ abstract class uTableDef implements iUtopiaModule {
 	public function GetPrimaryKey() {
 		return reset($this->primary);
 	}
-	
+
 	public function IsIndex($field) {
 		if ($this->primary == $field) return true;
 		if (is_array($this->primary) && array_search($field,$this->primary) !== FALSE) return true;
@@ -152,7 +152,7 @@ abstract class uTableDef implements iUtopiaModule {
 		if ($type == ftBOOL) $length = "1";
 		$sqltype = getSqlTypeFromFieldType($type);
 
-		$zeroIfNull = array_flip(array(ftNUMBER,ftBOOL,ftDECIMAL,ftPERCENT,ftCURRENCY,ftTIMESTAMP,ftTIME));
+		$zeroIfNull = array_flip(array(ftNUMBER,ftBOOL,ftDECIMAL,ftPERCENT,ftCURRENCY,ftTIME));
 		$emptyIfNull = array();
 		if ($default === NULL && isset($zeroIfNull[$sqltype]))
 			$default = 0;
@@ -219,20 +219,20 @@ abstract class uTableDef implements iUtopiaModule {
 	public static function addChecksum($table,$checksum) {
 		self::initChecksums();
 		self::$tableChecksum[$table] = $checksum;
-		
+
 		$file = '';
 		foreach (self::$tableChecksum as $k=>$v) {
 			$file .= $k.' = '.$v.PHP_EOL;
 		}
 		uCache::store('__table_checksum',$file);
 	}
-	
+
 	private function GetColDef($fieldName,$current = null,$position = null) {
 		$fieldData = $this->fields[$fieldName];
 		$type = getSqlTypeFromFieldType($fieldData['type']).(empty($fieldData['length']) ? '' : "({$fieldData['length']})");
 		if ($fieldData['type'] == ftTIMESTAMP) {
 			if (strtolower($fieldData['default']) == 'current_timestamp') $default = 'CURRENT_TIMESTAMP';
-			else $default = "0000-00-00 00:00:00";
+			else $default = null;
 		} else
 			$default = $fieldData['default'] === NULL ? NULL : "{$fieldData['default']}";
 		$null = $fieldData['null'];
@@ -245,7 +245,7 @@ abstract class uTableDef implements iUtopiaModule {
 			$extra = trim('AUTO_INCREMENT '.$extra);
 			$default = null;
 		}
-		
+
 		$changed = true;
 		if ($current) {
 			$changed = false;
@@ -341,13 +341,13 @@ abstract class uTableDef implements iUtopiaModule {
 			$row = NULL;
 			for ($i = 0,$rowCount = count($rows); $i < $rowCount; $i++) // find if field is already in the table
 			if (strtolower($rows[$i]['Field']) === strtolower($fieldName)) { $row = $rows[$i]; break; }
-			
+
 			// build field
 			$position = null;
 			if ($count !== $i) $position = $count==0 ? 'FIRST' : 'AFTER `'.$keys[$count-1].'`';
 			$col_def = $this->GetColDef($fieldName,$row,$position);
 			if (!$col_def) continue;
-			
+
 			if ($row !== NULL) // field exists, "modify" it
 				$alterArray[] = "MODIFY $col_def";
 			else // field doesnt exist, either hasnt been renamed, or hasnt been created yet. -- NO RENAME YET
@@ -365,7 +365,7 @@ abstract class uTableDef implements iUtopiaModule {
 		// change engine?
 		$stm = database::query('SHOW TABLE STATUS LIKE ?',array($this->tablename));
 		if ($stm && ($row = $stm->fetch()) && $row['Engine'] != $this->engine) {
-			database::query("ALTER IGNORE TABLE `$this->tablename` ENGINE={$this->engine}");
+			database::query("ALTER TABLE `$this->tablename` ENGINE={$this->engine}");
 		}
 
 		// update all indexes and keys
@@ -380,7 +380,7 @@ abstract class uTableDef implements iUtopiaModule {
 				$idx[$v['Key_name']][] = $v['Column_name'];
 			}
 		}
-		
+
 		$priDiff = array_merge(array_diff($this->primary,$pri),array_diff($pri,$this->primary));
 		if ($priDiff) {
 			$alterArray[] = ' DROP PRIMARY KEY, ADD PRIMARY KEY (`'.implode('`,`',$this->primary).'`)';
@@ -413,10 +413,10 @@ abstract class uTableDef implements iUtopiaModule {
 				$alterArray[] = 'ADD UNIQUE (`'.implode('`,`',$f).'`)';
 			}
 		}
-		
+
 		if ($alterArray) {
 			array_unshift($alterArray,"CHARACTER SET ".SQL_CHARSET_ENCODING." COLLATE ".SQL_COLLATION);
-			array_unshift($otherArray,"ALTER IGNORE TABLE `$this->tablename` ".join(', ',$alterArray).";");
+			array_unshift($otherArray,"ALTER TABLE `$this->tablename` ".join(', ',$alterArray).";");
 		}
 		if (!$otherArray) return;
 
@@ -436,7 +436,7 @@ abstract class uTableDef implements iUtopiaModule {
 		}
 		return $diff;
 	}
-	
+
 	private function CreateTable() {
 		// create table
 		$pk = NULL;
@@ -461,7 +461,7 @@ abstract class uTableDef implements iUtopiaModule {
 
 		uEvents::TriggerEvent('TableCreated',$this);
 	}
-	
+
 	public function __construct() {/* $this->AddInputDate(); */ $this->_SetupFields(); }
 	public function AddInputDate($fieldName = 'input_date',$update=false) {
 		$this->AddFieldArray($fieldName,ftTIMESTAMP,NULL,array('default'=>'CURRENT_TIMESTAMP'));
@@ -473,9 +473,9 @@ abstract class uTableDef implements iUtopiaModule {
 		uEvents::TriggerEvent('BeforeUpdateField',$this,array($fieldName,$newValue,&$pkVal,$fieldType));
 		//AjaxEcho('//'.str_replace("\n",'',get_class($this)."@UpdateField($fieldName,,$pkVal)\n"));
 		if ($fieldType === NULL) $fieldType = $this->fields[$fieldName]['type'];
-		
+
 		if (is_array($newValue)) $newValue = json_encode($newValue);
-		
+
 		if ($newValue) switch ($fieldType) {
 			case ftRAW: break;
 			case ftDATE:
@@ -507,7 +507,7 @@ abstract class uTableDef implements iUtopiaModule {
 			if (!$raw) $args[] = $newValue;
 			$args[] = $pkVal;
 		}
-		
+
 		database::query($query,$args);
 		if ($fieldName == $this->GetPrimaryKey() && $newValue !== NULL) {
 			// this allows us to get the real evaluated value of the new primary key
