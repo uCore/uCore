@@ -8,9 +8,9 @@ timer_end('Load Files');
 /**
  * Strip slashes from http inputs if magic quotes is enabled
  */
-if ($_POST && get_magic_quotes_gpc()) $_POST = utopia::stripslashes_deep($_POST);
-if ($_GET && get_magic_quotes_gpc()) $_GET = utopia::stripslashes_deep($_GET);
-if ($_REQUEST && get_magic_quotes_gpc()) $_REQUEST = utopia::stripslashes_deep($_REQUEST);
+$_POST = utopia::stripslashes_deep($_POST);
+$_GET = utopia::stripslashes_deep($_GET);
+$_REQUEST = utopia::stripslashes_deep($_REQUEST);
 
 ini_set('default_charset',CHARSET_ENCODING);
 header('Content-type: text/html; charset='.CHARSET_ENCODING);

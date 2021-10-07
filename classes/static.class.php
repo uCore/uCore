@@ -45,7 +45,7 @@ final class utopia
     {
       case 'uCMS_View':
         $currentPage = uCMS_View::findPage();
-        if($currentPage['is_home'] && isset(self::$children['']))
+        if($currentPage && $currentPage['is_home'] && isset(self::$children['']))
         {
           $baseModule = self::$children[''];
         }
@@ -2144,10 +2144,7 @@ final class utopia
     {
       parse_str($args, $args);
     }
-    if(get_magic_quotes_gpc())
-    {
-      $args = utopia::stripslashes_deep($args);
-    }
+    $args = utopia::stripslashes_deep($args);
 
     $page = isset($args[$pageKey]) ? $args[$pageKey] : 0;
     echo '<ul class="pagination">';
