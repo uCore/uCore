@@ -2461,7 +2461,7 @@ abstract class uDataModule extends uBasicModule {
 			$pkField = '__module_pk__';
 		else
 			$pkField = $this->GetPrimaryKey();
-		$fldId = $this->GetEncodedFieldName($fieldName,$row[$pkField]);
+		$fldId = $this->GetEncodedFieldName($fieldName,$row?$row[$pkField]:null);
 		$celldata = $this->GetCellData($fieldName,$row,$url,$inputTypeOverride,$valuesOverride);
 		return "<!-- NoProcess --><span class=\"$fldId\">$celldata</span><!-- /NoProcess -->";
 	}
