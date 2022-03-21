@@ -1092,8 +1092,8 @@ abstract class uDataModule extends uBasicModule {
 		$values = null;
 		if (!isset($this->fields[$alias])) {
 			$fltr =& $this->FindFilter($alias);
-			$values = $fltr['values'];
-			if (!is_array($values) && is_string($fltr['fieldName']) && isset($this->fields[$fltr['fieldName']])) $values = $this->GetValues($fltr['fieldName'],$pkVal,$stringify);
+			$values = $fltr ? $fltr['values'] : null;
+			if (!is_array($values) && $fltr && is_string($fltr['fieldName']) && isset($this->fields[$fltr['fieldName']])) $values = $this->GetValues($fltr['fieldName'],$pkVal,$stringify);
 		} else {
 			$values = $this->fields[$alias]['values'];
 		}
