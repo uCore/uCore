@@ -1104,7 +1104,7 @@ final class utopia
     uEvents::TriggerEvent('BeforeOutputTemplate');
     if(!self::UsingTemplate())
     {
-      ob_end_clean();
+      try{ob_end_clean();}catch(Exception $e){}
       echo utopia::GetVar('content');
       return;
     }
